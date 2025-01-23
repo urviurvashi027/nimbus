@@ -13,12 +13,13 @@ import { router, useNavigation, useRouter } from "expo-router";
 import { themeColors } from "@/constant/Colors";
 import { ScreenView, TextInput } from "@/components/Themed";
 import ThemeContext from "@/context/ThemeContext";
+import { useAuth } from "@/context/AuthContext";
 
 type ThemeKey = "basic" | "light" | "dark";
 
 export default function signUp() {
   const navigation = useNavigation();
-
+  const { onLogin, onRegister } = useAuth();
   const router = useRouter();
 
   const colorScheme = useColorScheme();
@@ -28,10 +29,11 @@ export default function signUp() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [fullName, setfullName] = useState<string>("");
+  const [username, setUsername] = useState<string>("");
   const [visible, setVisible] = useState(false);
 
   const onCreateAccount = () => {
-    if (!email && !password && !fullName) {
+    if (!email && !password && !fullName && !username) {
       if (Platform.OS != "android") {
         setVisible(true);
       } else {
@@ -43,7 +45,16 @@ export default function signUp() {
       return;
     }
 
+    onSignUpClick();
     // router.replace("/routine");
+  };
+
+  const onSignUpClick = async () => {
+    const result = await onRegister!(username, fullName, email, password);
+    if (result && result.success) router.replace("/(public)/signIn");
+    if (result && result.error) {
+      alert(result.msg);
+    }
   };
 
   useEffect(() => {
@@ -78,6 +89,21 @@ export default function signUp() {
           placeholder="Enter Full Name"
           placeholderTextColor="gray"
           onChangeText={(value) => setfullName(value)}
+        ></TextInput>
+      </View>
+
+      {/* UserName Name */}
+      <View
+        style={{
+          marginTop: 30,
+        }}
+      >
+        <Text style={styles.inputLabel}>User Name</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter User Name"
+          placeholderTextColor="gray"
+          onChangeText={(value) => setUsername(value)}
         ></TextInput>
       </View>
 

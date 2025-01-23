@@ -1,19 +1,51 @@
 import { ReactNode, createContext, useEffect } from "react";
 import { useContext, useState } from "react";
 import { router, useSegments } from "expo-router";
+import * as SecureStore from "expo-secure-store";
+import axios from "axios";
+import { login, signup, logout } from "@/service/loginService";
 
 type User = {
-  id: string;
-  username: string;
+  userId: number | null;
+  userName: string | null;
 };
 
-type AuthProvider = {
-  user: User | null;
-  login: (username: string, password: string) => boolean;
-  logout: () => void;
+// type AuthProvider = {
+//   user: User | null;
+//   login: (username: string, password: string) => boolean;
+//   logout: () => void;
+// };
+
+interface AuthProps {
+  authState?: { token: string | null; authenticated: boolean | null };
+  onRegister?: (
+    // test added optional paramter
+    email: string,
+    password: string,
+    username?: string,
+    fullname?: string
+  ) => Promise<any>;
+  onLogin?: (userName: string, password: string) => Promise<any>;
+  onLogout?: () => Promise<any>;
+  user?: User;
+}
+
+export const URL =
+  "https://6b1c-2401-4900-1cb9-115b-8c7e-beed-330c-35dd.ngrok-free.app/auth";
+const AuthContext = createContext<AuthProps>({});
+
+export const useAuth = () => {
+  if (!useContext(AuthContext)) {
+    throw new Error("useAuth must be used within a <AuthProvider />");
+  }
+
+  return useContext(AuthContext);
 };
 
-function useProtectedRoute(user: User | null) {
+function useProtectedRoute(authState: {
+  token: string | null;
+  authenticated: boolean | null;
+}) {
   const segments = useSegments();
 
   useEffect(() => {
@@ -21,53 +53,180 @@ function useProtectedRoute(user: User | null) {
 
     const inAuthGroup = segments[0] === "(auth)";
 
-    console.log(inAuthGroup, user, "from auth group");
+    console.log(inAuthGroup, authState, "from auth group");
 
-    if (!user && inAuthGroup) {
+    if (!authState.authenticated && inAuthGroup) {
       router.replace("/login");
-    } else if (user && !inAuthGroup) {
-      console.log("coming here again");
+    } else if (authState.authenticated && !inAuthGroup) {
       router.replace("/(auth)/(tabs)");
+    } else {
+      console.log("coming in else part");
+      router.replace("/login");
     }
-  }, [user]);
+  }, [authState.authenticated]);
 }
 
-export const AuthContext = createContext<AuthProvider>({
-  user: null,
-  login: () => false,
-  logout: () => {},
-});
-
-export function useAuth() {
-  if (!useContext(AuthContext)) {
-    throw new Error("useAuth must be used within a <AuthProvider />");
-  }
-
-  return useContext(AuthContext);
-}
-
+const TOKEN_KEY = "my-jwt";
+const USER_KEY = "user";
+const REFRESH_TOKEN = "refresh-token";
 export default function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<{
+    userId: number | null;
+    userName: string | null;
+  }>({ userId: null, userName: null });
 
-  const login = (username: string, password: string) => {
-    console.log("login", username, password);
-    setUser({
-      id: "1",
-      username: username,
-    });
+  const [authState, setAuthState] = useState<{
+    token: string | null;
+    authenticated: boolean | null;
+  }>({ token: null, authenticated: false });
 
-    return true;
+  useEffect(() => {
+    const loadToken = async () => {
+      await SecureStore.deleteItemAsync(TOKEN_KEY);
+      // await SecureStore.deleteItemAsync(TOKEN_KEY);
+      const token = await SecureStore.getItem(TOKEN_KEY);
+      const userInfo = await SecureStore.getItem(USER_KEY);
+
+      console.log("Auth Context File: 1# Use Effect --> stored token", token);
+      if (token) {
+        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+        setAuthState({
+          token: token,
+          authenticated: true,
+        });
+        const userData = JSON.parse(JSON.stringify(userInfo));
+        setUser(userData);
+      }
+    };
+    loadToken();
+  }, []);
+
+  // test added optional paramter
+  const _register = async (
+    userName: string,
+    fullName: string,
+    email?: string,
+    password?: string
+  ) => {
+    try {
+      const request = {
+        username: userName,
+        email,
+        full_name: fullName,
+        password,
+      };
+      return await signup(request);
+      // return await axios.post(`${URL}/register/`, { email, password });
+    } catch (e) {
+      console.log(`Auth Context File: 2# register ---> error ${e}`);
+      return { error: true, msg: (e as any).response.data.msg };
+    }
   };
 
-  const logout = () => {
-    setUser(null);
+  const _login = async (userName: string, password: string) => {
+    console.log(userName, password);
+    try {
+      const request = {
+        username: userName,
+        password: password,
+      };
+
+      const result = await login(request);
+
+      console.log(`file auth context:: login result---->`, result.data);
+
+      // const result = {
+      //   data: {
+      //     token: "kjshdkjgfkjdsgfjksgdkjfsgdjg",
+      //   },
+      // };
+
+      const { success, message, data } = result;
+
+      if (success) {
+        const { username, email, id, ...tokens } = data; // Destructuring user details separately
+        const userInfo = {
+          userId: id,
+          userName: username,
+        };
+        setAuthState({
+          token: tokens.access,
+          authenticated: true,
+        });
+
+        setUser(userInfo);
+
+        // Optionally, save tokens to AsyncStorage
+
+        axios.defaults.headers.common[
+          "Authorization"
+        ] = `Bearer ${tokens.access}`;
+
+        await SecureStore.setItemAsync(TOKEN_KEY, tokens.access);
+
+        await SecureStore.setItemAsync(REFRESH_TOKEN, tokens.refresh);
+
+        await SecureStore.setItemAsync(USER_KEY, JSON.stringify(userInfo));
+      } else {
+        console.error("Login failed:", message);
+      }
+
+      return result;
+    } catch (e) {
+      console.log(`Auth Context File: 2# login ----> error ${e}`);
+      return { error: true, msg: (e as any).response.data.msg };
+    }
   };
 
-  useProtectedRoute(user);
+  // const login = (username: string, password: string) => {
+  //   console.log("login", username, password);
+  //   setUser({
+  //     id: "1",
+  //     username: username,
+  //   });
 
-  return (
-    <AuthContext.Provider value={{ user, login, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  //   return true;
+  // };
+
+  const _logout = async () => {
+    console.log("logout called");
+    const ref = await SecureStore.getItem(REFRESH_TOKEN);
+    try {
+      const request = {
+        refresh: ref ?? "",
+      };
+
+      const result = await logout(request);
+
+      if (result.success && result.message) {
+        await SecureStore.setItemAsync(TOKEN_KEY, "");
+        axios.defaults.headers.common["Authorization"] = "";
+        await SecureStore.setItemAsync(USER_KEY, "");
+        await SecureStore.setItemAsync(REFRESH_TOKEN, "");
+        setUser({ userId: null, userName: null });
+        setAuthState({
+          authenticated: false,
+          token: null,
+        });
+      }
+    } catch (e) {}
+  };
+
+  const value = {
+    onRegister: _register,
+    onLogin: _login,
+    onLogout: _logout,
+    user,
+    authState,
+  };
+
+  useProtectedRoute(authState);
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+
+  // return (
+  //   <AuthContext.Provider value={{ user, login, logout }}>
+  //     {children}
+  //   </AuthContext.Provider>
+  // );
 }

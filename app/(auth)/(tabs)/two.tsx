@@ -10,33 +10,42 @@ import { useAuth } from "@/context/AuthContext";
 import { useContext, useEffect } from "react";
 import ThemeContext from "@/context/ThemeContext";
 import { themeColors } from "@/constant/Colors";
+import { router } from "expo-router";
 
 type ThemeKey = "basic" | "light" | "dark";
 
 export default function TabTwoScreen() {
-  const { user, logout } = useAuth();
+  const { authState, onLogout, user } = useAuth();
 
   const colorScheme = useColorScheme();
 
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
 
   useEffect(() => {
-    console.log("two", user);
+    console.log("two", authState?.authenticated);
   }, []);
 
   useEffect(() => {
     console.log(theme, "dicover theme");
   }, [theme]);
 
-  if (!user) return <Text>Loading...</Text>;
+  const onLogoutClick = async () => {
+    const result = await onLogout!();
+    if (result && result.success) console.log("logout is successful");
+    if (result && result.error) {
+      alert(result.msg);
+    }
+  };
+
+  if (!authState?.authenticated) return <Text>Loading...</Text>;
 
   const styles = styling(theme);
 
   return (
     <View className="flex-1 flex flex-col justify-center px-4 items-center">
       <Text>Account</Text>
-      <Text>{user?.username || "No username"}</Text>
-      <Button title="Log out" onPress={logout} />
+      <Text>{user?.userName || "No username"}</Text>
+      <Button title="Log out" onPress={onLogoutClick} />
       <View style={styles.container}>
         <Text style={styles.text}>Current Theme: {theme}</Text>
         <Text style={styles.text}>System Theme: {colorScheme}</Text>

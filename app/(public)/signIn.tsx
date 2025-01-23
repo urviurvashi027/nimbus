@@ -15,7 +15,7 @@ export default function signIn() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const { login } = useAuth();
+  const { onLogin, onRegister } = useAuth();
 
   const navigation = useNavigation();
 
@@ -37,10 +37,18 @@ export default function signIn() {
 
   const styles = styling(theme);
 
+  const onLoginClick = async () => {
+    const result = await onLogin!(username, password);
+    if (result && result.success) router.replace("/(auth)/(tabs)");
+    if (result && result.error) {
+      alert(result.msg);
+    }
+  };
+
   const _login = (username: string, password: string) => {
     if (username === "" || password === "")
       Alert.alert("Error", "Please enter a username and password");
-    else login(username, password);
+    else onLoginClick();
   };
 
   return (
