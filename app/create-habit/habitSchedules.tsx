@@ -14,7 +14,6 @@ export default function HabitMetric() {
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
 
   useEffect(() => {
-    console.log(navigation);
     navigation.setOptions({
       headerShown: true,
       // headerStyle: {

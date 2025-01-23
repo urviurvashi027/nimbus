@@ -44,27 +44,6 @@ export default function TabOneScreen() {
         <View style={styles.taskListContainer}>
           <HabitList data={tasks} />
         </View>
-
-        {/* <TouchableOpacity
-          onPress={onContinueClick}
-          // onPress={() => router.push("/create-habit/habitBasic")}
-          style={{
-            backgroundColor: "blue",
-            padding: 25,
-            borderRadius: 15,
-            marginTop: 20,
-          }}
-        >
-          <Text
-            style={{
-              textAlign: "center",
-              color: "white",
-              fontSize: 17,
-            }}
-          >
-            Continuee
-          </Text>
-        </TouchableOpacity> */}
       </GestureHandlerRootView>
       <TouchableOpacity style={styles.floatingButton} onPress={onContinueClick}>
         <Ionicons name="add" size={24} color="white" />

@@ -15,8 +15,6 @@ export default function HabitBasic() {
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
 
   useEffect(() => {
-    // console.log(navigation);
-    console.log("navigated");
     navigation.setOptions({
       headerShown: true,
       // headerStyle: {
