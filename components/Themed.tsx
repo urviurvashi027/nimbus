@@ -7,6 +7,7 @@ import {
   Text as DefaultText,
   View as DefaultView,
   TextInput as DefaultTextInput,
+  TouchableOpacity,
 } from "react-native";
 
 import Colors from "@/constant/Colors";
@@ -52,6 +53,24 @@ export function View(props: ViewProps) {
 
   return <DefaultView style={[{ backgroundColor }, style]} {...otherProps} />;
 }
+
+export const Button = ({
+  title,
+  onPress,
+  style,
+  textStyle,
+}: {
+  title: string;
+  onPress: () => void;
+  style?: any;
+  textStyle?: any;
+}) => {
+  return (
+    <TouchableOpacity onPress={onPress} style={[style]}>
+      <Text style={[textStyle]}>{title}</Text>
+    </TouchableOpacity>
+  );
+};
 
 export function LargeButton() {}
 

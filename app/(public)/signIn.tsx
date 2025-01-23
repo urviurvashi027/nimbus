@@ -8,6 +8,7 @@ import Colors, { primaryColor, themeColors } from "@/constant/Colors";
 import SegmentedButton from "@/components/segmentedButton";
 import { router, useNavigation } from "expo-router";
 import ThemeContext from "@/context/ThemeContext";
+import { Button } from "@/components/Themed";
 
 type ThemeKey = "basic" | "light" | "dark";
 
@@ -89,24 +90,6 @@ export default function signIn() {
     </ScreenView>
   );
 }
-
-const Button = ({
-  title,
-  onPress,
-  style,
-  textStyle,
-}: {
-  title: string;
-  onPress: () => void;
-  style?: any;
-  textStyle?: any;
-}) => {
-  return (
-    <TouchableOpacity onPress={onPress} style={[style]}>
-      <Text style={[textStyle]}>{title}</Text>
-    </TouchableOpacity>
-  );
-};
 
 const styling = (theme: ThemeKey) =>
   StyleSheet.create({

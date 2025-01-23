@@ -8,16 +8,16 @@ import SegmentedButton from "@/components/segmentedButton";
 import { router } from "expo-router";
 
 export default function login() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  // const [username, setUsername] = useState("");
+  // const [password, setPassword] = useState("");
 
-  const { login } = useAuth();
+  // const { login } = useAuth();
 
-  const _login = (username: string, password: string) => {
-    if (username === "" || password === "")
-      Alert.alert("Error", "Please enter a username and password");
-    else login(username, password);
-  };
+  // const _login = (username: string, password: string) => {
+  //   if (username === "" || password === "")
+  //     Alert.alert("Error", "Please enter a username and password");
+  //   else login(username, password);
+  // };
 
   const firstBtnSegmentBtnClick = () => {
     console.log(`firstSegmentBtnClick is clicked`);
@@ -87,12 +87,8 @@ const Button = ({
   style?: any;
 }) => {
   return (
-    <TouchableOpacity
-      onPress={onPress}
-      style={[style]}
-      className={`bg-blue-500 rounded-xl px-2 py-3`}
-    >
-      <Text className="text-white text-center">{title}</Text>
+    <TouchableOpacity onPress={onPress} style={[style]}>
+      <Text>{title}</Text>
     </TouchableOpacity>
   );
 };
