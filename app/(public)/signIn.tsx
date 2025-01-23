@@ -32,14 +32,15 @@ export default function signIn() {
     });
   }, [navigation]);
 
-  useEffect(() => {
-    console.log(theme, "dicover theme");
-  }, [theme]);
+  // useEffect(() => {
+  //   console.log(theme, "dicover theme");
+  // }, [theme]);
 
   const styles = styling(theme);
 
   const onLoginClick = async () => {
     const result = await onLogin!(username, password);
+    console.log("result", result);
     if (result && result.success) router.replace("/(auth)/(tabs)");
     if (result && result.error) {
       alert(result.msg);
@@ -47,6 +48,7 @@ export default function signIn() {
   };
 
   const _login = (username: string, password: string) => {
+    console.log("");
     if (username === "" || password === "")
       Alert.alert("Error", "Please enter a username and password");
     else onLoginClick();

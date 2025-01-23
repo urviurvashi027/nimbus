@@ -14,7 +14,6 @@ type ThemeKey = "basic" | "light" | "dark";
 
 export default function TabOneScreen() {
   const onContinueClick = () => {
-    console.log("pushed");
     router.push("/create-habit/habitBasic");
   };
 
@@ -27,12 +26,12 @@ export default function TabOneScreen() {
   const styles = styling(theme);
 
   useEffect(() => {
-    console.log(theme, "dicover theme");
+    // console.log(theme, "dicover theme");
   }, [theme]);
 
   // function to be called whenever date changes
   const onDateChange = (val: any) => {
-    console.log(val, "value of changed date from index");
+    // console.log(val, "value of changed date from index");
   };
 
   return (

@@ -57,9 +57,9 @@ export default function signUp() {
     }
   };
 
-  useEffect(() => {
-    console.log(theme, "dicover theme");
-  }, [theme]);
+  // useEffect(() => {
+  //   console.log(theme, "dicover theme");
+  // }, [theme]);
 
   const styles = styling(theme);
 

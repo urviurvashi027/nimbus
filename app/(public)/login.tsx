@@ -20,12 +20,12 @@ export default function login() {
   // };
 
   const firstBtnSegmentBtnClick = () => {
-    console.log(`firstSegmentBtnClick is clicked`);
+    // console.log(`firstSegmentBtnClick is clicked`);
     router.push("/(public)/signUp");
   };
 
   const secondBtnSegmentBtnClick = () => {
-    console.log(`secondBtnSegmentBtnClick is clicked`);
+    // console.log(`secondBtnSegmentBtnClick is clicked`);
     router.push("/(public)/signIn");
   };
 
