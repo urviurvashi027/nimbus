@@ -1,15 +1,13 @@
-import React, { useState, Dispatch, SetStateAction } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Modal,
-  TextInput,
-  TouchableOpacity,
-} from "react-native";
+import React, { useState, Dispatch, SetStateAction, useContext } from "react";
+import { View, StyleSheet, Modal, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { FormInput, Text } from "../Themed";
 import DropDownPicker from "react-native-dropdown-picker";
+import ThemeContext from "@/context/ThemeContext";
+import { themeColors } from "@/constant/Colors";
 // import { Button } from 'react-native-paper'; // Import Button for segmented control
+
+type ThemeKey = "basic" | "light" | "dark";
 
 export type MetricFormat = {
   target: string;
@@ -74,6 +72,9 @@ const HabitMetricModal: React.FC<HabitMetricModalProps> = ({
     onClose();
   };
 
+  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const styles = styling(theme);
+
   const findLabel = (value: number | null) =>
     units.find((item) => item.value === value);
 
@@ -89,19 +90,25 @@ const HabitMetricModal: React.FC<HabitMetricModalProps> = ({
           <View style={styles.header}>
             <Text style={styles.title}>Select Habit Metric</Text>
             <TouchableOpacity onPress={onClose}>
-              <Ionicons name="close" size={24} color="#333" />
+              <Ionicons
+                name="close"
+                size={24}
+                color={themeColors[theme].text}
+              />
             </TouchableOpacity>
           </View>
 
           {/* Input for Target Value */}
           <Text style={styles.label}>Target Value</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter target value"
-            value={target}
-            onChangeText={setTarget}
-            keyboardType="numeric"
-          />
+          <View style={styles.inputContainer}>
+            <FormInput
+              style={styles.input}
+              placeholder="Enter target value"
+              value={target}
+              onChangeText={setTarget}
+              keyboardType="numeric"
+            />
+          </View>
 
           {/* Dropdown for Unit Selection */}
           <Text style={styles.label}>Select Unit</Text>
@@ -110,27 +117,16 @@ const HabitMetricModal: React.FC<HabitMetricModalProps> = ({
             multiple={false}
             value={value}
             items={units}
+            style={styles.dropDown}
             setOpen={setOpen}
             setValue={setValue}
             setItems={setSelectedUnit}
+            textStyle={styles.item}
+            dropDownContainerStyle={{
+              backgroundColor: themeColors[theme].background,
+              borderColor: themeColors[theme].inpurBorderColor,
+            }}
           />
-
-          {/* Segmented Button for Frequency Selection */}
-          {/* <Text style={styles.label}>Select Frequency</Text>
-          <View style={styles.frequencyContainer}>
-            {frequencies.map((frequency) => (
-              <TouchableOpacity
-                key={frequency}
-                style={[
-                  styles.frequencyButton,
-                  selectedFrequency === frequency && styles.selectedFrequency,
-                ]}
-                onPress={() => setSelectedFrequency(frequency)}
-              >
-                <Text style={styles.frequencyText}>{frequency}</Text>
-              </TouchableOpacity>
-            ))}
-          </View> */}
 
           {/* Save Button */}
           <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
@@ -142,80 +138,70 @@ const HabitMetricModal: React.FC<HabitMetricModalProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContainer: {
-    width: "90%",
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 20,
-    maxHeight: "90%",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    padding: 10,
-    fontSize: 16,
-    color: "#333",
-    marginBottom: 10,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  label: {
-    fontSize: 16,
-    color: "#333",
-    marginBottom: 5,
-  },
-  segmentedControl: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginBottom: 20,
-  },
-  frequencyContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginBottom: 20,
-  },
-  frequencyButton: {
-    padding: 10,
-    borderRadius: 20,
-    backgroundColor: "#e0e0e0",
-  },
-  selectedFrequency: {
-    backgroundColor: "#007AFF",
-  },
-  frequencyText: {
-    color: "#333",
-  },
-  segmentedButton: {
-    flex: 1,
-    marginHorizontal: 5,
-  },
-  saveButton: {
-    backgroundColor: "#007AFF",
-    paddingVertical: 15,
-    borderRadius: 5,
-    alignItems: "center",
-  },
-  saveButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-});
+const styling = (theme: ThemeKey) =>
+  StyleSheet.create({
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(0,0,0,0.5)",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    modalContainer: {
+      width: "90%",
+      backgroundColor: themeColors[theme].background,
+      borderRadius: 10,
+      padding: 20,
+      maxHeight: "90%",
+    },
+    input: {
+      borderWidth: 1,
+      // borderColor: "#ccc",
+      borderRadius: 5,
+      padding: 10,
+      fontSize: 16,
+      // color: "#333",
+      marginBottom: 30,
+    },
+    inputContainer: {
+      marginBottom: 30,
+    },
+    header: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 20,
+    },
+    title: {
+      fontSize: 18,
+      fontWeight: "bold",
+      color: themeColors[theme].text,
+    },
+    label: {
+      fontSize: 16,
+      // color: "#333",
+      marginBottom: 5,
+    },
+    dropDown: {
+      backgroundColor: themeColors[theme].background,
+      borderColor: themeColors[theme].inpurBorderColor,
+      color: themeColors[theme].text,
+    },
+    saveButton: {
+      backgroundColor: themeColors[theme].primaryColor,
+      paddingVertical: 15,
+      borderRadius: 5,
+      alignItems: "center",
+      marginTop: 20,
+    },
+    saveButtonText: {
+      color: themeColors[theme].text,
+      fontSize: 16,
+      fontWeight: "bold",
+    },
+    item: {
+      color: themeColors[theme].text,
+      borderColor: themeColors[theme].inpurBorderColor,
+    },
+  });
 
 export default HabitMetricModal;

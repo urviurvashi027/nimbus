@@ -1,6 +1,10 @@
-import React from "react";
+import React, { useContext } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Modal } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import ThemeContext from "@/context/ThemeContext";
+import { themeColors } from "@/constant/Colors";
+
+type ThemeKey = "basic" | "light" | "dark";
 
 interface TaskTypeModalProps {
   visible: boolean;
@@ -23,6 +27,10 @@ const TaskTypeModal: React.FC<TaskTypeModalProps> = ({
   onSelect,
 }) => {
   // console.log('TaskTypeModal', visible, onClose, onSelect);
+
+  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const styles = styling(theme);
+
   return (
     <Modal
       animationType="slide"
@@ -36,7 +44,11 @@ const TaskTypeModal: React.FC<TaskTypeModalProps> = ({
           <View style={styles.header}>
             <Text style={styles.title}>Select Task Type</Text>
             <TouchableOpacity onPress={onClose}>
-              <Ionicons name="close" size={24} color="#333" />
+              <Ionicons
+                name="close"
+                size={24}
+                color={themeColors[theme].text}
+              />
             </TouchableOpacity>
           </View>
 
@@ -62,45 +74,47 @@ const TaskTypeModal: React.FC<TaskTypeModalProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContainer: {
-    width: "80%",
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 20,
-    maxHeight: "80%",
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  listContainer: {
-    // Optional: Add any additional styling if needed
-  },
-  typeButton: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-  },
-  typeText: {
-    fontSize: 16,
-    color: "#333",
-  },
-});
+const styling = (theme: ThemeKey) =>
+  StyleSheet.create({
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(0,0,0,0.5)",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    modalContainer: {
+      width: "80%",
+      backgroundColor: themeColors[theme].background,
+      borderRadius: 10,
+      padding: 20,
+      maxHeight: "80%",
+    },
+    header: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 20,
+    },
+    title: {
+      fontSize: 18,
+      color: themeColors[theme].text,
+      fontWeight: "bold",
+    },
+    listContainer: {
+      // Optional: Add any additional styling if needed
+    },
+    typeButton: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingVertical: 15,
+      borderBottomWidth: 1,
+      borderBottomColor: themeColors[theme].divider,
+    },
+    typeText: {
+      fontSize: 16,
+      color: themeColors[theme].text,
+    },
+  });
 
 export default TaskTypeModal;

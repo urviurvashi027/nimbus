@@ -1,5 +1,6 @@
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, TouchableOpacity, StyleSheet } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
+import { Text } from "@/components/Themed";
 import { router, useNavigation } from "expo-router";
 import HabitContext from "@/context/HabitContext";
 import { Button, ScreenView } from "@/components/Themed";
@@ -40,6 +41,15 @@ export default function HabitMetric() {
       // },
       headerTransparent: true,
       headerTitle: "Habit Metric Details",
+      headerBackButtonDisplayMode: "minimal",
+      headerTitleAlign: "center",
+      headerTintColor: styles.header.color,
+      headerTitleStyle: {
+        fontSize: 18,
+        color: styles.header,
+        paddingTop: 5,
+        height: 40,
+      },
     });
   }, [navigation]);
 
@@ -87,7 +97,7 @@ export default function HabitMetric() {
   const styles = styling(theme);
   return (
     <ScreenView style={{ paddingTop: 75 }}>
-      <View>
+      <View style={styles.container}>
         {/* Habit Metric */}
         <Text style={styles.label}>Habit Metric</Text>
         {/* Habit Metric Button */}
@@ -169,8 +179,11 @@ export default function HabitMetric() {
 
 const styling = (theme: ThemeKey) =>
   StyleSheet.create({
+    header: {
+      color: themeColors[theme]?.text,
+    },
     container: {
-      marginTop: 60,
+      marginTop: 20,
     },
     btn: {
       marginTop: 60,
@@ -201,8 +214,8 @@ const styling = (theme: ThemeKey) =>
     // },
     label: {
       fontSize: 16,
-      color: "#333",
-      marginBottom: 5,
+      // color: "#333",
+      marginBottom: 10,
       marginTop: 10,
     },
     selectorButton: {
@@ -211,13 +224,13 @@ const styling = (theme: ThemeKey) =>
       alignItems: "center",
       paddingVertical: 12,
       borderWidth: 1,
-      borderColor: "#ccc",
+      borderColor: themeColors[theme].inpurBorderColor,
       borderRadius: 5,
       paddingHorizontal: 10,
       marginBottom: 10,
     },
     selectorText: {
       fontSize: 16,
-      color: "#333",
+      color: themeColors.basic.mediumGrey,
     },
   });

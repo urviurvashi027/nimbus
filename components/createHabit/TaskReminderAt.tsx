@@ -1,22 +1,26 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   View,
-  Text,
   StyleSheet,
   TouchableOpacity,
   Modal,
   Switch,
   Platform,
 } from "react-native";
+import { Text } from "../Themed";
 import { Ionicons } from "@expo/vector-icons";
 import { format } from "date-fns";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import ThemeContext from "@/context/ThemeContext";
+import { themeColors } from "@/constant/Colors";
 
 export type FormattedReminderAt = {
   timeDisplay: string;
   time: Date;
   isTenMinsBeforeEnabled: boolean;
 };
+
+type ThemeKey = "basic" | "light" | "dark";
 
 interface ReminderAtModalProps {
   visible: boolean;
@@ -69,8 +73,11 @@ const ReminderAtModal: React.FC<ReminderAtModalProps> = ({
 
   const onSpecifyValueChange = (value: boolean) => {
     setIsSpecified(value);
-    setShowStartTimePicker(true);
+    setShowStartTimePicker(value);
   };
+
+  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const styles = styling(theme);
 
   return (
     <Modal
@@ -85,17 +92,31 @@ const ReminderAtModal: React.FC<ReminderAtModalProps> = ({
           <View style={styles.header}>
             <Text style={styles.title}>Habit Reminder At</Text>
             <TouchableOpacity onPress={onClose}>
-              <Ionicons name="close" size={24} color="#333" />
+              <Ionicons
+                name="close"
+                size={24}
+                color={themeColors[theme].text}
+              />
             </TouchableOpacity>
+          </View>
+
+          <View style={styles.remiderAt}>
+            <Text style={styles.remiderAtText}>
+              Reminder At: {format(reminderAt, "hh:mm a")}
+            </Text>
           </View>
 
           {/* Toggle for Specified Time */}
           <View style={styles.toggleContainer}>
             <Text style={styles.label}>Specify Time</Text>
-            <Switch value={isSpecified} onValueChange={onSpecifyValueChange} />
-          </View>
-          <View>
-            <Text>reminder at :: {format(reminderAt, "hh:mm a")}</Text>
+            <Switch
+              value={isSpecified}
+              onValueChange={onSpecifyValueChange}
+              thumbColor={themeColors.basic.primaryColor}
+              trackColor={{
+                true: `${themeColors.basic.tertiaryColor}`,
+              }}
+            />
           </View>
           {showStartTimePicker && (
             <View style={styles.optionsContainer}>
@@ -125,7 +146,7 @@ const ReminderAtModal: React.FC<ReminderAtModalProps> = ({
                         : "radio-button-off"
                     }
                     size={20}
-                    color="#007AFF"
+                    color={themeColors.basic.tertiaryColor}
                   />
                   <Text style={styles.radioText}>At the event time</Text>
                 </TouchableOpacity>
@@ -141,7 +162,7 @@ const ReminderAtModal: React.FC<ReminderAtModalProps> = ({
                         : "radio-button-off"
                     }
                     size={20}
-                    color="#007AFF"
+                    color={themeColors.basic.tertiaryColor}
                   />
                   <Text style={styles.radioText}>10 minutes before</Text>
                 </TouchableOpacity>
@@ -162,91 +183,95 @@ const ReminderAtModal: React.FC<ReminderAtModalProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContainer: {
-    width: "90%",
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 20,
-    maxHeight: "90%",
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  toggleContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 16,
-    color: "#333",
-  },
-  optionsContainer: {
-    alignItems: "flex-start",
-    marginBottom: 20,
-  },
-  radioContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginBottom: 20,
-  },
-  radioButton: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  radioText: {
-    marginLeft: 2,
-    marginRight: 4,
-    fontSize: 14,
-    color: "#333",
-  },
-  // timePickerButton: {
-  //   flexDirection: 'row',
-  //   justifyContent: 'space-between',
-  //   alignItems: 'center',
-  //   paddingVertical: 12,
-  //   borderWidth: 1,
-  //   borderColor: '#ccc',
-  //   borderRadius: 5,
-  //   paddingHorizontal: 10,
-  //   marginBottom: 10,
-  // },
-  // timePickerText: {
-  //   fontSize: 16,
-  //   color: '#333',
-  // },
-  saveButton: {
-    backgroundColor: "#007AFF",
-    paddingVertical: 15,
-    borderRadius: 5,
-    alignItems: "center",
-  },
-  saveButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  errorText: {
-    color: "red",
-    marginTop: 5,
-    fontSize: 14,
-    textAlign: "center",
-  },
-});
+const styling = (theme: ThemeKey) =>
+  StyleSheet.create({
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(0,0,0,0.5)",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    modalContainer: {
+      width: "90%",
+      backgroundColor: themeColors[theme].background,
+      borderRadius: 10,
+      padding: 20,
+      maxHeight: "90%",
+    },
+    remiderAt: {
+      marginBottom: 20,
+    },
+    remiderAtText: { fontSize: 18, color: themeColors[theme].text },
+    header: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 20,
+    },
+    title: {
+      fontSize: 18,
+      fontWeight: "bold",
+      color: themeColors[theme].text,
+    },
+    toggleContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 20,
+    },
+    label: {
+      fontSize: 16,
+    },
+    optionsContainer: {
+      alignItems: "flex-start",
+      marginBottom: 20,
+    },
+    radioContainer: {
+      flexDirection: "row",
+      justifyContent: "space-around",
+      marginBottom: 20,
+    },
+    radioButton: {
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    radioText: {
+      marginLeft: 2,
+      marginRight: 4,
+      fontSize: 14,
+    },
+    // timePickerButton: {
+    //   flexDirection: 'row',
+    //   justifyContent: 'space-between',
+    //   alignItems: 'center',
+    //   paddingVertical: 12,
+    //   borderWidth: 1,
+    //   borderColor: '#ccc',
+    //   borderRadius: 5,
+    //   paddingHorizontal: 10,
+    //   marginBottom: 10,
+    // },
+    // timePickerText: {
+    //   fontSize: 16,
+    //   color: '#333',
+    // },
+    saveButton: {
+      backgroundColor: themeColors.basic.secondaryColor,
+      paddingVertical: 15,
+      borderRadius: 5,
+      alignItems: "center",
+    },
+    saveButtonText: {
+      color: themeColors[theme].text,
+      fontSize: 16,
+      fontWeight: "bold",
+    },
+    errorText: {
+      color: themeColors.basic.danger,
+      marginTop: 5,
+      fontSize: 14,
+      textAlign: "center",
+    },
+  });
 
 export default ReminderAtModal;

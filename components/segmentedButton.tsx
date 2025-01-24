@@ -1,11 +1,11 @@
 import {
   View,
-  Text,
   TouchableOpacity,
   StyleSheet,
   useColorScheme,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
+import { Text } from "./Themed";
 import { useThemeColor } from "./Themed";
 import ThemeContext from "@/context/ThemeContext";
 import { themeColors } from "@/constant/Colors";
@@ -92,10 +92,10 @@ const styling = (theme: ThemeKey) =>
       paddingVertical: 12,
       paddingHorizontal: 20,
       marginHorizontal: 10,
-      borderWidth: 2,
+      borderWidth: 1,
       borderColor: themeColors[theme]?.primaryColor,
       borderRadius: 8,
-      backgroundColor: "white",
+      backgroundColor: themeColors[theme]?.background,
       alignItems: "center",
     },
     activeButton: {

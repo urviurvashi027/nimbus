@@ -6,9 +6,11 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { format, startOfWeek, addDays, isSameDay } from "date-fns";
 import { useNavigation } from "expo-router";
+import ThemeContext from "@/context/ThemeContext";
+import { themeColors } from "@/constant/Colors";
 
 const daysOfWeek = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
 const MAX_WEEK = 52; // 1 year forward
@@ -25,6 +27,8 @@ interface DatePanelProps {
   onDateChange: any;
   //   getSelectedDate: any;
 }
+
+type ThemeKey = "basic" | "light" | "dark";
 
 export default function DatePanel(props: DatePanelProps) {
   const { onDateChange } = props;
@@ -59,6 +63,10 @@ export default function DatePanel(props: DatePanelProps) {
       animated: false,
     });
   };
+
+  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+
+  const styles = styling(theme);
 
   useEffect(() => {
     // After updating the currentWeek, set the selected date and reset FlatList to center position
@@ -108,7 +116,7 @@ export default function DatePanel(props: DatePanelProps) {
               style={[styles.dayContainer, isSelected && styles.selectedDay]}
               onPress={() => setSelectedDate(date)}
             >
-              <Text style={styles.dayText}>
+              <Text style={[styles.dayText, isSelected && styles.selectedText]}>
                 {daysOfWeek[date.getDay() === 0 ? 6 : date.getDay() - 1]}
               </Text>
               <View style={styles.dateCircle}>
@@ -147,84 +155,62 @@ export default function DatePanel(props: DatePanelProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  gestureContainer: {
-    flex: 1, // Ensures full screen coverage
-  },
-  container: {
-    flex: 4, // Covers the full available space
-    paddingTop: 16,
-    paddingHorizontal: 5,
-    paddingBottom: 16, // Adjust as needed for Safe Area
-    backgroundColor: "#fff",
-    position: "relative", // Establishes positioning context for the floating button
-  },
-  headerText: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 10, // Space between header and FlatList
-    // textAlign: 'center',
-  },
-  flatList: {
-    flex: 1,
-    // No additional styles needed
-  },
-  scrollContainer: {
-    // Add any necessary styles here if needed
-  },
-  weekContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    width: Dimensions.get("window").width,
-  },
-  dayContainer: {
-    alignItems: "center",
-    marginHorizontal: 8,
-    paddingVertical: 5, // Adjusted for better touchability
-    width: Dimensions.get("window").width / 7 - 16, // Ensure each day occupies equal width minus margins
-  },
-  selectedDay: {
-    backgroundColor: "#e0f7fa",
-    borderRadius: 20,
-  },
-  dayText: {
-    fontSize: 16,
-    fontWeight: "500",
-  },
-  dateCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#d3d3d3",
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 0, // No margin needed
-  },
-  dateText: {
-    fontSize: 16,
-  },
-  taskListContainer: {
-    flex: 12, // Takes up the remaining space
-    marginTop: 10, // 10px space between FlatList and TaskList
-  },
-  taskList: {
-    flex: 1,
-    paddingHorizontal: 0, // Aligns with container's horizontal padding
-  },
-  floatingButton: {
-    position: "absolute",
-    right: 20,
-    bottom: 20,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: "#007AFF",
-    justifyContent: "center",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.8,
-    shadowRadius: 2,
-    elevation: 5,
-  },
-});
+const styling = (theme: ThemeKey) =>
+  StyleSheet.create({
+    gestureContainer: {
+      flex: 1, // Ensures full screen coverage
+    },
+    container: {
+      paddingTop: 20,
+      paddingBottom: 16, // Adjust as needed for Safe Area
+      position: "relative", // Establishes positioning context for the floating button
+    },
+    headerText: {
+      fontSize: 24,
+      fontWeight: "bold",
+      color: themeColors[theme].text,
+      marginBottom: 10, // Space between header and FlatList
+    },
+    flatList: {
+      flex: 1,
+    },
+    scrollContainer: {
+      // Add any necessary styles here if needed
+    },
+    weekContainer: {
+      flexDirection: "row",
+      width: Dimensions.get("window").width,
+    },
+    dayContainer: {
+      alignItems: "center",
+      marginHorizontal: 8,
+      paddingVertical: 5, // Adjusted for better touchability
+      width: Dimensions.get("window").width / 7 - 16, // Ensure each day occupies equal width minus margins
+    },
+    selectedDay: {
+      backgroundColor: themeColors.basic.tertiaryColor,
+      borderRadius: 20,
+    },
+    selectedText: {
+      color: themeColors.basic.mediumGrey,
+    },
+    dayText: {
+      fontSize: 16,
+      fontWeight: "500",
+      marginBottom: 10,
+      color: themeColors[theme].text,
+    },
+    dateCircle: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: themeColors.basic.lightGrey,
+      justifyContent: "center",
+      alignItems: "center",
+      marginTop: 0, // No margin needed
+    },
+    dateText: {
+      color: themeColors.basic.darkGrey,
+      fontSize: 16,
+    },
+  });

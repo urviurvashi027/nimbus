@@ -30,8 +30,6 @@ interface AuthProps {
   user?: User;
 }
 
-export const URL =
-  "https://6b1c-2401-4900-1cb9-115b-8c7e-beed-330c-35dd.ngrok-free.app/auth";
 const AuthContext = createContext<AuthProps>({});
 
 export const useAuth = () => {

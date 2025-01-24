@@ -1,18 +1,12 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  TextInput,
-} from "react-native";
+import { View, TouchableOpacity, StyleSheet, TextInput } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { router, useNavigation } from "expo-router";
 import HabitContext from "@/context/HabitContext";
-import { Button, ScreenView } from "@/components/Themed";
+import { Button, FormInput, ScreenView } from "@/components/Themed";
 import ThemeContext from "@/context/ThemeContext";
 import { themeColors } from "@/constant/Colors";
 import { Ionicons } from "@expo/vector-icons";
-
+import { Text } from "@/components/Themed";
 import TaskTagsModal from "@/components/createHabit/TaskTagsModal";
 import TaskTypeModal from "@/components/createHabit/TaskTypeModal";
 
@@ -70,6 +64,15 @@ export default function HabitBasic() {
       // },
       headerTransparent: true,
       headerTitle: "Habit Basic Details",
+      headerBackButtonDisplayMode: "minimal",
+      headerTitleAlign: "center",
+      headerTintColor: styles.header.color,
+      headerTitleStyle: {
+        fontSize: 18,
+        color: styles.header,
+        paddingTop: 5,
+        height: 40,
+      },
     });
   }, [navigation]);
 
@@ -95,7 +98,7 @@ export default function HabitBasic() {
     <ScreenView style={{ paddingTop: 75 }}>
       <View>
         {/* Color Selection */}
-        <Text style={styles.label}>Select Color</Text>
+        {/* <Text style={styles.label}>Select Color</Text> */}
         <View style={styles.colorOptionsContainer}>
           {["red", "blue", "green", "yellow", "black"].map((color) => (
             <TouchableOpacity
@@ -116,8 +119,9 @@ export default function HabitBasic() {
 
         {/* Task Name */}
         <Text style={styles.label}>Task Name</Text>
-        <TextInput
+        <FormInput
           style={styles.input}
+          placeholderTextColor={themeColors.basic.mediumGrey}
           placeholder="Enter task name"
           value={taskName}
           onChangeText={setTaskName}
@@ -187,6 +191,9 @@ export default function HabitBasic() {
 
 const styling = (theme: ThemeKey) =>
   StyleSheet.create({
+    header: {
+      color: themeColors[theme]?.text,
+    },
     container: {
       marginTop: 60,
     },
@@ -202,12 +209,6 @@ const styling = (theme: ThemeKey) =>
       fontWeight: 800,
       fontSize: 18,
     },
-    // input: {
-    //   padding: 15,
-    //   borderWidth: 1,
-    //   borderRadius: 15,
-    //   borderColor: themeColors.basic.GRAY,
-    // },
     input: {
       borderWidth: 1,
       borderColor: "#ccc",
@@ -216,13 +217,13 @@ const styling = (theme: ThemeKey) =>
       fontSize: 16,
       color: "#333",
     },
-    inputLabel: {
-      marginBottom: 10,
-    },
+    // inputLabel: {
+    //   marginBottom: 10,
+    // },
     label: {
       fontSize: 16,
-      color: "#333",
-      marginBottom: 5,
+      // color: "#333",
+      marginBottom: 10,
       marginTop: 10,
     },
     colorCircle: {
@@ -241,6 +242,7 @@ const styling = (theme: ThemeKey) =>
       flexDirection: "row",
       justifyContent: "space-between",
       marginBottom: 20,
+      paddingTop: 30,
     },
     selectorButton: {
       flexDirection: "row",
@@ -248,14 +250,14 @@ const styling = (theme: ThemeKey) =>
       alignItems: "center",
       paddingVertical: 12,
       borderWidth: 1,
-      borderColor: "#ccc",
+      borderColor: themeColors[theme].inpurBorderColor,
       borderRadius: 5,
       paddingHorizontal: 10,
       marginBottom: 10,
     },
     selectorText: {
-      fontSize: 16,
-      color: "#333",
+      fontSize: 14,
+      color: themeColors.basic.mediumGrey,
     },
     tagsContainer: {
       flexDirection: "row",

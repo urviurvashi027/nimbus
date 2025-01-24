@@ -32,6 +32,24 @@ export default function signUp() {
   const [username, setUsername] = useState<string>("");
   const [visible, setVisible] = useState(false);
 
+  useEffect(() => {
+    navigation.setOptions({
+      headerShown: true,
+      headerTransparent: true,
+      headerTitle: "Sign In",
+      headerBackButtonDisplayMode: "minimal",
+      headerTitleAlign: "center",
+      headerTintColor: styles.header.color,
+      headerTitleStyle: {
+        fontSize: 18,
+        color: styles.header,
+        paddingTop: 5,
+        // marginBottom: 20,
+        // height: 40,
+      },
+    });
+  }, [navigation]);
+
   const onCreateAccount = () => {
     if (!email && !password && !fullName && !username) {
       if (Platform.OS != "android") {
@@ -57,33 +75,19 @@ export default function signUp() {
     }
   };
 
-  // useEffect(() => {
-  //   console.log(theme, "dicover theme");
-  // }, [theme]);
-
   const styles = styling(theme);
 
   return (
-    <ScreenView
-    // style={{
-    //   padding: 25,
-    //   backgroundColor: themeColors.basic.WHITE,
-    //   height: "100%",
-    //   paddingTop: 40,
-    // }}
-    >
-      {/* <TouchableOpacity onPress={() => router.back()}>
-        <Ionicons name="arrow-back" size={24} color="black" />
-      </TouchableOpacity> */}
-      <Text style={styles.title}>Create An Account</Text>
+    <ScreenView style={styles.container}>
+      <View style={styles.titleContainer}>
+        <Text style={styles.title}>Create An Account</Text>
+      </View>
 
-      {/* Full Name */}
       <View
         style={{
           marginTop: 30,
         }}
       >
-        <Text style={styles.inputLabel}>Full Name</Text>
         <TextInput
           style={styles.input}
           placeholder="Enter Full Name"
@@ -92,13 +96,11 @@ export default function signUp() {
         ></TextInput>
       </View>
 
-      {/* UserName Name */}
       <View
         style={{
           marginTop: 30,
         }}
       >
-        <Text style={styles.inputLabel}>User Name</Text>
         <TextInput
           style={styles.input}
           placeholder="Enter User Name"
@@ -107,13 +109,11 @@ export default function signUp() {
         ></TextInput>
       </View>
 
-      {/* Email */}
       <View
         style={{
           marginTop: 30,
         }}
       >
-        <Text style={styles.inputLabel}>Email</Text>
         <TextInput
           style={styles.input}
           placeholder="Enter Email"
@@ -122,13 +122,11 @@ export default function signUp() {
         ></TextInput>
       </View>
 
-      {/* Password */}
       <View
         style={{
           marginTop: 30,
         }}
       >
-        <Text style={styles.inputLabel}>Password</Text>
         <TextInput
           secureTextEntry={true}
           placeholderTextColor="gray"
@@ -154,29 +152,29 @@ export default function signUp() {
         <Text style={styles.signBtnText}>Sign In</Text>
       </TouchableOpacity>
       {/* </View> */}
-
-      {/* Snackbar for error message */}
-      {/* <Snackbar
-        visible={visible}
-        onDismiss={() => setVisible(false)} // Dismiss Snackbar
-        action={{
-          label: "Close",
-          onPress: () => setVisible(false),
-        }}
-      >
-        "Please enter all the required fields",
-      </Snackbar> */}
     </ScreenView>
   );
 }
 
 const styling = (theme: ThemeKey) =>
   StyleSheet.create({
+    container: {
+      paddingTop: 95,
+    },
+    titleContainer: {
+      // justifyContent: "center",
+      // alignItems: "center",
+      justifyContent: "center", // Centers vertically
+      alignItems: "center",
+    },
     input: {
       padding: 15,
       borderWidth: 1,
       borderRadius: 15,
-      borderColor: themeColors.basic.GRAY,
+      // borderColor: themeColors.basic.GRAY,
+    },
+    header: {
+      color: themeColors[theme]?.text,
     },
     createButton: {
       padding: 15,
@@ -209,6 +207,7 @@ const styling = (theme: ThemeKey) =>
     placeholderColor: {},
     title: {
       color: themeColors[theme].text,
-      fontSize: 30,
+      fontSize: 25,
+      // alignContent: "center",
     },
   });

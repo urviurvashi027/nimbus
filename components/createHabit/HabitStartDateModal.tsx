@@ -1,15 +1,17 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   View,
-  Text,
   StyleSheet,
   Modal,
   Switch,
   TouchableOpacity,
 } from "react-native";
+import { Text } from "../Themed";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Ionicons } from "@expo/vector-icons";
 import { format } from "date-fns";
+import ThemeContext from "@/context/ThemeContext";
+import { themeColors } from "@/constant/Colors";
 
 export type parsedValue = {
   startDate: Date;
@@ -19,6 +21,8 @@ export type parsedValue = {
     endDate?: string;
   };
 };
+
+type ThemeKey = "basic" | "light" | "dark";
 
 interface StartTaskModalProps {
   visible: boolean;
@@ -65,6 +69,9 @@ const StartTaskModal: React.FC<StartTaskModalProps> = ({
     onClose();
   };
 
+  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const styles = styling(theme);
+
   return (
     <Modal
       animationType="slide"
@@ -77,7 +84,11 @@ const StartTaskModal: React.FC<StartTaskModalProps> = ({
           <View style={styles.header}>
             <Text style={styles.title}>Select Start Date</Text>
             <TouchableOpacity onPress={onClose}>
-              <Ionicons name="close" size={24} color="#333" />
+              <Ionicons
+                name="close"
+                size={24}
+                color={themeColors[theme].text}
+              />
             </TouchableOpacity>
           </View>
 
@@ -88,7 +99,11 @@ const StartTaskModal: React.FC<StartTaskModalProps> = ({
             <Text style={styles.datePickerText}>
               Start Date: {format(startDate, "dd MMMM yyyy")}
             </Text>
-            <Ionicons name="calendar-outline" size={24} color="#333" />
+            <Ionicons
+              name="calendar-outline"
+              size={24}
+              color={themeColors[theme].text}
+            />
           </TouchableOpacity>
 
           {showStartDatePicker && (
@@ -105,6 +120,10 @@ const StartTaskModal: React.FC<StartTaskModalProps> = ({
             <Text style={styles.label}>Set End Date</Text>
             <Switch
               value={isEndDateEnabled}
+              thumbColor={themeColors.basic.primaryColor}
+              trackColor={{
+                true: `${themeColors.basic.tertiaryColor}`,
+              }}
               onValueChange={(value) => {
                 setIsEndDateEnabled(value);
                 if (!value) {
@@ -126,7 +145,11 @@ const StartTaskModal: React.FC<StartTaskModalProps> = ({
                     ? format(endDate, "dd MMMM yyyy")
                     : "Select End Date"}
                 </Text>
-                <Ionicons name="calendar-outline" size={24} color="#333" />
+                <Ionicons
+                  name="calendar-outline"
+                  size={24}
+                  color={themeColors[theme].text}
+                />
               </TouchableOpacity>
 
               {showEndDatePicker && (
@@ -150,66 +173,67 @@ const StartTaskModal: React.FC<StartTaskModalProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContainer: {
-    width: "90%",
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 20,
-    maxHeight: "90%",
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  datePickerButton: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 12,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 10,
-  },
-  datePickerText: {
-    fontSize: 16,
-    color: "#333",
-  },
-  toggleContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 16,
-    color: "#333",
-  },
-  saveButton: {
-    backgroundColor: "#007AFF",
-    paddingVertical: 15,
-    borderRadius: 5,
-    alignItems: "center",
-  },
-  saveButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-});
+const styling = (theme: ThemeKey) =>
+  StyleSheet.create({
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(0,0,0,0.5)",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    modalContainer: {
+      width: "90%",
+      backgroundColor: themeColors[theme].background,
+      borderRadius: 10,
+      padding: 20,
+      maxHeight: "90%",
+    },
+    header: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 20,
+    },
+    title: {
+      fontSize: 18,
+      fontWeight: "bold",
+    },
+    datePickerButton: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingVertical: 12,
+      borderWidth: 1,
+      borderColor: themeColors[theme].inpurBorderColor,
+      borderRadius: 5,
+      paddingHorizontal: 10,
+      marginBottom: 10,
+    },
+    datePickerText: {
+      fontSize: 16,
+      color: themeColors[theme].text,
+    },
+    toggleContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 20,
+    },
+    label: {
+      fontSize: 16,
+      // color: "#333",
+    },
+    saveButton: {
+      backgroundColor: themeColors.basic.secondaryColor,
+      paddingVertical: 15,
+      borderRadius: 5,
+      alignItems: "center",
+    },
+    saveButtonText: {
+      color: themeColors[theme].text,
+      fontSize: 16,
+      fontWeight: "bold",
+    },
+  });
 
 export default StartTaskModal;

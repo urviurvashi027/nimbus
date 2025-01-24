@@ -1,14 +1,16 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   View,
-  Text,
   StyleSheet,
   Modal,
   TouchableOpacity,
   FlatList,
   TextInput,
 } from "react-native";
+import { FormInput, Text } from "../Themed";
 import { Ionicons } from "@expo/vector-icons";
+import ThemeContext from "@/context/ThemeContext";
+import { themeColors } from "@/constant/Colors";
 
 interface FrequencyModalProps {
   visible: boolean;
@@ -20,6 +22,8 @@ export type FormattedFrequency = {
   userDisplay: string;
   parsedFreq: ReminderOutput;
 };
+
+type ThemeKey = "basic" | "light" | "dark";
 
 export type Frequency =
   | { type: "Daily"; count: number }
@@ -197,6 +201,9 @@ const FrequencyModal: React.FC<FrequencyModalProps> = ({
     );
   };
 
+  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const styles = styling(theme);
+
   return (
     <Modal
       animationType="slide"
@@ -209,7 +216,11 @@ const FrequencyModal: React.FC<FrequencyModalProps> = ({
           <View style={styles.header}>
             <Text style={styles.title}>Select Frequency</Text>
             <TouchableOpacity onPress={onClose}>
-              <Ionicons name="close" size={24} color="#333" />
+              <Ionicons
+                name="close"
+                size={24}
+                color={themeColors[theme].text}
+              />
             </TouchableOpacity>
           </View>
 
@@ -235,7 +246,7 @@ const FrequencyModal: React.FC<FrequencyModalProps> = ({
           {selectedFrequency === "Daily" && (
             <View style={styles.inputContainer}>
               <Text style={styles.label}>Every</Text>
-              <TextInput
+              <FormInput
                 style={styles.input}
                 keyboardType="numeric"
                 value={dailyCount.toString()}
@@ -248,7 +259,7 @@ const FrequencyModal: React.FC<FrequencyModalProps> = ({
 
           {selectedFrequency === "Weekly" && (
             <View>
-              <Text style={styles.label}>Select Days:</Text>
+              <Text style={styles.inputLabel}>Select Days:</Text>
               <View style={styles.dayContainer}>
                 {daysOfWeek.map((day) => (
                   <TouchableOpacity
@@ -265,7 +276,7 @@ const FrequencyModal: React.FC<FrequencyModalProps> = ({
               </View>
               <View style={styles.inputContainer}>
                 <Text style={styles.label}>Every</Text>
-                <TextInput
+                <FormInput
                   style={styles.input}
                   keyboardType="numeric"
                   value={weeklyCount.toString()}
@@ -279,7 +290,7 @@ const FrequencyModal: React.FC<FrequencyModalProps> = ({
 
           {selectedFrequency === "Monthly" && (
             <View>
-              <Text style={styles.label}>Select Day:</Text>
+              <Text style={styles.inputLabel}>Select Day:</Text>
               <View style={styles.dayContainer}>
                 {Array.from({ length: 31 }, (_, i) => (
                   <TouchableOpacity
@@ -296,7 +307,7 @@ const FrequencyModal: React.FC<FrequencyModalProps> = ({
               </View>
               <View style={styles.inputContainer}>
                 <Text style={styles.label}>Every</Text>
-                <TextInput
+                <FormInput
                   style={styles.input}
                   keyboardType="numeric"
                   value={monthlyCount.toString()}
@@ -317,104 +328,107 @@ const FrequencyModal: React.FC<FrequencyModalProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContainer: {
-    width: "90%",
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 20,
-    maxHeight: "90%",
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  frequencyContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginBottom: 20,
-  },
-  pill: {
-    padding: 10,
-    borderRadius: 20,
-    backgroundColor: "#e0e0e0",
-  },
-  selectedPill: {
-    backgroundColor: "#007AFF",
-  },
-  pillText: {
-    color: "#333",
-  },
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 16,
-    color: "#333",
-    marginRight: 5,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    padding: 5,
-    width: 50,
-    textAlign: "center",
-  },
-  dayContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    marginBottom: 20,
-  },
-  dayPill: {
-    padding: 10,
-    borderRadius: 20,
-    backgroundColor: "#e0e0e0",
-    margin: 5,
-  },
-  selectedDayPill: {
-    backgroundColor: "#007AFF",
-  },
-  dayText: {
-    color: "#333",
-  },
-  monthDay: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: "#e0e0e0",
-    justifyContent: "center",
-    alignItems: "center",
-    margin: 5,
-  },
-  selectedMonthDay: {
-    backgroundColor: "#007AFF",
-  },
-  saveButton: {
-    backgroundColor: "#007AFF",
-    paddingVertical: 15,
-    borderRadius: 5,
-    alignItems: "center",
-  },
-  saveButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-});
+const styling = (theme: ThemeKey) =>
+  StyleSheet.create({
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(0,0,0,0.5)",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    modalContainer: {
+      width: "90%",
+      backgroundColor: themeColors[theme].background,
+      borderRadius: 10,
+      padding: 20,
+      maxHeight: "90%",
+    },
+    header: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 20,
+    },
+    title: {
+      fontSize: 18,
+      fontWeight: "bold",
+      color: themeColors[theme].text,
+    },
+    frequencyContainer: {
+      flexDirection: "row",
+      justifyContent: "space-around",
+      marginBottom: 20,
+    },
+    pill: {
+      padding: 10,
+      borderRadius: 20,
+      backgroundColor: themeColors.basic.lightGrey,
+    },
+    inputLabel: {},
+    selectedPill: {
+      backgroundColor: themeColors.basic.secondaryColor,
+    },
+    pillText: {
+      color: themeColors.basic.mediumGrey,
+    },
+    inputContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginBottom: 20,
+    },
+    label: {
+      fontSize: 16,
+      marginRight: 10,
+      marginLeft: 10,
+    },
+    input: {
+      borderWidth: 1,
+      borderRadius: 5,
+      padding: 5,
+      width: 50,
+      textAlign: "center",
+    },
+    dayContainer: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      marginBottom: 20,
+    },
+    dayPill: {
+      padding: 10,
+      borderRadius: 20,
+      backgroundColor: themeColors.basic.tertiaryColor,
+      margin: 5,
+    },
+    selectedDayPill: {
+      backgroundColor: themeColors.basic.secondaryColor,
+      // backgroundColor: "#007AFF",
+    },
+    dayText: {
+      color: themeColors.basic.mediumGrey,
+    },
+    monthDay: {
+      width: 30,
+      height: 30,
+      borderRadius: 15,
+      backgroundColor: themeColors.basic.tertiaryColor,
+      justifyContent: "center",
+      alignItems: "center",
+      margin: 5,
+    },
+    selectedMonthDay: {
+      backgroundColor: themeColors.basic.secondaryColor,
+    },
+    saveButton: {
+      backgroundColor: themeColors.basic.secondaryColor,
+      paddingVertical: 15,
+      borderRadius: 5,
+      alignItems: "center",
+    },
+    saveButtonText: {
+      color: themeColors[theme].text,
+      fontSize: 16,
+      fontWeight: "bold",
+    },
+  });
 
 export default FrequencyModal;

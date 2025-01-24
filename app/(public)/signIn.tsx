@@ -29,12 +29,17 @@ export default function signIn() {
       headerShown: true,
       headerTransparent: true,
       headerTitle: "Sign In",
+      headerBackButtonDisplayMode: "minimal",
+      headerTitleAlign: "center",
+      headerTintColor: styles.header.color,
+      headerTitleStyle: {
+        fontSize: 18,
+        color: styles.header,
+        paddingTop: 5,
+        height: 40,
+      },
     });
   }, [navigation]);
-
-  // useEffect(() => {
-  //   console.log(theme, "dicover theme");
-  // }, [theme]);
 
   const styles = styling(theme);
 
@@ -62,10 +67,10 @@ export default function signIn() {
           marginTop: 30,
         }}
       >
-        <Text style={styles.inputLabel}>Usernames</Text>
+        {/* <Text style={styles.inputLabel}>Usernames</Text> */}
         <TextInput
-          placeholder="username"
-          placeholderTextColor="gray"
+          placeholder="Username"
+          placeholderTextColor="#cfcac9"
           value={username}
           onChangeText={setUsername}
         />
@@ -75,11 +80,12 @@ export default function signIn() {
           marginTop: 30,
         }}
       >
-        <Text style={styles.inputLabel}>Password</Text>
+        {/* <Text style={styles.inputLabel}>Password</Text> */}
         <TextInput
-          placeholderTextColor="gray"
-          placeholder="password"
+          placeholderTextColor="#cfcac9"
+          placeholder="Password"
           value={password}
+          secureTextEntry={true}
           onChangeText={setPassword}
         />
       </View>
@@ -98,6 +104,9 @@ const styling = (theme: ThemeKey) =>
     container: {
       marginTop: 60,
     },
+    header: {
+      color: themeColors[theme]?.text,
+    },
     btn: {
       marginTop: 60,
       backgroundColor: themeColors[theme]?.primaryColor,
@@ -109,14 +118,5 @@ const styling = (theme: ThemeKey) =>
       color: themeColors[theme]?.text,
       fontWeight: 800,
       fontSize: 18,
-    },
-    input: {
-      padding: 15,
-      borderWidth: 1,
-      borderRadius: 15,
-      borderColor: themeColors.basic.GRAY,
-    },
-    inputLabel: {
-      marginBottom: 10,
     },
   });

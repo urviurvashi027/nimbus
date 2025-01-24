@@ -1,22 +1,25 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   View,
-  Text,
   StyleSheet,
   TouchableOpacity,
   Modal,
   Switch,
   Platform,
 } from "react-native";
+import { Text } from "../Themed";
 import { Ionicons } from "@expo/vector-icons";
 import { format } from "date-fns";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import ThemeContext from "@/context/ThemeContext";
+import { themeColors } from "@/constant/Colors";
 
 interface DurationModalProps {
   visible: boolean;
   onClose: () => void;
   onSave: (duration: Duration) => void;
 }
+type ThemeKey = "basic" | "light" | "dark";
 
 export type Duration =
   | { type: "All Day" }
@@ -48,6 +51,9 @@ const TaskModalDuration: React.FC<DurationModalProps> = ({
   const [showStartTimePicker, setShowStartTimePicker] = useState(false);
   const [showEndTimePicker, setShowEndTimePicker] = useState(false);
   const [error, setError] = useState("");
+
+  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const styles = styling(theme);
 
   const handleSave = () => {
     if (allDayEnabled) {
@@ -127,7 +133,11 @@ const TaskModalDuration: React.FC<DurationModalProps> = ({
           <View style={styles.header}>
             <Text style={styles.title}>Habit Duration</Text>
             <TouchableOpacity onPress={onClose}>
-              <Ionicons name="close" size={24} color="#333" />
+              <Ionicons
+                name="close"
+                size={24}
+                color={themeColors[theme].text}
+              />
             </TouchableOpacity>
           </View>
 
@@ -135,6 +145,10 @@ const TaskModalDuration: React.FC<DurationModalProps> = ({
           <View style={styles.toggleContainer}>
             <Text style={styles.label}>All Day</Text>
             <Switch
+              thumbColor={themeColors.basic.primaryColor}
+              trackColor={{
+                true: `${themeColors.basic.tertiaryColor}`,
+              }}
               value={allDayEnabled}
               onValueChange={(value) => setAllDayEnabled(value)}
             />
@@ -156,7 +170,7 @@ const TaskModalDuration: React.FC<DurationModalProps> = ({
                         : "radio-button-off"
                     }
                     size={20}
-                    color="#007AFF"
+                    color={themeColors.basic.tertiaryColor}
                   />
                   <Text style={styles.radioText}>Point Time</Text>
                 </TouchableOpacity>
@@ -172,7 +186,7 @@ const TaskModalDuration: React.FC<DurationModalProps> = ({
                         : "radio-button-off"
                     }
                     size={20}
-                    color="#007AFF"
+                    color={themeColors.basic.tertiaryColor}
                   />
                   <Text style={styles.radioText}>Time Period</Text>
                 </TouchableOpacity>
@@ -188,7 +202,11 @@ const TaskModalDuration: React.FC<DurationModalProps> = ({
                     <Text style={styles.timePickerText}>
                       {format(pointTime, "hh:mm a")}
                     </Text>
-                    <Ionicons name="time-outline" size={24} color="#333" />
+                    <Ionicons
+                      name="time-outline"
+                      size={24}
+                      color={themeColors[theme].text}
+                    />
                   </TouchableOpacity>
 
                   {showPointTimePicker && (
@@ -197,7 +215,13 @@ const TaskModalDuration: React.FC<DurationModalProps> = ({
                       mode="time"
                       is24Hour={false}
                       display="default"
+                      textColor="red"
                       onChange={handlePointTimeChange}
+                      style={
+                        {
+                          // backgroundColor: "lightgray", // Customize picker background
+                        }
+                      }
                     />
                   )}
                 </>
@@ -213,7 +237,11 @@ const TaskModalDuration: React.FC<DurationModalProps> = ({
                     <Text style={styles.timePickerText}>
                       From: {format(startTime, "hh:mm a")}
                     </Text>
-                    <Ionicons name="time-outline" size={24} color="#333" />
+                    <Ionicons
+                      name="time-outline"
+                      size={24}
+                      color={themeColors[theme].text}
+                    />
                   </TouchableOpacity>
 
                   {showStartTimePicker && (
@@ -233,7 +261,11 @@ const TaskModalDuration: React.FC<DurationModalProps> = ({
                     <Text style={styles.timePickerText}>
                       To: {format(endTime, "hh:mm a")}
                     </Text>
-                    <Ionicons name="time-outline" size={24} color="#333" />
+                    <Ionicons
+                      name="time-outline"
+                      size={24}
+                      color={themeColors[theme].text}
+                    />
                   </TouchableOpacity>
 
                   {showEndTimePicker && (
@@ -263,89 +295,90 @@ const TaskModalDuration: React.FC<DurationModalProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContainer: {
-    width: "90%",
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 20,
-    maxHeight: "90%",
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  toggleContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 16,
-    color: "#333",
-  },
-  optionsContainer: {
-    marginBottom: 20,
-  },
-  radioContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginBottom: 20,
-  },
-  radioButton: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  radioText: {
-    marginLeft: 8,
-    fontSize: 16,
-    color: "#333",
-  },
-  timePickerButton: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 12,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 10,
-  },
-  timePickerText: {
-    fontSize: 16,
-    color: "#333",
-  },
-  saveButton: {
-    backgroundColor: "#007AFF",
-    paddingVertical: 15,
-    borderRadius: 5,
-    alignItems: "center",
-  },
-  saveButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  errorText: {
-    color: "red",
-    marginTop: 5,
-    fontSize: 14,
-    textAlign: "center",
-  },
-});
+const styling = (theme: ThemeKey) =>
+  StyleSheet.create({
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(0,0,0,0.5)",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    modalContainer: {
+      width: "90%",
+      backgroundColor: themeColors[theme].background,
+      borderRadius: 10,
+      padding: 20,
+      maxHeight: "90%",
+    },
+    header: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 20,
+    },
+    title: {
+      fontSize: 18,
+      fontWeight: "bold",
+      color: themeColors[theme].text,
+    },
+    toggleContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 20,
+    },
+    label: {
+      fontSize: 16,
+    },
+    optionsContainer: {
+      marginBottom: 20,
+    },
+    radioContainer: {
+      flexDirection: "row",
+      justifyContent: "space-around",
+      marginBottom: 20,
+    },
+    radioButton: {
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    radioText: {
+      marginLeft: 8,
+      fontSize: 16,
+      color: themeColors[theme].text,
+    },
+    timePickerButton: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingVertical: 12,
+      borderWidth: 1,
+      borderColor: "#ccc",
+      borderRadius: 5,
+      paddingHorizontal: 10,
+      marginBottom: 10,
+    },
+    timePickerText: {
+      fontSize: 16,
+      color: themeColors[theme].text,
+    },
+    saveButton: {
+      backgroundColor: themeColors.basic.secondaryColor,
+      paddingVertical: 15,
+      borderRadius: 5,
+      alignItems: "center",
+    },
+    saveButtonText: {
+      color: themeColors[theme].text,
+      fontSize: 16,
+      fontWeight: "bold",
+    },
+    errorText: {
+      color: themeColors.basic.danger,
+      marginTop: 5,
+      fontSize: 14,
+      textAlign: "center",
+    },
+  });
 
 export default TaskModalDuration;

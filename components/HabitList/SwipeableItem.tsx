@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from "react-native";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Swipeable from "react-native-gesture-handler/ReanimatedSwipeable";
 import { HabitItemProps } from "./HabitList";
 import DeleteHabitModal from "../modal/deleteHabitModal";
@@ -10,30 +10,41 @@ import Animated, {
   runOnJS,
 } from "react-native-reanimated";
 import { deleteHabit } from "@/service/habitService";
+import { useNavigation } from "expo-router";
+import ThemeContext from "@/context/ThemeContext";
+import { themeColors } from "@/constant/Colors";
+import { Ionicons } from "@expo/vector-icons";
+
+type ThemeKey = "basic" | "light" | "dark";
 
 const SwipeableItem: React.FC<HabitItemProps> = ({ name, time, id, emoji }) => {
   const [showHabitActionModal, setshowHabitActionModal] = useState(false);
   const translateY = useSharedValue(0);
 
+  const navigation = useNavigation();
+
+  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+
+  const styles = styling(theme);
+
   const LeftSwipeActions = () => {
     return (
       <View
         style={{
-          // flex: 1,
-          backgroundColor: "#fa8973",
+          backgroundColor: themeColors[theme].background,
           justifyContent: "center",
           borderRadius: 12,
         }}
       >
         <Text
           style={{
-            color: "#fff",
+            color: themeColors.basic.danger,
             paddingHorizontal: 10,
             fontWeight: "600",
             padding: 20,
           }}
         >
-          Delete
+          <Ionicons name="trash-bin-outline" size={24} />
         </Text>
       </View>
     );
@@ -42,21 +53,20 @@ const SwipeableItem: React.FC<HabitItemProps> = ({ name, time, id, emoji }) => {
     return (
       <View
         style={{
-          backgroundColor: "#a4fcb6",
+          backgroundColor: themeColors[theme].background,
           justifyContent: "center",
           borderRadius: 12,
-          // alignItems: "flex-end",
         }}
       >
         <Text
           style={{
-            color: "#fff",
+            color: themeColors.basic.success,
             paddingHorizontal: 10,
             fontWeight: "600",
             padding: 20,
           }}
         >
-          Done
+          <Ionicons name="checkmark-done" size={24} />
         </Text>
       </View>
     );
@@ -68,7 +78,7 @@ const SwipeableItem: React.FC<HabitItemProps> = ({ name, time, id, emoji }) => {
   };
 
   const swipeFromLeftOpen = () => {
-    setshowHabitActionModal(true);
+    // setshowHabitActionModal(true);
     // alert("Swipe from left");
   };
   const swipeFromRightOpen = () => {
@@ -106,13 +116,6 @@ const SwipeableItem: React.FC<HabitItemProps> = ({ name, time, id, emoji }) => {
         </View>
       </Swipeable>
 
-      {/* <TaskModalDuration
-        visible={showHabitActionModal}
-        onClose={() => setshowHabitActionModal(false)}
-        onSave={deleteHabitClick}
-        // onSave={(selectedDuration: any) => setDuration(selectedDuration)}
-      /> */}
-
       {/* Task Type Modal */}
       <DeleteHabitModal
         visible={showHabitActionModal}
@@ -124,47 +127,48 @@ const SwipeableItem: React.FC<HabitItemProps> = ({ name, time, id, emoji }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#FFE4E1", // Light pink color
-    borderRadius: 10,
-    padding: 10,
-    marginBottom: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  emoji: {
-    fontSize: 24,
-    marginRight: 10,
-  },
-  textContainer: {
-    flex: 1,
-  },
-  taskName: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#333",
-  },
-  taskTime: {
-    fontSize: 14,
-    color: "#666",
-    marginTop: 2,
-  },
-  taskDone: {
-    textDecorationLine: "line-through",
-    color: "#999",
-  },
-  itemContainer: {
-    flexDirection: "row",
-    backgroundColor: "#98faf5",
-    padding: 15,
-    borderRadius: 12,
-  },
-});
+const styling = (theme: ThemeKey) =>
+  StyleSheet.create({
+    container: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: "#FFE4E1", // Light pink color
+      borderRadius: 10,
+      padding: 10,
+      marginBottom: 10,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.2,
+      shadowRadius: 2,
+      elevation: 2,
+    },
+    emoji: {
+      fontSize: 24,
+      marginRight: 10,
+    },
+    textContainer: {
+      flex: 1,
+    },
+    taskName: {
+      fontSize: 16,
+      fontWeight: "bold",
+      color: "#333",
+    },
+    taskTime: {
+      fontSize: 14,
+      color: "#666",
+      marginTop: 2,
+    },
+    taskDone: {
+      textDecorationLine: "line-through",
+      color: "#999",
+    },
+    itemContainer: {
+      flexDirection: "row",
+      backgroundColor: themeColors[theme].primaryColor,
+      padding: 15,
+      borderRadius: 12,
+    },
+  });
 
 export default SwipeableItem;
