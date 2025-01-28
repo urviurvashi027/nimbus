@@ -1,4 +1,10 @@
-import { View, TouchableOpacity, StyleSheet, TextInput } from "react-native";
+import {
+  View,
+  TouchableOpacity,
+  StyleSheet,
+  TextInput,
+  Platform,
+} from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { router, useNavigation } from "expo-router";
 import HabitContext from "@/context/HabitContext";
@@ -95,7 +101,11 @@ export default function HabitBasic() {
   };
 
   return (
-    <ScreenView style={{ paddingTop: 75 }}>
+    <ScreenView
+      style={{
+        paddingTop: Platform.OS === "ios" ? 80 : 20,
+      }}
+    >
       <View>
         {/* Color Selection */}
         {/* <Text style={styles.label}>Select Color</Text> */}

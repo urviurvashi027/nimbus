@@ -9,6 +9,7 @@ import {
   TextInput as DefaultTextInput,
   TouchableOpacity,
   StyleSheet,
+  Platform,
 } from "react-native";
 
 import Colors, { themeColors } from "@/constant/Colors";
@@ -100,6 +101,7 @@ export function ScreenView(props: ViewProps) {
   const { style, ...otherProps } = props;
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
   const styles = screenViewStyling(theme);
+  console.log(style, "screnview");
 
   return <DefaultView style={[style, styles.container]} {...otherProps} />;
 }
@@ -110,7 +112,7 @@ const screenViewStyling = (theme: ThemeKey) =>
       backgroundColor: themeColors[theme].background,
       padding: 15,
       height: "100%",
-      paddingTop: 80,
+      // paddingTop: Platform.OS === "ios" ? 50 : 20,
     },
   });
 

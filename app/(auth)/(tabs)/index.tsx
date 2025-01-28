@@ -1,4 +1,4 @@
-import { StyleSheet, TouchableOpacity } from "react-native";
+import { Platform, StyleSheet, TouchableOpacity } from "react-native";
 
 import { View, Text, ScreenView } from "@/components/Themed";
 import { router } from "expo-router";
@@ -32,7 +32,7 @@ export default function TabOneScreen() {
   };
 
   return (
-    <ScreenView>
+    <ScreenView style={{ paddingTop: Platform.OS === "ios" ? 50 : 20 }}>
       <GestureHandlerRootView style={styles.gestureContainer}>
         {/* Date Panel View */}
         <DatePanel onDateChange={onDateChange} />

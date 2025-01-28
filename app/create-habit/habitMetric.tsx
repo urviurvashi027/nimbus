@@ -1,4 +1,4 @@
-import { View, TouchableOpacity, StyleSheet } from "react-native";
+import { View, TouchableOpacity, StyleSheet, Platform } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { Text } from "@/components/Themed";
 import { router, useNavigation } from "expo-router";
@@ -53,9 +53,9 @@ export default function HabitMetric() {
     });
   }, [navigation]);
 
-  // useEffect(() => {
-  //   console.log(habitData, "habitData from metric");
-  // }, [habitData]);
+  useEffect(() => {
+    console.log(habitData, "habitData from metric");
+  }, [habitData]);
 
   // function to handle task duration
   const handleTaskDuration = (selectedDuration: any) => {
@@ -96,7 +96,11 @@ export default function HabitMetric() {
 
   const styles = styling(theme);
   return (
-    <ScreenView style={{ paddingTop: 75 }}>
+    <ScreenView
+      style={{
+        paddingTop: Platform.OS === "ios" ? 80 : 20,
+      }}
+    >
       <View style={styles.container}>
         {/* Habit Metric */}
         <Text style={styles.label}>Habit Metric</Text>

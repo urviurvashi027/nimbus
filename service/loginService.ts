@@ -9,7 +9,7 @@ import {
   LogoutResponse,
 } from "@/types/loginTypes";
 
-const BASE_URL = `https://cd71-2401-4900-1cb9-115b-51a9-38ec-68d6-8e9a.ngrok-free.app`;
+const BASE_URL = `https://51b2-2401-4900-1cb9-115b-4851-3479-9905-5a7f.ngrok-free.app`;
 
 export const API_ENDPOINTS = {
   login: `${BASE_URL}/auth/login/`,

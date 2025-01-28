@@ -13,6 +13,7 @@ import { format } from "date-fns";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import ThemeContext from "@/context/ThemeContext";
 import { themeColors } from "@/constant/Colors";
+import TimePicker from "../TimePicker";
 
 export type FormattedReminderAt = {
   timeDisplay: string;
@@ -63,9 +64,10 @@ const ReminderAtModal: React.FC<ReminderAtModalProps> = ({
     onClose();
   };
 
-  const handlePointTimeChange = (event: any, selectedDate?: Date) => {
-    // console.log('selectedDate', selectedDate);
-    setShowStartTimePicker(Platform.OS === "ios");
+  const handleTimeChange = (selectedDate: Date) => {
+    console.log(
+      `Reminder At Modal ${selectedDate} ${format(selectedDate, "hh:mm:a")}`
+    );
     if (selectedDate) {
       setReminderAt(selectedDate);
     }
@@ -119,15 +121,7 @@ const ReminderAtModal: React.FC<ReminderAtModalProps> = ({
             />
           </View>
           {showStartTimePicker && (
-            <View style={styles.optionsContainer}>
-              <DateTimePicker
-                value={reminderAt}
-                mode="time"
-                is24Hour={false}
-                display="default"
-                onChange={handlePointTimeChange}
-              />
-            </View>
+            <TimePicker onConfirmTime={handleTimeChange} label="Reminder At" />
           )}
 
           {/* Options when Specified Time is enabled */}

@@ -13,6 +13,7 @@ import { format } from "date-fns";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import ThemeContext from "@/context/ThemeContext";
 import { themeColors } from "@/constant/Colors";
+import TimePicker from "@/components/TimePicker";
 
 interface DurationModalProps {
   visible: boolean;
@@ -45,11 +46,9 @@ const TaskModalDuration: React.FC<DurationModalProps> = ({
     "Point Time"
   );
   const [pointTime, setPointTime] = useState<Date>(new Date());
-  const [showPointTimePicker, setShowPointTimePicker] = useState(false);
   const [startTime, setStartTime] = useState<Date>(new Date());
   const [endTime, setEndTime] = useState<Date>(new Date());
-  const [showStartTimePicker, setShowStartTimePicker] = useState(false);
-  const [showEndTimePicker, setShowEndTimePicker] = useState(false);
+
   const [error, setError] = useState("");
 
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
@@ -99,24 +98,33 @@ const TaskModalDuration: React.FC<DurationModalProps> = ({
     return timeString;
   };
 
-  const handlePointTimeChange = (event: any, selectedDate?: Date) => {
-    setShowPointTimePicker(Platform.OS === "ios");
-    if (selectedDate) {
-      setPointTime(selectedDate);
-    }
-  };
+  // const handlePointTimeChange = (event: any, selectedDate?: Date) => {
+  //   setShowPointTimePicker(Platform.OS === "ios");
+  //   if (selectedDate) {
+  //     setPointTime(selectedDate);
+  //   }
+  // };
 
-  const handleStartTimeChange = (event: any, selectedDate?: Date) => {
-    setShowStartTimePicker(Platform.OS === "ios");
+  const handleStartTimeChange = (selectedDate: Date) => {
+    // setShowStartTimePicker(Platform.OS === "ios");
     if (selectedDate) {
       setStartTime(selectedDate);
+      setError("");
     }
   };
 
-  const handleEndTimeChange = (event: any, selectedDate?: Date) => {
-    setShowEndTimePicker(Platform.OS === "ios");
+  const handleEndTimeChange = (selectedDate: Date) => {
+    // setShowEndTimePicker(Platform.OS === "ios");
     if (selectedDate) {
       setEndTime(selectedDate);
+      setError("");
+    }
+  };
+
+  const onPointTimeSelected = (selectedDate: Date) => {
+    if (selectedDate) {
+      setPointTime(selectedDate);
+      setError("");
     }
   };
 
@@ -194,89 +202,22 @@ const TaskModalDuration: React.FC<DurationModalProps> = ({
 
               {/* Time Picker for Point Time */}
               {selection === "Point Time" && (
-                <>
-                  <TouchableOpacity
-                    style={styles.timePickerButton}
-                    onPress={() => setShowPointTimePicker(true)}
-                  >
-                    <Text style={styles.timePickerText}>
-                      {format(pointTime, "hh:mm a")}
-                    </Text>
-                    <Ionicons
-                      name="time-outline"
-                      size={24}
-                      color={themeColors[theme].text}
-                    />
-                  </TouchableOpacity>
-
-                  {showPointTimePicker && (
-                    <DateTimePicker
-                      value={pointTime}
-                      mode="time"
-                      is24Hour={false}
-                      display="default"
-                      textColor="red"
-                      onChange={handlePointTimeChange}
-                      style={
-                        {
-                          // backgroundColor: "lightgray", // Customize picker background
-                        }
-                      }
-                    />
-                  )}
-                </>
+                <TimePicker
+                  onConfirmTime={onPointTimeSelected}
+                  label="Point of Time"
+                />
               )}
 
-              {/* Time Pickers for Time Period */}
               {selection === "Time Period" && (
                 <>
-                  <TouchableOpacity
-                    style={styles.timePickerButton}
-                    onPress={() => setShowStartTimePicker(true)}
-                  >
-                    <Text style={styles.timePickerText}>
-                      From: {format(startTime, "hh:mm a")}
-                    </Text>
-                    <Ionicons
-                      name="time-outline"
-                      size={24}
-                      color={themeColors[theme].text}
-                    />
-                  </TouchableOpacity>
-
-                  {showStartTimePicker && (
-                    <DateTimePicker
-                      value={startTime}
-                      mode="time"
-                      is24Hour={false}
-                      display="default"
-                      onChange={handleStartTimeChange}
-                    />
-                  )}
-
-                  <TouchableOpacity
-                    style={styles.timePickerButton}
-                    onPress={() => setShowEndTimePicker(true)}
-                  >
-                    <Text style={styles.timePickerText}>
-                      To: {format(endTime, "hh:mm a")}
-                    </Text>
-                    <Ionicons
-                      name="time-outline"
-                      size={24}
-                      color={themeColors[theme].text}
-                    />
-                  </TouchableOpacity>
-
-                  {showEndTimePicker && (
-                    <DateTimePicker
-                      value={endTime}
-                      mode="time"
-                      is24Hour={false}
-                      display="default"
-                      onChange={handleEndTimeChange}
-                    />
-                  )}
+                  <TimePicker
+                    onConfirmTime={handleStartTimeChange}
+                    label="Start Time"
+                  />
+                  <TimePicker
+                    onConfirmTime={handleEndTimeChange}
+                    label="End Time"
+                  />
                 </>
               )}
 

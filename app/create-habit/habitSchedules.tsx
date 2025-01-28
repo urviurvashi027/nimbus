@@ -1,4 +1,4 @@
-import { View, TouchableOpacity, StyleSheet } from "react-native";
+import { View, TouchableOpacity, StyleSheet, Platform } from "react-native";
 import { Text } from "@/components/Themed";
 import React, { useContext, useEffect, useState } from "react";
 import { router, useNavigation } from "expo-router";
@@ -85,7 +85,11 @@ export default function HabitMetric() {
   };
 
   return (
-    <ScreenView style={{ paddingTop: 75 }}>
+    <ScreenView
+      style={{
+        paddingTop: Platform.OS === "ios" ? 80 : 20,
+      }}
+    >
       <View style={styles.container}>
         <Text style={styles.label}>Habit Start Date</Text>
         <TouchableOpacity

@@ -7,11 +7,12 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Text } from "../Themed";
-import DateTimePicker from "@react-native-community/datetimepicker";
+// import DateTimePicker from "@react-native-community/datetimepicker";
 import { Ionicons } from "@expo/vector-icons";
 import { format } from "date-fns";
 import ThemeContext from "@/context/ThemeContext";
 import { themeColors } from "@/constant/Colors";
+import DatePicker from "../DatePicker";
 
 export type parsedValue = {
   startDate: Date;
@@ -36,20 +37,34 @@ const StartTaskModal: React.FC<StartTaskModalProps> = ({
   onSave,
 }) => {
   const [startDate, setStartDate] = useState<Date>(new Date());
-  const [showStartDatePicker, setShowStartDatePicker] = useState(false);
+  // const [showStartDatePicker, setShowStartDatePicker] = useState(false);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
-  const [showEndDatePicker, setShowEndDatePicker] = useState(false);
+  // const [showEndDatePicker, setShowEndDatePicker] = useState(false);
   const [isEndDateEnabled, setIsEndDateEnabled] = useState(false);
 
-  const handleStartDateChange = (event: any, selectedDate?: Date) => {
-    setShowStartDatePicker(false);
+  const handleStartDateChange = (selectedDate: Date) => {
+    // setShowStartDatePicker(false);
+
+    console.log(
+      `Selected Date End Date ${selectedDate} ${format(
+        selectedDate,
+        "dd MMMM yyyy"
+      )}`
+    );
+
     if (selectedDate) {
       setStartDate(selectedDate);
     }
   };
 
-  const handleEndDateChange = (event: any, selectedDate?: Date) => {
-    setShowEndDatePicker(false);
+  const handleEndDateChange = (selectedDate: Date) => {
+    // setShowEndDatePicker(false);
+    console.log(
+      `Selected Date End Date ${selectedDate} ${format(
+        selectedDate,
+        "dd MMMM yyyy"
+      )}`
+    );
     if (selectedDate) {
       setEndDate(selectedDate);
     }
@@ -92,7 +107,7 @@ const StartTaskModal: React.FC<StartTaskModalProps> = ({
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={styles.datePickerButton}
             onPress={() => setShowStartDatePicker(true)}
           >
@@ -104,9 +119,9 @@ const StartTaskModal: React.FC<StartTaskModalProps> = ({
               size={24}
               color={themeColors[theme].text}
             />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
-          {showStartDatePicker && (
+          {/* {showStartDatePicker && (
             <DateTimePicker
               value={startDate}
               mode="date"
@@ -114,7 +129,13 @@ const StartTaskModal: React.FC<StartTaskModalProps> = ({
               onChange={handleStartDateChange}
               minimumDate={new Date()} // Disable previous dates
             />
-          )}
+          )} */}
+
+          <DatePicker
+            onConfirmDate={handleStartDateChange}
+            label="Start Date"
+            minimumDate={new Date()}
+          ></DatePicker>
 
           <View style={styles.toggleContainer}>
             <Text style={styles.label}>Set End Date</Text>
@@ -135,7 +156,7 @@ const StartTaskModal: React.FC<StartTaskModalProps> = ({
 
           {isEndDateEnabled && (
             <>
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 style={styles.datePickerButton}
                 onPress={() => setShowEndDatePicker(true)}
               >
@@ -150,9 +171,9 @@ const StartTaskModal: React.FC<StartTaskModalProps> = ({
                   size={24}
                   color={themeColors[theme].text}
                 />
-              </TouchableOpacity>
+              </TouchableOpacity> */}
 
-              {showEndDatePicker && (
+              {/* {showEndDatePicker && (
                 <DateTimePicker
                   value={endDate || new Date()}
                   mode="date"
@@ -160,7 +181,13 @@ const StartTaskModal: React.FC<StartTaskModalProps> = ({
                   onChange={handleEndDateChange}
                   minimumDate={startDate} // End date must be after start date
                 />
-              )}
+              )} */}
+
+              <DatePicker
+                onConfirmDate={handleEndDateChange}
+                label="End Date"
+                minimumDate={startDate}
+              ></DatePicker>
             </>
           )}
 
