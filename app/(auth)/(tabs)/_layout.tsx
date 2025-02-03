@@ -2,7 +2,7 @@ import React from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, Tabs } from "expo-router";
 import { Pressable } from "react-native";
-
+import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constant/Colors";
 import { useColorScheme } from "@/components/UseColorScheme";
 
@@ -26,17 +26,39 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Tab One",
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          tabBarLabel: "Routine",
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="location-outline" size={24} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
-        name="two"
+        name="discover"
         options={{
-          title: "Tab Two",
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          tabBarLabel: "Discover",
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="globe-outline" size={24} color={color} />
+          ),
         }}
       />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          tabBarLabel: "Profile",
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="people-outline" size={24} color={color} />
+          ),
+        }}
+      ></Tabs.Screen>
+      <Tabs.Screen
+        name="setting"
+        options={{
+          tabBarLabel: "Setting",
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="people-outline" size={24} color={color} />
+          ),
+        }}
+      ></Tabs.Screen>
     </Tabs>
   );
 }

@@ -30,8 +30,6 @@ interface AuthProps {
   user?: User;
 }
 
-export const URL =
-  "https://6b1c-2401-4900-1cb9-115b-8c7e-beed-330c-35dd.ngrok-free.app/auth";
 const AuthContext = createContext<AuthProps>({});
 
 export const useAuth = () => {
@@ -53,14 +51,14 @@ function useProtectedRoute(authState: {
 
     const inAuthGroup = segments[0] === "(auth)";
 
-    console.log(inAuthGroup, authState, "from auth group");
+    // console.log(inAuthGroup, authState, "from auth group");
 
     if (!authState.authenticated && inAuthGroup) {
       router.replace("/login");
     } else if (authState.authenticated && !inAuthGroup) {
       router.replace("/(auth)/(tabs)");
     } else {
-      console.log("coming in else part");
+      // console.log("coming in else part");
       router.replace("/login");
     }
   }, [authState.authenticated]);
@@ -87,7 +85,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       const token = await SecureStore.getItem(TOKEN_KEY);
       const userInfo = await SecureStore.getItem(USER_KEY);
 
-      console.log("Auth Context File: 1# Use Effect --> stored token", token);
+      // console.log("Auth Context File: 1# Use Effect --> stored token", token);
       if (token) {
         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
         setAuthState({
@@ -118,13 +116,13 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       return await signup(request);
       // return await axios.post(`${URL}/register/`, { email, password });
     } catch (e) {
-      console.log(`Auth Context File: 2# register ---> error ${e}`);
+      // console.log(`Auth Context File: 2# register ---> error ${e}`);
       return { error: true, msg: (e as any).response.data.msg };
     }
   };
 
   const _login = async (userName: string, password: string) => {
-    console.log(userName, password);
+    // console.log(userName, password);
     try {
       const request = {
         username: userName,
@@ -133,7 +131,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
       const result = await login(request);
 
-      console.log(`file auth context:: login result---->`, result.data);
+      // console.log(`file auth context:: login result---->`, result.data);
 
       // const result = {
       //   data: {
@@ -173,7 +171,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
       return result;
     } catch (e) {
-      console.log(`Auth Context File: 2# login ----> error ${e}`);
+      // console.log(`Auth Context File: 2# login ----> error ${e}`);
       return { error: true, msg: (e as any).response.data.msg };
     }
   };
@@ -189,7 +187,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   // };
 
   const _logout = async () => {
-    console.log("logout called");
+    // console.log("logout called");
     const ref = await SecureStore.getItem(REFRESH_TOKEN);
     try {
       const request = {

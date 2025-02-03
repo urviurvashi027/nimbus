@@ -1,31 +1,16 @@
-import React, { useState } from "react";
+import React from "react";
 import { StyleSheet, Image } from "react-native";
-import { Text, View, TextInput, ScreenView } from "@/components/Themed";
-import { Alert, SafeAreaView, TouchableOpacity } from "react-native";
-import { useAuth } from "@/context/AuthContext";
-import Colors, { primaryColor } from "@/constant/Colors";
+import { View, ScreenView } from "@/components/Themed";
+import { SafeAreaView } from "react-native";
 import SegmentedButton from "@/components/segmentedButton";
 import { router } from "expo-router";
 
 export default function login() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-
-  const { login } = useAuth();
-
-  const _login = (username: string, password: string) => {
-    if (username === "" || password === "")
-      Alert.alert("Error", "Please enter a username and password");
-    else login(username, password);
-  };
-
   const firstBtnSegmentBtnClick = () => {
-    console.log(`firstSegmentBtnClick is clicked`);
     router.push("/(public)/signUp");
   };
 
   const secondBtnSegmentBtnClick = () => {
-    console.log(`secondBtnSegmentBtnClick is clicked`);
     router.push("/(public)/signIn");
   };
 
@@ -34,7 +19,7 @@ export default function login() {
       <ScreenView style={{ padding: 10, marginTop: 0 }}>
         <View style={styles.imageContainer}>
           <Image
-            source={require("@/assets/images/loginNew.jpg")}
+            source={require("@/assets/images/loginLatest.png")}
             style={{
               flex: 1,
               width: "100%",
@@ -50,56 +35,14 @@ export default function login() {
             onBtnAction={firstBtnSegmentBtnClick}
             onSecondBtnAction={secondBtnSegmentBtnClick}
           ></SegmentedButton>
-          {/* <View>
-            <Text>Usernames</Text>
-            <TextInput
-              placeholder="username"
-              value={username}
-              onChangeText={setUsername}
-            />
-          </View>
-          <View>
-            <Text>Password</Text>
-            <TextInput
-              placeholder="password"
-              value={password}
-              onChangeText={setPassword}
-            />
-          </View>
-          <Button
-            style={{ marginTop: 20 }}
-            title="Log in"
-            onPress={() => _login(username, password)}
-          /> */}
         </View>
       </ScreenView>
     </SafeAreaView>
   );
 }
 
-const Button = ({
-  title,
-  onPress,
-  style,
-}: {
-  title: string;
-  onPress: () => void;
-  style?: any;
-}) => {
-  return (
-    <TouchableOpacity
-      onPress={onPress}
-      style={[style]}
-      className={`bg-blue-500 rounded-xl px-2 py-3`}
-    >
-      <Text className="text-white text-center">{title}</Text>
-    </TouchableOpacity>
-  );
-};
-
 const styles = StyleSheet.create({
   imageContainer: {
-    // backgroundColor: primaryColor,
     height: "70%",
     borderRadius: 40,
   },

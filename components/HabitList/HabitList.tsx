@@ -9,6 +9,8 @@ import {
 import React from "react";
 import SwipeableItem from "./SwipeableItem";
 
+type ThemeKey = "basic" | "light" | "dark";
+
 export interface HabitItemProps {
   id: string;
   emoji: string;
@@ -20,11 +22,16 @@ export interface HabitItemProps {
 
 interface HabitListProps {
   data: Array<HabitItemProps>;
+  style: any;
 }
 
-const Separator = () => <View style={styles.itemSeparator} />;
+const Separator = (props: any) => {
+  const { style, ...otherProps } = props;
+  return <View style={[style]} />;
+};
 
-const HabitList: React.FC<HabitListProps> = ({ data }) => {
+const HabitList: React.FC<HabitListProps> = (props) => {
+  const { style, data, ...otherProps } = props;
   return (
     <>
       {/* <StatusBar /> */}
@@ -33,7 +40,7 @@ const HabitList: React.FC<HabitListProps> = ({ data }) => {
           data={data}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => <SwipeableItem {...item} />}
-          ItemSeparatorComponent={() => <Separator />}
+          ItemSeparatorComponent={() => <Separator style={style} />}
         />
       </SafeAreaView>
     </>
@@ -43,12 +50,6 @@ const HabitList: React.FC<HabitListProps> = ({ data }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  itemSeparator: {
-    flex: 1,
-    height: 1,
-    paddingBottom: 12,
-    backgroundColor: "#fff",
   },
 });
 export default HabitList;

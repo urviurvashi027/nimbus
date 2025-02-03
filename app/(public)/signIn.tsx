@@ -8,6 +8,7 @@ import Colors, { primaryColor, themeColors } from "@/constant/Colors";
 import SegmentedButton from "@/components/segmentedButton";
 import { router, useNavigation } from "expo-router";
 import ThemeContext from "@/context/ThemeContext";
+import { Button } from "@/components/Themed";
 
 type ThemeKey = "basic" | "light" | "dark";
 
@@ -28,17 +29,23 @@ export default function signIn() {
       headerShown: true,
       headerTransparent: true,
       headerTitle: "Sign In",
+      headerBackButtonDisplayMode: "minimal",
+      headerTitleAlign: "center",
+      headerTintColor: styles.header.color,
+      headerTitleStyle: {
+        fontSize: 18,
+        color: styles.header,
+        paddingTop: 5,
+        height: 40,
+      },
     });
   }, [navigation]);
-
-  useEffect(() => {
-    console.log(theme, "dicover theme");
-  }, [theme]);
 
   const styles = styling(theme);
 
   const onLoginClick = async () => {
     const result = await onLogin!(username, password);
+    console.log("result", result);
     if (result && result.success) router.replace("/(auth)/(tabs)");
     if (result && result.error) {
       alert(result.msg);
@@ -46,6 +53,7 @@ export default function signIn() {
   };
 
   const _login = (username: string, password: string) => {
+    console.log("");
     if (username === "" || password === "")
       Alert.alert("Error", "Please enter a username and password");
     else onLoginClick();
@@ -59,10 +67,10 @@ export default function signIn() {
           marginTop: 30,
         }}
       >
-        <Text style={styles.inputLabel}>Usernames</Text>
+        {/* <Text style={styles.inputLabel}>Usernames</Text> */}
         <TextInput
-          placeholder="username"
-          placeholderTextColor="gray"
+          placeholder="Username"
+          placeholderTextColor="#cfcac9"
           value={username}
           onChangeText={setUsername}
         />
@@ -72,11 +80,12 @@ export default function signIn() {
           marginTop: 30,
         }}
       >
-        <Text style={styles.inputLabel}>Password</Text>
+        {/* <Text style={styles.inputLabel}>Password</Text> */}
         <TextInput
-          placeholderTextColor="gray"
-          placeholder="password"
+          placeholderTextColor="#cfcac9"
+          placeholder="Password"
           value={password}
+          secureTextEntry={true}
           onChangeText={setPassword}
         />
       </View>
@@ -90,28 +99,13 @@ export default function signIn() {
   );
 }
 
-const Button = ({
-  title,
-  onPress,
-  style,
-  textStyle,
-}: {
-  title: string;
-  onPress: () => void;
-  style?: any;
-  textStyle?: any;
-}) => {
-  return (
-    <TouchableOpacity onPress={onPress} style={[style]}>
-      <Text style={[textStyle]}>{title}</Text>
-    </TouchableOpacity>
-  );
-};
-
 const styling = (theme: ThemeKey) =>
   StyleSheet.create({
     container: {
       marginTop: 60,
+    },
+    header: {
+      color: themeColors[theme]?.text,
     },
     btn: {
       marginTop: 60,
@@ -124,14 +118,5 @@ const styling = (theme: ThemeKey) =>
       color: themeColors[theme]?.text,
       fontWeight: 800,
       fontSize: 18,
-    },
-    input: {
-      padding: 15,
-      borderWidth: 1,
-      borderRadius: 15,
-      borderColor: themeColors.basic.GRAY,
-    },
-    inputLabel: {
-      marginBottom: 10,
     },
   });

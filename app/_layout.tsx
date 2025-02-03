@@ -4,8 +4,8 @@ import { ThemeProvider } from "@/context/ThemeContext";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import React, { useEffect } from "react";
-
+import React, { useEffect, useState } from "react";
+import HabitContext from "@/context/HabitContext";
 import { useColorScheme } from "@/components/UseColorScheme";
 import AuthProvider from "@/context/AuthContext";
 
@@ -44,18 +44,24 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
+  const [habitData, setHabitData] = useState({ habitName: "", habitType: "" });
   const colorScheme = useColorScheme();
 
   return (
     <AuthProvider>
       <ThemeProvider>
-        <Stack>
-          <Stack.Screen name="(auth)/(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="(public)/login"
-            options={{ headerShown: false }}
-          />
-        </Stack>
+        <HabitContext.Provider value={{ habitData, setHabitData }}>
+          <Stack>
+            <Stack.Screen
+              name="(auth)/(tabs)"
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="(public)/login"
+              options={{ headerShown: false }}
+            />
+          </Stack>
+        </HabitContext.Provider>
       </ThemeProvider>
     </AuthProvider>
   );
