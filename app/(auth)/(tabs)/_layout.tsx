@@ -28,25 +28,26 @@ export default function TabLayout() {
         options={{
           tabBarLabel: "Routine",
           tabBarIcon: ({ color }) => (
-            <Ionicons name="location-outline" size={24} color={color} />
+            <Ionicons name="body-outline" size={24} color={color} />
+            // <Ionicons name="location-outline" size={24} color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="discover"
+        name="tools"
         options={{
-          tabBarLabel: "Discover",
+          tabBarLabel: "Tools",
           tabBarIcon: ({ color }) => (
-            <Ionicons name="globe-outline" size={24} color={color} />
+            <Ionicons name="construct-outline" size={24} color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="profile"
+        name="self-care"
         options={{
-          tabBarLabel: "Profile",
+          tabBarLabel: "Self Care",
           tabBarIcon: ({ color }) => (
-            <Ionicons name="people-outline" size={24} color={color} />
+            <Ionicons name="fitness-outline" size={24} color={color} />
           ),
         }}
       ></Tabs.Screen>

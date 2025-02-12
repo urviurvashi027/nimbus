@@ -13,6 +13,7 @@ import ReminderAtModal, {
   FormattedReminderAt,
 } from "@/components/createHabit/TaskReminderAt";
 import { Ionicons } from "@expo/vector-icons";
+import { createHabit } from "@/service/habitService";
 
 type ThemeKey = "basic" | "light" | "dark";
 
@@ -49,39 +50,74 @@ export default function HabitMetric() {
     });
   }, [navigation]);
 
-  // useEffect(() => {
-  //   console.log(habitData, "habitData from Schedules");
-  // }, [habitData]);
-
   const styles = styling(theme);
 
   // function to handle Habit Reminder
   const handleHabitReminder = (reminderAt: any) => {
-    // console.log(reminderAt, "handleHabitReminder");
+    // console.log(reminderAt, "from reminderAt");
     setReminderAt(reminderAt);
   };
 
   // function which will be called on
   const handleStartTaskSave = (habitDate: parsedValue) => {
     // Handle the start and end date logic here
-    // console.log("from add routine habitDate", habitDate);
-    // console.log('End Date:', endDate);
+    // console.log(habitDate, "habitDate");
     setHabitDate(habitDate);
     setShowStartTaskModal(false);
   };
 
+  const getParsedDate = (habitDate: any) => {
+    console.log(habitDate, "getParsedDate");
+    if (habitDate.startDate && habitDate.endDate) {
+      return {
+        start_date: habitDate.startDate,
+        end_date: habitDate.endDate,
+      };
+    } else if (habitDate.startDate) {
+      return { start_date: habitDate.startDate };
+    }
+    return {};
+  };
+
+  useEffect(() => {
+    console.log(habitData, "habitData from Schedules");
+    if (habitData.habit_frequency?.start_date) {
+      console.log("I am getting called");
+      creatHabitApi(habitData);
+    }
+  }, [habitData]);
+
+  const creatHabitApi = async (data: any) => {
+    const result = await createHabit(data);
+    if (result && result.success) {
+      // console.log(result, "succesfully created");
+      router.replace("/(auth)/(tabs)");
+    }
+    if (result && result.error) {
+      alert(result);
+    }
+  };
+
   const onContinueClick = () => {
-    // console.log("continue clicked habit Schedules");
-    console.log("from habit schedules", habitData, {
-      habitDate: habitDate,
-      RemindHabitAt: reminderAt,
-    });
-    setHabitData({
-      ...habitData,
-      habitDate: habitDate,
-      RemindHabitAt: reminderAt,
-    });
-    router.push("/(auth)/(tabs)");
+    const habitDateVal = getParsedDate(habitDate);
+    console.log(habitDateVal, "habitDateVal");
+    // console.log(reminderAt, "jhdskjhfjkshdfkjhdkjh 0000000000000");
+    setHabitData((prevInfo: any) => ({
+      ...prevInfo, // Spread the existing state
+      remind_at: reminderAt?.val,
+      habit_frequency: {
+        ...prevInfo.habit_frequency, // Spread the existing address
+        ...habitDateVal,
+      },
+    }));
+
+    // setHabitData({
+    //   ...habitData,
+    //   habitDate.habit_duration: habitDate,
+    //   RemindHabitAt: reminderAt,
+    // });
+
+    // router.push("/(auth)/(tabs)");
   };
 
   return (

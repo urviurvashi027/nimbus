@@ -68,7 +68,6 @@ const ListItem = ({ text }: { text: any }) => (
     renderLeftActions={LeftSwipeActions}
     renderRightActions={rightSwipeActions}
     onSwipeableOpen={(direction) => {
-      console.log(direction); // "left" | "right"
       direction === "left" ? swipeFromLeftOpen() : swipeFromRightOpen();
     }}
   >

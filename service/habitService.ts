@@ -18,12 +18,26 @@ import {
 export const createHabit = async (
   data: HabitCreateRequest
 ): Promise<HabitCreateResponse> => {
+  console.log("serice called for creation", API_ENDPOINTS.createHabit);
   try {
     const response: AxiosResponse<HabitCreateResponse> = await axios.post(
-      API_ENDPOINTS.login,
+      API_ENDPOINTS.createHabit,
       data
     );
+    console.log(response, "response from creation");
     return response.data; // Return the data containing the token
+  } catch (error: any) {
+    throw error.response ? error.response.data : error.message;
+  }
+};
+
+// get habit list
+export const getHabitList = async (): Promise<HabitListResponse> => {
+  try {
+    const response: AxiosResponse<HabitListResponse> = await axios.get(
+      API_ENDPOINTS.createHabit
+    );
+    return response.data; // Return the list data
   } catch (error: any) {
     throw error.response ? error.response.data : error.message;
   }
@@ -39,20 +53,6 @@ export const deleteHabit = async (
       data
     );
     return response.data; // Return the data containing the token
-  } catch (error: any) {
-    throw error.response ? error.response.data : error.message;
-  }
-};
-
-// get habit list
-export const getHabitList = async (
-  data: string
-): Promise<HabitListResponse> => {
-  try {
-    const response: AxiosResponse<HabitListResponse> = await axios.get(
-      API_ENDPOINTS.habitList
-    );
-    return response.data; // Return the list data
   } catch (error: any) {
     throw error.response ? error.response.data : error.message;
   }

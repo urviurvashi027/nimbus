@@ -5,9 +5,9 @@ const ENV = process.env.NODE_ENV as "development" | "staging" | "production";
 
 // Define the base URL for different environments
 const BASE_URLS = {
-  development: "https://dev-api.yourdomain.com/api",
-  staging: "https://staging-api.yourdomain.com/api",
-  production: "https://api.yourdomain.com/api",
+  development: "https://nimbus.silentbonus.com",
+  staging: "https://nimbus.silentbonus.com",
+  production: "https://nimbus.silentbonus.com",
 };
 
 // Get the base URL based on the environment
@@ -19,9 +19,10 @@ export const API_URL = BASE_URL;
 export const API_ENDPOINTS = {
   login: `${BASE_URL}/auth/login/`,
   register: `${BASE_URL}/auth/register/`,
-  logout: `${BASE_URL}/habits/logout/`,
+  logout: `${BASE_URL}/auth/logout/`,
 
-  createHabit: `${BASE_URL}/habits/create`,
+  createHabit: `${BASE_URL}/api/habits/`,
+
   habitList: `${BASE_URL}/habits/list`,
   habitPatch: `${BASE_URL}/habits/list`,
   deleteHabit: `${BASE_URL}/habits/list`,

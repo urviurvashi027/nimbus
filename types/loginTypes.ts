@@ -6,6 +6,15 @@ interface UserData {
   access: string;
 }
 
+// TODO add types
+interface LogoutData {
+  data: any;
+}
+
+interface SignupData {
+  data: any;
+}
+
 export interface LoginRequest {
   username: string;
   password: string;
@@ -24,7 +33,7 @@ export interface LogoutRequest {
 export interface LogoutResponse {
   success: boolean;
   message: string;
-  data: any;
+  data: LogoutData;
 }
 
 export interface SignupRequest {
@@ -37,5 +46,5 @@ export interface SignupRequest {
 export interface SignupResponse {
   success: boolean;
   message: string;
-  data: any;
+  data: SignupData;
 }

@@ -4,6 +4,7 @@ import {
   StyleSheet,
   TextInput,
   Platform,
+  Alert,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { router, useNavigation } from "expo-router";
@@ -14,7 +15,10 @@ import { themeColors } from "@/constant/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { Text } from "@/components/Themed";
 import TaskTagsModal from "@/components/createHabit/TaskTagsModal";
-import TaskTypeModal from "@/components/createHabit/TaskTypeModal";
+import TaskTypeModal, {
+  HabitTypes,
+  TASK_TYPES,
+} from "@/components/createHabit/TaskTypeModal";
 
 type ThemeKey = "basic" | "light" | "dark";
 
@@ -22,9 +26,10 @@ export default function HabitBasic() {
   const [colorSchema, setColorSchema] = useState<
     "red" | "blue" | "green" | "yellow" | "black"
   >("red");
+
   const [taskName, setTaskName] = useState("");
-  const [taskType, setTaskType] = useState<string>("Build");
-  const [tags, setTags] = useState<string[]>([]);
+  const [taskType, setTaskType] = useState<HabitTypes>(TASK_TYPES[0]);
+  const [tags, setTags] = useState<any>([]);
 
   const [showTaskTypeModal, setShowTaskTypeModal] = useState(false);
   const [showTaskTagsModal, setShowTaskTagsModal] = useState(false);
@@ -42,32 +47,34 @@ export default function HabitBasic() {
 
   // function to handle Type Task Modal
   const handleTypeTaskModal = (type: any) => {
-    // console.log(type, "from type task modal");
     setTaskType(type);
   };
 
   const handleAddTag = (tag: string) => {
-    // console.log(tag, "from tag modal");
+    // console.log(tags, "habit basic tags");
     setTags([...tags, tag]);
   };
 
+  const handleNewTag = (tagName: string, id: number | undefined) => {
+    // console.log(tags, "habit basic tags");
+    setTags([...tags, { name: tagName, id }]);
+  };
+
+  // useEffect(() => {
+  //   console.log(tags, "from useEffect ");
+  // }, [tags]);
+
   // Handle removing tags
   const handleRemoveTag = (index: number) => {
+    // console.log("remove tags called", index);
     const updatedTags = [...tags];
     updatedTags.splice(index, 1);
     setTags(updatedTags);
   };
 
-  // useEffect(() => {
-  //   console.log(habitData, "habitData");
-  // }, [habitData]);
-
   useEffect(() => {
     navigation.setOptions({
       headerShown: true,
-      // headerStyle: {
-      //   backgroundColor: "#f4511e",
-      // },
       headerTransparent: true,
       headerTitle: "Habit Basic Details",
       headerBackButtonDisplayMode: "minimal",
@@ -84,20 +91,24 @@ export default function HabitBasic() {
 
   const styles = styling(theme);
 
-  // useEffect(() => {
-  //   console.log(habitData, "habitData from basic");
-  // }, [habitData]);
+  const getSelectedTag = () => {
+    const tagNames = tags.map((tag: any) => tag.name);
+    return tagNames;
+  };
 
   const onContinueClick = () => {
-    // console.log("continue clicked habit basics");
-    setHabitData({
-      ...habitData,
-      habitColor: colorSchema,
-      habitName: taskName,
-      habitType: taskType,
-      Tags: tags,
-    });
-    router.push("/create-habit/habitMetric");
+    if (!taskName && taskType?.id) {
+      alert("Please fill in the required field");
+    } else {
+      setHabitData({
+        ...habitData,
+        color: colorSchema,
+        name: taskName,
+        habit_type_id: taskType?.id,
+        tags: getSelectedTag(),
+      });
+      router.push("/create-habit/habitMetric");
+    }
   };
 
   return (
@@ -143,7 +154,7 @@ export default function HabitBasic() {
           style={styles.selectorButton}
           onPress={() => setShowTaskTypeModal(true)}
         >
-          <Text style={styles.selectorText}>{taskType}</Text>
+          <Text style={styles.selectorText}>{taskType?.name}</Text>
           <Ionicons name="chevron-forward" size={20} color="#888" />
         </TouchableOpacity>
 
@@ -164,7 +175,7 @@ export default function HabitBasic() {
       <View style={styles.tagsContainer}>
         {tags.map((tag, index) => (
           <View key={index} style={styles.tag}>
-            <Text style={styles.tagText}>{tag}</Text>
+            <Text style={styles.tagText}>{tag.name}</Text>
             <TouchableOpacity onPress={() => handleRemoveTag(index)}>
               <Ionicons name="close-circle" size={16} color="#ff0000" />
             </TouchableOpacity>
@@ -193,7 +204,7 @@ export default function HabitBasic() {
         onClose={() => setShowTaskTagsModal(false)}
         onSelect={(tag: any) => handleAddTag(tag)}
         existingTags={tags}
-        onAddNewTag={handleAddTag}
+        onAddNewTag={handleNewTag}
       />
     </ScreenView>
   );
@@ -227,12 +238,8 @@ const styling = (theme: ThemeKey) =>
       fontSize: 16,
       color: "#333",
     },
-    // inputLabel: {
-    //   marginBottom: 10,
-    // },
     label: {
       fontSize: 16,
-      // color: "#333",
       marginBottom: 10,
       marginTop: 10,
     },

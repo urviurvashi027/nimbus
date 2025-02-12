@@ -25,7 +25,6 @@ const TimePicker = (props: TimePicker) => {
   const styles = styling(theme);
 
   const showTimePicker = () => {
-    console.log("clicked");
     setTimePickerVisibility(true);
   };
 

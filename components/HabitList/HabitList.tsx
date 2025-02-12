@@ -13,9 +13,12 @@ type ThemeKey = "basic" | "light" | "dark";
 
 export interface HabitItemProps {
   id: string;
-  emoji: string;
   name: string;
   time: string;
+  habit_type: number;
+  color: string;
+  reminder_time: string;
+  duration: string;
   // isDone: boolean;
   //   onToggle: (isDone: boolean) => void;
 }

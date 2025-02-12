@@ -15,8 +15,8 @@ import { themeColors } from "@/constant/Colors";
 import DatePicker from "../DatePicker";
 
 export type parsedValue = {
-  startDate: Date;
-  eneDate?: Date;
+  startDate: string;
+  eneDate?: string;
   display: {
     startDate: string;
     endDate?: string;
@@ -44,14 +44,6 @@ const StartTaskModal: React.FC<StartTaskModalProps> = ({
 
   const handleStartDateChange = (selectedDate: Date) => {
     // setShowStartDatePicker(false);
-
-    console.log(
-      `Selected Date End Date ${selectedDate} ${format(
-        selectedDate,
-        "dd MMMM yyyy"
-      )}`
-    );
-
     if (selectedDate) {
       setStartDate(selectedDate);
     }
@@ -59,22 +51,16 @@ const StartTaskModal: React.FC<StartTaskModalProps> = ({
 
   const handleEndDateChange = (selectedDate: Date) => {
     // setShowEndDatePicker(false);
-    console.log(
-      `Selected Date End Date ${selectedDate} ${format(
-        selectedDate,
-        "dd MMMM yyyy"
-      )}`
-    );
     if (selectedDate) {
       setEndDate(selectedDate);
     }
   };
 
   const handleSave = () => {
-    // console.log(startDate, endDate, "Habit Start Modal");
+    const endDateVal = endDate ? format(endDate, "yyyy-MM-dd") : null;
     let parsedValue = {
-      startDate: startDate,
-      endDate: isEndDateEnabled ? endDate : undefined,
+      startDate: format(startDate, "yyyy-MM-dd"),
+      endDate: isEndDateEnabled ? endDateVal : undefined,
       display: {
         startDate: format(startDate, "dd MMMM yyyy"),
         endDate: endDate ? format(endDate, "dd MMMM yyyy") : undefined,

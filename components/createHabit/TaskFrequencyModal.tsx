@@ -1,12 +1,5 @@
 import React, { useContext, useState } from "react";
-import {
-  View,
-  StyleSheet,
-  Modal,
-  TouchableOpacity,
-  FlatList,
-  TextInput,
-} from "react-native";
+import { View, StyleSheet, Modal, TouchableOpacity } from "react-native";
 import { FormInput, Text } from "../Themed";
 import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/context/ThemeContext";
@@ -31,12 +24,10 @@ export type Frequency =
   | { type: "Monthly"; count: number; dates: number[] };
 
 export type ReminderOutput = {
-  frequencyType: "daily" | "weekly" | "monthly";
-  details: {
-    interval: number;
-    daysOfWeek?: string[];
-    specificDate?: number[];
-  };
+  frequency_type: "daily" | "weekly" | "monthly";
+  interval: number;
+  days_of_week?: string[];
+  days_of_month?: number[];
 };
 
 const FrequencyModal: React.FC<FrequencyModalProps> = ({
@@ -58,23 +49,24 @@ const FrequencyModal: React.FC<FrequencyModalProps> = ({
   // helper function
   function convertDayAbbreviation(day: string): string {
     const daysMap: { [key: string]: string } = {
-      Mo: "Monday",
-      Tu: "Tuesday",
-      We: "Wednesday",
-      Th: "Thursday",
-      Fr: "Friday",
-      Sa: "Saturday",
-      Su: "Sunday",
+      Mo: "mon",
+      Tu: "tue",
+      We: "wed",
+      Th: "thu",
+      Fr: "fri",
+      Sa: "sat",
+      Su: "sun",
     };
     return daysMap[day] || "Invalid day";
   }
 
   function convertToReminder(input: Frequency): ReminderOutput {
     let reminder: ReminderOutput = {
-      frequencyType: input.type.toLowerCase() as "daily" | "weekly" | "monthly",
-      details: {
-        interval: input.count,
-      },
+      frequency_type: input.type.toLowerCase() as
+        | "daily"
+        | "weekly"
+        | "monthly",
+      interval: input.count,
     };
 
     switch (input.type) {
@@ -84,7 +76,7 @@ const FrequencyModal: React.FC<FrequencyModalProps> = ({
 
       case "Weekly":
         if ("days" in input) {
-          reminder.details.daysOfWeek = input.days.map((day) =>
+          reminder.days_of_week = input.days.map((day) =>
             convertDayAbbreviation(day)
           );
         }
@@ -92,7 +84,7 @@ const FrequencyModal: React.FC<FrequencyModalProps> = ({
 
       case "Monthly":
         if ("dates" in input) {
-          reminder.details.specificDate = input.dates;
+          reminder.days_of_month = input.dates;
         }
         break;
 
@@ -104,39 +96,39 @@ const FrequencyModal: React.FC<FrequencyModalProps> = ({
   }
 
   function formatReminder(reminder: any) {
-    let { frequencyType, details } = reminder;
+    let { frequency_type, interval, ...rest } = reminder;
     let displayString = "";
 
-    switch (frequencyType) {
+    switch (frequency_type) {
       case "daily":
-        if (details.interval === 1) {
+        if (interval === 1) {
           displayString = "Daily";
         } else {
-          displayString = `Every ${details.interval} days`;
+          displayString = `Every ${interval} days`;
         }
         break;
 
       case "weekly":
-        if (details.interval === 1) {
+        if (interval === 1) {
           displayString = "Weekly";
         } else {
-          displayString = `Every ${details.interval} weeks`;
+          displayString = `Every ${interval} weeks`;
         }
-        if (details.daysOfWeek && details.daysOfWeek.length > 0) {
-          displayString += ` on ${details.daysOfWeek.join(" and ")}`;
+        if (daysOfWeek && daysOfWeek.length > 0) {
+          displayString += ` on ${daysOfWeek.join(" and ")}`;
         }
         break;
 
       case "monthly":
-        if (details.interval === 1) {
+        if (interval === 1) {
           displayString = "Monthly";
         } else {
-          displayString = `Every ${details.interval} months`;
+          displayString = `Every ${interval} months`;
         }
-        if (details.specificDate) {
-          displayString += ` on the ${details.specificDate}th`;
+        if (rest?.specificDate) {
+          displayString += ` on the ${rest?.specificDate}th`;
         }
-        if (details.monthsOfYear && details.monthsOfYear.length > 0) {
+        if (rest?.monthsOfYear && rest?.monthsOfYear.length > 0) {
           const monthNames = [
             "January",
             "February",
@@ -151,7 +143,7 @@ const FrequencyModal: React.FC<FrequencyModalProps> = ({
             "November",
             "December",
           ];
-          const selectedMonths = details.monthsOfYear.map(
+          const selectedMonths = rest?.monthsOfYear.map(
             (monthIndex: number) => monthNames[monthIndex - 1]
           );
           displayString += ` in ${selectedMonths.join(", ")}`;
@@ -175,8 +167,6 @@ const FrequencyModal: React.FC<FrequencyModalProps> = ({
       frequency = { type: "Monthly", count: monthlyCount, dates: monthlyDates };
     }
 
-    // console.log(frequency, "----------------from frequency modal-------------");
-
     let parsedFrequency = convertToReminder(frequency);
     let userDisplayFreq = formatReminder(parsedFrequency);
     let result = {
@@ -184,7 +174,6 @@ const FrequencyModal: React.FC<FrequencyModalProps> = ({
       parsedFreq: parsedFrequency,
     };
 
-    // console.log("for user diaply format", )
     onSave(result);
     onClose();
   };

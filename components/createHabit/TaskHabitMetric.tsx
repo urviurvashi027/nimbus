@@ -10,9 +10,9 @@ import { themeColors } from "@/constant/Colors";
 type ThemeKey = "basic" | "light" | "dark";
 
 export type MetricFormat = {
-  target: string;
-  unitValue: number; // TODO need to check
-  unitLabel: string;
+  count: string;
+  unitId: number; // TODO need to check
+  unit: string;
   // frequency: "Daily" | "Weekly" | "Monthly";
 };
 
@@ -60,13 +60,11 @@ const HabitMetricModal: React.FC<HabitMetricModalProps> = ({
   const [target, setTarget] = useState("");
 
   const handleSave = () => {
-    // console.log(value, "value");
     let selectedItemLabel = findLabel(value);
-    // console.log(findLabel(value));
     const val = {
-      target,
-      unitValue: value !== null ? value : 0,
-      unitLabel: selectedItemLabel ? selectedItemLabel.label : "",
+      count: target,
+      unitId: value !== null ? value : 0,
+      unit: selectedItemLabel ? selectedItemLabel.label : "",
     };
     onSave(val);
     onClose();

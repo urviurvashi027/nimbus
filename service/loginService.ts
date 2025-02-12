@@ -1,5 +1,5 @@
 import axios, { AxiosResponse, AxiosError } from "axios";
-// import { API_ENDPOINTS } from "@/config/apiConfig";
+import { API_ENDPOINTS } from "@/config/apiConfig";
 import {
   LoginRequest,
   LoginResponse,
@@ -8,26 +8,6 @@ import {
   LogoutRequest,
   LogoutResponse,
 } from "@/types/loginTypes";
-
-const BASE_URL = `https://51b2-2401-4900-1cb9-115b-4851-3479-9905-5a7f.ngrok-free.app`;
-
-export const API_ENDPOINTS = {
-  login: `${BASE_URL}/auth/login/`,
-  register: `${BASE_URL}/auth/register/`,
-  logout: `${BASE_URL}/auth/logout/`,
-
-  createHabit: `${BASE_URL}/habits/create`,
-  habitList: `${BASE_URL}/habits/list`,
-  habitPatch: `${BASE_URL}/habits/list`,
-  deleteHabit: `${BASE_URL}/habits/list`,
-  getHabitDetailsById: `${BASE_URL}/habits/id`,
-
-  toolList: `${BASE_URL}/habits/list`,
-  getSoundscapeList: `${BASE_URL}/habits/list`,
-  downloadMedia: `${BASE_URL}/habits/list`,
-  getWorkoutVideo: `${BASE_URL}/habits/list`,
-  // Add more API endpoints as needed
-};
 
 // Login API request
 export const login = async (data: LoginRequest): Promise<LoginResponse> => {

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,30 +8,77 @@ import {
   TextInput,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+
 import { themeColors } from "@/constant/Colors";
 import ThemeContext from "@/context/ThemeContext";
 import { FormInput } from "../Themed";
+import { findIdBName, addObjectAtEnd } from "@/utlity/helper";
+
+interface TagsType {
+  id: number;
+  name: string;
+}
 
 interface TaskTagsModalProps {
   visible: boolean;
   onClose: () => void;
-  onSelect: (tag: string) => void;
-  existingTags: string[];
-  onAddNewTag: (tag: string) => void;
+  onSelect: (tag: TagsType) => void;
+  existingTags: TagsType[];
+  onAddNewTag: (tag: string, id: number) => void;
 }
 
 type ThemeKey = "basic" | "light" | "dark";
 
 const PREDEFINED_TAGS = [
-  "Morning",
-  "Routine",
-  "Workout",
-  "Clean Room",
-  "Healthy Lifestyle",
-  "Sleep Better",
-  "Relationship",
-  "Add New",
+  {
+    id: 1,
+    name: "Morning",
+  },
+  {
+    id: 2,
+    name: "Routine",
+  },
+  {
+    id: 3,
+    name: "Workout",
+  },
+  {
+    id: 4,
+    name: "Clean Room",
+  },
+  {
+    id: 5,
+    name: "Healthy Lifestyle",
+  },
+  {
+    id: 6,
+    name: "Sleep Better",
+  },
+  {
+    id: 7,
+    name: "Relationship",
+  },
 ];
+
+// addObjectAtEnd(PREDEFINED_TAGS);
+// const addNewLabel = () => {
+//   // Get the last object in the array
+//   const lastObject = PREDEFINED_TAGS[PREDEFINED_TAGS.length - 1];
+
+//   // Extract the last id and increment it by 1
+//   const newId = lastObject ? lastObject.id + 1 : 1; // Handle empty array case
+
+//   // Create the new object to add
+//   const newObject = {
+//     id: newId,
+//     name: "Add New",
+//   };
+
+//   // Add the new object to the end of the array
+//   const modifiedArray = [...PREDEFINED_TAGS, newObject];
+
+//   return modifiedArray;
+// };
 
 const TaskTagsModal: React.FC<TaskTagsModalProps> = ({
   visible,
@@ -40,8 +87,13 @@ const TaskTagsModal: React.FC<TaskTagsModalProps> = ({
   existingTags,
   onAddNewTag,
 }) => {
+  const [data, setData] = useState<TagsType[]>([]);
+
   const [isAdding, setIsAdding] = useState(false);
-  const [newTag, setNewTag] = useState("");
+
+  const [selectedTag, setSelectedTag] = useState<string[]>([]);
+
+  const [newTag, setNewTag] = useState<any>();
   const [error, setError] = useState("");
 
   const handleAddNew = () => {
@@ -57,7 +109,8 @@ const TaskTagsModal: React.FC<TaskTagsModalProps> = ({
       setError("Tag already exists.");
       return;
     }
-    onAddNewTag(newTag.trim());
+    const id = findIdBName(data, "name", "id", "Add New");
+    onAddNewTag(newTag.trim(), id);
     setNewTag("");
     setIsAdding(false);
     setError("");
@@ -66,6 +119,16 @@ const TaskTagsModal: React.FC<TaskTagsModalProps> = ({
 
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
   const styles = styling(theme);
+
+  useEffect(() => {
+    const modifiedArray = addObjectAtEnd(PREDEFINED_TAGS);
+    setData(modifiedArray);
+  }, []);
+
+  const handleSaveClick = (tag: any) => {
+    // setSelectedTag([...selectedTag, tag]);
+    onSelect(tag);
+  };
 
   return (
     <Modal
@@ -102,21 +165,21 @@ const TaskTagsModal: React.FC<TaskTagsModalProps> = ({
 
           {/* List of Task Tags */}
           <View style={styles.listContainer}>
-            {PREDEFINED_TAGS.map((tag, index) => (
+            {data.map((tag, index) => (
               <TouchableOpacity
                 key={index}
                 style={styles.tagButton}
                 onPress={() => {
-                  if (tag === "Add New") {
+                  if (tag.name === "Add New") {
                     setIsAdding(true);
                   } else {
-                    onSelect(tag);
+                    handleSaveClick(tag);
                     onClose();
                   }
                 }}
               >
-                <Text style={styles.tagText}>{tag}</Text>
-                {tag === "Add New" && (
+                <Text style={styles.tagText}>{tag.name}</Text>
+                {tag.name === "Add New" && (
                   <Ionicons name="chevron-forward" size={20} color="#888" />
                 )}
               </TouchableOpacity>
@@ -124,17 +187,17 @@ const TaskTagsModal: React.FC<TaskTagsModalProps> = ({
 
             {/* Display existing tags dynamically */}
             {existingTags
-              .filter((tag) => !PREDEFINED_TAGS.includes(tag))
+              .filter((tag) => !data.includes(tag))
               .map((tag, index) => (
                 <TouchableOpacity
                   key={`existing-${index}`}
                   style={styles.tagButton}
                   onPress={() => {
-                    onSelect(tag);
+                    handleSaveClick(tag);
                     onClose();
                   }}
                 >
-                  <Text style={styles.tagText}>{tag}</Text>
+                  <Text style={styles.tagText}>{tag.name}</Text>
                   <Ionicons name="chevron-forward" size={20} color="#888" />
                 </TouchableOpacity>
               ))}

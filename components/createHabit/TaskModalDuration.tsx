@@ -22,17 +22,11 @@ interface DurationModalProps {
 }
 type ThemeKey = "basic" | "light" | "dark";
 
-export type Duration =
-  | { type: "All Day" }
-  | {
-      type: "Point Time";
-      time: Date;
-    }
-  | {
-      type: "Time Period";
-      start: Date;
-      end: Date;
-    };
+export type Duration = {
+  all_day?: boolean;
+  start_time?: string;
+  end_time?: string;
+};
 
 const TaskModalDuration: React.FC<DurationModalProps> = ({
   visible,
@@ -55,13 +49,13 @@ const TaskModalDuration: React.FC<DurationModalProps> = ({
   const styles = styling(theme);
 
   const handleSave = () => {
+    // console.log(allDayEnabled, selection);
     if (allDayEnabled) {
-      onSave({ type: "All Day" });
+      onSave({ all_day: true });
     } else {
       if (selection === "Point Time") {
         onSave({
-          type: "Point Time",
-          time: pointTime,
+          start_time: format(pointTime, "hh:mm:ss"),
         });
       } else {
         if (endTime <= startTime) {
@@ -69,9 +63,8 @@ const TaskModalDuration: React.FC<DurationModalProps> = ({
           return;
         }
         onSave({
-          type: "Time Period",
-          start: startTime,
-          end: endTime,
+          start_time: format(startTime, "hh:mm:ss"),
+          end_time: format(endTime, "hh:mm:ss"),
         });
       }
     }

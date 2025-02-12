@@ -1,13 +1,14 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { DarkTheme, DefaultTheme } from "@react-navigation/native";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect, useState } from "react";
+
 import HabitContext from "@/context/HabitContext";
 import { useColorScheme } from "@/components/UseColorScheme";
 import AuthProvider from "@/context/AuthContext";
+import { HabitCreateRequest } from "@/types/habitTypes";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -44,7 +45,7 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-  const [habitData, setHabitData] = useState({ habitName: "", habitType: "" });
+  const [habitData, setHabitData] = useState<HabitCreateRequest>(habitInfo);
   const colorScheme = useColorScheme();
 
   return (
@@ -66,3 +67,25 @@ function RootLayoutNav() {
     </AuthProvider>
   );
 }
+
+export const habitInfo = {
+  name: "",
+  habit_type_id: 0,
+  color: "",
+  tags: [],
+  habit_metric: {
+    unit: "",
+    count: 0,
+  },
+  habit_duration: {
+    // default case
+    all_day: true,
+  },
+  habit_frequency: {
+    frequency_type: "",
+    interval: 0,
+    start_date: "",
+  },
+  remind_at: { ten_min_before: true },
+  subtasks: [],
+};

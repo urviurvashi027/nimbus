@@ -33,7 +33,6 @@ export function useThemeColor(
   colorName: keyof typeof Colors.light & keyof typeof Colors.dark
 ) {
   const theme = useColorScheme() ?? "light";
-  // console.log(theme, "theme");
   const colorFromProps = props[theme];
 
   if (colorFromProps) {
@@ -48,7 +47,6 @@ export function Text(props: TextProps) {
   const color = useThemeColor({ light: lightColor, dark: darkColor }, "text");
 
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
-  console.log("Text styling", theme);
   const styles = textStyling(theme);
 
   return <DefaultText style={[styles.textStyle, style]} {...otherProps} />;
@@ -83,7 +81,6 @@ export const Button = ({
   textStyle?: any;
 }) => {
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
-  console.log("Text styling", theme);
   const styles = btnStyling(theme);
 
   return (
@@ -101,7 +98,6 @@ export function ScreenView(props: ViewProps) {
   const { style, ...otherProps } = props;
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
   const styles = screenViewStyling(theme);
-  console.log(style, "screnview");
 
   return <DefaultView style={[style, styles.container]} {...otherProps} />;
 }

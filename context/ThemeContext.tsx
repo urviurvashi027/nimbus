@@ -87,27 +87,22 @@ export const ThemeProvider: FC<ThemeProviderProps> = ({ children }) => {
   }, [colorScheme]);
 
   useEffect(() => {
-    // console.log(theme, "theme value");
     const getTheme = async () => {
       try {
         const savedTheme = (await AsyncStorage.getItem("theme")) as
           | "basic"
           | "light"
           | "dark";
-        // console.log("saved theme", savedTheme);
         if (savedTheme) {
           setTheme(savedTheme);
         }
-      } catch (error) {
-        // console.log("Error loading theme:", error);
-      }
+      } catch (error) {}
     };
     getTheme();
   }, []);
 
   const toggleTheme = (newTheme: "basic" | "light" | "dark") => {
     setTheme(newTheme);
-    // console.log(theme, newTheme, "from toggle theme func");
     AsyncStorage.setItem("theme", newTheme).catch((error) =>
       console.log("Error saving theme:", error)
     );

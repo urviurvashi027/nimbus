@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet } from "react-native";
 import React, { useContext, useState } from "react";
 import Swipeable from "react-native-gesture-handler/ReanimatedSwipeable";
-import { HabitItemProps } from "./HabitList";
+// import { HabitItemProps } from "./HabitList";
 import DeleteHabitModal from "../modal/deleteHabitModal";
 import Animated, {
   useAnimatedStyle,
@@ -17,7 +17,20 @@ import { Ionicons } from "@expo/vector-icons";
 
 type ThemeKey = "basic" | "light" | "dark";
 
-const SwipeableItem: React.FC<HabitItemProps> = ({ name, time, id, emoji }) => {
+export interface HabitItemProps {
+  id: string;
+  name: string;
+  time: string;
+  habit_type: number;
+  color: string;
+  reminder_time: string;
+  duration: string;
+  // isDone: boolean;
+  //   onToggle: (isDone: boolean) => void;
+}
+
+const SwipeableItem: React.FC<HabitItemProps> = (props: any) => {
+  const { name, id, ...rest } = props;
   const [showHabitActionModal, setshowHabitActionModal] = useState(false);
   const translateY = useSharedValue(0);
 
@@ -73,7 +86,6 @@ const SwipeableItem: React.FC<HabitItemProps> = ({ name, time, id, emoji }) => {
   };
 
   const deleteHabitClick = async () => {
-    // console.log(`delete is confirm for the id : ${id}`);
     // const result = await deleteHabit({ id });
   };
 
@@ -95,7 +107,6 @@ const SwipeableItem: React.FC<HabitItemProps> = ({ name, time, id, emoji }) => {
         renderLeftActions={LeftSwipeActions}
         renderRightActions={rightSwipeActions}
         onSwipeableOpen={(direction: string) => {
-          console.log(direction); // "left" | "right"
           direction === "left" ? swipeFromLeftOpen() : swipeFromRightOpen();
         }}
       >
@@ -108,10 +119,10 @@ const SwipeableItem: React.FC<HabitItemProps> = ({ name, time, id, emoji }) => {
         </Animated.View> */}
 
         <View style={styles.itemContainer}>
-          <Text style={styles.emoji}>{emoji}</Text>
+          {/* <Text style={styles.emoji}>{emoji}</Text> */}
           <View style={styles.textContainer}>
             <Text style={styles.taskName}>{name}</Text>
-            <Text style={styles.taskTime}>{time}</Text>
+            <Text style={styles.taskTime}>{rest.reminder_time}</Text>
           </View>
         </View>
       </Swipeable>

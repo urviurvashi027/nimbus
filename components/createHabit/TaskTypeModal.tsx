@@ -6,19 +6,38 @@ import { themeColors } from "@/constant/Colors";
 
 type ThemeKey = "basic" | "light" | "dark";
 
+export interface HabitTypes {
+  id: number;
+  name: string;
+}
+
 interface TaskTypeModalProps {
   visible: boolean;
   onClose: () => void;
-  onSelect: (type: string) => void;
+  onSelect: (type: HabitTypes) => void;
 }
 
-const TASK_TYPES = [
-  "Build",
-  "Quit",
-  "Improve",
-  "Learn",
-  "Maintain",
-  // Add more task types as needed
+export const TASK_TYPES: HabitTypes[] = [
+  {
+    id: 1,
+    name: "Build",
+  },
+  {
+    id: 2,
+    name: "Quit",
+  },
+  {
+    id: 3,
+    name: "Improve",
+  },
+  {
+    id: 4,
+    name: "Learn",
+  },
+  {
+    id: 5,
+    name: "Maintain",
+  },
 ];
 
 const TaskTypeModal: React.FC<TaskTypeModalProps> = ({
@@ -26,8 +45,6 @@ const TaskTypeModal: React.FC<TaskTypeModalProps> = ({
   onClose,
   onSelect,
 }) => {
-  // console.log('TaskTypeModal', visible, onClose, onSelect);
-
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
   const styles = styling(theme);
 
@@ -63,7 +80,7 @@ const TaskTypeModal: React.FC<TaskTypeModalProps> = ({
                   onClose();
                 }}
               >
-                <Text style={styles.typeText}>{type}</Text>
+                <Text style={styles.typeText}>{type.name}</Text>
                 {/* <Ionicons name="chevron-forward" size={20} color="#888" /> */}
               </TouchableOpacity>
             ))}

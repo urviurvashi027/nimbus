@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -14,11 +14,17 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import ThemeContext from "@/context/ThemeContext";
 import { themeColors } from "@/constant/Colors";
 import TimePicker from "../TimePicker";
+import HabitContext from "@/context/HabitContext";
+
+interface ReminderAt {
+  time?: string | undefined;
+  ten_min_before?: boolean;
+  thirty_min_before?: boolean;
+}
 
 export type FormattedReminderAt = {
-  timeDisplay: string;
-  time: Date;
-  isTenMinsBeforeEnabled: boolean;
+  timeDisplay: string | undefined | null;
+  val: ReminderAt;
 };
 
 type ThemeKey = "basic" | "light" | "dark";
@@ -36,41 +42,82 @@ const ReminderAtModal: React.FC<ReminderAtModalProps> = ({
 }) => {
   const [isSpecified, setIsSpecified] = useState(false);
   const [showStartTimePicker, setShowStartTimePicker] = useState(false);
+  const [label, setLabel] = useState("");
   //   const [reminderAt, setReminderAt] = useState('');
-  const [reminderAt, setReminderAt] = useState(new Date());
+  const [reminderAt, setReminderAt] = useState<string | undefined>(undefined);
   const [selection, setSelection] = useState("");
   const [error, setError] = useState("");
 
-  const handleSave = () => {
-    const date = new Date(reminderAt);
+  const { habitData, setHabitData } = useContext(HabitContext);
 
+  useEffect(() => {
+    // console.log(habitData, "habitData from reminder at");
+    // console.log(
+    //   habitData.habit_duration,
+    //   "******************************************************************"
+    // );
+    if (habitData.habit_duration?.all_day) {
+      setLabel("You have selected All day in habit duration specify time");
+      setIsSpecified(true);
+      setShowStartTimePicker(true);
+    } else if (habitData.habit_duration?.start_time) {
+      setLabel("select the preset to send reminder");
+      setReminderAt(habitData.habit_duration?.start_time);
+      setIsSpecified(false);
+      setShowStartTimePicker(false);
+    }
+  }, []);
+
+  const handleSave = () => {
+    const date = reminderAt ? new Date(reminderAt) : null;
+    let timeString = null;
     // Format the time using toLocaleTimeString
-    const timeString = date.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      timeZoneName: "short", // Optional to include the time zone abbreviation
-    });
+    if (date) {
+      const timeString = date.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        timeZoneName: "short", // Optional to include the time zone abbreviation
+      });
+    }
+
+    const obj = getFormattedValue();
+
     const parsedValue = {
       timeDisplay: timeString,
-      time: reminderAt,
-      isTenMinsBeforeEnabled: selection === "10 minutes before" ? true : false,
+      val: obj,
     };
-    //  console.log(timeString, "foramtted time");
     onSave(parsedValue);
     // Reset state after saving
-    setReminderAt(new Date()); // TODO Need to recheck how to reset the value
+    setReminderAt(""); // TODO Need to recheck how to reset the value
     setIsSpecified(false);
     setError("");
     onClose();
   };
 
-  const handleTimeChange = (selectedDate: Date) => {
-    console.log(
-      `Reminder At Modal ${selectedDate} ${format(selectedDate, "hh:mm:a")}`
-    );
+  const handleTimeChange = (selectedDate: any) => {
     if (selectedDate) {
       setReminderAt(selectedDate);
     }
+  };
+
+  const getFormattedValue = () => {
+    let result: {
+      time?: string | undefined;
+      ten_min_before?: boolean;
+      thirty_min_before?: boolean;
+      [key: string]: string | boolean | undefined; // Index signature
+    } = {};
+    if (isSpecified) {
+      result.time = reminderAt ? format(reminderAt, "hh:mm:ss") : "";
+    } else {
+      // Determine the key based on the selection
+      let key =
+        selection === "10 minutes before"
+          ? "ten_min_before"
+          : "thirty_min_before";
+      result[key] = true;
+    }
+    return result;
   };
 
   const onSpecifyValueChange = (value: boolean) => {
@@ -103,13 +150,14 @@ const ReminderAtModal: React.FC<ReminderAtModalProps> = ({
           </View>
 
           <View style={styles.remiderAt}>
+            <Text>{label}</Text>
             <Text style={styles.remiderAtText}>
-              Reminder At: {format(reminderAt, "hh:mm a")}
+              Reminder At: {reminderAt ? reminderAt : null}
             </Text>
           </View>
 
           {/* Toggle for Specified Time */}
-          <View style={styles.toggleContainer}>
+          {/* <View style={styles.toggleContainer}>
             <Text style={styles.label}>Specify Time</Text>
             <Switch
               value={isSpecified}
@@ -119,13 +167,14 @@ const ReminderAtModal: React.FC<ReminderAtModalProps> = ({
                 true: `${themeColors.basic.tertiaryColor}`,
               }}
             />
-          </View>
+          </View> */}
+
           {showStartTimePicker && (
             <TimePicker onConfirmTime={handleTimeChange} label="Reminder At" />
           )}
 
           {/* Options when Specified Time is enabled */}
-          {isSpecified && (
+          {!isSpecified && (
             <View style={styles.optionsContainer}>
               {/* Radio Buttons for Point Time and Time Period */}
               <View style={styles.radioContainer}>

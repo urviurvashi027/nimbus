@@ -27,7 +27,7 @@ export default function HabitMetric() {
 
   const [habitMetric, setHabitMetric] = useState<MetricFormat | null>(null);
   const [frequency, setFrequency] = useState<FormattedFrequency | null>(null);
-  const [duration, setDuration] = useState<Duration>({ type: "All Day" });
+  const [duration, setDuration] = useState<Duration>({ all_day: true });
 
   const [showFrequencyModal, setShowFrequencyModal] = useState(false);
   const [showHabitMetricModal, setShowHabitMetricModal] = useState(false);
@@ -53,46 +53,44 @@ export default function HabitMetric() {
     });
   }, [navigation]);
 
-  useEffect(() => {
-    console.log(habitData, "habitData from metric");
-  }, [habitData]);
-
   // function to handle task duration
   const handleTaskDuration = (selectedDuration: any) => {
-    // console.log(selectedDuration, "selectedDuration");
+    // console.log(selectedDuration, "durationk");
     setDuration(selectedDuration);
   };
 
   // function to handle metric
   const handleHabitMetricSave = (value: MetricFormat) => {
-    // console.log(value, "handleHabitMetricSave");
     setHabitMetric(value);
     setShowHabitMetricModal(false);
   };
 
   // function to handle frequency save
   const handleFrequencySave = (selectedFrequency: any) => {
-    // console.log(selectedFrequency, "from: selectedFrequency ");
+    console.log(selectedFrequency, "selectedFrequency============= ");
     setFrequency(selectedFrequency);
     setShowFrequencyModal(false);
   };
 
   const onContinueClick = () => {
-    // console.log("continue clicked habit Metric");
-    console.log("from habit basic", habitData, {
-      habitMetric: habitMetric,
-      frequency: frequency?.parsedFreq,
-      habitDuration: duration,
-    });
-    console.log(frequency?.parsedFreq.details.specificDate, "specific data");
     setHabitData({
       ...habitData,
-      habitMetric: habitMetric,
-      frequency: frequency?.parsedFreq,
-      habitDuration: duration,
+      habit_metric: {
+        count: habitMetric?.count,
+        unit: habitMetric?.unit,
+      },
+      habit_frequency: frequency?.parsedFreq,
+      habit_duration: duration,
     });
     router.push("/create-habit/habitSchedules");
   };
+
+  useEffect(() => {
+    console.log(
+      habitData,
+      "habitData from metric -------------------------------------"
+    );
+  }, [habitData]);
 
   const styles = styling(theme);
   return (
@@ -111,7 +109,7 @@ export default function HabitMetric() {
         >
           <Text style={styles.selectorText}>
             {habitMetric
-              ? `Metric: ${habitMetric.target}  ${habitMetric.unitLabel}`
+              ? `Metric: ${habitMetric.count}  ${habitMetric.unit}`
               : "Select Habit Metric"}
           </Text>
         </TouchableOpacity>
@@ -136,14 +134,13 @@ export default function HabitMetric() {
           onPress={() => setShowDurationModal(true)}
         >
           <Text style={styles.selectorText}>
-            {duration.type === "All Day"
+            {duration?.all_day === true
               ? "All Day"
-              : duration.type === "Point Time"
-              ? `Point Time: ${format(duration.time, "hh:mm a")}`
-              : `From ${format(duration.start, "hh:mm a")} To ${format(
-                  duration.end,
+              : duration.start_time && duration.end_time
+              ? `From ${duration.start_time} To ${duration.end_time},
                   "hh:mm a"
-                )}`}
+                )}`
+              : `Point Time: ${duration.start_time}`}
           </Text>
           <Ionicons name="chevron-forward" size={20} color="#888" />
         </TouchableOpacity>

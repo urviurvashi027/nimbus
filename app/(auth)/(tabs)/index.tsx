@@ -2,7 +2,7 @@ import { Platform, StyleSheet, TouchableOpacity } from "react-native";
 
 import { View, Text, ScreenView } from "@/components/Themed";
 import { router } from "expo-router";
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import ThemeContext from "@/context/ThemeContext";
 import DatePanel from "@/components/homeScreen/DatePanel";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -10,6 +10,7 @@ import HabitList from "@/components/HabitList/HabitList";
 import { tasks } from "@/constant/data/taskList";
 import { Ionicons } from "@expo/vector-icons";
 import { themeColors } from "@/constant/Colors";
+import { getHabitList } from "@/service/habitService";
 
 type ThemeKey = "basic" | "light" | "dark";
 
@@ -18,18 +19,30 @@ export default function TabOneScreen() {
     router.push("/create-habit/habitBasic");
   };
 
+  const [habitList, setHabitList] = useState();
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
 
   const styles = styling(theme);
-
-  // useEffect(() => {
-  //   // console.log(theme, "dicover theme");
-  // }, [theme]);
 
   // function to be called whenever date changes
   const onDateChange = (val: any) => {
     // console.log(val, "value of changed date from index");
   };
+
+  const getHabitListData = async () => {
+    const result = await getHabitList();
+    if (result && result.success) {
+      setHabitList(result.data);
+      console.log(result, "succesfully created");
+    }
+    if (result && result.error) {
+      alert(result);
+    }
+  };
+
+  useEffect(() => {
+    getHabitListData();
+  }, []);
 
   return (
     <ScreenView style={{ paddingTop: Platform.OS === "ios" ? 50 : 20 }}>
@@ -38,7 +51,7 @@ export default function TabOneScreen() {
         <DatePanel onDateChange={onDateChange} />
 
         <View style={styles.taskListContainer}>
-          <HabitList data={tasks} style={styles.itemSeparator} />
+          <HabitList data={habitList} style={styles.itemSeparator} />
         </View>
       </GestureHandlerRootView>
       <TouchableOpacity style={styles.floatingButton} onPress={onContinueClick}>
