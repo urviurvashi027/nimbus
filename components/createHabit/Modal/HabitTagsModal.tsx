@@ -62,7 +62,6 @@ const HabitTagsModal: React.FC<TaskTagsModalProps> = ({
       setError("Tag already exists.");
       return;
     }
-    console.log(newTag, "newTag -=-=-=-=-=-=-=-=-=-=-=-=-=-=");
     // setNewTag("");
     setIsAdding(false);
     setError("");
@@ -83,7 +82,6 @@ const HabitTagsModal: React.FC<TaskTagsModalProps> = ({
 
   useEffect(() => {
     if (selectedTag.length) {
-      console.log(newTag, "newTag");
       const result = {
         existing_tag: selectedTag,
         new_tag: newTag,

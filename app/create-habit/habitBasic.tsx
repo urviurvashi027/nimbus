@@ -8,7 +8,6 @@ import { Button, FormInput, ScreenView } from "@/components/Themed";
 import ThemeContext from "@/context/ThemeContext";
 import { themeColors } from "@/constant/Colors";
 import { Text } from "@/components/Themed";
-import TaskTagsModal from "@/components/createHabit/TaskTagsModal";
 import HabitTypeInput from "@/components/createHabit/HabitTypeInput";
 import HabitTagsInput from "@/components/createHabit/HabitTagsInput";
 import { ThemeKey } from "@/components/Themed";
@@ -112,8 +111,6 @@ export default function HabitBasic() {
       }}
     >
       <View>
-        {/* Color Selection */}
-        {/* <Text style={styles.label}>Select Color</Text> */}
         <View style={styles.colorOptionsContainer}>
           {["red", "blue", "green", "yellow", "black"].map((color) => (
             <TouchableOpacity
@@ -143,57 +140,14 @@ export default function HabitBasic() {
         />
 
         <HabitTypeInput onSelect={handleHabitTypeSelect} />
-
         <HabitTagsInput onSelect={handleHabitTagSelection} />
-
-        {/* Tags */}
-        {/* <Text style={styles.label}>Tags</Text>
-        <TouchableOpacity
-          style={styles.selectorButton}
-          onPress={() => setShowTaskTagsModal(true)}
-        >
-          <Text style={styles.selectorText}>
-            {tags.length > 0 ? `${tags.length} Tag(s) Selected` : "Select Tags"}
-          </Text>
-          <Ionicons name="chevron-forward" size={20} color="#888" />
-        </TouchableOpacity> */}
       </View>
-
-      {/* Display Selected Tags */}
-      {/* <View style={styles.tagsContainer}>
-        {tags.map((tag, index) => (
-          <View key={index} style={styles.tag}>
-            <Text style={styles.tagText}>{tag.name}</Text>
-            <TouchableOpacity onPress={() => handleRemoveTag(index)}>
-              <Ionicons name="close-circle" size={16} color="#ff0000" />
-            </TouchableOpacity>
-          </View>
-        ))}
-      </View> */}
-
       <Button
         style={styles.btn}
         textStyle={styles.btnText}
         title="Continue"
         onPress={onContinueClick}
       />
-
-      {/* Task Type Modal */}
-      {/* <TaskTypeModal
-        // visible={showTaskTypeModal}
-        // onClose={() => setShowTaskTypeModal(false)}
-        onSelect={handleTypeTaskModal}
-        // onSelect={(type) => setTaskType(type)}
-      /> */}
-
-      {/* Task Tags Modal */}
-      {/* <TaskTagsModal
-        visible={showTaskTagsModal}
-        onClose={() => setShowTaskTagsModal(false)}
-        onSelect={(tag: any) => handleAddTag(tag)}
-        existingTags={tags}
-        onAddNewTag={handleNewTag}
-      /> */}
     </ScreenView>
   );
 }

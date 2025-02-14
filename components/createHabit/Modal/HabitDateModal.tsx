@@ -6,13 +6,13 @@ import {
   Switch,
   TouchableOpacity,
 } from "react-native";
-import { Text } from "../Themed";
+import { Text } from "../../Themed";
 // import DateTimePicker from "@react-native-community/datetimepicker";
 import { Ionicons } from "@expo/vector-icons";
 import { format } from "date-fns";
 import ThemeContext from "@/context/ThemeContext";
 import { themeColors } from "@/constant/Colors";
-import DatePicker from "../DatePicker";
+import DatePicker from "../../DatePicker";
 
 export type parsedValue = {
   startDate: string;
@@ -31,7 +31,7 @@ interface StartTaskModalProps {
   onSave: (habitDate: parsedValue) => void;
 }
 
-const StartTaskModal: React.FC<StartTaskModalProps> = ({
+const HabitDateModal: React.FC<StartTaskModalProps> = ({
   visible,
   onClose,
   onSave,
@@ -249,4 +249,4 @@ const styling = (theme: ThemeKey) =>
     },
   });
 
-export default StartTaskModal;
+export default HabitDateModal;

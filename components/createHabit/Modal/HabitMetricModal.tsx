@@ -1,7 +1,7 @@
 import React, { useState, Dispatch, SetStateAction, useContext } from "react";
 import { View, StyleSheet, Modal, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { FormInput, Text } from "../Themed";
+import { FormInput, Text } from "../../Themed";
 import DropDownPicker from "react-native-dropdown-picker";
 import ThemeContext from "@/context/ThemeContext";
 import { themeColors } from "@/constant/Colors";

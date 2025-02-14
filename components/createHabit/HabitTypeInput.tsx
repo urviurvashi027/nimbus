@@ -97,7 +97,7 @@ const styling = (theme: ThemeKey) =>
       borderColor: themeColors[theme].inpurBorderColor,
       borderRadius: 5,
       paddingHorizontal: 5,
-      marginBottom: 10,
+      // marginBottom: 10,
       width: "100%",
     },
     selectorText: {

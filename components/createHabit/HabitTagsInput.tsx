@@ -83,15 +83,12 @@ const HabitTagsInput: React.FC<HabitTagsInputProps> = ({ onSelect }) => {
   //   }, [habitTypeList]);
 
   const handleOnSelect = (selectedHabitTag: selectedTag) => {
-    console.log(selectedHabitTag, "from input");
-
     setSelectedTag(selectedHabitTag);
     // onSelect(id);
   };
 
   useEffect(() => {
     const res = selectedTag?.existing_tag?.map((item: any) => item.id);
-    console.log(res, "exisitng only id");
   }, [selectedTag]);
 
   return (

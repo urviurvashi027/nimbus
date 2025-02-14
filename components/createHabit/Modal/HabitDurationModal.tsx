@@ -7,7 +7,7 @@ import {
   Switch,
   Platform,
 } from "react-native";
-import { Text } from "../Themed";
+import { Text } from "../../Themed";
 import { Ionicons } from "@expo/vector-icons";
 import { format } from "date-fns";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -28,7 +28,7 @@ export type Duration = {
   end_time?: string;
 };
 
-const TaskModalDuration: React.FC<DurationModalProps> = ({
+const HabitDurationModal: React.FC<DurationModalProps> = ({
   visible,
   onClose,
   onSave,
@@ -315,4 +315,4 @@ const styling = (theme: ThemeKey) =>
     },
   });
 
-export default TaskModalDuration;
+export default HabitDurationModal;

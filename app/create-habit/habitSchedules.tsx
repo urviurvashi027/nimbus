@@ -15,6 +15,9 @@ import ReminderAtModal, {
 import { Ionicons } from "@expo/vector-icons";
 import { createHabit } from "@/services/habitService";
 
+import HabitDateInput from "@/components/createHabit/HabitDateInput";
+import HabitReminderInput from "@/components/createHabit/HabitReminderInput";
+
 type ThemeKey = "basic" | "light" | "dark";
 
 export default function HabitMetric() {
@@ -127,7 +130,10 @@ export default function HabitMetric() {
       }}
     >
       <View style={styles.container}>
-        <Text style={styles.label}>Habit Start Date</Text>
+        <HabitDateInput />
+        <HabitReminderInput />
+
+        {/* <Text style={styles.label}>Habit Start Date</Text>
         <TouchableOpacity
           style={styles.selectorButton}
           onPress={() => setShowStartTaskModal(true)}
@@ -139,10 +145,11 @@ export default function HabitMetric() {
                 )} - ${JSON.stringify(habitDate.display.endDate)}`
               : "Select Start Task Date"}
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         {/* Reminder At */}
-        <Text style={styles.label}>Reminder At</Text>
+
+        {/* <Text style={styles.label}>Reminder At</Text>
         <TouchableOpacity
           style={styles.selectorButton}
           onPress={() => setShowReminderAtModal(true)}
@@ -153,7 +160,7 @@ export default function HabitMetric() {
               : "Select Reminder Time"}
           </Text>
           <Ionicons name="chevron-forward" size={20} color="#888" />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
 
       <Button
@@ -163,20 +170,20 @@ export default function HabitMetric() {
         onPress={onContinueClick}
       />
 
-      {/* Reminder At Modal */}
+      {/* Reminder At Modal
       <ReminderAtModal
         visible={showReminderAtModal}
         onClose={() => setShowReminderAtModal(false)}
         onSave={handleHabitReminder}
         // onSave={(reminderAt) => setReminderAt(reminderAt)}
-      />
+      /> */}
 
       {/* Start Task Modal */}
-      <StartTaskModal
+      {/* <StartTaskModal
         visible={showStartTaskModal}
         onClose={() => setShowStartTaskModal(false)}
         onSave={handleStartTaskSave}
-      />
+      /> */}
     </ScreenView>
   );
 }

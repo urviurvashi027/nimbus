@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import { View, StyleSheet, Modal, TouchableOpacity } from "react-native";
-import { FormInput, Text } from "../Themed";
+import { FormInput, Text } from "../../Themed";
 import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/context/ThemeContext";
 import { themeColors } from "@/constant/Colors";
@@ -30,7 +30,7 @@ export type ReminderOutput = {
   days_of_month?: number[];
 };
 
-const FrequencyModal: React.FC<FrequencyModalProps> = ({
+const HabitFrequencyModal: React.FC<FrequencyModalProps> = ({
   visible,
   onClose,
   onSave,
@@ -239,7 +239,7 @@ const FrequencyModal: React.FC<FrequencyModalProps> = ({
                 style={styles.input}
                 keyboardType="numeric"
                 value={dailyCount.toString()}
-                onChangeText={(text) => setDailyCount(Number(text))}
+                onChangeText={(text: any) => setDailyCount(Number(text))}
                 maxLength={2}
               />
               <Text style={styles.label}>days</Text>
@@ -269,7 +269,7 @@ const FrequencyModal: React.FC<FrequencyModalProps> = ({
                   style={styles.input}
                   keyboardType="numeric"
                   value={weeklyCount.toString()}
-                  onChangeText={(text) => setWeeklyCount(Number(text))}
+                  onChangeText={(text: any) => setWeeklyCount(Number(text))}
                   maxLength={2}
                 />
                 <Text style={styles.label}>weeks</Text>
@@ -300,7 +300,7 @@ const FrequencyModal: React.FC<FrequencyModalProps> = ({
                   style={styles.input}
                   keyboardType="numeric"
                   value={monthlyCount.toString()}
-                  onChangeText={(text) => setMonthlyCount(Number(text))}
+                  onChangeText={(text: any) => setMonthlyCount(Number(text))}
                   maxLength={2}
                 />
                 <Text style={styles.label}>months</Text>
@@ -420,4 +420,4 @@ const styling = (theme: ThemeKey) =>
     },
   });
 
-export default FrequencyModal;
+export default HabitFrequencyModal;

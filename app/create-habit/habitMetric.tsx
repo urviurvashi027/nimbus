@@ -6,9 +6,7 @@ import HabitContext from "@/context/HabitContext";
 import { Button, ScreenView } from "@/components/Themed";
 import { themeColors } from "@/constant/Colors";
 import ThemeContext from "@/context/ThemeContext";
-import HabitMetricModal, {
-  MetricFormat,
-} from "@/components/createHabit/TaskHabitMetric";
+import { MetricFormat } from "@/components/createHabit/Modal/HabitMetricModal";
 import FrequencyModal, {
   FormattedFrequency,
 } from "@/components/createHabit/TaskFrequencyModal";
@@ -17,6 +15,9 @@ import TaskModalDuration, {
 } from "@/components/createHabit/TaskModalDuration";
 import { format } from "date-fns";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import HabitMetricInput from "@/components/createHabit/HabitMetricInput";
+import HabitFrequencyInput from "@/components/createHabit/HabitFrequencyInput";
+import HabitDurationInput from "@/components/createHabit/HabitDurationInput";
 
 type ThemeKey = "basic" | "light" | "dark";
 
@@ -29,8 +30,6 @@ export default function HabitMetric() {
   const [frequency, setFrequency] = useState<FormattedFrequency | null>(null);
   const [duration, setDuration] = useState<Duration>({ all_day: true });
 
-  const [showFrequencyModal, setShowFrequencyModal] = useState(false);
-  const [showHabitMetricModal, setShowHabitMetricModal] = useState(false);
   const [showDurationModal, setShowDurationModal] = useState(false);
 
   useEffect(() => {
@@ -59,18 +58,18 @@ export default function HabitMetric() {
     setDuration(selectedDuration);
   };
 
-  // function to handle metric
-  const handleHabitMetricSave = (value: MetricFormat) => {
-    setHabitMetric(value);
-    setShowHabitMetricModal(false);
-  };
+  // // function to handle metric
+  // const handleHabitMetricSave = (value: MetricFormat) => {
+  //   setHabitMetric(value);
+  //   setShowHabitMetricModal(false);
+  // };
 
-  // function to handle frequency save
-  const handleFrequencySave = (selectedFrequency: any) => {
-    console.log(selectedFrequency, "selectedFrequency============= ");
-    setFrequency(selectedFrequency);
-    setShowFrequencyModal(false);
-  };
+  // // function to handle frequency save
+  // const handleFrequencySave = (selectedFrequency: any) => {
+  //   console.log(selectedFrequency, "selectedFrequency============= ");
+  //   setFrequency(selectedFrequency);
+  //   setShowFrequencyModal(false);
+  // };
 
   const onContinueClick = () => {
     setHabitData({
@@ -101,8 +100,12 @@ export default function HabitMetric() {
     >
       <View style={styles.container}>
         {/* Habit Metric */}
-        <Text style={styles.label}>Habit Metric</Text>
-        {/* Habit Metric Button */}
+
+        <HabitMetricInput />
+        <HabitFrequencyInput />
+        <HabitDurationInput />
+
+        {/* <Text style={styles.label}>Habit Metric</Text>
         <TouchableOpacity
           style={styles.selectorButton}
           onPress={() => setShowHabitMetricModal(true)}
@@ -112,10 +115,10 @@ export default function HabitMetric() {
               ? `Metric: ${habitMetric.count}  ${habitMetric.unit}`
               : "Select Habit Metric"}
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         {/* Habit Frequency */}
-        <Text style={styles.label}>Habit Frequency</Text>
+        {/* <Text style={styles.label}>Habit Frequency</Text>
         <TouchableOpacity
           style={styles.selectorButton}
           onPress={() => setShowFrequencyModal(true)}
@@ -125,10 +128,10 @@ export default function HabitMetric() {
               ? `Frequency: ${JSON.stringify(frequency.userDisplay)}`
               : "Select Frequency"}
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         {/* Habit Duration */}
-        <Text style={styles.label}>Habit Duration</Text>
+        {/* <Text style={styles.label}>Habit Duration</Text>
         <TouchableOpacity
           style={styles.selectorButton}
           onPress={() => setShowDurationModal(true)}
@@ -143,7 +146,7 @@ export default function HabitMetric() {
               : `Point Time: ${duration.start_time}`}
           </Text>
           <Ionicons name="chevron-forward" size={20} color="#888" />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
 
       <Button
@@ -153,27 +156,13 @@ export default function HabitMetric() {
         onPress={onContinueClick}
       />
 
-      {/* Duration Modal */}
+      {/* Duration Modal
       <TaskModalDuration
         visible={showDurationModal}
         onClose={() => setShowDurationModal(false)}
         onSave={handleTaskDuration}
         // onSave={(selectedDuration: any) => setDuration(selectedDuration)}
-      />
-
-      {/* Habit Metric Modal */}
-      <HabitMetricModal
-        visible={showHabitMetricModal}
-        onClose={() => setShowHabitMetricModal(false)}
-        onSave={handleHabitMetricSave}
-      />
-
-      {/* Frequency Type Modal */}
-      <FrequencyModal
-        visible={showFrequencyModal}
-        onClose={() => setShowFrequencyModal(false)}
-        onSave={handleFrequencySave}
-      />
+      /> */}
     </ScreenView>
   );
 }

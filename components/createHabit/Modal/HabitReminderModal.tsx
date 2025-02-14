@@ -7,13 +7,13 @@ import {
   Switch,
   Platform,
 } from "react-native";
-import { Text } from "../Themed";
+import { Text } from "../../Themed";
 import { Ionicons } from "@expo/vector-icons";
 import { format } from "date-fns";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import ThemeContext from "@/context/ThemeContext";
 import { themeColors } from "@/constant/Colors";
-import TimePicker from "../TimePicker";
+import TimePicker from "../../TimePicker";
 import HabitContext from "@/context/HabitContext";
 
 interface ReminderAt {
@@ -35,7 +35,7 @@ interface ReminderAtModalProps {
   onSave: (duration: FormattedReminderAt) => void;
 }
 
-const ReminderAtModal: React.FC<ReminderAtModalProps> = ({
+const HabitReminderModal: React.FC<ReminderAtModalProps> = ({
   visible,
   onClose,
   onSave,
@@ -317,4 +317,4 @@ const styling = (theme: ThemeKey) =>
     },
   });
 
-export default ReminderAtModal;
+export default HabitReminderModal;
