@@ -13,7 +13,7 @@ import ReminderAtModal, {
   FormattedReminderAt,
 } from "@/components/createHabit/TaskReminderAt";
 import { Ionicons } from "@expo/vector-icons";
-import { createHabit } from "@/service/habitService";
+import { createHabit } from "@/services/habitService";
 
 type ThemeKey = "basic" | "light" | "dark";
 

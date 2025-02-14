@@ -1,22 +1,20 @@
 import React, { useContext, useEffect, useState } from "react";
-import { StyleSheet, Image, useColorScheme } from "react-native";
-import { Text, View, TextInput, ScreenView } from "@/components/Themed";
-import { Alert, SafeAreaView, TouchableOpacity } from "react-native";
-import { useAuth } from "@/context/AuthContext";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import Colors, { primaryColor, themeColors } from "@/constant/Colors";
-import SegmentedButton from "@/components/segmentedButton";
+import { StyleSheet, useColorScheme } from "react-native";
+import { Alert } from "react-native";
 import { router, useNavigation } from "expo-router";
+
+import { View, TextInput, ScreenView } from "@/components/Themed";
+import { useAuth } from "@/context/AuthContext";
+import { themeColors } from "@/constant/Colors";
 import ThemeContext from "@/context/ThemeContext";
 import { Button } from "@/components/Themed";
-
-type ThemeKey = "basic" | "light" | "dark";
+import { ThemeKey } from "@/components/Themed";
 
 export default function signIn() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const { onLogin, onRegister } = useAuth();
+  const { onLogin } = useAuth();
 
   const navigation = useNavigation();
 

@@ -1,43 +1,35 @@
-import {
-  View,
-  TouchableOpacity,
-  StyleSheet,
-  TextInput,
-  Platform,
-  Alert,
-} from "react-native";
+import { View, TouchableOpacity, StyleSheet, Platform } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { router, useNavigation } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+
 import HabitContext from "@/context/HabitContext";
 import { Button, FormInput, ScreenView } from "@/components/Themed";
 import ThemeContext from "@/context/ThemeContext";
 import { themeColors } from "@/constant/Colors";
-import { Ionicons } from "@expo/vector-icons";
 import { Text } from "@/components/Themed";
 import TaskTagsModal from "@/components/createHabit/TaskTagsModal";
-import TaskTypeModal, {
-  HabitTypes,
-  TASK_TYPES,
-} from "@/components/createHabit/TaskTypeModal";
-
-type ThemeKey = "basic" | "light" | "dark";
+import HabitTypeInput from "@/components/createHabit/HabitTypeInput";
+import HabitTagsInput from "@/components/createHabit/HabitTagsInput";
+import { ThemeKey } from "@/components/Themed";
+import { HabitType } from "@/types/habitTypes";
 
 export default function HabitBasic() {
   const [colorSchema, setColorSchema] = useState<
     "red" | "blue" | "green" | "yellow" | "black"
   >("red");
 
-  const [taskName, setTaskName] = useState("");
-  const [taskType, setTaskType] = useState<HabitTypes>(TASK_TYPES[0]);
+  const [habitName, sethabitName] = useState("");
+  const [habitTypeId, sethabitTypeId] = useState<number>(0);
   const [tags, setTags] = useState<any>([]);
-
-  const [showTaskTypeModal, setShowTaskTypeModal] = useState(false);
+  // for modal
   const [showTaskTagsModal, setShowTaskTagsModal] = useState(false);
 
   const { habitData, setHabitData } = useContext(HabitContext);
-  const navigation = useNavigation();
-
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const styles = styling(theme);
+
+  const navigation = useNavigation();
 
   const handleColorSelect = (
     color: "red" | "blue" | "green" | "yellow" | "black"
@@ -46,31 +38,35 @@ export default function HabitBasic() {
   };
 
   // function to handle Type Task Modal
-  const handleTypeTaskModal = (type: any) => {
-    setTaskType(type);
+  const handleHabitTypeSelect = (habitTypeId: number) => {
+    sethabitTypeId(habitTypeId);
   };
 
-  const handleAddTag = (tag: string) => {
-    // console.log(tags, "habit basic tags");
-    setTags([...tags, tag]);
+  const handleHabitTagSelection = (selectedTags: any) => {
+    console.log(
+      selectedTags,
+      "selectedTags selectedTags handleHabitTagSelection-------------"
+    );
   };
 
-  const handleNewTag = (tagName: string, id: number | undefined) => {
-    // console.log(tags, "habit basic tags");
-    setTags([...tags, { name: tagName, id }]);
-  };
+  // const handleAddTag = (tag: string) => {
+  //   setTags([...tags, tag]);
+  // };
 
-  // useEffect(() => {
-  //   console.log(tags, "from useEffect ");
-  // }, [tags]);
+  // const handleNewTag = (tagName: string, id: number | undefined) => {
+  //   setTags([...tags, { name: tagName, id }]);
+  // };
 
-  // Handle removing tags
-  const handleRemoveTag = (index: number) => {
-    // console.log("remove tags called", index);
-    const updatedTags = [...tags];
-    updatedTags.splice(index, 1);
-    setTags(updatedTags);
-  };
+  // // useEffect(() => {
+  // //   console.log(tags, "from useEffect ");
+  // // }, [tags]);
+
+  // // Handle removing tags
+  // const handleRemoveTag = (index: number) => {
+  //   const updatedTags = [...tags];
+  //   updatedTags.splice(index, 1);
+  //   setTags(updatedTags);
+  // };
 
   useEffect(() => {
     navigation.setOptions({
@@ -89,22 +85,20 @@ export default function HabitBasic() {
     });
   }, [navigation]);
 
-  const styles = styling(theme);
-
   const getSelectedTag = () => {
     const tagNames = tags.map((tag: any) => tag.name);
     return tagNames;
   };
 
   const onContinueClick = () => {
-    if (!taskName && taskType?.id) {
+    if (!habitName && habitTypeId) {
       alert("Please fill in the required field");
     } else {
       setHabitData({
         ...habitData,
         color: colorSchema,
-        name: taskName,
-        habit_type_id: taskType?.id,
+        name: habitName,
+        habit_type_id: habitTypeId,
         tags: getSelectedTag(),
       });
       router.push("/create-habit/habitMetric");
@@ -144,22 +138,16 @@ export default function HabitBasic() {
           style={styles.input}
           placeholderTextColor={themeColors.basic.mediumGrey}
           placeholder="Enter task name"
-          value={taskName}
-          onChangeText={setTaskName}
+          value={habitName}
+          onChangeText={sethabitName}
         />
 
-        {/* Task Type */}
-        <Text style={styles.label}>Task Type</Text>
-        <TouchableOpacity
-          style={styles.selectorButton}
-          onPress={() => setShowTaskTypeModal(true)}
-        >
-          <Text style={styles.selectorText}>{taskType?.name}</Text>
-          <Ionicons name="chevron-forward" size={20} color="#888" />
-        </TouchableOpacity>
+        <HabitTypeInput onSelect={handleHabitTypeSelect} />
+
+        <HabitTagsInput onSelect={handleHabitTagSelection} />
 
         {/* Tags */}
-        <Text style={styles.label}>Tags</Text>
+        {/* <Text style={styles.label}>Tags</Text>
         <TouchableOpacity
           style={styles.selectorButton}
           onPress={() => setShowTaskTagsModal(true)}
@@ -168,11 +156,11 @@ export default function HabitBasic() {
             {tags.length > 0 ? `${tags.length} Tag(s) Selected` : "Select Tags"}
           </Text>
           <Ionicons name="chevron-forward" size={20} color="#888" />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
 
       {/* Display Selected Tags */}
-      <View style={styles.tagsContainer}>
+      {/* <View style={styles.tagsContainer}>
         {tags.map((tag, index) => (
           <View key={index} style={styles.tag}>
             <Text style={styles.tagText}>{tag.name}</Text>
@@ -181,7 +169,7 @@ export default function HabitBasic() {
             </TouchableOpacity>
           </View>
         ))}
-      </View>
+      </View> */}
 
       <Button
         style={styles.btn}
@@ -191,21 +179,21 @@ export default function HabitBasic() {
       />
 
       {/* Task Type Modal */}
-      <TaskTypeModal
-        visible={showTaskTypeModal}
-        onClose={() => setShowTaskTypeModal(false)}
+      {/* <TaskTypeModal
+        // visible={showTaskTypeModal}
+        // onClose={() => setShowTaskTypeModal(false)}
         onSelect={handleTypeTaskModal}
         // onSelect={(type) => setTaskType(type)}
-      />
+      /> */}
 
       {/* Task Tags Modal */}
-      <TaskTagsModal
+      {/* <TaskTagsModal
         visible={showTaskTagsModal}
         onClose={() => setShowTaskTagsModal(false)}
         onSelect={(tag: any) => handleAddTag(tag)}
         existingTags={tags}
         onAddNewTag={handleNewTag}
-      />
+      /> */}
     </ScreenView>
   );
 }

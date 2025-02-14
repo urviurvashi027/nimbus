@@ -8,8 +8,10 @@ import {
   HabitDeleteResponse,
   HabitDoneRequest,
   HabitDoneResponse,
-  HabitRequest,
-  HabitResponse,
+  HabitDetailRequest,
+  HabitDetailResponse,
+  HabitTypeResponse,
+  HabitTagResponse,
 } from "@/types/habitTypes";
 
 // Type definitions for login, signup, and list responses
@@ -36,6 +38,30 @@ export const getHabitList = async (): Promise<HabitListResponse> => {
   try {
     const response: AxiosResponse<HabitListResponse> = await axios.get(
       API_ENDPOINTS.createHabit
+    );
+    return response.data; // Return the list data
+  } catch (error: any) {
+    throw error.response ? error.response.data : error.message;
+  }
+};
+
+// get habit type
+export const getHabitType = async (): Promise<HabitTypeResponse> => {
+  try {
+    const response: AxiosResponse<HabitTypeResponse> = await axios.get(
+      API_ENDPOINTS.habitTypeList
+    );
+    return response.data; // Return the list data
+  } catch (error: any) {
+    throw error.response ? error.response.data : error.message;
+  }
+};
+
+// get habit tag
+export const getHabitTag = async (): Promise<HabitTagResponse> => {
+  try {
+    const response: AxiosResponse<HabitTagResponse> = await axios.get(
+      API_ENDPOINTS.habitTagList
     );
     return response.data; // Return the list data
   } catch (error: any) {
@@ -75,10 +101,10 @@ export const markHabitDone = async (
 
 // get habit details by id
 export const getHabitListById = async (
-  data: HabitRequest
-): Promise<HabitResponse> => {
+  data: HabitTypeResponse
+): Promise<HabitTypeResponse> => {
   try {
-    const response: AxiosResponse<HabitResponse> = await axios.get(
+    const response: AxiosResponse<HabitTypeResponse> = await axios.get(
       `${API_ENDPOINTS.getHabitDetailsById}/${data}`
     );
     return response.data; // Return the list data

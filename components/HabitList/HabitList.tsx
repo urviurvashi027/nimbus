@@ -8,23 +8,11 @@ import {
 } from "react-native";
 import React from "react";
 import SwipeableItem from "./SwipeableItem";
-
-type ThemeKey = "basic" | "light" | "dark";
-
-export interface HabitItemProps {
-  id: string;
-  name: string;
-  time: string;
-  habit_type: number;
-  color: string;
-  reminder_time: string;
-  duration: string;
-  // isDone: boolean;
-  //   onToggle: (isDone: boolean) => void;
-}
+import { HabitItem } from "@/types/habitTypes";
+// import { ThemeKey } from "../Themed";
 
 interface HabitListProps {
-  data: Array<HabitItemProps>;
+  data: Array<HabitItem>;
   style: any;
 }
 

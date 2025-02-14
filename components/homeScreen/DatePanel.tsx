@@ -9,8 +9,10 @@ import {
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { format, startOfWeek, addDays, isSameDay } from "date-fns";
 import { useNavigation } from "expo-router";
+
 import ThemeContext from "@/context/ThemeContext";
 import { themeColors } from "@/constant/Colors";
+import { ThemeKey } from "../Themed";
 
 const daysOfWeek = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
 const MAX_WEEK = 52; // 1 year forward
@@ -27,8 +29,6 @@ interface DatePanelProps {
   onDateChange: any;
   //   getSelectedDate: any;
 }
-
-type ThemeKey = "basic" | "light" | "dark";
 
 export default function DatePanel(props: DatePanelProps) {
   const { onDateChange } = props;

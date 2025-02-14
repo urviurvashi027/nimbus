@@ -5,32 +5,29 @@ import {
   StyleSheet,
   Platform,
   ToastAndroid,
-  useColorScheme,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import { router, useNavigation, useRouter } from "expo-router";
+import { useNavigation, useRouter } from "expo-router";
+
 import { themeColors } from "@/constant/Colors";
 import { ScreenView, TextInput } from "@/components/Themed";
 import ThemeContext from "@/context/ThemeContext";
 import { useAuth } from "@/context/AuthContext";
-
-type ThemeKey = "basic" | "light" | "dark";
+import { ThemeKey } from "@/components/Themed";
 
 export default function signUp() {
-  const navigation = useNavigation();
-  const { onLogin, onRegister } = useAuth();
-  const router = useRouter();
-
-  const colorScheme = useColorScheme();
-
-  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
-
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [fullName, setfullName] = useState<string>("");
   const [username, setUsername] = useState<string>("");
   const [visible, setVisible] = useState(false);
+
+  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const styles = styling(theme);
+
+  const navigation = useNavigation();
+  const { onRegister } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     navigation.setOptions({
@@ -44,8 +41,6 @@ export default function signUp() {
         fontSize: 18,
         color: styles.header,
         paddingTop: 5,
-        // marginBottom: 20,
-        // height: 40,
       },
     });
   }, [navigation]);
@@ -64,7 +59,6 @@ export default function signUp() {
     }
 
     onSignUpClick();
-    // router.replace("/routine");
   };
 
   const onSignUpClick = async () => {
@@ -74,8 +68,6 @@ export default function signUp() {
       alert(result.msg);
     }
   };
-
-  const styles = styling(theme);
 
   return (
     <ScreenView style={styles.container}>
@@ -162,16 +154,13 @@ const styling = (theme: ThemeKey) =>
       paddingTop: 95,
     },
     titleContainer: {
-      // justifyContent: "center",
-      // alignItems: "center",
-      justifyContent: "center", // Centers vertically
+      justifyContent: "center",
       alignItems: "center",
     },
     input: {
       padding: 15,
       borderWidth: 1,
       borderRadius: 15,
-      // borderColor: themeColors.basic.GRAY,
     },
     header: {
       color: themeColors[theme]?.text,
@@ -208,6 +197,5 @@ const styling = (theme: ThemeKey) =>
     title: {
       color: themeColors[theme].text,
       fontSize: 25,
-      // alignContent: "center",
     },
   });

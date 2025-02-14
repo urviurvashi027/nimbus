@@ -3,7 +3,7 @@ import { useContext, useState } from "react";
 import { router, useSegments } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import axios from "axios";
-import { login, signup, logout } from "@/service/loginService";
+import { login, signup, logout } from "@/services/loginService";
 
 type User = {
   userId: number | null;
@@ -52,11 +52,11 @@ function useProtectedRoute(authState: {
     const inAuthGroup = segments[0] === "(auth)";
 
     if (!authState.authenticated && inAuthGroup) {
-      router.replace("/login");
+      router.replace("/landing");
     } else if (authState.authenticated && !inAuthGroup) {
       router.replace("/(auth)/(tabs)");
     } else {
-      router.replace("/login");
+      router.replace("/landing");
     }
   }, [authState.authenticated]);
 }

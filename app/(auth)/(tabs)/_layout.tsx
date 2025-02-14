@@ -1,17 +1,16 @@
 import React from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, Tabs } from "expo-router";
-import { Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constant/Colors";
 import { useColorScheme } from "@/components/UseColorScheme";
 
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>["name"];
-  color: string;
-}) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
-}
+// function TabBarIcon(props: {
+//   name: React.ComponentProps<typeof FontAwesome>["name"];
+//   color: string;
+// }) {
+//   return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
+// }
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -29,7 +28,6 @@ export default function TabLayout() {
           tabBarLabel: "Routine",
           tabBarIcon: ({ color }) => (
             <Ionicons name="body-outline" size={24} color={color} />
-            // <Ionicons name="location-outline" size={24} color={color} />
           ),
         }}
       />

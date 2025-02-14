@@ -26,7 +26,7 @@ export type TextProps = ThemeProps & DefaultText["props"];
 export type ViewProps = ThemeProps & DefaultView["props"];
 export type TextInputProps = ThemeProps & DefaultTextInput["props"];
 
-type ThemeKey = "basic" | "light" | "dark";
+export type ThemeKey = "basic" | "light" | "dark";
 
 export function useThemeColor(
   props: { light?: string; dark?: string },

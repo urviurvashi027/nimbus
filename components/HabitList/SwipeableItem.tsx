@@ -9,27 +9,15 @@ import Animated, {
   withSpring,
   runOnJS,
 } from "react-native-reanimated";
-import { deleteHabit } from "@/service/habitService";
+import { deleteHabit } from "@/services/habitService";
 import { useNavigation } from "expo-router";
 import ThemeContext from "@/context/ThemeContext";
 import { themeColors } from "@/constant/Colors";
 import { Ionicons } from "@expo/vector-icons";
+import { HabitItem } from "@/types/habitTypes";
+import { ThemeKey } from "../Themed";
 
-type ThemeKey = "basic" | "light" | "dark";
-
-export interface HabitItemProps {
-  id: string;
-  name: string;
-  time: string;
-  habit_type: number;
-  color: string;
-  reminder_time: string;
-  duration: string;
-  // isDone: boolean;
-  //   onToggle: (isDone: boolean) => void;
-}
-
-const SwipeableItem: React.FC<HabitItemProps> = (props: any) => {
+const SwipeableItem: React.FC<HabitItem> = (props: any) => {
   const { name, id, ...rest } = props;
   const [showHabitActionModal, setshowHabitActionModal] = useState(false);
   const translateY = useSharedValue(0);

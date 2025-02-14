@@ -11,8 +11,12 @@ import { Ionicons } from "@expo/vector-icons";
 
 import { themeColors } from "@/constant/Colors";
 import ThemeContext from "@/context/ThemeContext";
-import { FormInput } from "../Themed";
+import { FormInput } from "../../Themed";
 import { findIdBName, addObjectAtEnd } from "@/utils/helper";
+import { HabitTag } from "@/types/habitTypes";
+import { selectedTag } from "../HabitTagsInput";
+
+type ThemeKey = "basic" | "light" | "dark";
 
 interface TagsType {
   id: number;
@@ -20,78 +24,27 @@ interface TagsType {
 }
 
 interface TaskTagsModalProps {
+  habitTagList: HabitTag[];
   visible: boolean;
   onClose: () => void;
-  onSelect: (tag: TagsType) => void;
-  existingTags: TagsType[];
-  onAddNewTag: (tag: string, id: number) => void;
+  onSelect: (tag: selectedTag) => void;
+  //   existingTags: TagsType[];
+  //   onAddNewTag: (tag: string, id: number) => void;
 }
 
-type ThemeKey = "basic" | "light" | "dark";
-
-const PREDEFINED_TAGS = [
-  {
-    id: 1,
-    name: "Morning",
-  },
-  {
-    id: 2,
-    name: "Routine",
-  },
-  {
-    id: 3,
-    name: "Workout",
-  },
-  {
-    id: 4,
-    name: "Clean Room",
-  },
-  {
-    id: 5,
-    name: "Healthy Lifestyle",
-  },
-  {
-    id: 6,
-    name: "Sleep Better",
-  },
-  {
-    id: 7,
-    name: "Relationship",
-  },
-];
-
-// addObjectAtEnd(PREDEFINED_TAGS);
-// const addNewLabel = () => {
-//   // Get the last object in the array
-//   const lastObject = PREDEFINED_TAGS[PREDEFINED_TAGS.length - 1];
-
-//   // Extract the last id and increment it by 1
-//   const newId = lastObject ? lastObject.id + 1 : 1; // Handle empty array case
-
-//   // Create the new object to add
-//   const newObject = {
-//     id: newId,
-//     name: "Add New",
-//   };
-
-//   // Add the new object to the end of the array
-//   const modifiedArray = [...PREDEFINED_TAGS, newObject];
-
-//   return modifiedArray;
-// };
-
-const TaskTagsModal: React.FC<TaskTagsModalProps> = ({
+const HabitTagsModal: React.FC<TaskTagsModalProps> = ({
+  habitTagList,
   visible,
   onClose,
   onSelect,
-  existingTags,
-  onAddNewTag,
+  //   existingTags,
+  //   onAddNewTag,
 }) => {
-  const [data, setData] = useState<TagsType[]>([]);
+  const [habitTagData, setHabitTagData] = useState<TagsType[]>([]);
 
   const [isAdding, setIsAdding] = useState(false);
 
-  const [selectedTag, setSelectedTag] = useState<string[]>([]);
+  const [selectedTag, setSelectedTag] = useState<TagsType[]>([]);
 
   const [newTag, setNewTag] = useState<any>();
   const [error, setError] = useState("");
@@ -105,13 +58,12 @@ const TaskTagsModal: React.FC<TaskTagsModalProps> = ({
       setError("Tag cannot exceed 20 characters.");
       return;
     }
-    if (existingTags.includes(newTag.trim())) {
+    if (selectedTag.includes(newTag.trim())) {
       setError("Tag already exists.");
       return;
     }
-    const id = findIdBName(data, "name", "id", "Add New");
-    // onAddNewTag(newTag.trim(), id);
-    setNewTag("");
+    console.log(newTag, "newTag -=-=-=-=-=-=-=-=-=-=-=-=-=-=");
+    // setNewTag("");
     setIsAdding(false);
     setError("");
     onClose();
@@ -121,14 +73,25 @@ const TaskTagsModal: React.FC<TaskTagsModalProps> = ({
   const styles = styling(theme);
 
   useEffect(() => {
-    const modifiedArray = addObjectAtEnd(PREDEFINED_TAGS);
-    setData(modifiedArray);
-  }, []);
+    const modifiedArray = addObjectAtEnd(habitTagList);
+    setHabitTagData(modifiedArray);
+  }, [habitTagList]);
 
   const handleSaveClick = (tag: any) => {
-    // setSelectedTag([...selectedTag, tag]);
-    onSelect(tag);
+    setSelectedTag([...selectedTag, tag]);
   };
+
+  useEffect(() => {
+    if (selectedTag.length) {
+      console.log(newTag, "newTag");
+      const result = {
+        existing_tag: selectedTag,
+        new_tag: newTag,
+      };
+
+      onSelect(result);
+    }
+  }, [selectedTag, newTag]);
 
   return (
     <Modal
@@ -165,7 +128,7 @@ const TaskTagsModal: React.FC<TaskTagsModalProps> = ({
 
           {/* List of Task Tags */}
           <View style={styles.listContainer}>
-            {data.map((tag, index) => (
+            {habitTagData.map((tag, index) => (
               <TouchableOpacity
                 key={index}
                 style={styles.tagButton}
@@ -186,7 +149,7 @@ const TaskTagsModal: React.FC<TaskTagsModalProps> = ({
             ))}
 
             {/* Display existing tags dynamically */}
-            {existingTags
+            {/* {existingTags
               .filter((tag) => !data.includes(tag))
               .map((tag, index) => (
                 <TouchableOpacity
@@ -200,7 +163,7 @@ const TaskTagsModal: React.FC<TaskTagsModalProps> = ({
                   <Text style={styles.tagText}>{tag.name}</Text>
                   <Ionicons name="chevron-forward" size={20} color="#888" />
                 </TouchableOpacity>
-              ))}
+              ))} */}
           </View>
 
           {/* Add New Tag Section */}
@@ -300,4 +263,4 @@ const styling = (theme: ThemeKey) =>
     },
   });
 
-export default TaskTagsModal;
+export default HabitTagsModal;

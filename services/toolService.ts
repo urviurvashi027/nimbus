@@ -8,7 +8,7 @@ import {
   GetSoundscapeListResponse,
   DownloadMediaListRequest,
   DownloadMediaListResponse,
-} from "@/types/ToolTypes";
+} from "@/types/toolTypes";
 
 // Type definitions for login, signup, and list responses
 
