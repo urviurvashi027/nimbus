@@ -5,6 +5,7 @@ import { FormInput, Text } from "../../Themed";
 import DropDownPicker from "react-native-dropdown-picker";
 import ThemeContext from "@/context/ThemeContext";
 import { themeColors } from "@/constant/Colors";
+import styling from "../style/HabitMetricModalStyle";
 // import { Button } from 'react-native-paper'; // Import Button for segmented control
 
 type ThemeKey = "basic" | "light" | "dark";
@@ -51,9 +52,6 @@ const HabitMetricModal: React.FC<HabitMetricModalProps> = ({
   onSave,
 }) => {
   const [selectedUnit, setSelectedUnit] = useState<any[]>(units);
-  // const [selectedFrequency, setSelectedFrequency] = useState<string>(
-  //   frequencies[0]
-  // );
 
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(0);
@@ -135,71 +133,5 @@ const HabitMetricModal: React.FC<HabitMetricModalProps> = ({
     </Modal>
   );
 };
-
-const styling = (theme: ThemeKey) =>
-  StyleSheet.create({
-    modalOverlay: {
-      flex: 1,
-      backgroundColor: "rgba(0,0,0,0.5)",
-      justifyContent: "center",
-      alignItems: "center",
-    },
-    modalContainer: {
-      width: "90%",
-      backgroundColor: themeColors[theme].background,
-      borderRadius: 10,
-      padding: 20,
-      maxHeight: "90%",
-    },
-    input: {
-      borderWidth: 1,
-      // borderColor: "#ccc",
-      borderRadius: 5,
-      padding: 10,
-      fontSize: 16,
-      // color: "#333",
-      marginBottom: 30,
-    },
-    inputContainer: {
-      marginBottom: 30,
-    },
-    header: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: 20,
-    },
-    title: {
-      fontSize: 18,
-      fontWeight: "bold",
-      color: themeColors[theme].text,
-    },
-    label: {
-      fontSize: 16,
-      // color: "#333",
-      marginBottom: 5,
-    },
-    dropDown: {
-      backgroundColor: themeColors[theme].background,
-      borderColor: themeColors[theme].inpurBorderColor,
-      color: themeColors[theme].text,
-    },
-    saveButton: {
-      backgroundColor: themeColors[theme].primaryColor,
-      paddingVertical: 15,
-      borderRadius: 5,
-      alignItems: "center",
-      marginTop: 20,
-    },
-    saveButtonText: {
-      color: themeColors[theme].text,
-      fontSize: 16,
-      fontWeight: "bold",
-    },
-    item: {
-      color: themeColors[theme].text,
-      borderColor: themeColors[theme].inpurBorderColor,
-    },
-  });
 
 export default HabitMetricModal;

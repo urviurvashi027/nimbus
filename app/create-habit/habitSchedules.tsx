@@ -1,37 +1,24 @@
 import { View, TouchableOpacity, StyleSheet, Platform } from "react-native";
-import { Text } from "@/components/Themed";
 import React, { useContext, useEffect, useState } from "react";
 import { router, useNavigation } from "expo-router";
-import HabitContext from "@/context/HabitContext";
-import { Button, ScreenView } from "@/components/Themed";
-import { themeColors } from "@/constant/Colors";
-import ThemeContext from "@/context/ThemeContext";
-import StartTaskModal, {
-  parsedValue,
-} from "@/components/createHabit/HabitStartDateModal";
-import ReminderAtModal, {
-  FormattedReminderAt,
-} from "@/components/createHabit/TaskReminderAt";
 import { Ionicons } from "@expo/vector-icons";
-import { createHabit } from "@/services/habitService";
 
+import { Text, ThemeKey, Button, ScreenView } from "@/components/Themed";
+import HabitContext from "@/context/HabitContext";
+import ThemeContext from "@/context/ThemeContext";
+import { themeColors } from "@/constant/Colors";
+import { HabitDateType } from "@/components/createHabit/Modal/HabitDateModal";
+import { ReminderAt } from "@/components/createHabit/Modal/HabitReminderModal";
 import HabitDateInput from "@/components/createHabit/HabitDateInput";
 import HabitReminderInput from "@/components/createHabit/HabitReminderInput";
 
-type ThemeKey = "basic" | "light" | "dark";
-
 export default function HabitMetric() {
-  const [reminderAt, setReminderAt] = useState<FormattedReminderAt | null>(
-    null
-  );
-  const [habitDate, setHabitDate] = useState<parsedValue>();
-
-  const [showReminderAtModal, setShowReminderAtModal] = useState(false);
-  const [showStartTaskModal, setShowStartTaskModal] = useState(false);
+  const [reminderAt, setReminderAt] = useState<ReminderAt | null>(null);
+  const [habitDate, setHabitDate] = useState<HabitDateType>();
 
   const { habitData, setHabitData } = useContext(HabitContext);
   const navigation = useNavigation();
-  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext);
 
   useEffect(() => {
     navigation.setOptions({
@@ -56,18 +43,26 @@ export default function HabitMetric() {
   const styles = styling(theme);
 
   // function to handle Habit Reminder
-  const handleHabitReminder = (reminderAt: any) => {
-    // console.log(reminderAt, "from reminderAt");
-    setReminderAt(reminderAt);
+  // const handleHabitReminder = (reminderAt: any) => {
+  //   // console.log(reminderAt, "from reminderAt");
+  //   setReminderAt(reminderAt);
+  // };
+
+  const handleHabitStartDate = (value: any) => {
+    console.log(value, "handleHabitStartDate from schedules");
+  };
+
+  const handleReminderSelect = (value: any) => {
+    console.log(value, "handleReminderSelect from schedules");
   };
 
   // function which will be called on
-  const handleStartTaskSave = (habitDate: parsedValue) => {
-    // Handle the start and end date logic here
-    // console.log(habitDate, "habitDate");
-    setHabitDate(habitDate);
-    setShowStartTaskModal(false);
-  };
+  // const handleStartTaskSave = (habitDate: parsedValue) => {
+  //   // Handle the start and end date logic here
+  //   // console.log(habitDate, "habitDate");
+  //   setHabitDate(habitDate);
+  //   setShowStartTaskModal(false);
+  // };
 
   const getParsedDate = (habitDate: any) => {
     console.log(habitDate, "getParsedDate");
@@ -82,45 +77,36 @@ export default function HabitMetric() {
     return {};
   };
 
-  useEffect(() => {
-    console.log(habitData, "habitData from Schedules");
-    if (habitData.habit_frequency?.start_date) {
-      console.log("I am getting called");
-      creatHabitApi(habitData);
-    }
-  }, [habitData]);
+  // useEffect(() => {
+  //   console.log(habitData, "habitData from Schedules");
+  //   if (habitData.habit_frequency?.start_date) {
+  //     console.log("I am getting called");
+  //     creatHabitApi(habitData);
+  //   }
+  // }, [habitData]);
 
-  const creatHabitApi = async (data: any) => {
-    const result = await createHabit(data);
-    if (result && result.success) {
-      // console.log(result, "succesfully created");
-      router.replace("/(auth)/(tabs)");
-    }
-    if (result && result.error) {
-      alert(result);
-    }
-  };
+  // const creatHabitApi = async (data: any) => {
+  //   const result = await createHabit(data);
+  //   if (result && result.success) {
+  //     // console.log(result, "succesfully created");
+  //     router.replace("/(auth)/(tabs)");
+  //   }
+  //   if (result && result.error) {
+  //     alert(result);
+  //   }
+  // };
 
   const onContinueClick = () => {
-    const habitDateVal = getParsedDate(habitDate);
-    console.log(habitDateVal, "habitDateVal");
-    // console.log(reminderAt, "jhdskjhfjkshdfkjhdkjh 0000000000000");
-    setHabitData((prevInfo: any) => ({
-      ...prevInfo, // Spread the existing state
-      remind_at: reminderAt?.val,
-      habit_frequency: {
-        ...prevInfo.habit_frequency, // Spread the existing address
-        ...habitDateVal,
-      },
-    }));
-
-    // setHabitData({
-    //   ...habitData,
-    //   habitDate.habit_duration: habitDate,
-    //   RemindHabitAt: reminderAt,
-    // });
-
-    // router.push("/(auth)/(tabs)");
+    // const habitDateVal = getParsedDate(habitDate);
+    // console.log(habitDateVal, "habitDateVal");
+    // setHabitData((prevInfo: any) => ({
+    //   ...prevInfo,
+    //   remind_at: reminderAt?.val,
+    //   habit_frequency: {
+    //     ...prevInfo.habit_frequency,
+    //     ...habitDateVal,
+    //   },
+    // }));
   };
 
   return (
@@ -130,37 +116,8 @@ export default function HabitMetric() {
       }}
     >
       <View style={styles.container}>
-        <HabitDateInput />
-        <HabitReminderInput />
-
-        {/* <Text style={styles.label}>Habit Start Date</Text>
-        <TouchableOpacity
-          style={styles.selectorButton}
-          onPress={() => setShowStartTaskModal(true)}
-        >
-          <Text style={styles.selectorText}>
-            {habitDate
-              ? `${JSON.stringify(
-                  habitDate.display.startDate
-                )} - ${JSON.stringify(habitDate.display.endDate)}`
-              : "Select Start Task Date"}
-          </Text>
-        </TouchableOpacity> */}
-
-        {/* Reminder At */}
-
-        {/* <Text style={styles.label}>Reminder At</Text>
-        <TouchableOpacity
-          style={styles.selectorButton}
-          onPress={() => setShowReminderAtModal(true)}
-        >
-          <Text style={styles.selectorText}>
-            {reminderAt
-              ? `Reminder At: ${reminderAt.timeDisplay}`
-              : "Select Reminder Time"}
-          </Text>
-          <Ionicons name="chevron-forward" size={20} color="#888" />
-        </TouchableOpacity> */}
+        <HabitDateInput onSelect={handleHabitStartDate} />
+        <HabitReminderInput onSelect={handleReminderSelect} />
       </View>
 
       <Button
@@ -169,21 +126,6 @@ export default function HabitMetric() {
         title="Continue"
         onPress={onContinueClick}
       />
-
-      {/* Reminder At Modal
-      <ReminderAtModal
-        visible={showReminderAtModal}
-        onClose={() => setShowReminderAtModal(false)}
-        onSave={handleHabitReminder}
-        // onSave={(reminderAt) => setReminderAt(reminderAt)}
-      /> */}
-
-      {/* Start Task Modal */}
-      {/* <StartTaskModal
-        visible={showStartTaskModal}
-        onClose={() => setShowStartTaskModal(false)}
-        onSave={handleStartTaskSave}
-      /> */}
     </ScreenView>
   );
 }

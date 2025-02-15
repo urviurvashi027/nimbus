@@ -4,17 +4,26 @@ import { FormInput, Text } from "../../Themed";
 import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/context/ThemeContext";
 import { themeColors } from "@/constant/Colors";
+import styling from "../style/HabitFrequencyModalStyle";
 
 interface FrequencyModalProps {
   visible: boolean;
   onClose: () => void;
-  onSave: (frequency: FormattedFrequency) => void;
+  onSave: (frequency: FrequencyObj) => void;
 }
 
-export type FormattedFrequency = {
-  userDisplay: string;
-  parsedFreq: ReminderOutput;
+export type FrequencyObj = {
+  frequency_type: string;
+  interval: number;
+
+  days_of_week?: string[];
+  days_of_month?: number[];
 };
+
+// export type FormattedFrequency = {
+//   userDisplay: string;
+//   parsedFreq: ReminderOutput;
+// };
 
 type ThemeKey = "basic" | "light" | "dark";
 
@@ -95,68 +104,6 @@ const HabitFrequencyModal: React.FC<FrequencyModalProps> = ({
     return reminder;
   }
 
-  function formatReminder(reminder: any) {
-    let { frequency_type, interval, ...rest } = reminder;
-    let displayString = "";
-
-    switch (frequency_type) {
-      case "daily":
-        if (interval === 1) {
-          displayString = "Daily";
-        } else {
-          displayString = `Every ${interval} days`;
-        }
-        break;
-
-      case "weekly":
-        if (interval === 1) {
-          displayString = "Weekly";
-        } else {
-          displayString = `Every ${interval} weeks`;
-        }
-        if (daysOfWeek && daysOfWeek.length > 0) {
-          displayString += ` on ${daysOfWeek.join(" and ")}`;
-        }
-        break;
-
-      case "monthly":
-        if (interval === 1) {
-          displayString = "Monthly";
-        } else {
-          displayString = `Every ${interval} months`;
-        }
-        if (rest?.specificDate) {
-          displayString += ` on the ${rest?.specificDate}th`;
-        }
-        if (rest?.monthsOfYear && rest?.monthsOfYear.length > 0) {
-          const monthNames = [
-            "January",
-            "February",
-            "March",
-            "April",
-            "May",
-            "June",
-            "July",
-            "August",
-            "September",
-            "October",
-            "November",
-            "December",
-          ];
-          const selectedMonths = rest?.monthsOfYear.map(
-            (monthIndex: number) => monthNames[monthIndex - 1]
-          );
-          displayString += ` in ${selectedMonths.join(", ")}`;
-        }
-        break;
-
-      default:
-        displayString = "Unknown frequency";
-    }
-
-    return displayString;
-  }
-
   const handleSave = () => {
     let frequency: Frequency;
     if (selectedFrequency === "Daily") {
@@ -168,13 +115,7 @@ const HabitFrequencyModal: React.FC<FrequencyModalProps> = ({
     }
 
     let parsedFrequency = convertToReminder(frequency);
-    let userDisplayFreq = formatReminder(parsedFrequency);
-    let result = {
-      userDisplay: userDisplayFreq,
-      parsedFreq: parsedFrequency,
-    };
-
-    onSave(result);
+    onSave(parsedFrequency);
     onClose();
   };
 
@@ -190,7 +131,7 @@ const HabitFrequencyModal: React.FC<FrequencyModalProps> = ({
     );
   };
 
-  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext);
   const styles = styling(theme);
 
   return (
@@ -309,115 +250,14 @@ const HabitFrequencyModal: React.FC<FrequencyModalProps> = ({
           )}
 
           <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-            <Text style={styles.saveButtonText}>Save</Text>
+            <View>
+              <Text style={styles.saveButtonText}>Save</Text>
+            </View>
           </TouchableOpacity>
         </View>
       </View>
     </Modal>
   );
 };
-
-const styling = (theme: ThemeKey) =>
-  StyleSheet.create({
-    modalOverlay: {
-      flex: 1,
-      backgroundColor: "rgba(0,0,0,0.5)",
-      justifyContent: "center",
-      alignItems: "center",
-    },
-    modalContainer: {
-      width: "90%",
-      backgroundColor: themeColors[theme].background,
-      borderRadius: 10,
-      padding: 20,
-      maxHeight: "90%",
-    },
-    header: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: 20,
-    },
-    title: {
-      fontSize: 18,
-      fontWeight: "bold",
-      color: themeColors[theme].text,
-    },
-    frequencyContainer: {
-      flexDirection: "row",
-      justifyContent: "space-around",
-      marginBottom: 20,
-    },
-    pill: {
-      padding: 10,
-      borderRadius: 20,
-      backgroundColor: themeColors.basic.lightGrey,
-    },
-    inputLabel: {},
-    selectedPill: {
-      backgroundColor: themeColors.basic.secondaryColor,
-    },
-    pillText: {
-      color: themeColors.basic.mediumGrey,
-    },
-    inputContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-      marginBottom: 20,
-    },
-    label: {
-      fontSize: 16,
-      marginRight: 10,
-      marginLeft: 10,
-    },
-    input: {
-      borderWidth: 1,
-      borderRadius: 5,
-      padding: 5,
-      width: 50,
-      textAlign: "center",
-    },
-    dayContainer: {
-      flexDirection: "row",
-      flexWrap: "wrap",
-      marginBottom: 20,
-    },
-    dayPill: {
-      padding: 10,
-      borderRadius: 20,
-      backgroundColor: themeColors.basic.tertiaryColor,
-      margin: 5,
-    },
-    selectedDayPill: {
-      backgroundColor: themeColors.basic.secondaryColor,
-      // backgroundColor: "#007AFF",
-    },
-    dayText: {
-      color: themeColors.basic.mediumGrey,
-    },
-    monthDay: {
-      width: 30,
-      height: 30,
-      borderRadius: 15,
-      backgroundColor: themeColors.basic.tertiaryColor,
-      justifyContent: "center",
-      alignItems: "center",
-      margin: 5,
-    },
-    selectedMonthDay: {
-      backgroundColor: themeColors.basic.secondaryColor,
-    },
-    saveButton: {
-      backgroundColor: themeColors.basic.secondaryColor,
-      paddingVertical: 15,
-      borderRadius: 5,
-      alignItems: "center",
-    },
-    saveButtonText: {
-      color: themeColors[theme].text,
-      fontSize: 16,
-      fontWeight: "bold",
-    },
-  });
 
 export default HabitFrequencyModal;

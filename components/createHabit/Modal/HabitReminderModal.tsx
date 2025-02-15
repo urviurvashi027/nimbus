@@ -7,32 +7,34 @@ import {
   Switch,
   Platform,
 } from "react-native";
-import { Text } from "../../Themed";
 import { Ionicons } from "@expo/vector-icons";
 import { format } from "date-fns";
 import DateTimePicker from "@react-native-community/datetimepicker";
+
+import { Text } from "../../Themed";
 import ThemeContext from "@/context/ThemeContext";
+import HabitContext from "@/context/HabitContext";
 import { themeColors } from "@/constant/Colors";
 import TimePicker from "../../TimePicker";
-import HabitContext from "@/context/HabitContext";
+import styling from "../style/HabitReminderModal";
 
-interface ReminderAt {
+export interface ReminderAt {
   time?: string | undefined;
   ten_min_before?: boolean;
   thirty_min_before?: boolean;
 }
 
-export type FormattedReminderAt = {
-  timeDisplay: string | undefined | null;
-  val: ReminderAt;
-};
+// export type FormattedReminderAt = {
+//   timeDisplay: string | undefined | null;
+//   val: ReminderAt;
+// };
 
 type ThemeKey = "basic" | "light" | "dark";
 
 interface ReminderAtModalProps {
   visible: boolean;
   onClose: () => void;
-  onSave: (duration: FormattedReminderAt) => void;
+  onSave: (duration: ReminderAt) => void;
 }
 
 const HabitReminderModal: React.FC<ReminderAtModalProps> = ({
@@ -44,18 +46,13 @@ const HabitReminderModal: React.FC<ReminderAtModalProps> = ({
   const [showStartTimePicker, setShowStartTimePicker] = useState(false);
   const [label, setLabel] = useState("");
   //   const [reminderAt, setReminderAt] = useState('');
-  const [reminderAt, setReminderAt] = useState<string | undefined>(undefined);
+  const [reminderAt, setReminderAt] = useState<Date>();
   const [selection, setSelection] = useState("");
   const [error, setError] = useState("");
 
   const { habitData, setHabitData } = useContext(HabitContext);
 
   useEffect(() => {
-    // console.log(habitData, "habitData from reminder at");
-    // console.log(
-    //   habitData.habit_duration,
-    //   "******************************************************************"
-    // );
     if (habitData.habit_duration?.all_day) {
       setLabel("You have selected All day in habit duration specify time");
       setIsSpecified(true);
@@ -82,19 +79,22 @@ const HabitReminderModal: React.FC<ReminderAtModalProps> = ({
 
     const obj = getFormattedValue();
 
-    const parsedValue = {
-      timeDisplay: timeString,
-      val: obj,
-    };
-    onSave(parsedValue);
+    console.log(obj, "obj");
+
+    // const parsedValue = {
+    //   timeDisplay: timeString,
+    //   val: obj,
+    // };
+    onSave(obj);
     // Reset state after saving
-    setReminderAt(""); // TODO Need to recheck how to reset the value
-    setIsSpecified(false);
+    // setReminderAt(); // TODO Need to recheck how to reset the value
+    // setIsSpecified(false);
     setError("");
     onClose();
   };
 
   const handleTimeChange = (selectedDate: any) => {
+    console.log(selectedDate, "selectedDate");
     if (selectedDate) {
       setReminderAt(selectedDate);
     }
@@ -120,12 +120,12 @@ const HabitReminderModal: React.FC<ReminderAtModalProps> = ({
     return result;
   };
 
-  const onSpecifyValueChange = (value: boolean) => {
-    setIsSpecified(value);
-    setShowStartTimePicker(value);
-  };
+  // const onSpecifyValueChange = (value: boolean) => {
+  //   setIsSpecified(value);
+  //   setShowStartTimePicker(value);
+  // };
 
-  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext);
   const styles = styling(theme);
 
   return (
@@ -152,22 +152,9 @@ const HabitReminderModal: React.FC<ReminderAtModalProps> = ({
           <View style={styles.remiderAt}>
             <Text>{label}</Text>
             <Text style={styles.remiderAtText}>
-              Reminder At: {reminderAt ? reminderAt : null}
+              {/* Reminder At: {reminderAt ? reminderAt : null} */}
             </Text>
           </View>
-
-          {/* Toggle for Specified Time */}
-          {/* <View style={styles.toggleContainer}>
-            <Text style={styles.label}>Specify Time</Text>
-            <Switch
-              value={isSpecified}
-              onValueChange={onSpecifyValueChange}
-              thumbColor={themeColors.basic.primaryColor}
-              trackColor={{
-                true: `${themeColors.basic.tertiaryColor}`,
-              }}
-            />
-          </View> */}
 
           {showStartTimePicker && (
             <TimePicker onConfirmTime={handleTimeChange} label="Reminder At" />
@@ -225,96 +212,5 @@ const HabitReminderModal: React.FC<ReminderAtModalProps> = ({
     </Modal>
   );
 };
-
-const styling = (theme: ThemeKey) =>
-  StyleSheet.create({
-    modalOverlay: {
-      flex: 1,
-      backgroundColor: "rgba(0,0,0,0.5)",
-      justifyContent: "center",
-      alignItems: "center",
-    },
-    modalContainer: {
-      width: "90%",
-      backgroundColor: themeColors[theme].background,
-      borderRadius: 10,
-      padding: 20,
-      maxHeight: "90%",
-    },
-    remiderAt: {
-      marginBottom: 20,
-    },
-    remiderAtText: { fontSize: 18, color: themeColors[theme].text },
-    header: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: 20,
-    },
-    title: {
-      fontSize: 18,
-      fontWeight: "bold",
-      color: themeColors[theme].text,
-    },
-    toggleContainer: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: 20,
-    },
-    label: {
-      fontSize: 16,
-    },
-    optionsContainer: {
-      alignItems: "flex-start",
-      marginBottom: 20,
-    },
-    radioContainer: {
-      flexDirection: "row",
-      justifyContent: "space-around",
-      marginBottom: 20,
-    },
-    radioButton: {
-      flexDirection: "row",
-      alignItems: "center",
-    },
-    radioText: {
-      marginLeft: 2,
-      marginRight: 4,
-      fontSize: 14,
-    },
-    // timePickerButton: {
-    //   flexDirection: 'row',
-    //   justifyContent: 'space-between',
-    //   alignItems: 'center',
-    //   paddingVertical: 12,
-    //   borderWidth: 1,
-    //   borderColor: '#ccc',
-    //   borderRadius: 5,
-    //   paddingHorizontal: 10,
-    //   marginBottom: 10,
-    // },
-    // timePickerText: {
-    //   fontSize: 16,
-    //   color: '#333',
-    // },
-    saveButton: {
-      backgroundColor: themeColors.basic.secondaryColor,
-      paddingVertical: 15,
-      borderRadius: 5,
-      alignItems: "center",
-    },
-    saveButtonText: {
-      color: themeColors[theme].text,
-      fontSize: 16,
-      fontWeight: "bold",
-    },
-    errorText: {
-      color: themeColors.basic.danger,
-      marginTop: 5,
-      fontSize: 14,
-      textAlign: "center",
-    },
-  });
 
 export default HabitReminderModal;

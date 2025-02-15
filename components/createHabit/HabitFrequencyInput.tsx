@@ -1,31 +1,108 @@
-import { TouchableOpacity, StyleSheet } from "react-native";
+import { TouchableOpacity, StyleSheet, View } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
+import { format } from "date-fns";
+import Ionicons from "@expo/vector-icons/Ionicons";
+
 import { Text } from "@/components/Themed";
 import { themeColors } from "@/constant/Colors";
 import ThemeContext from "@/context/ThemeContext";
-import FrequencyModal, {
-  FormattedFrequency,
-} from "@/components/createHabit/TaskFrequencyModal";
+import { FrequencyObj } from "./Modal/HabitFrequencyModal";
 import HabitFrequencyModal from "./Modal/HabitFrequencyModal";
-import { format } from "date-fns";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { ThemeKey } from "@/components/Themed";
+import styling from "./style/HabitFrequencyInputStyle";
 
-const HabitFrequencyInput: React.FC = () => {
+interface HabitFrequencyInputProp {
+  onSelect: (value: any) => void;
+}
+
+const HabitFrequencyInput: React.FC<HabitFrequencyInputProp> = ({
+  onSelect,
+}) => {
   const { theme } = useContext(ThemeContext);
 
-  const [frequency, setFrequency] = useState<FormattedFrequency | null>(null);
+  const [frequency, setFrequency] = useState<FrequencyObj | null>(null);
+  const [userDisplay, setUserDisplay] = useState<string>("");
 
   const [showFrequencyModal, setShowFrequencyModal] = useState(false);
+
+  const styles = styling(theme);
+
+  // const daysOfWeek = ["su", "mo", "tu", "we", "th", "fr", "sa"];
+
+  function formatUserDisplay(reminder: any) {
+    let { frequency_type, interval, ...rest } = reminder;
+    let displayString = "";
+
+    switch (frequency_type) {
+      case "daily":
+        if (interval === 1) {
+          displayString = "Daily";
+        } else {
+          displayString = `Every ${interval} days`;
+        }
+        break;
+
+      case "weekly":
+        if (interval === 1) {
+          displayString = "Weekly";
+        } else {
+          displayString = `Every ${interval} weeks`;
+        }
+        if (rest.days_of_week && rest.days_of_week.length > 0) {
+          displayString += ` on ${rest.days_of_week.join(" and ")}`;
+        }
+        break;
+
+      case "monthly":
+        if (interval === 1) {
+          displayString = "Monthly";
+        } else {
+          displayString = `Every ${interval} months`;
+        }
+        if (rest?.days_of_month) {
+          displayString += ` on the ${rest?.days_of_month}th`;
+        }
+        // if (rest?.monthsOfYear && rest?.monthsOfYear.length > 0) {
+        //   const monthNames = [
+        //     "January",
+        //     "February",
+        //     "March",
+        //     "April",
+        //     "May",
+        //     "June",
+        //     "July",
+        //     "August",
+        //     "September",
+        //     "October",
+        //     "November",
+        //     "December",
+        //   ];
+        //   const selectedMonths = rest?.monthsOfYear.map(
+        //     (monthIndex: number) => monthNames[monthIndex - 1]
+        //   );
+        //   displayString += ` in ${selectedMonths.join(", ")}`;
+        // }
+        break;
+
+      default:
+        displayString = "Unknown frequency";
+    }
+
+    return displayString;
+  }
 
   // function to handle frequency save
   const handleFrequencySave = (selectedFrequency: any) => {
     console.log(selectedFrequency, "selectedFrequency============= ");
+    let userDisplayFreq = formatUserDisplay(selectedFrequency);
+    console.log(userDisplayFreq, "userDisplayFreq output");
+    setUserDisplay(userDisplayFreq);
     setFrequency(selectedFrequency);
     setShowFrequencyModal(false);
-  };
 
-  const styles = styling(theme);
+    // onSelect call from parent
+    onSelect(selectedFrequency);
+  };
 
   return (
     <>
@@ -33,12 +110,26 @@ const HabitFrequencyInput: React.FC = () => {
         style={styles.selectorButton}
         onPress={() => setShowFrequencyModal(true)}
       >
-        <Text style={styles.label}>Habit Frequency</Text>
+        {/* <View> */}
+        <Ionicons
+          style={styles.iconLeft}
+          name="chevron-forward"
+          size={20}
+          color={themeColors[theme].text}
+        />
+        <Text style={styles.label}>Frequency</Text>
         <Text style={styles.selectorText}>
           {frequency
-            ? `Frequency: ${JSON.stringify(frequency.userDisplay)}`
+            ? `Frequency: ${JSON.stringify(userDisplay)}`
             : "Select Frequency"}
         </Text>
+        <Ionicons
+          style={styles.iconRight}
+          name="chevron-forward"
+          size={20}
+          color={themeColors[theme].text}
+        />
+        {/* </View> */}
       </TouchableOpacity>
 
       <HabitFrequencyModal
@@ -51,61 +142,3 @@ const HabitFrequencyInput: React.FC = () => {
 };
 
 export default HabitFrequencyInput;
-
-const styling = (theme: ThemeKey) =>
-  StyleSheet.create({
-    header: {
-      color: themeColors[theme]?.text,
-    },
-    container: {
-      marginTop: 20,
-    },
-    btn: {
-      marginTop: 60,
-      backgroundColor: themeColors[theme]?.primaryColor,
-      padding: 20,
-      alignItems: "center",
-      borderRadius: 10,
-    },
-    btnText: {
-      color: themeColors[theme]?.text,
-      fontWeight: 800,
-      fontSize: 18,
-    },
-    input: {
-      padding: 15,
-      borderWidth: 1,
-      borderRadius: 15,
-      borderColor: themeColors.basic.GRAY,
-    },
-    inputLabel: {
-      marginBottom: 10,
-    },
-    // container: {
-    //   backgroundColor: themeColors.basic.WHITE,
-    //   padding: 45,
-    //   paddingTop: 105,
-    //   height: "100%",
-    // },
-    label: {
-      fontSize: 16,
-      // color: "#333",
-      marginBottom: 10,
-      marginTop: 10,
-    },
-    selectorButton: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      paddingVertical: 12,
-      borderWidth: 1,
-      borderColor: themeColors[theme].inpurBorderColor,
-      borderRadius: 5,
-      paddingHorizontal: 10,
-      marginBottom: 10,
-    },
-    selectorText: {
-      fontSize: 16,
-      color: themeColors.basic.mediumGrey,
-    },
-  });

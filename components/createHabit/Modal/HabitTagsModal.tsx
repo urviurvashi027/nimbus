@@ -15,6 +15,7 @@ import { FormInput } from "../../Themed";
 import { findIdBName, addObjectAtEnd } from "@/utils/helper";
 import { HabitTag } from "@/types/habitTypes";
 import { selectedTag } from "../HabitTagsInput";
+import styling from "../style/HabitTagModalStyle";
 
 type ThemeKey = "basic" | "light" | "dark";
 
@@ -27,6 +28,7 @@ interface TaskTagsModalProps {
   habitTagList: HabitTag[];
   visible: boolean;
   onClose: () => void;
+  selectedTagData: any;
   onSelect: (tag: selectedTag) => void;
   //   existingTags: TagsType[];
   //   onAddNewTag: (tag: string, id: number) => void;
@@ -37,6 +39,7 @@ const HabitTagsModal: React.FC<TaskTagsModalProps> = ({
   visible,
   onClose,
   onSelect,
+  selectedTagData,
   //   existingTags,
   //   onAddNewTag,
 }) => {
@@ -79,6 +82,15 @@ const HabitTagsModal: React.FC<TaskTagsModalProps> = ({
   const handleSaveClick = (tag: any) => {
     setSelectedTag([...selectedTag, tag]);
   };
+
+  useEffect(() => {
+    console.log(selectedTagData?.existing_tag, "selectedTagData from modal");
+    if (selectedTagData.length) setSelectedTag(selectedTagData?.existing_tag);
+  }, [selectedTagData]);
+
+  useEffect(() => {
+    console.log(selectedTag, "selectedTag usefeect modal");
+  }, [selectedTag]);
 
   useEffect(() => {
     if (selectedTag.length) {
@@ -190,75 +202,5 @@ const HabitTagsModal: React.FC<TaskTagsModalProps> = ({
     </Modal>
   );
 };
-
-const styling = (theme: ThemeKey) =>
-  StyleSheet.create({
-    modalOverlay: {
-      flex: 1,
-      backgroundColor: "rgba(0,0,0,0.5)",
-      justifyContent: "center",
-      alignItems: "center",
-    },
-    modalContainer: {
-      width: "85%",
-      backgroundColor: themeColors[theme].background,
-      borderRadius: 10,
-      padding: 20,
-      maxHeight: "85%",
-    },
-    header: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: 20,
-    },
-    title: {
-      fontSize: 18,
-      fontWeight: "bold",
-      color: themeColors[theme].text,
-    },
-    listContainer: {
-      // Optional: Add any additional styling if needed
-    },
-    tagButton: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      paddingVertical: 12,
-      borderBottomWidth: 1,
-      borderBottomColor: themeColors[theme].divider,
-    },
-    tagText: {
-      fontSize: 16,
-      color: themeColors[theme].text,
-    },
-    addNewContainer: {
-      marginTop: 20,
-    },
-    input: {
-      borderWidth: 1,
-      borderColor: "#ccc",
-      borderRadius: 5,
-      padding: 10,
-      fontSize: 16,
-    },
-    addButton: {
-      marginTop: 10,
-      backgroundColor: themeColors.basic.secondaryColor,
-      paddingVertical: 12,
-      borderRadius: 5,
-      alignItems: "center",
-    },
-    addButtonText: {
-      color: themeColors[theme].text,
-      fontSize: 16,
-      fontWeight: "bold",
-    },
-    errorText: {
-      color: themeColors.basic.danger,
-      marginTop: 5,
-      fontSize: 14,
-    },
-  });
 
 export default HabitTagsModal;

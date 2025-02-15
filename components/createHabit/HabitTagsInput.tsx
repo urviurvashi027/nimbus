@@ -8,6 +8,7 @@ import { getHabitTag } from "@/services/habitService";
 import { HabitTag } from "@/types/habitTypes";
 import { ThemeKey } from "../Themed";
 import HabitTagsModal from "./Modal/HabitTagsModal";
+import styling from "./style/HabitTagsInputStyle";
 
 export type selectedTag = {
   existing_tag: HabitTag[];
@@ -76,14 +77,25 @@ const HabitTagsInput: React.FC<HabitTagsInputProps> = ({ onSelect }) => {
     setSelectedTag((prev: any) => ({ ...prev, existing_tag: updatedTags }));
   };
 
+  useEffect(() => {
+    console.log(selectedTag, "selectedTag from useEffect");
+  }, [selectedTag]);
+
   //   useEffect(() => {
   //     if (tagsList.length) {
   //       setSelectedTaskType(habitTypeList[0]);
   //     }
   //   }, [habitTypeList]);
 
+  // const handleNewTag = (newTag: string) => {
+  //   const tag = { name: newTag, id: 0 };
+  //   setSelectedTag((prev: any) => ({ ...prev, existing_tag: tag }));
+  // };
+
   const handleOnSelect = (selectedHabitTag: selectedTag) => {
+    console.log(selectedHabitTag, "selectedHabitTag");
     setSelectedTag(selectedHabitTag);
+    // handleNewTag(selectedHabitTag.new_tag);
     // onSelect(id);
   };
 
@@ -134,6 +146,7 @@ const HabitTagsInput: React.FC<HabitTagsInputProps> = ({ onSelect }) => {
       <HabitTagsModal
         habitTagList={tagsList}
         visible={showHabitTagsModal}
+        selectedTagData={selectedTag}
         onClose={() => setShowHabitTagsModal(false)}
         onSelect={handleOnSelect}
       />
@@ -143,62 +156,7 @@ const HabitTagsInput: React.FC<HabitTagsInputProps> = ({ onSelect }) => {
 
 export default HabitTagsInput;
 
-const styling = (theme: ThemeKey) =>
-  StyleSheet.create({
-    label: {
-      fontSize: 16,
-      marginBottom: 5,
-      marginTop: 5,
-      marginRight: 5,
-      color: themeColors.basic.mediumGrey,
-      width: "50%",
-    },
-    selectorButton: {
-      flexDirection: "row",
-      alignItems: "center",
-      paddingVertical: 9,
-      borderWidth: 1,
-      borderColor: themeColors[theme].inpurBorderColor,
-      borderRadius: 5,
-      paddingHorizontal: 5,
-      marginBottom: 10,
-      //   width: "100%",
-    },
-    selectorText: {
-      fontSize: 16,
-      color: themeColors.basic.mediumGrey,
-      //   paddingLeft: 30,
-      margin: "auto",
-    },
-    iconLeft: {
-      padding: 0,
-      marginRight: 5,
-    },
-    iconRight: {
-      // marginLeft: 9,
-      // width: "5%",
-    },
-    tagsContainer: {
-      flexDirection: "row",
-      flexWrap: "wrap",
-      marginTop: 10,
-    },
-    tag: {
-      flexDirection: "row",
-      alignItems: "center",
-      backgroundColor: "#e0f7fa",
-      borderRadius: 15,
-      paddingHorizontal: 10,
-      paddingVertical: 5,
-      marginRight: 5,
-      marginBottom: 5,
-    },
-    tagText: {
-      marginRight: 5,
-      fontSize: 14,
-      color: "#333",
-    },
-  });
-
+// Bug List
 // bug unselect everything and then select on of the value, it will show all selected
 // add new tag not coming with cross
+// css fix for input box

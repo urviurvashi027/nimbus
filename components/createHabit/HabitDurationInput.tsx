@@ -1,18 +1,24 @@
 import { View, TouchableOpacity, StyleSheet, Platform } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
+import { format } from "date-fns";
+import Ionicons from "@expo/vector-icons/Ionicons";
+
 import { Text } from "@/components/Themed";
 import HabitContext from "@/context/HabitContext";
 import { Button, ScreenView } from "@/components/Themed";
 import { themeColors } from "@/constant/Colors";
 import ThemeContext from "@/context/ThemeContext";
-import { format } from "date-fns";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import HabitDurationModal from "./Modal/HabitDurationModal";
 import { Duration } from "./Modal/HabitDurationModal";
+import styling from "./style/HabitDurationInputStyle";
 
-import { ThemeKey } from "@/components/Themed";
+interface HabitDurationInputProps {
+  onSelect: (value: any) => void;
+}
 
-const HabitDurationInput: React.FC = () => {
+const HabitDurationInput: React.FC<HabitDurationInputProps> = ({
+  onSelect,
+}) => {
   const [duration, setDuration] = useState<Duration>({ all_day: true });
 
   const [showDurationModal, setShowDurationModal] = useState(false);
@@ -21,10 +27,31 @@ const HabitDurationInput: React.FC = () => {
 
   const styles = styling(theme);
 
+  const handleSave = (selectedDuration: any) => {
+    // console.log(allDayEnabled, selection);
+    if (selectedDuration.all_day) {
+      onSelect({ all_day: true });
+    } else {
+      if (selectedDuration.start_time && selectedDuration.end_time) {
+        onSelect({
+          start_time: format(selectedDuration.start_time, "hh:mm:ss"),
+          end_time: format(selectedDuration.end_time, "hh:mm:ss"),
+          // start_time: pointTime,
+        });
+      } else {
+        onSelect({
+          start_time: format(selectedDuration.start_time, "hh:mm:ss"),
+        });
+      }
+    }
+  };
+
   // function to handle task duration
-  const handleTaskDuration = (selectedDuration: any) => {
-    // console.log(selectedDuration, "durationk");
+  const handleHabitDuration = (selectedDuration: any) => {
+    console.log(selectedDuration, "duration Habit Duration Input");
     setDuration(selectedDuration);
+    handleSave(selectedDuration);
+    // onSelect(selectedDuration);
   };
 
   return (
@@ -33,85 +60,41 @@ const HabitDurationInput: React.FC = () => {
         style={styles.selectorButton}
         onPress={() => setShowDurationModal(true)}
       >
-        <Text style={styles.label}>Habit Duration</Text>
+        <Ionicons
+          style={styles.iconLeft}
+          name="chevron-forward"
+          size={20}
+          color={themeColors[theme].text}
+        />
+        <Text style={styles.label}>Duration</Text>
         <Text style={styles.selectorText}>
           {duration?.all_day === true
             ? "All Day"
             : duration.start_time && duration.end_time
-            ? `From ${duration.start_time} To ${duration.end_time},
-                  "hh:mm a"
-                )}`
-            : `Point Time: ${duration.start_time}`}
+            ? `From ${format(duration.start_time, "hh:mm: a")} To ${format(
+                duration.end_time,
+                "hh:mm: a"
+              )}`
+            : `Point Time: ${format(
+                duration.start_time ?? new Date(),
+                "hh:mm: a"
+              )}`}
         </Text>
-        <Ionicons name="chevron-forward" size={20} color="#888" />
+        <Ionicons
+          style={styles.iconRight}
+          name="chevron-forward"
+          size={20}
+          color={themeColors[theme].text}
+        />
       </TouchableOpacity>
 
       <HabitDurationModal
         visible={showDurationModal}
         onClose={() => setShowDurationModal(false)}
-        onSave={handleTaskDuration}
-        // onSave={(selectedDuration: any) => setDuration(selectedDuration)}
+        onSave={handleHabitDuration}
       />
     </>
   );
 };
-
-const styling = (theme: ThemeKey) =>
-  StyleSheet.create({
-    header: {
-      color: themeColors[theme]?.text,
-    },
-    container: {
-      marginTop: 20,
-    },
-    btn: {
-      marginTop: 60,
-      backgroundColor: themeColors[theme]?.primaryColor,
-      padding: 20,
-      alignItems: "center",
-      borderRadius: 10,
-    },
-    btnText: {
-      color: themeColors[theme]?.text,
-      fontWeight: 800,
-      fontSize: 18,
-    },
-    input: {
-      padding: 15,
-      borderWidth: 1,
-      borderRadius: 15,
-      borderColor: themeColors.basic.GRAY,
-    },
-    inputLabel: {
-      marginBottom: 10,
-    },
-    // container: {
-    //   backgroundColor: themeColors.basic.WHITE,
-    //   padding: 45,
-    //   paddingTop: 105,
-    //   height: "100%",
-    // },
-    label: {
-      fontSize: 16,
-      // color: "#333",
-      marginBottom: 10,
-      marginTop: 10,
-    },
-    selectorButton: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      paddingVertical: 12,
-      borderWidth: 1,
-      borderColor: themeColors[theme].inpurBorderColor,
-      borderRadius: 5,
-      paddingHorizontal: 10,
-      marginBottom: 10,
-    },
-    selectorText: {
-      fontSize: 16,
-      color: themeColors.basic.mediumGrey,
-    },
-  });
 
 export default HabitDurationInput;

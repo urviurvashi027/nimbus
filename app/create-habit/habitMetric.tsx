@@ -2,19 +2,16 @@ import { View, TouchableOpacity, StyleSheet, Platform } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { Text } from "@/components/Themed";
 import { router, useNavigation } from "expo-router";
+import { format } from "date-fns";
+import Ionicons from "@expo/vector-icons/Ionicons";
+
 import HabitContext from "@/context/HabitContext";
 import { Button, ScreenView } from "@/components/Themed";
 import { themeColors } from "@/constant/Colors";
 import ThemeContext from "@/context/ThemeContext";
 import { MetricFormat } from "@/components/createHabit/Modal/HabitMetricModal";
-import FrequencyModal, {
-  FormattedFrequency,
-} from "@/components/createHabit/TaskFrequencyModal";
-import TaskModalDuration, {
-  Duration,
-} from "@/components/createHabit/TaskModalDuration";
-import { format } from "date-fns";
-import Ionicons from "@expo/vector-icons/Ionicons";
+import { FrequencyObj } from "@/components/createHabit/Modal/HabitFrequencyModal";
+import { Duration } from "@/components/createHabit/Modal/HabitDurationModal";
 import HabitMetricInput from "@/components/createHabit/HabitMetricInput";
 import HabitFrequencyInput from "@/components/createHabit/HabitFrequencyInput";
 import HabitDurationInput from "@/components/createHabit/HabitDurationInput";
@@ -27,7 +24,7 @@ export default function HabitMetric() {
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
 
   const [habitMetric, setHabitMetric] = useState<MetricFormat | null>(null);
-  const [frequency, setFrequency] = useState<FormattedFrequency | null>(null);
+  const [frequency, setFrequency] = useState<FrequencyObj | null>(null);
   const [duration, setDuration] = useState<Duration>({ all_day: true });
 
   const [showDurationModal, setShowDurationModal] = useState(false);
@@ -58,6 +55,18 @@ export default function HabitMetric() {
     setDuration(selectedDuration);
   };
 
+  const handleMetricSelect = (value: any) => {
+    console.log(value, "habit metric is selected");
+  };
+
+  const handleFrequencySelect = (value: any) => {
+    console.log(value, "habit metric:: handleFrequencySelect:: value");
+  };
+
+  const handleDurationSelect = (value: any) => {
+    console.log(value, "habit metric:: handleDurationSelect:: value");
+  };
+
   // // function to handle metric
   // const handleHabitMetricSave = (value: MetricFormat) => {
   //   setHabitMetric(value);
@@ -78,7 +87,7 @@ export default function HabitMetric() {
         count: habitMetric?.count,
         unit: habitMetric?.unit,
       },
-      habit_frequency: frequency?.parsedFreq,
+      habit_frequency: frequency,
       habit_duration: duration,
     });
     router.push("/create-habit/habitSchedules");
@@ -101,9 +110,9 @@ export default function HabitMetric() {
       <View style={styles.container}>
         {/* Habit Metric */}
 
-        <HabitMetricInput />
-        <HabitFrequencyInput />
-        <HabitDurationInput />
+        <HabitMetricInput onSelect={handleMetricSelect} />
+        <HabitFrequencyInput onSelect={handleFrequencySelect} />
+        <HabitDurationInput onSelect={handleDurationSelect} />
 
         {/* <Text style={styles.label}>Habit Metric</Text>
         <TouchableOpacity

@@ -1,33 +1,57 @@
 import { Text } from "react-native";
-import { View, TouchableOpacity, StyleSheet, Platform } from "react-native";
+import { View, TouchableOpacity } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
-import HabitContext from "@/context/HabitContext";
-import { Button, ScreenView } from "@/components/Themed";
+import { Ionicons } from "@expo/vector-icons";
+import { format } from "date-fns";
+
 import { themeColors } from "@/constant/Colors";
 import ThemeContext from "@/context/ThemeContext";
-import { Ionicons } from "@expo/vector-icons";
-import { ThemeKey } from "@/components/Themed";
-import { parsedValue } from "./Modal/HabitDateModal";
+import { HabitDateType } from "./Modal/HabitDateModal";
 import HabitDateModal from "./Modal/HabitDateModal";
+import styling from "./style/HabitDateInputStyle";
 
-const HabitDateInput: React.FC = () => {
-  const [habitDate, setHabitDate] = useState<parsedValue>();
+interface HabitDateInputProps {
+  onSelect: (value: any) => void;
+}
 
-  const [showReminderAtModal, setShowReminderAtModal] = useState(false);
+const HabitDateInput: React.FC<HabitDateInputProps> = ({ onSelect }) => {
+  const [habitDate, setHabitDate] = useState<HabitDateType>();
+  const [userDisplay, setUserDisplay] = useState<string>();
+
   const [showStartTaskModal, setShowStartTaskModal] = useState(false);
 
-  const { habitData, setHabitData } = useContext(HabitContext);
-
-  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext);
 
   const styles = styling(theme);
 
   // function which will be called on
-  const handleStartTaskSave = (habitDate: parsedValue) => {
+  const handleStartSave = (habitDate: HabitDateType) => {
     // Handle the start and end date logic here
-    // console.log(habitDate, "habitDate");
+    console.log(habitDate, "habitDate");
+    const { start_date, end_date } = habitDate;
+    let result = {};
     setHabitDate(habitDate);
+    const userDisplay = end_date
+      ? `${format(start_date, "dd-MM-yyyy")} - ${format(
+          end_date,
+          "yyyy-MM-dd"
+        )}`
+      : `${format(start_date, "dd-MM-yyyy")}`;
+
+    setUserDisplay(userDisplay);
+    if (start_date && end_date) {
+      result = {
+        start_date: format(start_date, "yyyy-MM-dd"),
+        end_date: format(end_date, "yyyy-MM-dd"),
+      };
+    } else {
+      result = {
+        start_date: format(start_date, "yyyy-MM-dd"),
+      };
+    }
     setShowStartTaskModal(false);
+
+    onSelect(result);
   };
 
   return (
@@ -36,80 +60,31 @@ const HabitDateInput: React.FC = () => {
         style={styles.selectorButton}
         onPress={() => setShowStartTaskModal(true)}
       >
-        <Text style={styles.label}>Habit Start Date</Text>
+        <Ionicons
+          style={styles.iconLeft}
+          name="chevron-forward"
+          size={20}
+          color={themeColors[theme].text}
+        />
+        <Text style={styles.label}>Start Date</Text>
         <Text style={styles.selectorText}>
-          {habitDate
-            ? `${JSON.stringify(
-                habitDate.display.startDate
-              )} - ${JSON.stringify(habitDate.display.endDate)}`
-            : "Select Start Task Date"}
+          {habitDate ? userDisplay : "Select Start Task Date"}
         </Text>
+        <Ionicons
+          style={styles.iconRight}
+          name="chevron-forward"
+          size={20}
+          color={themeColors[theme].text}
+        />
       </TouchableOpacity>
 
       <HabitDateModal
         visible={showStartTaskModal}
         onClose={() => setShowStartTaskModal(false)}
-        onSave={handleStartTaskSave}
+        onSave={handleStartSave}
       />
     </>
   );
 };
 
 export default HabitDateInput;
-
-const styling = (theme: ThemeKey) =>
-  StyleSheet.create({
-    header: {
-      color: themeColors[theme]?.text,
-    },
-    container: {
-      marginTop: 20,
-    },
-    btn: {
-      marginTop: 60,
-      backgroundColor: themeColors[theme]?.primaryColor,
-      padding: 20,
-      alignItems: "center",
-      borderRadius: 10,
-    },
-    btnText: {
-      color: themeColors[theme]?.text,
-      fontWeight: 800,
-      fontSize: 18,
-    },
-    input: {
-      padding: 15,
-      borderWidth: 1,
-      borderRadius: 15,
-      borderColor: themeColors.basic.GRAY,
-    },
-    inputLabel: {
-      marginBottom: 10,
-    },
-    // container: {
-    //   backgroundColor: themeColors.basic.WHITE,
-    //   padding: 45,
-    //   paddingTop: 105,
-    //   height: "100%",
-    // },
-    label: {
-      fontSize: 16,
-      marginBottom: 5,
-      marginTop: 10,
-    },
-    selectorButton: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      paddingVertical: 12,
-      borderWidth: 1,
-      borderColor: themeColors[theme].inpurBorderColor,
-      borderRadius: 5,
-      paddingHorizontal: 10,
-      marginBottom: 10,
-    },
-    selectorText: {
-      fontSize: 16,
-      color: themeColors.basic.mediumGrey,
-    },
-  });

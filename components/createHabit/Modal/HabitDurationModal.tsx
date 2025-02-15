@@ -7,13 +7,15 @@ import {
   Switch,
   Platform,
 } from "react-native";
-import { Text } from "../../Themed";
 import { Ionicons } from "@expo/vector-icons";
 import { format } from "date-fns";
 import DateTimePicker from "@react-native-community/datetimepicker";
+
+import { Text } from "../../Themed";
 import ThemeContext from "@/context/ThemeContext";
 import { themeColors } from "@/constant/Colors";
 import TimePicker from "@/components/TimePicker";
+import styling from "../style/HabitDurationModalStyle";
 
 interface DurationModalProps {
   visible: boolean;
@@ -24,8 +26,8 @@ type ThemeKey = "basic" | "light" | "dark";
 
 export type Duration = {
   all_day?: boolean;
-  start_time?: string;
-  end_time?: string;
+  start_time?: Date;
+  end_time?: Date;
 };
 
 const HabitDurationModal: React.FC<DurationModalProps> = ({
@@ -55,7 +57,8 @@ const HabitDurationModal: React.FC<DurationModalProps> = ({
     } else {
       if (selection === "Point Time") {
         onSave({
-          start_time: format(pointTime, "hh:mm:ss"),
+          // start_time: format(pointTime, "hh:mm:ss"),
+          start_time: pointTime,
         });
       } else {
         if (endTime <= startTime) {
@@ -63,8 +66,11 @@ const HabitDurationModal: React.FC<DurationModalProps> = ({
           return;
         }
         onSave({
-          start_time: format(startTime, "hh:mm:ss"),
-          end_time: format(endTime, "hh:mm:ss"),
+          // start_time: format(startTime, "hh:mm:ss"),
+          // end_time: format(endTime, "hh:mm:ss"),
+
+          start_time: startTime,
+          end_time: endTime,
         });
       }
     }
@@ -221,98 +227,14 @@ const HabitDurationModal: React.FC<DurationModalProps> = ({
 
           {/* Save Button */}
           <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-            <Text style={styles.saveButtonText}>Save</Text>
+            <View>
+              <Text style={styles.saveButtonText}>Save</Text>
+            </View>
           </TouchableOpacity>
         </View>
       </View>
     </Modal>
   );
 };
-
-const styling = (theme: ThemeKey) =>
-  StyleSheet.create({
-    modalOverlay: {
-      flex: 1,
-      backgroundColor: "rgba(0,0,0,0.5)",
-      justifyContent: "center",
-      alignItems: "center",
-    },
-    modalContainer: {
-      width: "90%",
-      backgroundColor: themeColors[theme].background,
-      borderRadius: 10,
-      padding: 20,
-      maxHeight: "90%",
-    },
-    header: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: 20,
-    },
-    title: {
-      fontSize: 18,
-      fontWeight: "bold",
-      color: themeColors[theme].text,
-    },
-    toggleContainer: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: 20,
-    },
-    label: {
-      fontSize: 16,
-    },
-    optionsContainer: {
-      marginBottom: 20,
-    },
-    radioContainer: {
-      flexDirection: "row",
-      justifyContent: "space-around",
-      marginBottom: 20,
-    },
-    radioButton: {
-      flexDirection: "row",
-      alignItems: "center",
-    },
-    radioText: {
-      marginLeft: 8,
-      fontSize: 16,
-      color: themeColors[theme].text,
-    },
-    timePickerButton: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      paddingVertical: 12,
-      borderWidth: 1,
-      borderColor: "#ccc",
-      borderRadius: 5,
-      paddingHorizontal: 10,
-      marginBottom: 10,
-    },
-    timePickerText: {
-      fontSize: 16,
-      color: themeColors[theme].text,
-    },
-    saveButton: {
-      backgroundColor: themeColors.basic.secondaryColor,
-      paddingVertical: 15,
-      borderRadius: 5,
-      alignItems: "center",
-    },
-    saveButtonText: {
-      color: themeColors[theme].text,
-      fontSize: 16,
-      fontWeight: "bold",
-    },
-    errorText: {
-      color: themeColors.basic.danger,
-      marginTop: 5,
-      fontSize: 14,
-      textAlign: "center",
-    },
-  });
 
 export default HabitDurationModal;
