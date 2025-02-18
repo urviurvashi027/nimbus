@@ -79,6 +79,20 @@ export const getHabitTag = async (): Promise<HabitTagResponse> => {
   }
 };
 
+// get habit details by id
+export const getHabitDetailsById = async (
+  id: string
+): Promise<HabitDetailResponse> => {
+  try {
+    const response: AxiosResponse<HabitDetailResponse> = await axios.get(
+      `${API_ENDPOINTS.habitDetailsById}${id}/`
+    );
+    return response.data; // Return the list data
+  } catch (error: any) {
+    throw error.response ? error.response.data : error.message;
+  }
+};
+
 // delete habit request
 export const deleteHabit = async (
   data: HabitDeleteRequest
@@ -102,20 +116,6 @@ export const markHabitDone = async (
     const response: AxiosResponse<HabitDoneResponse> = await axios.post(
       API_ENDPOINTS.habitPatch,
       data
-    );
-    return response.data; // Return the list data
-  } catch (error: any) {
-    throw error.response ? error.response.data : error.message;
-  }
-};
-
-// get habit details by id
-export const getHabitListById = async (
-  data: HabitTypeResponse
-): Promise<HabitTypeResponse> => {
-  try {
-    const response: AxiosResponse<HabitTypeResponse> = await axios.get(
-      `${API_ENDPOINTS.getHabitDetailsById}/${data}`
     );
     return response.data; // Return the list data
   } catch (error: any) {

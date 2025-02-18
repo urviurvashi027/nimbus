@@ -74,7 +74,7 @@ export interface HabitCreateResponse {
   success: string;
   message: string;
   data: HabitItem;
-  error?: string;
+  error_code?: string;
 }
 
 // Habit List Response
@@ -82,7 +82,7 @@ export interface HabitListResponse {
   success: string;
   message: string;
   data: HabitItem[];
-  error?: any;
+  error_code?: string;
 }
 
 // Habit Type Request and Response Types
@@ -92,7 +92,7 @@ export interface HabitTypeResponse {
   success: string;
   message: string;
   data: HabitType[];
-  error?: string;
+  error_code?: string;
 }
 
 // Habit Tag Request and Response Types
@@ -102,7 +102,7 @@ export interface HabitTagResponse {
   success: string;
   message: string;
   data: HabitTag[];
-  error?: string;
+  error_code?: string;
 }
 
 // Habit Delete Request and Response
@@ -127,11 +127,35 @@ export interface HabitDoneRequest {
   id: string;
 }
 
+// Habit details type
+export interface HabitDetail {
+  id: number;
+  tags: string[];
+  frequency: string;
+  name: string;
+  description: string;
+  color: string;
+  reminder_time: string;
+  // API need to send proper format either calculate and send or send startime and endtime
+  duration: string;
+  current_streak: number;
+  longest_streak: number;
+  last_completed: null;
+  start_time: string;
+  end_time: string;
+  all_day: boolean;
+  // API: need to send habit type name
+  habit_type: number;
+  // API: need to send proper format
+  metric: number;
+  goal: null;
+}
+
 // Get Habit BY Id
 export interface HabitDetailResponse {
   success: string;
   message: string;
-  data: HabitItem;
+  data: HabitDetail;
 }
 
 export interface HabitDetailRequest {

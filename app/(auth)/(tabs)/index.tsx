@@ -21,7 +21,7 @@ export default function TabOneScreen() {
 
   // create button click
   const onCreateClick = () => {
-    router.push("/create-habit/habitBasic");
+    router.push("/habit/create");
   };
 
   // function to be called whenever date changes
@@ -30,13 +30,22 @@ export default function TabOneScreen() {
   };
 
   const getHabitListData = async () => {
-    const result = await getHabitList();
-    if (result && result.success) {
-      setHabitList(result.data);
+    try {
+      const result = await getHabitList();
+      if (result?.success) {
+        setHabitList(result.data);
+      }
+    } catch (error: any) {
+      console.log(error, "API Error Response");
     }
-    if (result && result.error) {
-      alert(result);
-    }
+
+    // const result = await getHabitList();
+    // if (result && result.success) {
+    //   setHabitList(result.data);
+    // }
+    // if (result && result.error) {
+    //   alert(result);
+    // }
   };
 
   useEffect(() => {

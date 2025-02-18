@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import React, { useContext, useState } from "react";
 import Swipeable from "react-native-gesture-handler/ReanimatedSwipeable";
 // import { HabitItemProps } from "./HabitList";
@@ -16,9 +16,16 @@ import { themeColors } from "@/constant/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { HabitItem } from "@/types/habitTypes";
 import { ThemeKey } from "../Themed";
+type SwipeableItemProps = {
+  item: HabitItem;
+  habitItemClick: (id: any) => void;
+};
 
-const SwipeableItem: React.FC<HabitItem> = (props: any) => {
-  const { name, id, ...rest } = props;
+const SwipeableItem: React.FC<SwipeableItemProps> = (
+  props: SwipeableItemProps
+) => {
+  const { name, id, ...rest } = props.item;
+  const { habitItemClick } = props;
   const [showHabitActionModal, setshowHabitActionModal] = useState(false);
   const translateY = useSharedValue(0);
 
@@ -105,14 +112,15 @@ const SwipeableItem: React.FC<HabitItem> = (props: any) => {
             <Text style={styles.taskTime}>{time}</Text>
           </View>
         </Animated.View> */}
-
-        <View style={styles.itemContainer}>
-          {/* <Text style={styles.emoji}>{emoji}</Text> */}
-          <View style={styles.textContainer}>
-            <Text style={styles.taskName}>{name}</Text>
-            <Text style={styles.taskTime}>{rest.reminder_time}</Text>
+        <TouchableOpacity onPress={() => habitItemClick(id)}>
+          <View style={styles.itemContainer}>
+            {/* <Text style={styles.emoji}>{emoji}</Text> */}
+            <View style={styles.textContainer}>
+              <Text style={styles.taskName}>{name}</Text>
+              <Text style={styles.taskTime}>{rest.reminder_time}</Text>
+            </View>
           </View>
-        </View>
+        </TouchableOpacity>
       </Swipeable>
 
       {/* Task Type Modal */}

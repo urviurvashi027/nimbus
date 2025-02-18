@@ -23,14 +23,13 @@ export const API_ENDPOINTS = {
 
   createHabit: `${BASE_URL}/api/habits/`,
 
-  // get habit type equest
+  // get habit type `equest
   habitTypeList: `${BASE_URL}/api/habit-types/`,
   habitTagList: `${BASE_URL}/api/tags/`,
+  habitDetailsById: `${BASE_URL}/api/habits/`,
 
   habitPatch: `${BASE_URL}/habits/list`,
   deleteHabit: `${BASE_URL}/habits/list`,
-  getHabitDetailsById: `${BASE_URL}/habits/id`,
-
   toolList: `${BASE_URL}/habits/list`,
   getSoundscapeList: `${BASE_URL}/habits/list`,
   downloadMedia: `${BASE_URL}/habits/list`,
