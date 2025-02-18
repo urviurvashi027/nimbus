@@ -26,7 +26,7 @@ const HabitDateModal: React.FC<HabitDateModalProps> = ({
   onSave,
 }) => {
   const [startDate, setStartDate] = useState<Date>(new Date());
-  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
+  const [endDate, setEndDate] = useState<Date>(new Date());
   const [isEndDateEnabled, setIsEndDateEnabled] = useState(false);
 
   const handleStartDateChange = (selectedDate: Date) => {
@@ -76,6 +76,7 @@ const HabitDateModal: React.FC<HabitDateModalProps> = ({
           <DatePicker
             onConfirmDate={handleStartDateChange}
             label="Start Date"
+            selectedDateValue={startDate}
             minimumDate={new Date()}
           ></DatePicker>
 
@@ -89,9 +90,9 @@ const HabitDateModal: React.FC<HabitDateModalProps> = ({
               }}
               onValueChange={(value) => {
                 setIsEndDateEnabled(value);
-                if (!value) {
-                  setEndDate(undefined); // Reset end date if switch is turned off
-                }
+                // if (!value) {
+                //   setEndDate(undefined); // Reset end date if switch is turned off
+                // }
               }}
             />
           </View>
@@ -101,6 +102,7 @@ const HabitDateModal: React.FC<HabitDateModalProps> = ({
               <DatePicker
                 onConfirmDate={handleEndDateChange}
                 label="End Date"
+                selectedDateValue={endDate}
                 minimumDate={startDate}
               ></DatePicker>
             </>

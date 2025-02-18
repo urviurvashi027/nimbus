@@ -9,7 +9,8 @@ import ThemeContext from "@/context/ThemeContext";
 import { FrequencyObj } from "./Modal/HabitFrequencyModal";
 import HabitFrequencyModal from "./Modal/HabitFrequencyModal";
 import { ThemeKey } from "@/components/Themed";
-import styling from "./style/HabitFrequencyInputStyle";
+import styling from "./style/HabitInputStyle";
+// import styling from "./style/HabitFrequencyInputStyle";
 
 interface HabitFrequencyInputProp {
   onSelect: (value: any) => void;
@@ -93,9 +94,9 @@ const HabitFrequencyInput: React.FC<HabitFrequencyInputProp> = ({
 
   // function to handle frequency save
   const handleFrequencySave = (selectedFrequency: any) => {
-    console.log(selectedFrequency, "selectedFrequency============= ");
+    // console.log(selectedFrequency, "selectedFrequency============= ");
     let userDisplayFreq = formatUserDisplay(selectedFrequency);
-    console.log(userDisplayFreq, "userDisplayFreq output");
+    // console.log(userDisplayFreq, "userDisplayFreq output");
     setUserDisplay(userDisplayFreq);
     setFrequency(selectedFrequency);
     setShowFrequencyModal(false);
@@ -113,16 +114,16 @@ const HabitFrequencyInput: React.FC<HabitFrequencyInputProp> = ({
         {/* <View> */}
         <Ionicons
           style={styles.iconLeft}
-          name="chevron-forward"
+          name="sync"
           size={20}
           color={themeColors[theme].text}
         />
-        <Text style={styles.label}>Frequency</Text>
-        <Text style={styles.selectorText}>
-          {frequency
-            ? `Frequency: ${JSON.stringify(userDisplay)}`
-            : "Select Frequency"}
-        </Text>
+        <View style={styles.inputField}>
+          <Text style={styles.label}>Frequency</Text>
+          <Text style={styles.selectorText}>
+            {frequency ? `${JSON.stringify(userDisplay)}` : "Select Frequency"}
+          </Text>
+        </View>
         <Ionicons
           style={styles.iconRight}
           name="chevron-forward"

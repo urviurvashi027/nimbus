@@ -8,7 +8,8 @@ import { getHabitType } from "@/services/habitService";
 import { HabitType } from "@/types/habitTypes";
 import { ThemeKey } from "../Themed";
 import HabitTypeModal from "./Modal/HabitTypeModal";
-import styling from "./style/HabitTypeInputStyle";
+import styling from "./style/HabitInputStyle";
+// import styling from "./style/HabitTypeInputStyle";
 
 interface HabitTypeModalProps {
   onSelect: (id: number) => void;
@@ -56,12 +57,14 @@ const HabitTypeInput: React.FC<HabitTypeModalProps> = ({ onSelect }) => {
       >
         <Ionicons
           style={styles.iconLeft}
-          name="chevron-forward"
+          name="ticket-outline"
           size={20}
           color={themeColors[theme].text}
         />
-        <Text style={styles.label}>Type</Text>
-        <Text style={styles.selectorText}>{selectedHabitType?.name}</Text>
+        <View style={styles.inputField}>
+          <Text style={styles.label}>Type</Text>
+          <Text style={styles.selectorText}>{selectedHabitType?.name}</Text>
+        </View>
         <Ionicons
           style={styles.iconRight}
           name="chevron-forward"

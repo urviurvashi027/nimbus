@@ -29,7 +29,7 @@ interface TaskTagsModalProps {
   visible: boolean;
   onClose: () => void;
   selectedTagData: any;
-  onSelect: (tag: selectedTag) => void;
+  onSelect: (tag: TagsType[], newTag?: string) => void;
   //   existingTags: TagsType[];
   //   onAddNewTag: (tag: string, id: number) => void;
 }
@@ -65,13 +65,14 @@ const HabitTagsModal: React.FC<TaskTagsModalProps> = ({
       setError("Tag already exists.");
       return;
     }
+    setSelectedTag([...selectedTag, { id: 0, name: newTag }]);
     // setNewTag("");
     setIsAdding(false);
     setError("");
     onClose();
   };
 
-  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext);
   const styles = styling(theme);
 
   useEffect(() => {
@@ -79,29 +80,36 @@ const HabitTagsModal: React.FC<TaskTagsModalProps> = ({
     setHabitTagData(modifiedArray);
   }, [habitTagList]);
 
-  const handleSaveClick = (tag: any) => {
-    setSelectedTag([...selectedTag, tag]);
+  const handleSaveClick = (tag: { id: number; name: string }) => {
+    console.log(tag, "hanlde save tag");
+    setSelectedTag((prev) => {
+      // Check if the tag already exists based on `id`
+      const tagExists = prev.some((t) => t.id === tag.id);
+
+      if (tagExists) {
+        return prev; // Do nothing if tag already exists
+      }
+
+      // Otherwise, add the new tag
+      return [...prev, tag];
+    });
   };
 
-  useEffect(() => {
-    console.log(selectedTagData?.existing_tag, "selectedTagData from modal");
-    if (selectedTagData.length) setSelectedTag(selectedTagData?.existing_tag);
-  }, [selectedTagData]);
+  // useEffect(() => {
+  //   // console.log(selectedTagData?.existing_tag, "selectedTagData from modal");
+  //   if (selectedTagData.length) setSelectedTag(selectedTagData?.existing_tag);
+  // }, [selectedTagData]);
 
   useEffect(() => {
     console.log(selectedTag, "selectedTag usefeect modal");
+    onSelect(selectedTag);
   }, [selectedTag]);
 
   useEffect(() => {
-    if (selectedTag.length) {
-      const result = {
-        existing_tag: selectedTag,
-        new_tag: newTag,
-      };
-
-      onSelect(result);
+    if (selectedTag.length && newTag) {
+      onSelect(selectedTag, newTag);
     }
-  }, [selectedTag, newTag]);
+  }, [newTag]);
 
   return (
     <Modal

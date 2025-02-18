@@ -8,7 +8,8 @@ import { themeColors } from "@/constant/Colors";
 import ThemeContext from "@/context/ThemeContext";
 import { HabitDateType } from "./Modal/HabitDateModal";
 import HabitDateModal from "./Modal/HabitDateModal";
-import styling from "./style/HabitDateInputStyle";
+// import styling from "./style/HabitDateInputStyle";
+import styling from "./style/HabitInputStyle";
 
 interface HabitDateInputProps {
   onSelect: (value: any) => void;
@@ -27,7 +28,7 @@ const HabitDateInput: React.FC<HabitDateInputProps> = ({ onSelect }) => {
   // function which will be called on
   const handleStartSave = (habitDate: HabitDateType) => {
     // Handle the start and end date logic here
-    console.log(habitDate, "habitDate");
+    // console.log(habitDate, "habitDate");
     const { start_date, end_date } = habitDate;
     let result = {};
     setHabitDate(habitDate);
@@ -62,14 +63,16 @@ const HabitDateInput: React.FC<HabitDateInputProps> = ({ onSelect }) => {
       >
         <Ionicons
           style={styles.iconLeft}
-          name="chevron-forward"
+          name="calendar-outline"
           size={20}
           color={themeColors[theme].text}
         />
-        <Text style={styles.label}>Start Date</Text>
-        <Text style={styles.selectorText}>
-          {habitDate ? userDisplay : "Select Start Task Date"}
-        </Text>
+        <View style={styles.inputField}>
+          <Text style={styles.label}>Start Date</Text>
+          <Text style={styles.selectorText}>
+            {habitDate ? userDisplay : "Select Date"}
+          </Text>
+        </View>
         <Ionicons
           style={styles.iconRight}
           name="chevron-forward"

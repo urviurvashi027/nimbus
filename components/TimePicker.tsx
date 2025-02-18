@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Button, View, StyleSheet, TouchableOpacity } from "react-native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { Ionicons } from "@expo/vector-icons";
@@ -9,13 +9,14 @@ import ThemeContext from "../context/ThemeContext";
 
 interface TimePicker {
   label: string;
+  selectedValue: Date;
   onConfirmTime: (selectedDate: Date) => void;
 }
 
 type ThemeKey = "basic" | "light" | "dark";
 
 const TimePicker = (props: TimePicker) => {
-  const { onConfirmTime, label } = props;
+  const { onConfirmTime, label, selectedValue } = props;
 
   const [selectedTime, setSelectedTime] = useState<Date>(new Date());
 
@@ -28,12 +29,16 @@ const TimePicker = (props: TimePicker) => {
     setTimePickerVisibility(true);
   };
 
+  useEffect(() => {
+    setSelectedTime(selectedValue);
+  }, [selectedValue]);
+
   const hideDatePicker = () => {
     setTimePickerVisibility(false);
   };
 
   const handleConfirm = (date: Date) => {
-    console.warn("A date has been picked: ", date);
+    // console.warn("A date has been picked: ", date);
     onConfirmTime(date);
     setSelectedTime(date);
     hideDatePicker();

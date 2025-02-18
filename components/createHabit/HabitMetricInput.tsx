@@ -1,4 +1,4 @@
-import { TouchableOpacity } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -7,7 +7,8 @@ import { themeColors } from "@/constant/Colors";
 import ThemeContext from "@/context/ThemeContext";
 import { MetricFormat } from "./Modal/HabitMetricModal";
 import HabitMetricModal from "./Modal/HabitMetricModal";
-import styling from "./style/HabitMetricInputStyle";
+import styling from "./style/HabitInputStyle";
+// import styling from "./style/HabitMetricInputStyle";
 
 interface HabitMetricInputProp {
   onSelect: (metricValue: any) => void;
@@ -22,7 +23,7 @@ const HabitMetricInput: React.FC<HabitMetricInputProp> = ({ onSelect }) => {
 
   // function to handle metric
   const handleHabitMetricSave = (value: MetricFormat) => {
-    console.log(value, "metric value selected");
+    // console.log(value, "metric value selected");
     setHabitMetric(value);
     setShowHabitMetricModal(false);
 
@@ -42,16 +43,18 @@ const HabitMetricInput: React.FC<HabitMetricInputProp> = ({ onSelect }) => {
       >
         <Ionicons
           style={styles.iconLeft}
-          name="chevron-forward"
+          name="calculator-outline"
           size={20}
           color={themeColors[theme].text}
         />
-        <Text style={styles.label}>Metric</Text>
-        <Text style={styles.selectorText}>
-          {habitMetric
-            ? `Metric: ${habitMetric.count}  ${habitMetric.unit}`
-            : "Select Habit Metric"}
-        </Text>
+        <View style={styles.inputField}>
+          <Text style={styles.label}>Metric</Text>
+          <Text style={styles.selectorText}>
+            {habitMetric
+              ? `Metric: ${habitMetric.count}  ${habitMetric.unit}`
+              : "Select Habit Metric"}
+          </Text>
+        </View>
         <Ionicons
           style={styles.iconRight}
           name="chevron-forward"

@@ -8,11 +8,12 @@ import { getHabitTag } from "@/services/habitService";
 import { HabitTag } from "@/types/habitTypes";
 import { ThemeKey } from "../Themed";
 import HabitTagsModal from "./Modal/HabitTagsModal";
-import styling from "./style/HabitTagsInputStyle";
+import styling from "./style/HabitInputStyle";
+// import styling from "./style/HabitTagsInputStyle";
 
 export type selectedTag = {
   existing_tag: HabitTag[];
-  new_tag: string;
+  new_tag?: string;
 };
 
 // type selectedTag = {
@@ -33,11 +34,6 @@ const HabitTagsInput: React.FC<HabitTagsInputProps> = ({ onSelect }) => {
 
   const [showHabitTagsModal, setShowHabitTagsModal] = useState(false);
 
-  const [parsedValue, setParsedValue] = useState<selectedTag>({
-    existing_tag: [],
-    new_tag: "",
-  });
-
   const { theme } = useContext(ThemeContext);
   const styles = styling(theme);
 
@@ -55,31 +51,19 @@ const HabitTagsInput: React.FC<HabitTagsInputProps> = ({ onSelect }) => {
     getHabitTagList();
   }, []);
 
-  //   const handleAddTag = (tag: string) => {
-  //     setSelectedTag([...selectedTag, tag]);
-  //   };
-
-  //   const handleNewTag = (tagName: string, id: number | undefined) => {
-  //     setSelectedTag([...selectedTag, { name: tagName, id }]);
-  //   };
-
-  // useEffect(() => {
-  //   console.log(tags, "from useEffect ");
-  // }, [tags]);
-
   // Handle removing tags
   const handleRemoveTag = (index: number) => {
     const res = selectedTag.existing_tag;
     const updatedTags = [...res];
     updatedTags.splice(index, 1);
-
+    console.log(updatedTags, "updated tag value");
     // TODO
     setSelectedTag((prev: any) => ({ ...prev, existing_tag: updatedTags }));
   };
 
-  useEffect(() => {
-    console.log(selectedTag, "selectedTag from useEffect");
-  }, [selectedTag]);
+  // useEffect(() => {
+  //   console.log(selectedTag, "selectedTag from useEffect");
+  // }, [selectedTag]);
 
   //   useEffect(() => {
   //     if (tagsList.length) {
@@ -92,15 +76,25 @@ const HabitTagsInput: React.FC<HabitTagsInputProps> = ({ onSelect }) => {
   //   setSelectedTag((prev: any) => ({ ...prev, existing_tag: tag }));
   // };
 
-  const handleOnSelect = (selectedHabitTag: selectedTag) => {
-    console.log(selectedHabitTag, "selectedHabitTag");
-    setSelectedTag(selectedHabitTag);
+  const handleOnSelect = (selectedHabitTag: any, newTag?: string) => {
+    console.log(selectedHabitTag, "selectedHabitTag from tag input");
+    if (newTag) {
+      console.log("tag is added newly", selectedHabitTag, newTag);
+    } else {
+      console.log("else part newly", selectedHabitTag, newTag);
+      const result = {
+        existing_tag: selectedHabitTag,
+      };
+      setSelectedTag(result);
+    }
+
     // handleNewTag(selectedHabitTag.new_tag);
-    // onSelect(id);
+    // onSelect(selectedHabitTag);
   };
 
   useEffect(() => {
-    const res = selectedTag?.existing_tag?.map((item: any) => item.id);
+    console.log(selectedTag, "from useEffect input");
+    // onSelect(selectedTag);
   }, [selectedTag]);
 
   return (
@@ -112,16 +106,18 @@ const HabitTagsInput: React.FC<HabitTagsInputProps> = ({ onSelect }) => {
         >
           <Ionicons
             style={styles.iconLeft}
-            name="chevron-forward"
+            name="pricetags-outline"
             size={20}
             color={themeColors[theme].text}
           />
-          <Text style={styles.label}>Tags</Text>
-          <Text style={styles.selectorText}>
-            {selectedTag?.existing_tag.length > 0
-              ? `${selectedTag?.existing_tag?.length} Tag(s) Selected`
-              : "Select Tags"}
-          </Text>
+          <View style={styles.inputField}>
+            <Text style={styles.label}>Tags</Text>
+            <Text style={styles.selectorText}>
+              {selectedTag?.existing_tag?.length > 0
+                ? `${selectedTag?.existing_tag?.length} Tag(s) Selected`
+                : "Select Tags"}
+            </Text>
+          </View>
           <Ionicons
             style={styles.iconRight}
             name="chevron-forward"
@@ -159,4 +155,3 @@ export default HabitTagsInput;
 // Bug List
 // bug unselect everything and then select on of the value, it will show all selected
 // add new tag not coming with cross
-// css fix for input box

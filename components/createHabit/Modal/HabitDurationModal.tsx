@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -42,12 +42,11 @@ const HabitDurationModal: React.FC<DurationModalProps> = ({
     "Point Time"
   );
   const [pointTime, setPointTime] = useState<Date>(new Date());
-  const [startTime, setStartTime] = useState<Date>(new Date());
   const [endTime, setEndTime] = useState<Date>(new Date());
 
   const [error, setError] = useState("");
 
-  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext);
   const styles = styling(theme);
 
   const handleSave = () => {
@@ -61,59 +60,23 @@ const HabitDurationModal: React.FC<DurationModalProps> = ({
           start_time: pointTime,
         });
       } else {
-        if (endTime <= startTime) {
+        if (endTime <= pointTime) {
           setError("End time must be after start time.");
           return;
         }
         onSave({
-          // start_time: format(startTime, "hh:mm:ss"),
-          // end_time: format(endTime, "hh:mm:ss"),
-
-          start_time: startTime,
+          start_time: pointTime,
           end_time: endTime,
         });
       }
     }
     // Reset state after saving
-    // setIsSpecified(false);
     setSelection("Point Time");
-    setPointTime(new Date());
-    setStartTime(new Date());
-    setEndTime(new Date());
     setError("");
     onClose();
   };
 
-  const timeFormat = (value: Date) => {
-    const date = new Date(value);
-
-    // Format the time using toLocaleTimeString
-    const timeString = date.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      timeZoneName: "short", // Optional to include the time zone abbreviation
-    });
-
-    return timeString;
-  };
-
-  // const handlePointTimeChange = (event: any, selectedDate?: Date) => {
-  //   setShowPointTimePicker(Platform.OS === "ios");
-  //   if (selectedDate) {
-  //     setPointTime(selectedDate);
-  //   }
-  // };
-
-  const handleStartTimeChange = (selectedDate: Date) => {
-    // setShowStartTimePicker(Platform.OS === "ios");
-    if (selectedDate) {
-      setStartTime(selectedDate);
-      setError("");
-    }
-  };
-
   const handleEndTimeChange = (selectedDate: Date) => {
-    // setShowEndTimePicker(Platform.OS === "ios");
     if (selectedDate) {
       setEndTime(selectedDate);
       setError("");
@@ -126,6 +89,17 @@ const HabitDurationModal: React.FC<DurationModalProps> = ({
       setError("");
     }
   };
+
+  useEffect(() => {
+    // console.log(
+    //   format(pointTime, "hh:mm:ss"),
+    //   format(endTime, "hh:mm:ss"),
+    //   "mounting"
+    // );
+  }, []);
+  useEffect(() => {
+    // console.log(format(pointTime, "hh:mm:ss"), format(endTime, "hh:mm:ss"));
+  }, [pointTime, endTime]);
 
   return (
     <Modal
@@ -200,8 +174,9 @@ const HabitDurationModal: React.FC<DurationModalProps> = ({
               </View>
 
               {/* Time Picker for Point Time */}
-              {selection === "Point Time" && (
+              {(selection === "Point Time" || selection === "Time Period") && (
                 <TimePicker
+                  selectedValue={pointTime}
                   onConfirmTime={onPointTimeSelected}
                   label="Point of Time"
                 />
@@ -210,10 +185,7 @@ const HabitDurationModal: React.FC<DurationModalProps> = ({
               {selection === "Time Period" && (
                 <>
                   <TimePicker
-                    onConfirmTime={handleStartTimeChange}
-                    label="Start Time"
-                  />
-                  <TimePicker
+                    selectedValue={endTime}
                     onConfirmTime={handleEndTimeChange}
                     label="End Time"
                   />

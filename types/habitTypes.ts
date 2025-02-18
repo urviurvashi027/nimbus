@@ -56,14 +56,6 @@ export interface HabitItem {
   // TODO Add other fields that are returned in your list items
 }
 
-// Habit List Response
-export interface HabitListResponse {
-  success: string;
-  message: string;
-  data: HabitItem[];
-  error?: any;
-}
-
 // Habit Create Request and Response
 export interface HabitCreateRequest {
   name: string;
@@ -83,6 +75,14 @@ export interface HabitCreateResponse {
   message: string;
   data: HabitItem;
   error?: string;
+}
+
+// Habit List Response
+export interface HabitListResponse {
+  success: string;
+  message: string;
+  data: HabitItem[];
+  error?: any;
 }
 
 // Habit Type Request and Response Types

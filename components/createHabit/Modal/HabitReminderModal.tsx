@@ -33,6 +33,7 @@ type ThemeKey = "basic" | "light" | "dark";
 
 interface ReminderAtModalProps {
   visible: boolean;
+  isAllDayEnabled: boolean;
   onClose: () => void;
   onSave: (duration: ReminderAt) => void;
 }
@@ -40,46 +41,48 @@ interface ReminderAtModalProps {
 const HabitReminderModal: React.FC<ReminderAtModalProps> = ({
   visible,
   onClose,
+  isAllDayEnabled,
   onSave,
 }) => {
   const [isSpecified, setIsSpecified] = useState(false);
   const [showStartTimePicker, setShowStartTimePicker] = useState(false);
   const [label, setLabel] = useState("");
   //   const [reminderAt, setReminderAt] = useState('');
-  const [reminderAt, setReminderAt] = useState<Date>();
+  const [reminderAt, setReminderAt] = useState<Date>(new Date());
   const [selection, setSelection] = useState("");
   const [error, setError] = useState("");
 
   const { habitData, setHabitData } = useContext(HabitContext);
 
   useEffect(() => {
-    if (habitData.habit_duration?.all_day) {
+    // console.log(isAllDayEnabled, "isAllDayEnabled");
+    if (isAllDayEnabled) {
       setLabel("You have selected All day in habit duration specify time");
       setIsSpecified(true);
       setShowStartTimePicker(true);
-    } else if (habitData.habit_duration?.start_time) {
+    } else {
       setLabel("select the preset to send reminder");
-      setReminderAt(habitData.habit_duration?.start_time);
+      // setReminderAt(habitData.habit_duration?.start_time);
       setIsSpecified(false);
       setShowStartTimePicker(false);
     }
-  }, []);
+  }, [isAllDayEnabled]);
 
   const handleSave = () => {
-    const date = reminderAt ? new Date(reminderAt) : null;
-    let timeString = null;
-    // Format the time using toLocaleTimeString
-    if (date) {
-      const timeString = date.toLocaleTimeString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-        timeZoneName: "short", // Optional to include the time zone abbreviation
-      });
-    }
+    // const date = reminderAt ? new Date(reminderAt) : null;
+    // let timeString = null;
+    // // Format the time using toLocaleTimeString
+    // if (date) {
+    //   const timeString = date.toLocaleTimeString("en-US", {
+    //     hour: "2-digit",
+    //     minute: "2-digit",
+    //     timeZoneName: "short", // Optional to include the time zone abbreviation
+    //   });
+    // }
 
     const obj = getFormattedValue();
 
-    console.log(obj, "obj");
+    // console.log(obj, "obj");
 
     // const parsedValue = {
     //   timeDisplay: timeString,
@@ -94,7 +97,7 @@ const HabitReminderModal: React.FC<ReminderAtModalProps> = ({
   };
 
   const handleTimeChange = (selectedDate: any) => {
-    console.log(selectedDate, "selectedDate");
+    // console.log(selectedDate, "selectedDate");
     if (selectedDate) {
       setReminderAt(selectedDate);
     }
@@ -157,7 +160,11 @@ const HabitReminderModal: React.FC<ReminderAtModalProps> = ({
           </View>
 
           {showStartTimePicker && (
-            <TimePicker onConfirmTime={handleTimeChange} label="Reminder At" />
+            <TimePicker
+              selectedValue={reminderAt}
+              onConfirmTime={handleTimeChange}
+              label="Reminder At"
+            />
           )}
 
           {/* Options when Specified Time is enabled */}

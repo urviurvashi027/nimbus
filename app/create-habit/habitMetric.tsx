@@ -56,15 +56,15 @@ export default function HabitMetric() {
   };
 
   const handleMetricSelect = (value: any) => {
-    console.log(value, "habit metric is selected");
+    // console.log(value, "habit metric is selected");
   };
 
   const handleFrequencySelect = (value: any) => {
-    console.log(value, "habit metric:: handleFrequencySelect:: value");
+    // console.log(value, "habit metric:: handleFrequencySelect:: value");
   };
 
   const handleDurationSelect = (value: any) => {
-    console.log(value, "habit metric:: handleDurationSelect:: value");
+    // console.log(value, "habit metric:: handleDurationSelect:: value");
   };
 
   // // function to handle metric

@@ -49,11 +49,11 @@ export default function HabitMetric() {
   // };
 
   const handleHabitStartDate = (value: any) => {
-    console.log(value, "handleHabitStartDate from schedules");
+    // console.log(value, "handleHabitStartDate from schedules");
   };
 
   const handleReminderSelect = (value: any) => {
-    console.log(value, "handleReminderSelect from schedules");
+    // console.log(value, "handleReminderSelect from schedules");
   };
 
   // function which will be called on

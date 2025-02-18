@@ -10,7 +10,8 @@ import { themeColors } from "@/constant/Colors";
 import ThemeContext from "@/context/ThemeContext";
 import HabitDurationModal from "./Modal/HabitDurationModal";
 import { Duration } from "./Modal/HabitDurationModal";
-import styling from "./style/HabitDurationInputStyle";
+import styling from "./style/HabitInputStyle";
+// import styling from "./style/HabitDurationInputStyle";
 
 interface HabitDurationInputProps {
   onSelect: (value: any) => void;
@@ -48,7 +49,7 @@ const HabitDurationInput: React.FC<HabitDurationInputProps> = ({
 
   // function to handle task duration
   const handleHabitDuration = (selectedDuration: any) => {
-    console.log(selectedDuration, "duration Habit Duration Input");
+    // console.log(selectedDuration, "duration Habit Duration Input");
     setDuration(selectedDuration);
     handleSave(selectedDuration);
     // onSelect(selectedDuration);
@@ -62,24 +63,26 @@ const HabitDurationInput: React.FC<HabitDurationInputProps> = ({
       >
         <Ionicons
           style={styles.iconLeft}
-          name="chevron-forward"
+          name="alarm-outline"
           size={20}
           color={themeColors[theme].text}
         />
-        <Text style={styles.label}>Duration</Text>
-        <Text style={styles.selectorText}>
-          {duration?.all_day === true
-            ? "All Day"
-            : duration.start_time && duration.end_time
-            ? `From ${format(duration.start_time, "hh:mm: a")} To ${format(
-                duration.end_time,
-                "hh:mm: a"
-              )}`
-            : `Point Time: ${format(
-                duration.start_time ?? new Date(),
-                "hh:mm: a"
-              )}`}
-        </Text>
+        <View style={styles.inputField}>
+          <Text style={styles.label}>Duration</Text>
+          <Text style={styles.selectorText}>
+            {duration?.all_day === true
+              ? "All Day"
+              : duration.start_time && duration.end_time
+              ? `From ${format(duration.start_time, "hh:mm: a")} To ${format(
+                  duration.end_time,
+                  "hh:mm: a"
+                )}`
+              : `Point Time: ${format(
+                  duration.start_time ?? new Date(),
+                  "hh:mm: a"
+                )}`}
+          </Text>
+        </View>
         <Ionicons
           style={styles.iconRight}
           name="chevron-forward"

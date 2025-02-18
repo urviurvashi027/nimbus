@@ -8,15 +8,18 @@ import ThemeContext from "@/context/ThemeContext";
 import { ThemeKey } from "@/components/Themed";
 import { ReminderAt } from "./Modal/HabitReminderModal";
 import HabitReminderModal from "./Modal/HabitReminderModal";
-import styling from "./style/HabitRemiderInputStyle";
+// import styling from "./style/HabitRemiderInputStyle";
+import styling from "./style/HabitInputStyle";
 import { format } from "date-fns";
 
 interface HabitReminderInputProps {
+  isAllDayEnabled: boolean;
   onSelect: (value: any) => void;
 }
 
 const HabitReminderInput: React.FC<HabitReminderInputProps> = ({
   onSelect,
+  isAllDayEnabled,
 }) => {
   const [reminderAt, setReminderAt] = useState<ReminderAt | null>(null);
   const [userDisplay, setUserDisplay] = useState<string>("");
@@ -32,7 +35,7 @@ const HabitReminderInput: React.FC<HabitReminderInputProps> = ({
     if (reminderAt.time) {
       setUserDisplay(reminderAt.time);
     }
-    // onSelect(reminderAt);
+    onSelect(reminderAt);
   };
 
   return (
@@ -43,14 +46,18 @@ const HabitReminderInput: React.FC<HabitReminderInputProps> = ({
       >
         <Ionicons
           style={styles.iconLeft}
-          name="chevron-forward"
+          name="stopwatch-outline"
           size={20}
           color={themeColors[theme].text}
         />
-        <Text style={styles.label}>Reminder At</Text>
-        <Text style={styles.selectorText}>
-          {reminderAt ? `Reminder At: ${userDisplay}` : "Select Reminder Time"}
-        </Text>
+        <View style={styles.inputField}>
+          <Text style={styles.label}>Reminder At</Text>
+          <Text style={styles.selectorText}>
+            {reminderAt
+              ? `Reminder At: ${userDisplay}`
+              : "Select Reminder Time"}
+          </Text>
+        </View>
         <Ionicons
           style={styles.iconRight}
           name="chevron-forward"
@@ -61,6 +68,7 @@ const HabitReminderInput: React.FC<HabitReminderInputProps> = ({
       <HabitReminderModal
         visible={showReminderAtModal}
         onClose={() => setShowReminderAtModal(false)}
+        isAllDayEnabled={isAllDayEnabled}
         onSave={handleHabitReminder}
       />
     </>
