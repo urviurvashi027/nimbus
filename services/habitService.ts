@@ -13,6 +13,7 @@ import {
   HabitTypeResponse,
   HabitTagResponse,
 } from "@/types/habitTypes";
+import Toast from "react-native-toast-message";
 
 // Type definitions for login, signup, and list responses
 
@@ -20,15 +21,24 @@ import {
 export const createHabit = async (
   data: HabitCreateRequest
 ): Promise<HabitCreateResponse> => {
-  console.log("serice called for creation", API_ENDPOINTS.createHabit);
   try {
     const response: AxiosResponse<HabitCreateResponse> = await axios.post(
       API_ENDPOINTS.createHabit,
       data
     );
-    console.log(response, "response from creation");
     return response.data; // Return the data containing the token
   } catch (error: any) {
+    const errorMessage =
+      error.response?.data?.message ||
+      "Something went wrong. Please try again.";
+
+    // Show error toast
+    Toast.show({
+      type: "error",
+      text1: "Habit Creation Failed",
+      text2: errorMessage,
+      position: "bottom",
+    });
     throw error.response ? error.response.data : error.message;
   }
 };

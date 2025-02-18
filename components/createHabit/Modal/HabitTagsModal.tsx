@@ -29,7 +29,7 @@ interface TaskTagsModalProps {
   visible: boolean;
   onClose: () => void;
   selectedTagData: any;
-  onSelect: (tag: TagsType[], newTag?: string) => void;
+  onSelect: (tag: any, newTag?: string) => void;
   //   existingTags: TagsType[];
   //   onAddNewTag: (tag: string, id: number) => void;
 }
@@ -66,6 +66,7 @@ const HabitTagsModal: React.FC<TaskTagsModalProps> = ({
       return;
     }
     setSelectedTag([...selectedTag, { id: 0, name: newTag }]);
+    onSelect({ id: 0, name: newTag });
     // setNewTag("");
     setIsAdding(false);
     setError("");
@@ -81,7 +82,7 @@ const HabitTagsModal: React.FC<TaskTagsModalProps> = ({
   }, [habitTagList]);
 
   const handleSaveClick = (tag: { id: number; name: string }) => {
-    console.log(tag, "hanlde save tag");
+    console.log("Tags Modal:: handleSaveClick", tag);
     setSelectedTag((prev) => {
       // Check if the tag already exists based on `id`
       const tagExists = prev.some((t) => t.id === tag.id);
@@ -93,6 +94,7 @@ const HabitTagsModal: React.FC<TaskTagsModalProps> = ({
       // Otherwise, add the new tag
       return [...prev, tag];
     });
+    onSelect(tag);
   };
 
   // useEffect(() => {
@@ -100,16 +102,24 @@ const HabitTagsModal: React.FC<TaskTagsModalProps> = ({
   //   if (selectedTagData.length) setSelectedTag(selectedTagData?.existing_tag);
   // }, [selectedTagData]);
 
-  useEffect(() => {
-    console.log(selectedTag, "selectedTag usefeect modal");
-    onSelect(selectedTag);
-  }, [selectedTag]);
+  // useEffect(() => {
+  //   console.log("Tags Modal:: useffect modal selectedTag", selectedTag);
+  //   // if (selectedTag.length) onSelect(selectedTag);
+  // }, [selectedTag]);
 
   useEffect(() => {
-    if (selectedTag.length && newTag) {
-      onSelect(selectedTag, newTag);
-    }
-  }, [newTag]);
+    console.log(
+      "Tags Modal:: useffect modal:: selectedTagData",
+      selectedTagData
+    );
+    if (selectedTagData.length) setSelectedTag(selectedTagData);
+  }, [selectedTagData]);
+
+  // useEffect(() => {
+  //   if (selectedTag.length && newTag) {
+  //     onSelect(selectedTag, newTag);
+  //   }
+  // }, [newTag]);
 
   return (
     <Modal
@@ -165,23 +175,6 @@ const HabitTagsModal: React.FC<TaskTagsModalProps> = ({
                 )}
               </TouchableOpacity>
             ))}
-
-            {/* Display existing tags dynamically */}
-            {/* {existingTags
-              .filter((tag) => !data.includes(tag))
-              .map((tag, index) => (
-                <TouchableOpacity
-                  key={`existing-${index}`}
-                  style={styles.tagButton}
-                  onPress={() => {
-                    handleSaveClick(tag);
-                    onClose();
-                  }}
-                >
-                  <Text style={styles.tagText}>{tag.name}</Text>
-                  <Ionicons name="chevron-forward" size={20} color="#888" />
-                </TouchableOpacity>
-              ))} */}
           </View>
 
           {/* Add New Tag Section */}

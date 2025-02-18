@@ -23,7 +23,8 @@ export interface LoginRequest {
 export interface LoginResponse {
   success: boolean;
   message: string;
-  data: UserData;
+  data: UserData | {};
+  error_code?: string;
 }
 
 export interface LogoutRequest {

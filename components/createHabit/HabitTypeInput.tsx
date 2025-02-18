@@ -20,13 +20,14 @@ const HabitTypeInput: React.FC<HabitTypeModalProps> = ({ onSelect }) => {
   const [showHabitTypeModal, setShowHabitTypeModal] = useState(false);
   const [selectedHabitType, setSelectedHabitType] = useState<HabitType>();
 
-  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext);
   const styles = styling(theme);
 
   const getHabitTypeList = async () => {
     const result = await getHabitType();
     if (result && result.success) {
       setHabitTypeList(result.data);
+      setSelectedHabitType(result.data[0]);
     }
     if (result && result.error) {
       alert(result.error);
@@ -46,8 +47,14 @@ const HabitTypeInput: React.FC<HabitTypeModalProps> = ({ onSelect }) => {
   const handleOnSelect = (selectedHabitType: HabitType) => {
     const { id, name, ...rest } = selectedHabitType;
     setSelectedHabitType(selectedHabitType);
-    onSelect(id);
   };
+
+  useEffect(() => {
+    if (selectedHabitType) {
+      const { id, name, ...rest } = selectedHabitType;
+      onSelect(id);
+    }
+  }, [selectedHabitType]);
 
   return (
     <>

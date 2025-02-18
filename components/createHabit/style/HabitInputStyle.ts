@@ -19,7 +19,7 @@ const styling = (theme: ThemeKey) =>
       flex: 1,
       flexDirection: "row",
       alignItems: "center",
-      paddingVertical: 9,
+      paddingVertical: 5,
       paddingHorizontal: 5,
     },
     selectorButton: {
@@ -31,6 +31,7 @@ const styling = (theme: ThemeKey) =>
     },
     selectorText: {
       fontSize: 16,
+      width: 130,
       color: themeColors.basic.mediumGrey,
       //   paddingLeft: 30,
       margin: "auto",

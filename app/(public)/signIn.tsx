@@ -18,9 +18,7 @@ export default function signIn() {
 
   const navigation = useNavigation();
 
-  const colorScheme = useColorScheme();
-
-  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext);
 
   useEffect(() => {
     navigation.setOptions({
@@ -42,10 +40,13 @@ export default function signIn() {
   const styles = styling(theme);
 
   const onLoginClick = async () => {
-    const result = await onLogin!(username, password);
-    if (result && result.success) router.replace("/(auth)/(tabs)");
-    if (result && result.error) {
-      alert(result.msg);
+    try {
+      const result = await onLogin!(username, password);
+      if (result?.success) {
+        router.replace("/(auth)/(tabs)"); // Navigate on success
+      }
+    } catch (error: any) {
+      console.log(error, "API Error Response");
     }
   };
 

@@ -8,6 +8,7 @@ import {
   LogoutRequest,
   LogoutResponse,
 } from "@/types/loginTypes";
+import Toast from "react-native-toast-message";
 
 // Login API request
 export const login = async (data: LoginRequest): Promise<LoginResponse> => {
@@ -18,6 +19,20 @@ export const login = async (data: LoginRequest): Promise<LoginResponse> => {
     );
     return response.data; // Return the data containing the token
   } catch (error: any) {
+    // error.response.data - have backend response where as error.message has axios error
+    // Extract error message properly
+    const errorMessage =
+      error.response?.data?.message ||
+      "Something went wrong. Please try again.";
+
+    // Show error toast
+    Toast.show({
+      type: "error",
+      text1: "Login Failed",
+      text2: errorMessage,
+      position: "bottom",
+    });
+
     throw error.response ? error.response.data : error.message;
   }
 };

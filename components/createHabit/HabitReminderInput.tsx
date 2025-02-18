@@ -21,22 +21,29 @@ const HabitReminderInput: React.FC<HabitReminderInputProps> = ({
   onSelect,
   isAllDayEnabled,
 }) => {
-  const [reminderAt, setReminderAt] = useState<ReminderAt | null>(null);
+  const [reminderAt, setReminderAt] = useState<ReminderAt>({
+    time: format(new Date(), "hh:mm:ss"),
+  });
   const [userDisplay, setUserDisplay] = useState<string>("");
   const [showReminderAtModal, setShowReminderAtModal] = useState(false);
-  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext);
 
   const styles = styling(theme);
 
   // function to handle Habit Reminder
   const handleHabitReminder = (reminderAt: any) => {
     setReminderAt(reminderAt);
-    console.log(reminderAt, "reminderAt from reminder input");
+    // if (reminderAt.time) {
+    //   setUserDisplay(reminderAt.time);
+    // }
+  };
+
+  useEffect(() => {
     if (reminderAt.time) {
       setUserDisplay(reminderAt.time);
+      onSelect(reminderAt);
     }
-    onSelect(reminderAt);
-  };
+  }, [reminderAt]);
 
   return (
     <>
@@ -52,10 +59,12 @@ const HabitReminderInput: React.FC<HabitReminderInputProps> = ({
         />
         <View style={styles.inputField}>
           <Text style={styles.label}>Reminder At</Text>
-          <Text style={styles.selectorText}>
-            {reminderAt
-              ? `Reminder At: ${userDisplay}`
-              : "Select Reminder Time"}
+          <Text
+            style={styles.selectorText}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {reminderAt ? `${userDisplay}` : "Select Reminder Time"}
           </Text>
         </View>
         <Ionicons

@@ -119,9 +119,13 @@ const HabitFrequencyInput: React.FC<HabitFrequencyInputProp> = ({
           color={themeColors[theme].text}
         />
         <View style={styles.inputField}>
-          <Text style={styles.label}>Frequency</Text>
-          <Text style={styles.selectorText}>
-            {frequency ? `${JSON.stringify(userDisplay)}` : "Select Frequency"}
+          <Text style={styles.label}>Repeat</Text>
+          <Text
+            style={styles.selectorText}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {frequency ? `${JSON.stringify(userDisplay)}` : "No Repeat"}
           </Text>
         </View>
         <Ionicons

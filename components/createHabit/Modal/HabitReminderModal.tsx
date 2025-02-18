@@ -24,13 +24,6 @@ export interface ReminderAt {
   thirty_min_before?: boolean;
 }
 
-// export type FormattedReminderAt = {
-//   timeDisplay: string | undefined | null;
-//   val: ReminderAt;
-// };
-
-type ThemeKey = "basic" | "light" | "dark";
-
 interface ReminderAtModalProps {
   visible: boolean;
   isAllDayEnabled: boolean;

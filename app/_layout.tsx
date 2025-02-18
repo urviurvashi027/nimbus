@@ -4,6 +4,7 @@ import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect, useState } from "react";
+import Toast from "react-native-toast-message";
 
 import HabitContext from "@/context/HabitContext";
 import { useColorScheme } from "@/components/UseColorScheme";
@@ -62,6 +63,7 @@ function RootLayoutNav() {
               options={{ headerShown: false }}
             />
           </Stack>
+          <Toast />
         </HabitContext.Provider>
       </ThemeProvider>
     </AuthProvider>

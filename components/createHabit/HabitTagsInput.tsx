@@ -27,10 +27,7 @@ interface HabitTagsInputProps {
 const HabitTagsInput: React.FC<HabitTagsInputProps> = ({ onSelect }) => {
   const [tagsList, setTagsList] = useState<HabitTag[]>([]);
 
-  const [selectedTag, setSelectedTag] = useState<any>({
-    existing_tag: [],
-    new_tag: "",
-  });
+  const [selectedTag, setSelectedTag] = useState<HabitTag[]>([]);
 
   const [showHabitTagsModal, setShowHabitTagsModal] = useState(false);
 
@@ -53,12 +50,14 @@ const HabitTagsInput: React.FC<HabitTagsInputProps> = ({ onSelect }) => {
 
   // Handle removing tags
   const handleRemoveTag = (index: number) => {
-    const res = selectedTag.existing_tag;
+    const res = selectedTag;
     const updatedTags = [...res];
     updatedTags.splice(index, 1);
-    console.log(updatedTags, "updated tag value");
+    console.log("Tags Input:: handleRemoveTag, updatedTags, ");
     // TODO
-    setSelectedTag((prev: any) => ({ ...prev, existing_tag: updatedTags }));
+    console.log(updatedTags);
+    setSelectedTag(updatedTags);
+    // setSelectedTag((prev: any) => ({ ...prev, updatedTags }));
   };
 
   // useEffect(() => {
@@ -77,25 +76,57 @@ const HabitTagsInput: React.FC<HabitTagsInputProps> = ({ onSelect }) => {
   // };
 
   const handleOnSelect = (selectedHabitTag: any, newTag?: string) => {
-    console.log(selectedHabitTag, "selectedHabitTag from tag input");
+    console.log("Tags Input:: handleOnSelect from tag input", selectedHabitTag);
     if (newTag) {
-      console.log("tag is added newly", selectedHabitTag, newTag);
+      console.log(
+        " Tags Input:: handleOnSelect added newly",
+        selectedHabitTag,
+        newTag
+      );
     } else {
-      console.log("else part newly", selectedHabitTag, newTag);
-      const result = {
-        existing_tag: selectedHabitTag,
-      };
-      setSelectedTag(result);
-    }
+      console.log(
+        " Tags Input:: handleOnSelect else part",
+        selectedHabitTag,
+        newTag
+      );
+      setSelectedTag((prevTags) => {
+        // Check if the tag already exists based on the `id`
+        const isDuplicate = prevTags.some(
+          (tag) => tag.id === selectedHabitTag.id
+        );
 
-    // handleNewTag(selectedHabitTag.new_tag);
-    // onSelect(selectedHabitTag);
+        if (isDuplicate) {
+          return prevTags; // If already exists, return the same array (no update)
+        }
+
+        return [...prevTags, selectedHabitTag]; // Otherwise, add new tag
+      });
+      //   if (!selectedTag.includes(tag)) {
+      //     setSelectedTags([...selectedTags, tag]);
+      //   }
+      // setSelectedTag([...selectedTag, selectedHabitTag]);
+    }
+  };
+
+  const constructTagObject = (tagsArray: { id: number; name: string }[]) => {
+    return {
+      existing_tag: tagsArray.filter((tag) => tag.id !== 0), // Exclude id = 0
+      new_tag: tagsArray.find((tag) => tag.id === 0)?.name || "", // Store name of id = 0
+    };
   };
 
   useEffect(() => {
-    console.log(selectedTag, "from useEffect input");
-    // onSelect(selectedTag);
+    if (selectedTag.length) {
+      console.log("Tags Input:: useEffect", selectedTag);
+      const result = constructTagObject(selectedTag);
+      console.log(result);
+      onSelect(result);
+    }
   }, [selectedTag]);
+
+  const onCloseModalClick = () => {
+    setShowHabitTagsModal(false);
+  };
 
   return (
     <>
@@ -113,8 +144,8 @@ const HabitTagsInput: React.FC<HabitTagsInputProps> = ({ onSelect }) => {
           <View style={styles.inputField}>
             <Text style={styles.label}>Tags</Text>
             <Text style={styles.selectorText}>
-              {selectedTag?.existing_tag?.length > 0
-                ? `${selectedTag?.existing_tag?.length} Tag(s) Selected`
+              {selectedTag?.length > 0
+                ? `${selectedTag?.length} Tag(s) Selected`
                 : "Select Tags"}
             </Text>
           </View>
@@ -129,7 +160,7 @@ const HabitTagsInput: React.FC<HabitTagsInputProps> = ({ onSelect }) => {
 
       {/* Display Selected Tags */}
       <View style={styles.tagsContainer}>
-        {selectedTag?.existing_tag.map((tag: any, index: number) => (
+        {selectedTag?.map((tag: any, index: number) => (
           <View key={index} style={styles.tag}>
             <Text style={styles.tagText}>{tag.name}</Text>
             <TouchableOpacity onPress={() => handleRemoveTag(index)}>
@@ -143,7 +174,7 @@ const HabitTagsInput: React.FC<HabitTagsInputProps> = ({ onSelect }) => {
         habitTagList={tagsList}
         visible={showHabitTagsModal}
         selectedTagData={selectedTag}
-        onClose={() => setShowHabitTagsModal(false)}
+        onClose={onCloseModalClick}
         onSelect={handleOnSelect}
       />
     </>

@@ -51,9 +51,27 @@ const HabitDurationInput: React.FC<HabitDurationInputProps> = ({
   const handleHabitDuration = (selectedDuration: any) => {
     // console.log(selectedDuration, "duration Habit Duration Input");
     setDuration(selectedDuration);
-    handleSave(selectedDuration);
+    // handleSave(selectedDuration);
     // onSelect(selectedDuration);
   };
+
+  useEffect(() => {
+    if (duration.all_day) {
+      onSelect({ all_day: true });
+    } else {
+      if (duration.start_time && duration.end_time) {
+        onSelect({
+          start_time: format(duration.start_time, "hh:mm:ss"),
+          end_time: format(duration.end_time, "hh:mm:ss"),
+          // start_time: pointTime,
+        });
+      } else {
+        onSelect({
+          start_time: format(duration.start_time || new Date(), "hh:mm:ss"),
+        });
+      }
+    }
+  }, [duration]);
 
   return (
     <>
@@ -69,7 +87,11 @@ const HabitDurationInput: React.FC<HabitDurationInputProps> = ({
         />
         <View style={styles.inputField}>
           <Text style={styles.label}>Duration</Text>
-          <Text style={styles.selectorText}>
+          <Text
+            style={styles.selectorText}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
             {duration?.all_day === true
               ? "All Day"
               : duration.start_time && duration.end_time

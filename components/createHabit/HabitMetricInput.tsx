@@ -49,10 +49,14 @@ const HabitMetricInput: React.FC<HabitMetricInputProp> = ({ onSelect }) => {
         />
         <View style={styles.inputField}>
           <Text style={styles.label}>Metric</Text>
-          <Text style={styles.selectorText}>
+          <Text
+            style={styles.selectorText}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
             {habitMetric
               ? `Metric: ${habitMetric.count}  ${habitMetric.unit}`
-              : "Select Habit Metric"}
+              : "Select Metric"}
           </Text>
         </View>
         <Ionicons

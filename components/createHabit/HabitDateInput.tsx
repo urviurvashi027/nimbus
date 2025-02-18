@@ -16,7 +16,9 @@ interface HabitDateInputProps {
 }
 
 const HabitDateInput: React.FC<HabitDateInputProps> = ({ onSelect }) => {
-  const [habitDate, setHabitDate] = useState<HabitDateType>();
+  const [habitDate, setHabitDate] = useState<HabitDateType>({
+    start_date: new Date(),
+  });
   const [userDisplay, setUserDisplay] = useState<string>();
 
   const [showStartTaskModal, setShowStartTaskModal] = useState(false);
@@ -27,33 +29,56 @@ const HabitDateInput: React.FC<HabitDateInputProps> = ({ onSelect }) => {
 
   // function which will be called on
   const handleStartSave = (habitDate: HabitDateType) => {
-    // Handle the start and end date logic here
-    // console.log(habitDate, "habitDate");
-    const { start_date, end_date } = habitDate;
-    let result = {};
+    // const { start_date, end_date } = habitDate;
+    // let result = {};
     setHabitDate(habitDate);
-    const userDisplay = end_date
+    // const userDisplay = end_date
+    //   ? `${format(start_date, "dd-MM-yyyy")} - ${format(
+    //       end_date,
+    //       "yyyy-MM-dd"
+    //     )}`
+    //   : `${format(start_date, "dd-MM-yyyy")}`;
+
+    // setUserDisplay(userDisplay);
+    // if (start_date && end_date) {
+    //   result = {
+    //     start_date: format(start_date, "yyyy-MM-dd"),
+    //     end_date: format(end_date, "yyyy-MM-dd"),
+    //   };
+    // } else {
+    //   result = {
+    //     start_date: format(start_date, "yyyy-MM-dd"),
+    //   };
+    // }
+    setShowStartTaskModal(false);
+
+    // onSelect(result);
+  };
+
+  useEffect(() => {
+    const { start_date, ...rest } = habitDate;
+    let result = {};
+
+    const userDisplay = rest.end_date
       ? `${format(start_date, "dd-MM-yyyy")} - ${format(
-          end_date,
-          "yyyy-MM-dd"
+          rest.end_date,
+          "dd-MM-yyyy"
         )}`
       : `${format(start_date, "dd-MM-yyyy")}`;
 
     setUserDisplay(userDisplay);
-    if (start_date && end_date) {
+    if (start_date && rest.end_date) {
       result = {
         start_date: format(start_date, "yyyy-MM-dd"),
-        end_date: format(end_date, "yyyy-MM-dd"),
+        end_date: format(rest.end_date, "yyyy-MM-dd"),
       };
     } else {
       result = {
         start_date: format(start_date, "yyyy-MM-dd"),
       };
     }
-    setShowStartTaskModal(false);
-
     onSelect(result);
-  };
+  }, [habitDate]);
 
   return (
     <>
@@ -69,7 +94,11 @@ const HabitDateInput: React.FC<HabitDateInputProps> = ({ onSelect }) => {
         />
         <View style={styles.inputField}>
           <Text style={styles.label}>Start Date</Text>
-          <Text style={styles.selectorText}>
+          <Text
+            style={[styles.selectorText, { width: 130 }]}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
             {habitDate ? userDisplay : "Select Date"}
           </Text>
         </View>
