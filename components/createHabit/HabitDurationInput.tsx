@@ -15,10 +15,12 @@ import styling from "./style/HabitInputStyle";
 
 interface HabitDurationInputProps {
   onSelect: (value: any) => void;
+  isEditMode?: Duration;
 }
 
 const HabitDurationInput: React.FC<HabitDurationInputProps> = ({
   onSelect,
+  isEditMode,
 }) => {
   const [duration, setDuration] = useState<Duration>({ all_day: true });
 
@@ -49,10 +51,8 @@ const HabitDurationInput: React.FC<HabitDurationInputProps> = ({
 
   // function to handle task duration
   const handleHabitDuration = (selectedDuration: any) => {
-    // console.log(selectedDuration, "duration Habit Duration Input");
     setDuration(selectedDuration);
-    // handleSave(selectedDuration);
-    // onSelect(selectedDuration);
+    handleSave(selectedDuration);
   };
 
   useEffect(() => {
@@ -71,7 +71,13 @@ const HabitDurationInput: React.FC<HabitDurationInputProps> = ({
         });
       }
     }
-  }, [duration]);
+  }, []);
+
+  useEffect(() => {
+    if (isEditMode) {
+      setDuration(isEditMode);
+    }
+  }, [isEditMode]);
 
   return (
     <>
@@ -117,6 +123,7 @@ const HabitDurationInput: React.FC<HabitDurationInputProps> = ({
         visible={showDurationModal}
         onClose={() => setShowDurationModal(false)}
         onSave={handleHabitDuration}
+        isEditMode={isEditMode}
       />
     </>
   );

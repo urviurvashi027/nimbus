@@ -135,7 +135,6 @@ export default function HabitBasic() {
     setShowSuccess(true);
     if (name && Object.keys(metric).length > 0) {
       const freq = getFrequencyDetail();
-      console.log(Object.keys(metric).length, metric);
 
       let result = {
         name: name,
@@ -174,7 +173,6 @@ export default function HabitBasic() {
       }
     } catch (error: any) {
       setIsLoading(false);
-      console.log(error, "API Error Response");
     }
 
     // if (result && result.success) {

@@ -35,8 +35,6 @@ const DatePicker = (props: DatePicker) => {
   }, [selectedDateValue]);
 
   const handleConfirm = (date: any) => {
-    // console.warn("A date has been picked: ", date);
-    // console.warn("A date has been picked: ", date);
     hideDatePicker();
     setSelectedDate(date);
     onConfirmDate(date);

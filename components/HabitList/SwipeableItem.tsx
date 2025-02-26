@@ -16,16 +16,18 @@ import { themeColors } from "@/constant/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { HabitItem } from "@/types/habitTypes";
 import { ThemeKey } from "../Themed";
+
 type SwipeableItemProps = {
   item: HabitItem;
   habitItemClick: (id: any) => void;
+  habitItemDeleted: (id: any) => void;
 };
 
 const SwipeableItem: React.FC<SwipeableItemProps> = (
   props: SwipeableItemProps
 ) => {
   const { name, id, ...rest } = props.item;
-  const { habitItemClick } = props;
+  const { habitItemClick, habitItemDeleted } = props;
   const [showHabitActionModal, setshowHabitActionModal] = useState(false);
   const translateY = useSharedValue(0);
 
@@ -81,15 +83,18 @@ const SwipeableItem: React.FC<SwipeableItemProps> = (
   };
 
   const deleteHabitClick = async () => {
+    console.log("Delete habit click", id);
+    habitItemDeleted(id);
     // const result = await deleteHabit({ id });
   };
 
   const swipeFromLeftOpen = () => {
     // setshowHabitActionModal(true);
-    // alert("Swipe from left");
+    alert("Swipe from left");
   };
   const swipeFromRightOpen = () => {
     // alert("Swipe from right");
+    setshowHabitActionModal(true);
   };
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -105,13 +110,6 @@ const SwipeableItem: React.FC<SwipeableItemProps> = (
           direction === "left" ? swipeFromLeftOpen() : swipeFromRightOpen();
         }}
       >
-        {/* <Animated.View style={[styles.container, animatedStyle]}>
-          <Text style={styles.emoji}>{emoji}</Text>
-          <View style={styles.textContainer}>
-            <Text style={styles.taskName}>{name}</Text>
-            <Text style={styles.taskTime}>{time}</Text>
-          </View>
-        </Animated.View> */}
         <TouchableOpacity onPress={() => habitItemClick(id)}>
           <View style={styles.itemContainer}>
             {/* <Text style={styles.emoji}>{emoji}</Text> */}
@@ -126,8 +124,13 @@ const SwipeableItem: React.FC<SwipeableItemProps> = (
       {/* Task Type Modal */}
       <DeleteHabitModal
         visible={showHabitActionModal}
-        onClose={() => setshowHabitActionModal(false)}
-        onDelete={deleteHabitClick}
+        header="Delete Habit"
+        title="Are you sure !!"
+        content="Do you want to delete this task?"
+        primaryBtnText="Yes"
+        secondaryBtnText="Cancel"
+        secondaryBtnClick={() => setshowHabitActionModal(false)}
+        primaryBtnClick={deleteHabitClick}
         // onSelect={(type) => setTaskType(type)}
       />
     </>

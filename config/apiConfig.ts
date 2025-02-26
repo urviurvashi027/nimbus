@@ -27,9 +27,9 @@ export const API_ENDPOINTS = {
   habitTypeList: `${BASE_URL}/api/habit-types/`,
   habitTagList: `${BASE_URL}/api/tags/`,
   habitDetailsById: `${BASE_URL}/api/habits/`,
+  habitDelete: `${BASE_URL}/api/habits/delete`,
 
   habitPatch: `${BASE_URL}/habits/list`,
-  deleteHabit: `${BASE_URL}/habits/list`,
   toolList: `${BASE_URL}/habits/list`,
   getSoundscapeList: `${BASE_URL}/habits/list`,
   downloadMedia: `${BASE_URL}/habits/list`,

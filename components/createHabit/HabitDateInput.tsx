@@ -2,7 +2,7 @@ import { Text } from "react-native";
 import { View, TouchableOpacity } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { format } from "date-fns";
+import { format, interval } from "date-fns";
 
 import { themeColors } from "@/constant/Colors";
 import ThemeContext from "@/context/ThemeContext";
@@ -13,9 +13,13 @@ import styling from "./style/HabitInputStyle";
 
 interface HabitDateInputProps {
   onSelect: (value: any) => void;
+  isEditMode?: HabitDateType;
 }
 
-const HabitDateInput: React.FC<HabitDateInputProps> = ({ onSelect }) => {
+const HabitDateInput: React.FC<HabitDateInputProps> = ({
+  onSelect,
+  isEditMode,
+}) => {
   const [habitDate, setHabitDate] = useState<HabitDateType>({
     start_date: new Date(),
   });
@@ -29,17 +33,58 @@ const HabitDateInput: React.FC<HabitDateInputProps> = ({ onSelect }) => {
 
   // function which will be called on
   const handleStartSave = (habitDate: HabitDateType) => {
-    // const { start_date, end_date } = habitDate;
-    // let result = {};
     setHabitDate(habitDate);
-    // const userDisplay = end_date
-    //   ? `${format(start_date, "dd-MM-yyyy")} - ${format(
-    //       end_date,
-    //       "yyyy-MM-dd"
-    //     )}`
-    //   : `${format(start_date, "dd-MM-yyyy")}`;
 
-    // setUserDisplay(userDisplay);
+    setShowStartTaskModal(false);
+    handleSave(habitDate);
+  };
+
+  const handleSave = (habitDate: HabitDateType) => {
+    const { start_date, end_date, ...rest } = habitDate;
+    let result = {};
+    if (start_date && end_date) {
+      result = {
+        start_date: format(start_date, "yyyy-MM-dd"),
+        end_date: format(end_date, "yyyy-MM-dd"),
+      };
+    } else {
+      result = {
+        start_date: format(start_date, "yyyy-MM-dd"),
+      };
+    }
+
+    if (rest.frequency_type) {
+      result = {
+        ...result,
+        ...rest,
+      };
+    }
+    onSelect(result);
+  };
+
+  useEffect(() => {
+    if (isEditMode) {
+      console.log("Edit mode is on", isEditMode);
+      // handleSave(isEditMode);
+      setHabitDate(habitDate);
+    } else {
+      console.log("Edit mode is off");
+    }
+  }, [isEditMode]);
+
+  useEffect(() => {
+    const { start_date, end_date, ...rest } = habitDate;
+    // let result = {};
+
+    const userDisplay = end_date
+      ? `${format(start_date, "dd-MM-yyyy")} - ${format(
+          end_date,
+          "dd-MM-yyyy"
+        )}`
+      : `${format(start_date, "dd-MM-yyyy")}`;
+
+    setUserDisplay(userDisplay);
+    handleSave(habitDate);
     // if (start_date && end_date) {
     //   result = {
     //     start_date: format(start_date, "yyyy-MM-dd"),
@@ -50,35 +95,15 @@ const HabitDateInput: React.FC<HabitDateInputProps> = ({ onSelect }) => {
     //     start_date: format(start_date, "yyyy-MM-dd"),
     //   };
     // }
-    setShowStartTaskModal(false);
 
+    // if (rest.frequency_type) {
+    //   result = {
+    //     ...result,
+    //     ...rest,
+    //   };
+    // }
     // onSelect(result);
-  };
-
-  useEffect(() => {
-    const { start_date, ...rest } = habitDate;
-    let result = {};
-
-    const userDisplay = rest.end_date
-      ? `${format(start_date, "dd-MM-yyyy")} - ${format(
-          rest.end_date,
-          "dd-MM-yyyy"
-        )}`
-      : `${format(start_date, "dd-MM-yyyy")}`;
-
-    setUserDisplay(userDisplay);
-    if (start_date && rest.end_date) {
-      result = {
-        start_date: format(start_date, "yyyy-MM-dd"),
-        end_date: format(rest.end_date, "yyyy-MM-dd"),
-      };
-    } else {
-      result = {
-        start_date: format(start_date, "yyyy-MM-dd"),
-      };
-    }
-    onSelect(result);
-  }, [habitDate]);
+  }, []);
 
   return (
     <>
@@ -114,6 +139,7 @@ const HabitDateInput: React.FC<HabitDateInputProps> = ({ onSelect }) => {
         visible={showStartTaskModal}
         onClose={() => setShowStartTaskModal(false)}
         onSave={handleStartSave}
+        isEditMode={isEditMode}
       />
     </>
   );

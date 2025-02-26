@@ -53,9 +53,7 @@ const HabitTagsInput: React.FC<HabitTagsInputProps> = ({ onSelect }) => {
     const res = selectedTag;
     const updatedTags = [...res];
     updatedTags.splice(index, 1);
-    console.log("Tags Input:: handleRemoveTag, updatedTags, ");
     // TODO
-    console.log(updatedTags);
     setSelectedTag(updatedTags);
     // setSelectedTag((prev: any) => ({ ...prev, updatedTags }));
   };
@@ -76,19 +74,8 @@ const HabitTagsInput: React.FC<HabitTagsInputProps> = ({ onSelect }) => {
   // };
 
   const handleOnSelect = (selectedHabitTag: any, newTag?: string) => {
-    console.log("Tags Input:: handleOnSelect from tag input", selectedHabitTag);
     if (newTag) {
-      console.log(
-        " Tags Input:: handleOnSelect added newly",
-        selectedHabitTag,
-        newTag
-      );
     } else {
-      console.log(
-        " Tags Input:: handleOnSelect else part",
-        selectedHabitTag,
-        newTag
-      );
       setSelectedTag((prevTags) => {
         // Check if the tag already exists based on the `id`
         const isDuplicate = prevTags.some(
@@ -117,9 +104,7 @@ const HabitTagsInput: React.FC<HabitTagsInputProps> = ({ onSelect }) => {
 
   useEffect(() => {
     if (selectedTag.length) {
-      console.log("Tags Input:: useEffect", selectedTag);
       const result = constructTagObject(selectedTag);
-      console.log(result);
       onSelect(result);
     }
   }, [selectedTag]);

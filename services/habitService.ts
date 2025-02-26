@@ -95,12 +95,12 @@ export const getHabitDetailsById = async (
 
 // delete habit request
 export const deleteHabit = async (
-  data: HabitDeleteRequest
+  id: HabitDeleteRequest
 ): Promise<HabitDeleteResponse> => {
   try {
     const response: AxiosResponse<HabitDeleteResponse> = await axios.post(
-      API_ENDPOINTS.deleteHabit,
-      data
+      `${API_ENDPOINTS.habitDetailsById}${id}/`,
+      id
     );
     return response.data; // Return the data containing the token
   } catch (error: any) {

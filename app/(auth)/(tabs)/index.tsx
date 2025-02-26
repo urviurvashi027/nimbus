@@ -25,9 +25,7 @@ export default function TabOneScreen() {
   };
 
   // function to be called whenever date changes
-  const onDateChange = (val: any) => {
-    // console.log(val, "value of changed date from index");
-  };
+  const onDateChange = (val: any) => {};
 
   const getHabitListData = async () => {
     try {
@@ -38,19 +36,15 @@ export default function TabOneScreen() {
     } catch (error: any) {
       console.log(error, "API Error Response");
     }
-
-    // const result = await getHabitList();
-    // if (result && result.success) {
-    //   setHabitList(result.data);
-    // }
-    // if (result && result.error) {
-    //   alert(result);
-    // }
   };
 
   useEffect(() => {
     getHabitListData();
   }, []);
+
+  const refreshData = () => {
+    getHabitListData();
+  };
 
   return (
     <ScreenView style={{ paddingTop: Platform.OS === "ios" ? 50 : 20 }}>
@@ -59,7 +53,11 @@ export default function TabOneScreen() {
         <DatePanel onDateChange={onDateChange} />
 
         <View style={styles.taskListContainer}>
-          <HabitList data={habitList} style={styles.itemSeparator} />
+          <HabitList
+            data={habitList}
+            style={styles.itemSeparator}
+            refreshData={refreshData}
+          />
         </View>
       </GestureHandlerRootView>
       <TouchableOpacity style={styles.floatingButton} onPress={onCreateClick}>

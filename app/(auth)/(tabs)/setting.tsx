@@ -51,6 +51,11 @@ export default function profile() {
     }
   };
 
+  const onToggle = (id: any, value: any) => {
+    setFormState({ ...formState, [id]: value });
+    value ? toggleTheme("dark") : toggleTheme("light");
+  };
+
   return (
     // <ScreenView>
     <GestureHandlerRootView style={styles.gestureContainer}>
@@ -115,9 +120,11 @@ export default function profile() {
                           trackColor={{
                             true: `${themeColors.basic.tertiaryColor}`,
                           }}
-                          onValueChange={(value) =>
-                            setFormState({ ...formState, [id]: value })
-                          }
+                          // onValueChange={(value) =>
+                          //   setFormState({ ...formState, [id]: value })
+                          // }
+                          onValueChange={(value) => onToggle(id, value)}
+                          // onValueChange={onToggle}
                         />
                       )}
 
@@ -206,14 +213,14 @@ const styling = (theme: ThemeKey) =>
       alignItems: "center",
       justifyContent: "flex-start",
       height: 50,
-      backgroundColor: "#f2f2f2",
+      backgroundColor: themeColors[theme].divider,
       borderRadius: 8,
       marginBottom: 12,
       paddingHorizontal: 12,
     },
     rowLabel: {
       fontSize: 12,
-      color: "#0c0c0c",
+      color: themeColors[theme].text,
     },
     rowIcon: {
       width: 32,

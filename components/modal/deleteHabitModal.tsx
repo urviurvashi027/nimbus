@@ -12,17 +12,27 @@ import { Ionicons } from "@expo/vector-icons";
 
 interface DeleteHabitModalProps {
   visible: boolean;
-  onClose: () => void;
-  onDelete: () => void;
+  title: string;
+  header: string;
+  content: string;
+  primaryBtnText: string;
+  secondaryBtnText: string;
+  secondaryBtnClick: () => void;
+  primaryBtnClick: () => void;
 }
 
 const DeleteHabitModal: React.FC<DeleteHabitModalProps> = ({
   visible,
-  onClose,
-  onDelete,
+  content,
+  title,
+  header,
+  primaryBtnText,
+  secondaryBtnText,
+  secondaryBtnClick,
+  primaryBtnClick,
 }) => {
   const onDeleteClick = () => {
-    onDelete();
+    primaryBtnClick();
   };
 
   return (
@@ -30,24 +40,27 @@ const DeleteHabitModal: React.FC<DeleteHabitModalProps> = ({
       animationType="slide"
       transparent={true}
       visible={visible}
-      onRequestClose={onClose}
+      onRequestClose={secondaryBtnClick}
     >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContainer}>
           {/* Header */}
           <View style={styles.header}>
-            <Text style={styles.title}>Habit Delete</Text>
-            <TouchableOpacity onPress={onClose}>
+            <Text style={styles.title}>{header}</Text>
+            <TouchableOpacity onPress={secondaryBtnClick}>
               <Ionicons name="close" size={24} color="#333" />
             </TouchableOpacity>
           </View>
 
           <View>
-            <Text> Are you sure !!</Text>
-            <Text>Do you want to delete this task?</Text>
+            <Text>{title}</Text>
+            <Text>{content}</Text>
           </View>
           <View style={styles.rowDirection}>
-            <TouchableOpacity style={styles.createButton} onPress={onClose}>
+            <TouchableOpacity
+              style={styles.createButton}
+              onPress={secondaryBtnClick}
+            >
               <Text
                 style={{
                   color: themeColors.basic.PRIMARY,
@@ -55,7 +68,7 @@ const DeleteHabitModal: React.FC<DeleteHabitModalProps> = ({
                   fontSize: 17,
                 }}
               >
-                Cancel
+                {secondaryBtnText}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -69,7 +82,7 @@ const DeleteHabitModal: React.FC<DeleteHabitModalProps> = ({
                   fontSize: 17,
                 }}
               >
-                Yes
+                {primaryBtnText}
               </Text>
             </TouchableOpacity>
           </View>

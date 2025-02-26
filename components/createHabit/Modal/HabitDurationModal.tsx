@@ -21,8 +21,8 @@ interface DurationModalProps {
   visible: boolean;
   onClose: () => void;
   onSave: (duration: Duration) => void;
+  isEditMode?: Duration;
 }
-type ThemeKey = "basic" | "light" | "dark";
 
 export type Duration = {
   all_day?: boolean;
@@ -34,6 +34,7 @@ const HabitDurationModal: React.FC<DurationModalProps> = ({
   visible,
   onClose,
   onSave,
+  isEditMode,
 }) => {
   const [allDayEnabled, setAllDayEnabled] = useState<boolean>(true);
 
@@ -91,12 +92,21 @@ const HabitDurationModal: React.FC<DurationModalProps> = ({
   };
 
   useEffect(() => {
-    // console.log(
-    //   format(pointTime, "hh:mm:ss"),
-    //   format(endTime, "hh:mm:ss"),
-    //   "mounting"
-    // );
-  }, []);
+    if (isEditMode?.all_day) {
+      setAllDayEnabled(true);
+    } else if (isEditMode?.end_time && isEditMode.start_time) {
+      setPointTime(isEditMode.start_time);
+      setEndTime(isEditMode.end_time);
+      setAllDayEnabled(false);
+      setSelection("Time Period");
+    } else {
+      if (isEditMode?.start_time) {
+        setSelection("Point Time");
+        setPointTime(isEditMode.start_time);
+      }
+    }
+  }, [isEditMode]);
+
   useEffect(() => {
     // console.log(format(pointTime, "hh:mm:ss"), format(endTime, "hh:mm:ss"));
   }, [pointTime, endTime]);

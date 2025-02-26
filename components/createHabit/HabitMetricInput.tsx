@@ -10,11 +10,21 @@ import HabitMetricModal from "./Modal/HabitMetricModal";
 import styling from "./style/HabitInputStyle";
 // import styling from "./style/HabitMetricInputStyle";
 
+type EditData = {
+  count: string;
+  unit: string;
+  unitId: number;
+};
+
 interface HabitMetricInputProp {
+  isEditMode?: EditData;
   onSelect: (metricValue: any) => void;
 }
 
-const HabitMetricInput: React.FC<HabitMetricInputProp> = ({ onSelect }) => {
+const HabitMetricInput: React.FC<HabitMetricInputProp> = ({
+  onSelect,
+  isEditMode,
+}) => {
   const { theme } = useContext(ThemeContext);
 
   const [habitMetric, setHabitMetric] = useState<MetricFormat | null>(null);
@@ -33,6 +43,13 @@ const HabitMetricInput: React.FC<HabitMetricInputProp> = ({ onSelect }) => {
   };
 
   const styles = styling(theme);
+
+  useEffect(() => {
+    if (isEditMode) {
+      setHabitMetric(isEditMode);
+    } else {
+    }
+  }, [isEditMode]);
 
   return (
     <>
@@ -70,6 +87,7 @@ const HabitMetricInput: React.FC<HabitMetricInputProp> = ({ onSelect }) => {
       <HabitMetricModal
         visible={showHabitMetricModal}
         onClose={() => setShowHabitMetricModal(false)}
+        isEditMode={habitMetric}
         onSave={handleHabitMetricSave}
       />
     </>

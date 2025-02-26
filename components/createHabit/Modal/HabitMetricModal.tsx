@@ -1,4 +1,10 @@
-import React, { useState, Dispatch, SetStateAction, useContext } from "react";
+import React, {
+  useState,
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+} from "react";
 import { View, StyleSheet, Modal, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { FormInput, Text } from "../../Themed";
@@ -8,8 +14,6 @@ import { themeColors } from "@/constant/Colors";
 import styling from "../style/HabitMetricModalStyle";
 // import { Button } from 'react-native-paper'; // Import Button for segmented control
 
-type ThemeKey = "basic" | "light" | "dark";
-
 export type MetricFormat = {
   count: string;
   unitId: number; // TODO need to check
@@ -17,9 +21,16 @@ export type MetricFormat = {
   // frequency: "Daily" | "Weekly" | "Monthly";
 };
 
+type EditData = {
+  count: string;
+  unitId: number; // TODO need to check
+  unit: string;
+};
+
 interface HabitMetricModalProps {
   visible: boolean;
   onClose: () => void;
+  isEditMode?: EditData | null;
   onSave: (value: MetricFormat) => void;
 }
 
@@ -50,6 +61,7 @@ const HabitMetricModal: React.FC<HabitMetricModalProps> = ({
   visible,
   onClose,
   onSave,
+  isEditMode,
 }) => {
   const [selectedUnit, setSelectedUnit] = useState<any[]>(units);
 
@@ -73,6 +85,14 @@ const HabitMetricModal: React.FC<HabitMetricModalProps> = ({
 
   const findLabel = (value: number | null) =>
     units.find((item) => item.value === value);
+
+  useEffect(() => {
+    if (isEditMode) {
+      setTarget(isEditMode.count);
+      setValue(isEditMode.unitId);
+    } else {
+    }
+  }, [isEditMode]);
 
   return (
     <Modal

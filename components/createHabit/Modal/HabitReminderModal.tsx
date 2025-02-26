@@ -24,11 +24,18 @@ export interface ReminderAt {
   thirty_min_before?: boolean;
 }
 
+type EditData = {
+  time?: Date | undefined | null;
+  ten_min_before?: boolean;
+  thirty_min_before?: boolean;
+};
+
 interface ReminderAtModalProps {
   visible: boolean;
   isAllDayEnabled: boolean;
   onClose: () => void;
   onSave: (duration: ReminderAt) => void;
+  isEditMode?: EditData | null;
 }
 
 const HabitReminderModal: React.FC<ReminderAtModalProps> = ({
@@ -36,6 +43,7 @@ const HabitReminderModal: React.FC<ReminderAtModalProps> = ({
   onClose,
   isAllDayEnabled,
   onSave,
+  isEditMode,
 }) => {
   const [isSpecified, setIsSpecified] = useState(false);
   const [showStartTimePicker, setShowStartTimePicker] = useState(false);
@@ -48,43 +56,37 @@ const HabitReminderModal: React.FC<ReminderAtModalProps> = ({
   const { habitData, setHabitData } = useContext(HabitContext);
 
   useEffect(() => {
-    // console.log(isAllDayEnabled, "isAllDayEnabled");
     if (isAllDayEnabled) {
       setLabel("You have selected All day in habit duration specify time");
       setIsSpecified(true);
       setShowStartTimePicker(true);
+      if (isEditMode) {
+        if (isEditMode?.time) setReminderAt(isEditMode?.time);
+      }
     } else {
       setLabel("select the preset to send reminder");
-      // setReminderAt(habitData.habit_duration?.start_time);
       setIsSpecified(false);
       setShowStartTimePicker(false);
+      if (isEditMode) {
+        let key = isEditMode.ten_min_before
+          ? "ten_min_before"
+          : "thirty_min_before";
+        setSelection(key);
+      }
     }
-  }, [isAllDayEnabled]);
+  }, [isAllDayEnabled, isEditMode]);
+
+  // useEffect(() => {
+  //   if (isEditMode) {
+  //     console.log("Reminder Modal is edit on");
+  //   } else {
+  //     console.log("Reminder Modal is edit off");
+  //   }
+  // }, [isEditMode]);
 
   const handleSave = () => {
-    // const date = reminderAt ? new Date(reminderAt) : null;
-    // let timeString = null;
-    // // Format the time using toLocaleTimeString
-    // if (date) {
-    //   const timeString = date.toLocaleTimeString("en-US", {
-    //     hour: "2-digit",
-    //     minute: "2-digit",
-    //     timeZoneName: "short", // Optional to include the time zone abbreviation
-    //   });
-    // }
-
     const obj = getFormattedValue();
-
-    // console.log(obj, "obj");
-
-    // const parsedValue = {
-    //   timeDisplay: timeString,
-    //   val: obj,
-    // };
     onSave(obj);
-    // Reset state after saving
-    // setReminderAt(); // TODO Need to recheck how to reset the value
-    // setIsSpecified(false);
     setError("");
     onClose();
   };
@@ -108,18 +110,11 @@ const HabitReminderModal: React.FC<ReminderAtModalProps> = ({
     } else {
       // Determine the key based on the selection
       let key =
-        selection === "10 minutes before"
-          ? "ten_min_before"
-          : "thirty_min_before";
+        selection === "ten_min_before" ? "ten_min_before" : "thirty_min_before";
       result[key] = true;
     }
     return result;
   };
-
-  // const onSpecifyValueChange = (value: boolean) => {
-  //   setIsSpecified(value);
-  //   setShowStartTimePicker(value);
-  // };
 
   const { theme } = useContext(ThemeContext);
   const styles = styling(theme);
@@ -135,7 +130,7 @@ const HabitReminderModal: React.FC<ReminderAtModalProps> = ({
         <View style={styles.modalContainer}>
           {/* Header */}
           <View style={styles.header}>
-            <Text style={styles.title}>Habit Reminder At</Text>
+            <Text style={styles.title}>Reminder At</Text>
             <TouchableOpacity onPress={onClose}>
               <Ionicons
                 name="close"
@@ -147,9 +142,6 @@ const HabitReminderModal: React.FC<ReminderAtModalProps> = ({
 
           <View style={styles.remiderAt}>
             <Text>{label}</Text>
-            <Text style={styles.remiderAtText}>
-              {/* Reminder At: {reminderAt ? reminderAt : null} */}
-            </Text>
           </View>
 
           {showStartTimePicker && (
@@ -167,27 +159,11 @@ const HabitReminderModal: React.FC<ReminderAtModalProps> = ({
               <View style={styles.radioContainer}>
                 <TouchableOpacity
                   style={styles.radioButton}
-                  onPress={() => setSelection("at the event time")}
+                  onPress={() => setSelection("ten_min_before")}
                 >
                   <Ionicons
                     name={
-                      selection === "at the event time"
-                        ? "radio-button-on"
-                        : "radio-button-off"
-                    }
-                    size={20}
-                    color={themeColors.basic.tertiaryColor}
-                  />
-                  <Text style={styles.radioText}>At the event time</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.radioButton}
-                  onPress={() => setSelection("10 minutes before")}
-                >
-                  <Ionicons
-                    name={
-                      selection === "10 minutes before"
+                      selection === "ten_min_before"
                         ? "radio-button-on"
                         : "radio-button-off"
                     }
@@ -195,6 +171,22 @@ const HabitReminderModal: React.FC<ReminderAtModalProps> = ({
                     color={themeColors.basic.tertiaryColor}
                   />
                   <Text style={styles.radioText}>10 minutes before</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.radioButton}
+                  onPress={() => setSelection("thirty_min_before")}
+                >
+                  <Ionicons
+                    name={
+                      selection === "thirty_min_before"
+                        ? "radio-button-on"
+                        : "radio-button-off"
+                    }
+                    size={20}
+                    color={themeColors.basic.tertiaryColor}
+                  />
+                  <Text style={styles.radioText}>30 minutes before</Text>
                 </TouchableOpacity>
               </View>
 

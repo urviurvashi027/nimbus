@@ -15,6 +15,7 @@ import { router } from "expo-router";
 interface HabitListProps {
   data: Array<HabitItem>;
   style: any;
+  refreshData: () => void;
 }
 
 const Separator = (props: any) => {
@@ -22,13 +23,17 @@ const Separator = (props: any) => {
   return <View style={[style]} />;
 };
 
-const habitItemClicked = (id: any) => {
-  console.log("HabitList:: habitItemClicked", id);
-  router.push({ pathname: "/habit/details", params: { id: id } });
-};
-
 const HabitList: React.FC<HabitListProps> = (props) => {
-  const { style, data, ...otherProps } = props;
+  const { style, data, refreshData, ...otherProps } = props;
+
+  const habitItemClicked = (id: any) => {
+    router.push({ pathname: "/habit/details", params: { id: id } });
+  };
+
+  const habitItemDeleted = (id: any) => {
+    console.log(id, "refresh daye habit list");
+    refreshData();
+  };
   return (
     <>
       {/* <StatusBar /> */}
@@ -37,7 +42,11 @@ const HabitList: React.FC<HabitListProps> = (props) => {
           data={data}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <SwipeableItem item={item} habitItemClick={habitItemClicked} />
+            <SwipeableItem
+              item={item}
+              habitItemDeleted={habitItemDeleted}
+              habitItemClick={habitItemClicked}
+            />
           )}
           ItemSeparatorComponent={() => <Separator style={style} />}
         />

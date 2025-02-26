@@ -108,10 +108,6 @@ const HabitTagsModal: React.FC<TaskTagsModalProps> = ({
   // }, [selectedTag]);
 
   useEffect(() => {
-    console.log(
-      "Tags Modal:: useffect modal:: selectedTagData",
-      selectedTagData
-    );
     if (selectedTagData.length) setSelectedTag(selectedTagData);
   }, [selectedTagData]);
 
