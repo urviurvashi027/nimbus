@@ -1,8 +1,19 @@
-import React, { useContext } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Modal } from "react-native";
+import React, { useContext, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+  Image,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/context/ThemeContext";
 import { themeColors } from "@/constant/Colors";
+import LottieView from "lottie-react-native"; // For animated background GIF
+import SettingsModal from "./WaterIntakeForm";
+import AddWaterModal from "./AddWaterModal";
+import HistoryModal from "./WaterIntakeHistory";
 
 type ThemeKey = "basic" | "light" | "dark";
 
@@ -12,35 +23,93 @@ interface WaterIntakeProps {
 }
 
 const WaterIntakeModal: React.FC<WaterIntakeProps> = ({ visible, onClose }) => {
+  const [waterIntake, setWaterIntake] = useState(0);
+  const [historyVisible, setHistoryVisible] = useState(false);
+  const [addWaterVisible, setAddWaterVisible] = useState(false);
+  const [settingsVisible, setSettingsVisible] = useState(false);
+  const goal = 73;
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
   const styles = styling(theme);
 
   return (
-    <Modal
-      animationType="slide"
-      transparent={true}
-      visible={visible}
-      onRequestClose={onClose}
-    >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContainer}>
-          {/* Header with Title and Close Button */}
-          <View style={styles.header}>
-            <Text style={styles.title}>Things TO Do</Text>
-            <TouchableOpacity onPress={onClose}>
-              <Ionicons
-                name="close"
-                size={24}
-                color={themeColors[theme].text}
-              />
-            </TouchableOpacity>
-          </View>
+    <Modal visible={visible} animationType="slide" transparent>
+      <View style={styles.modalContainer}>
+        {/* Background Animation */}
+        <Image
+          source={require("../../../../assets/images/water.gif")} // Replace with your GIF file
+          style={styles.backgroundAnimation}
+        />
+        {/* <LottieView
+          source={require("./assets/water-animation.json")} // Add your Lottie file in assets
+          autoPlay
+          loop
+          style={styles.backgroundAnimation}
+        /> */}
 
-          <View style={styles.listContainer}>
-            <Text>100 thing to do</Text>
-          </View>
+        {/* Close Button */}
+        <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+          <Ionicons name="close" size={28} color="black" />
+        </TouchableOpacity>
+
+        {/* Header */}
+        <Text style={styles.headerText}>Stay Hydrated !!!</Text>
+
+        {/* Water Intake Display */}
+        <Text style={styles.waterText}>
+          {waterIntake} / {goal}oz
+        </Text>
+        <Text style={styles.subText}>Water intake & your goal</Text>
+
+        {/* Buttons Section */}
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.iconButton}>
+            <Ionicons
+              name="settings-outline"
+              size={28}
+              color="black"
+              onPress={() => setSettingsVisible(true)}
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() => setAddWaterVisible(true)}
+            // onPress={() => setWaterIntake((prev) => Math.min(prev + 8, goal))} // Adds 8oz per tap
+          >
+            <Text style={styles.addButtonText}>+ Add Water</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={() => setHistoryVisible(true)}
+          >
+            <Ionicons name="calendar-outline" size={28} color="black" />
+          </TouchableOpacity>
         </View>
       </View>
+      {/* Settings Modal */}
+      <SettingsModal
+        visible={settingsVisible}
+        onClose={() => {
+          console.log("water intake form close modal clicked");
+          setSettingsVisible(false);
+        }}
+      />
+
+      {/* Add Water Modal */}
+      <AddWaterModal
+        visible={addWaterVisible}
+        onClose={() => setAddWaterVisible(false)}
+        onAddWater={(amount: any) =>
+          setWaterIntake((prev) => Math.min(prev + amount, goal))
+        }
+      />
+
+      {/* History Modal */}
+      <HistoryModal
+        visible={historyVisible}
+        onClose={() => setHistoryVisible(false)}
+      />
     </Modal>
   );
 };
@@ -49,43 +118,62 @@ export default WaterIntakeModal;
 
 const styling = (theme: ThemeKey) =>
   StyleSheet.create({
-    modalOverlay: {
-      flex: 1,
-      backgroundColor: "rgba(0,0,0,0.5)",
-      justifyContent: "center",
-      alignItems: "center",
-    },
     modalContainer: {
-      width: "80%",
-      backgroundColor: themeColors[theme].background,
-      borderRadius: 10,
-      padding: 20,
-      maxHeight: "80%",
-    },
-    header: {
-      flexDirection: "row",
-      justifyContent: "space-between",
+      flex: 1,
+      backgroundColor: "#E3F2FD", // Light blue background
       alignItems: "center",
-      marginBottom: 20,
+      justifyContent: "center",
+      paddingHorizontal: 20,
     },
-    title: {
-      fontSize: 18,
-      color: themeColors[theme].text,
+    backgroundAnimation: {
+      position: "absolute",
+      width: "100%",
+      height: "100%",
+    },
+    closeButton: {
+      position: "absolute",
+      top: 40,
+      left: 20,
+      zIndex: 10,
+    },
+    headerText: {
+      fontSize: 22,
       fontWeight: "bold",
+      color: "black",
+      marginBottom: 10,
     },
-    listContainer: {
-      // Optional: Add any additional styling if needed
+    waterText: {
+      fontSize: 32,
+      fontWeight: "bold",
+      color: "black",
     },
-    typeButton: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      paddingVertical: 15,
-      borderBottomWidth: 1,
-      borderBottomColor: themeColors[theme].divider,
-    },
-    typeText: {
+    subText: {
       fontSize: 16,
-      color: themeColors[theme].text,
+      color: "#555",
+    },
+    buttonContainer: {
+      flexDirection: "row",
+      position: "absolute",
+      bottom: 50,
+      alignItems: "center",
+    },
+    iconButton: {
+      backgroundColor: "white",
+      padding: 15,
+      borderRadius: 30,
+      marginHorizontal: 15,
+      elevation: 5,
+    },
+    addButton: {
+      backgroundColor: "black",
+      paddingVertical: 15,
+      paddingHorizontal: 30,
+      borderRadius: 30,
+      elevation: 5,
+    },
+    addButtonText: {
+      color: "white",
+      fontSize: 18,
+      fontWeight: "bold",
     },
   });

@@ -232,7 +232,7 @@ export default function HabitBasic() {
             >
               {/* <View style={{ backgroundColor: "#dfd9f9" }}> */}
               <View>
-                <Text style={styles.label}>Task Name</Text>
+                <Text style={styles.label}>Task Namee</Text>
                 <FormInput
                   style={styles.input}
                   placeholderTextColor={themeColors.basic.mediumGrey}
@@ -263,7 +263,7 @@ export default function HabitBasic() {
                 <HabitTypeInput onSelect={handleHabitTypeSelect} />
 
                 <HabitMetricInput onSelect={handleMetricSelect} />
-                <HabitFrequencyInput onSelect={handleFrequencySelect} />
+                {/* <HabitFrequencyInput onSelect={handleFrequencySelect} /> */}
                 <HabitDurationInput onSelect={handleDurationSelect} />
                 <HabitDateInput onSelect={handleHabitStartDate} />
                 <HabitReminderInput

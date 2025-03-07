@@ -36,7 +36,7 @@ const Tools: React.FC = () => {
   const navigation = useNavigation();
   const [selectedButton, setSelectedButton] = useState("");
 
-  const [showDrinkModal, setShowDrinkModal] = useState(false);
+  const [showWaterIntakekModal, setShowWaterIntakekModal] = useState(false);
   const [showSleepTagsModal, setShowSleepTagsModal] = useState(false);
   const [showThingsToDoTagsModal, setShowThingsToDoTagsModal] = useState(false);
 
@@ -45,7 +45,7 @@ const Tools: React.FC = () => {
       id: 1,
       label: "Test",
       action: "navigate",
-      screen: "/(auth)/Tools/test/test",
+      screen: "/(auth)/Tools/test",
       icon: require("../../../assets/images/options/test.png"),
     },
     {
@@ -117,7 +117,7 @@ const Tools: React.FC = () => {
         setShowThingsToDoTagsModal(true);
         break;
       case "waterIntake":
-        setShowDrinkModal(true);
+        setShowWaterIntakekModal(true);
         break;
     }
   };
@@ -161,13 +161,16 @@ const Tools: React.FC = () => {
 
         {/* Water Modal */}
         <WaterIntakeModal
-          visible={showDrinkModal}
-          onClose={() => setShowDrinkModal(false)}
+          visible={showWaterIntakekModal}
+          onClose={() => {
+            console.log("on closse modal clicked");
+            setShowWaterIntakekModal(false);
+          }}
         />
 
         {/* Things To Do Modal */}
         <ThingsToDoModal
-          visible={showThingsToDoTagsModal}
+          isVisible={showThingsToDoTagsModal}
           onClose={() => setShowThingsToDoTagsModal(false)}
         />
       </View>
