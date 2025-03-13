@@ -9,14 +9,16 @@ import {
   Platform,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
-import ThemeContext from "@/context/ThemeContext";
-import { themeColors } from "@/constant/Colors";
 import { router, useNavigation } from "expo-router";
 
+import ThemeContext from "@/context/ThemeContext";
+import { themeColors } from "@/constant/Colors";
 import SleepModal from "../Tools/Sleep/Sleep";
 import WaterIntakeModal from "../Tools/WaterIntake/WaterIntake";
 import ThingsToDoModal from "../Tools/ThingsToDo/ThingsToDo";
 import { ScreenView } from "@/components/Themed";
+import MasterClass from "@/components/tools/VideoListCard";
+import { ThemeKey } from "@/components/Themed";
 
 // import DrinkIcon from "@/assets/images/Options/drink.png";
 // import ThingToDoIcon from "@/assets/images/Options/things.png";
@@ -30,8 +32,6 @@ import { ScreenView } from "@/components/Themed";
 
 // const { theme, toggleTheme } = useContext(ThemeContext);
 
-type ThemeKey = "basic" | "light" | "dark";
-
 const Tools: React.FC = () => {
   const navigation = useNavigation();
   const [selectedButton, setSelectedButton] = useState("");
@@ -39,6 +39,10 @@ const Tools: React.FC = () => {
   const [showWaterIntakekModal, setShowWaterIntakekModal] = useState(false);
   const [showSleepTagsModal, setShowSleepTagsModal] = useState(false);
   const [showThingsToDoTagsModal, setShowThingsToDoTagsModal] = useState(false);
+
+  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+
+  const styles = styling(theme);
 
   const buttons = [
     {
@@ -141,17 +145,23 @@ const Tools: React.FC = () => {
                 onPress={() => handleButtonPress(button)}
               >
                 {/* <View> */}
+                {/* source={button.icon} */}
                 <Image
                   style={styles.buttonIcon}
                   alt={button.label}
-                  source={button.icon}
+                  // source={require("../../../assets/images/options/drink.png")}
+                  source={
+                    button.icon
+                      ? String(button.icon)
+                      : require("../../../assets/images/options/drink.png")
+                  }
                 />
-                {/* </View> */}
               </TouchableOpacity>
-              <Text style={styles.buttonText}>{button.label}</Text>
+              <Text style={styles.buttonLabel}>{button.label}</Text>
             </View>
           ))}
         </ScrollView>
+        <MasterClass />
 
         {/* Sleep Modal */}
         <SleepModal
@@ -178,64 +188,40 @@ const Tools: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  scrollView: {
-    height: 100,
-    marginBottom: 20,
-  },
-  buttonContainer: {
-    // justifyContent: "center",
-    alignItems: "center",
-  },
-  button: {
-    width: 60,
-    height: 60,
-    borderRadius: 25, // Makes the button rounded
-    // backgroundColor: "#007BFF",
-    // justifyContent: "center",
-    // alignItems: "center",
-    marginHorizontal: 8, // Space between buttons
-  },
-  buttonIcon: {
-    width: 60,
-    height: 60,
-    borderRadius: 25, // Makes the button rounded
-  },
-  buttonText: {
-    paddingTop: 10,
-    color: "#fff",
-    fontSize: 10,
-  },
-  modalView: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  modalContent: {
-    backgroundColor: "#fff",
-    padding: 30,
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  modalTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-  closeButton: {
-    backgroundColor: "#007AFF",
-    padding: 10,
-    borderRadius: 5,
-    marginTop: 10,
-  },
-  closeButtonText: {
-    color: "#fff",
-    fontSize: 16,
-  },
-});
+const styling = (theme: ThemeKey) =>
+  StyleSheet.create({
+    container: {
+      // flex: 1,
+    },
+    scrollView: {
+      height: 100,
+      marginBottom: 20,
+    },
+    buttonContainer: {
+      alignItems: "center",
+    },
+    content: {
+      padding: 0,
+    },
+    button: {
+      width: 60,
+      height: 60,
+      borderRadius: 25, // Makes the button rounded
+      // backgroundColor: "#007BFF",
+      // justifyContent: "center",
+      // alignItems: "center",
+      marginHorizontal: 8, // Space between buttons
+    },
+    buttonIcon: {
+      width: 60,
+      height: 60,
+      borderRadius: 25, // Makes the button rounded
+    },
+    buttonLabel: {
+      paddingTop: 10,
+      color: themeColors[theme].text,
+      fontSize: 10,
+    },
+  });
 
 export default Tools;

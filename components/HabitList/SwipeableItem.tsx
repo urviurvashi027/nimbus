@@ -1,5 +1,5 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import React, { useContext, useState } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import React, { useContext, useRef, useState } from "react";
 import Swipeable from "react-native-gesture-handler/ReanimatedSwipeable";
 // import { HabitItemProps } from "./HabitList";
 import DeleteHabitModal from "../modal/deleteHabitModal";
@@ -16,6 +16,7 @@ import { themeColors } from "@/constant/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { HabitItem } from "@/types/habitTypes";
 import { ThemeKey } from "../Themed";
+import ActivityIndicatorModal from "../common/ActivityIndicatorModal";
 
 type SwipeableItemProps = {
   item: HabitItem;
@@ -30,6 +31,13 @@ const SwipeableItem: React.FC<SwipeableItemProps> = (
   const { habitItemClick, habitItemDeleted } = props;
   const [showHabitActionModal, setshowHabitActionModal] = useState(false);
   const translateY = useSharedValue(0);
+  // ✅ Create a ref for Swipeable
+  // const swipeableRef = useRef<Swipeable>(null as any);
+
+  //   // ✅ Function to close swipe manually
+  //   const closeSwipe = () => {
+  //     swipeableRef.current?.close();
+  //   };
 
   const navigation = useNavigation();
 
@@ -86,15 +94,58 @@ const SwipeableItem: React.FC<SwipeableItemProps> = (
     console.log("Delete habit click", id);
     habitItemDeleted(id);
     // const result = await deleteHabit({ id });
+    //   setIsLoading(true);
+    //   try {
+    //     const result = await habitItemDeleted(data);
+    //     if (result?.success) {
+    //       setIsLoading(false);
+    //       setShowSuccess(true);
+    //       router.replace("/(auth)/(tabs)"); // Navigate on success
+    //     }
+    //   } catch (error: any) {
+    //     setIsLoading(false);
+    //   }
+  };
+
+  const markHabitDone = () => {
+    console.log("OK Done Pressed");
   };
 
   const swipeFromLeftOpen = () => {
     // setshowHabitActionModal(true);
-    alert("Swipe from left");
+    // alert("Swipe from left");
+
+    Alert.alert("Mark Habit Complete", "Mark this habit as done !!!", [
+      // {
+      //   text: "Ask me later",
+      //   onPress: () => console.log("Ask me later pressed"),
+      // },
+      {
+        text: "Cancel",
+        onPress: () => console.log("Cancel Pressed"),
+        style: "cancel",
+      },
+      { text: "Done", onPress: markHabitDone },
+    ]);
   };
+
   const swipeFromRightOpen = () => {
     // alert("Swipe from right");
-    setshowHabitActionModal(true);
+    console.log("swipeFromRightOpen");
+    // setshowHabitActionModal(true);
+
+    Alert.alert("Delete Habit", "Are you sure to delete this?", [
+      // {
+      //   text: "Ask me later",
+      //   onPress: () => console.log("Ask me later pressed"),
+      // },
+      {
+        text: "Cancel",
+        onPress: () => console.log("Cancel Pressed"),
+        style: "cancel",
+      },
+      { text: "Delete", onPress: deleteHabitClick },
+    ]);
   };
 
   const animatedStyle = useAnimatedStyle(() => ({

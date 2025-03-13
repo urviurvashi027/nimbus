@@ -108,7 +108,7 @@ const MentalHealthTestScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    // backgroundColor: "#fff",
     paddingHorizontal: 16,
   },
   backButton: {
@@ -126,6 +126,7 @@ const styles = StyleSheet.create({
   },
   tabsContainer: {
     marginBottom: 15,
+    // paddingRight: 5,
   },
   activeTab: {
     borderBottomWidth: 2,
@@ -141,12 +142,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: 12,
-    borderBottomWidth: 1,
+    borderBottomWidth: 3,
     borderBottomColor: "#EEE",
   },
   listImage: {
-    width: 80,
-    height: 80,
+    width: 100,
+    height: 100,
     borderRadius: 10,
     marginRight: 15,
   },

@@ -40,7 +40,7 @@ export type HabitType = {
 
 export type HabitTag = {
   id: number;
-  name: string;
+  // name: string;
 };
 
 export interface HabitItem {
@@ -66,8 +66,8 @@ export interface HabitCreateRequest {
   habit_metric: HabitMetric;
   habit_duration: AtLeastOne<HabitDuration>;
   habit_frequency: HabitFrequency;
-  remind_at: AtLeastOne<ReminderAt>;
-  subtasks: string[];
+  remind_at?: AtLeastOne<ReminderAt>;
+  subtasks?: string[];
 }
 
 export interface HabitCreateResponse {
@@ -95,6 +95,18 @@ export interface HabitTypeResponse {
   error_code?: string;
 }
 
+export interface HabitUnit {
+  id: number;
+  name: string;
+}
+
+export interface HabitUnitesponse {
+  success: string;
+  message: string;
+  data: HabitUnit[];
+  error_code?: string;
+}
+
 // Habit Tag Request and Response Types
 export interface HabitTagRequest {}
 
@@ -113,7 +125,7 @@ export interface HabitDeleteResponse {
 }
 
 export interface HabitDeleteRequest {
-  id: string;
+  id: number;
 }
 
 // Habit completed Request and Response

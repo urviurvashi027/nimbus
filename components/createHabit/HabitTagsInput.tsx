@@ -12,8 +12,8 @@ import styling from "./style/HabitInputStyle";
 // import styling from "./style/HabitTagsInputStyle";
 
 export type selectedTag = {
-  existing_tag: HabitTag[];
-  new_tag?: string;
+  old?: HabitTag[];
+  new?: string;
 };
 
 // type selectedTag = {
@@ -34,13 +34,25 @@ const HabitTagsInput: React.FC<HabitTagsInputProps> = ({ onSelect }) => {
   const { theme } = useContext(ThemeContext);
   const styles = styling(theme);
 
+  // const onLoginClick = async () => {
+  //   try {
+  //     const result = await getHabitTag();
+  //     if (result?.success) {
+  //          setTagsList(result.data);
+  //     }
+  //   } catch (error: any) {
+  //     console.log(error, "API Error Response");
+  //   }
+  // };
+
   const getHabitTagList = async () => {
-    const result = await getHabitTag();
-    if (result && result.success) {
-      setTagsList(result.data);
-    }
-    if (result && result.error) {
-      alert(result.error);
+    try {
+      const result = await getHabitTag();
+      if (result?.success) {
+        setTagsList(result.data);
+      }
+    } catch (error: any) {
+      console.log(error, "API Error Response");
     }
   };
 
@@ -95,10 +107,10 @@ const HabitTagsInput: React.FC<HabitTagsInputProps> = ({ onSelect }) => {
     }
   };
 
-  const constructTagObject = (tagsArray: { id: number; name: string }[]) => {
+  const constructTagObject = (tagsArray: { id: number; name?: string }[]) => {
     return {
-      existing_tag: tagsArray.filter((tag) => tag.id !== 0), // Exclude id = 0
-      new_tag: tagsArray.find((tag) => tag.id === 0)?.name || "", // Store name of id = 0
+      old: tagsArray.filter((tag) => tag.id !== 0), // Exclude id = 0
+      new: tagsArray.find((tag) => tag.id === 0)?.name || "", // Store name of id = 0
     };
   };
 

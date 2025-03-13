@@ -196,16 +196,16 @@ const HabitDateModal: React.FC<HabitDateModalProps> = ({
   const handleSave = () => {
     let frequency: Frequency | {} = {};
     if (selectedFrequency === "Daily") {
-      frequency = { frequency_type: "Daily", interval: dailyCount };
+      frequency = { frequency_type: "daily", interval: dailyCount };
     } else if (selectedFrequency === "Weekly") {
       frequency = {
-        frequency_type: "Weekly",
+        frequency_type: "weekly",
         days_of_week: weeklyDays,
         interval: weeklyCount,
       };
     } else if (selectedFrequency === "Monthly") {
       frequency = {
-        frequency_type: "Monthly",
+        frequency_type: "monthly",
         interval: monthlyCount,
         days_of_month: monthlyDates,
       };
@@ -250,31 +250,7 @@ const HabitDateModal: React.FC<HabitDateModalProps> = ({
           ></DatePicker>
 
           <View style={styles.toggleContainer}>
-            <Text style={styles.label}>Set End Date</Text>
-            <Switch
-              value={isEndDateEnabled}
-              thumbColor={themeColors.basic.primaryColor}
-              trackColor={{
-                true: `${themeColors.basic.tertiaryColor}`,
-              }}
-              onValueChange={(value) => {
-                setIsEndDateEnabled(value);
-              }}
-            />
-          </View>
-          {isEndDateEnabled && (
-            <>
-              <DatePicker
-                onConfirmDate={handleEndDateChange}
-                label="End Date"
-                selectedDateValue={endDate}
-                minimumDate={startDate}
-              ></DatePicker>
-            </>
-          )}
-
-          <View style={styles.toggleContainer}>
-            <Text style={styles.label}>Repeat</Text>
+            <Text style={styles.label}>Repeate</Text>
             <Switch
               value={isReapeatEnabled}
               thumbColor={themeColors.basic.primaryColor}
@@ -290,6 +266,19 @@ const HabitDateModal: React.FC<HabitDateModalProps> = ({
           {isReapeatEnabled && (
             <>
               <View>
+                {/* <View style={styles.toggleContainer}>
+                  <Text style={styles.label}>Repeat</Text>
+                  <Switch
+                    value={isReapeatEnabled}
+                    thumbColor={themeColors.basic.primaryColor}
+                    trackColor={{
+                      true: `${themeColors.basic.tertiaryColor}`,
+                    }}
+                    onValueChange={(value) => {
+                      setIsRepeatEnabled(value);
+                    }}
+                  />
+                </View> */}
                 <View style={styles.frequencyContainer}>
                   {["Daily", "Weekly", "Monthly"].map((frequency) => (
                     <TouchableOpacity
@@ -389,7 +378,42 @@ const HabitDateModal: React.FC<HabitDateModalProps> = ({
                   </View>
                 )}
               </View>
+
+              <View style={styles.toggleContainer}>
+                <Text style={styles.label}>Set End Date</Text>
+                <Switch
+                  value={isEndDateEnabled}
+                  thumbColor={themeColors.basic.primaryColor}
+                  trackColor={{
+                    true: `${themeColors.basic.tertiaryColor}`,
+                  }}
+                  onValueChange={(value) => {
+                    setIsEndDateEnabled(value);
+                  }}
+                />
+              </View>
+              {isEndDateEnabled && (
+                <>
+                  <DatePicker
+                    onConfirmDate={handleEndDateChange}
+                    label="End Date"
+                    selectedDateValue={endDate}
+                    minimumDate={startDate}
+                  ></DatePicker>
+                </>
+              )}
             </>
+            // ) &&
+            // isEndDateEnabled && (
+            //   <>
+            //     <DatePicker
+            //       onConfirmDate={handleEndDateChange}
+            //       label="End Date"
+            //       selectedDateValue={endDate}
+            //       minimumDate={startDate}
+            //     ></DatePicker>
+            //   </>
+            // )}
           )}
 
           <TouchableOpacity style={styles.saveButton} onPress={handleSave}>

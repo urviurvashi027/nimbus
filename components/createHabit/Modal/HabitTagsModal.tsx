@@ -21,7 +21,7 @@ type ThemeKey = "basic" | "light" | "dark";
 
 interface TagsType {
   id: number;
-  name: string;
+  name?: string;
 }
 
 interface TaskTagsModalProps {
@@ -29,7 +29,7 @@ interface TaskTagsModalProps {
   visible: boolean;
   onClose: () => void;
   selectedTagData: any;
-  onSelect: (tag: any, newTag?: string) => void;
+  onSelect: (tag?: any, newTag?: string) => void;
   //   existingTags: TagsType[];
   //   onAddNewTag: (tag: string, id: number) => void;
 }
@@ -81,7 +81,7 @@ const HabitTagsModal: React.FC<TaskTagsModalProps> = ({
     setHabitTagData(modifiedArray);
   }, [habitTagList]);
 
-  const handleSaveClick = (tag: { id: number; name: string }) => {
+  const handleSaveClick = (tag: { id: number; name?: string }) => {
     console.log("Tags Modal:: handleSaveClick", tag);
     setSelectedTag((prev) => {
       // Check if the tag already exists based on `id`

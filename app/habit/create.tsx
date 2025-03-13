@@ -19,7 +19,9 @@ import ThemeContext from "@/context/ThemeContext";
 import { themeColors } from "@/constant/Colors";
 import { Text } from "@/components/Themed";
 import HabitTypeInput from "@/components/createHabit/HabitTypeInput";
-import HabitTagsInput from "@/components/createHabit/HabitTagsInput";
+import HabitTagsInput, {
+  selectedTag,
+} from "@/components/createHabit/HabitTagsInput";
 import { ThemeKey } from "@/components/Themed";
 import { HabitCreateRequest, HabitType } from "@/types/habitTypes";
 import HabitMetricInput from "@/components/createHabit/HabitMetricInput";
@@ -44,13 +46,13 @@ export default function HabitBasic() {
     "red" | "blue" | "green" | "yellow" | "black"
   >("red");
   const [name, setName] = useState("");
-  const [habitTypeId, sethabitTypeId] = useState<number>();
-  const [tags, setTags] = useState<any>([]);
+  const [habitTypeId, sethabitTypeId] = useState<number>(0);
+  const [tags, setTags] = useState<selectedTag>({} as selectedTag);
   const [metric, setMetric] = useState<MetricFormat | {}>({});
   const [frequency, setFrequency] = useState<FrequencyObj | null>(null);
   const [duration, setDuration] = useState<Duration>({ all_day: undefined });
   const [date, setDate] = useState<HabitDateType>();
-  const [reminderAt, setReminderAt] = useState<ReminderAt | null>(null);
+  const [reminderAt, setReminderAt] = useState<ReminderAt>({});
   // api state
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -93,7 +95,7 @@ export default function HabitBasic() {
   };
 
   // function to handle habit tags selection
-  const handleHabitTagSelection = (selectedTags: any) => {
+  const handleHabitTagSelection = (selectedTags: selectedTag) => {
     setTags(selectedTags);
   };
 
@@ -131,8 +133,8 @@ export default function HabitBasic() {
       return { ...frequency, ...date };
   };
 
-  const getCreateHabitData = async () => {
-    setShowSuccess(true);
+  const createHabitData = async () => {
+    // setShowSuccess(true);
     if (name && Object.keys(metric).length > 0) {
       const freq = getFrequencyDetail();
 
@@ -143,11 +145,19 @@ export default function HabitBasic() {
         habit_metric: metric,
         habit_duration: duration,
         habit_frequency: freq,
-        remind_at: reminderAt,
+        // remind_at: reminderAt,
         tags: tags,
+        ...(reminderAt?.time || reminderAt?.ten_min_before
+          ? { remind_at: reminderAt }
+          : {}),
       };
 
-      const res = tags.length ? { result, tag: tags } : result;
+      // if (reminderAt.time || reminderAt.ten_min_before) {
+      //   result = { ...result, remind_at: reminderAt };
+      //   //  result.remind_at = reminderAt;
+      // }
+
+      const res = tags.old?.length ? { result, tag: tags } : result;
 
       creatHabitApi(res);
     } else {
@@ -188,7 +198,7 @@ export default function HabitBasic() {
 
   // function to handle continue click
   const onSubmitClick = () => {
-    getCreateHabitData();
+    createHabitData();
   };
 
   // const CustomInput = ({
@@ -232,7 +242,7 @@ export default function HabitBasic() {
             >
               {/* <View style={{ backgroundColor: "#dfd9f9" }}> */}
               <View>
-                <Text style={styles.label}>Task Namee</Text>
+                <Text style={styles.label}>Task Name</Text>
                 <FormInput
                   style={styles.input}
                   placeholderTextColor={themeColors.basic.mediumGrey}

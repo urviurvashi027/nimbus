@@ -90,14 +90,18 @@ const Soundscape = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <ScreenView
-        style={{ padding: 0, paddingTop: Platform.OS === "ios" ? 50 : 20 }}
-      >
+    <ScreenView
+      style={{ padding: 0, paddingTop: Platform.OS === "ios" ? 50 : 20 }}
+    >
+      <View style={styles.container}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons
+            name="arrow-back"
+            size={24}
+            color={themeColors[theme].text}
+          />
+        </TouchableOpacity>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Ionicons name="arrow-back" size={24} color="black" />
-          </TouchableOpacity>
           <Text style={styles.headerTitle}>Soundscape</Text>
         </View>
         {/* "For You" Section */}
@@ -178,8 +182,8 @@ const Soundscape = () => {
             </TouchableOpacity>
           </View>
         )}
-      </ScreenView>
-    </View>
+      </View>
+    </ScreenView>
   );
 };
 
@@ -187,11 +191,11 @@ const styling = (theme: ThemeKey) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: "#fff",
       padding: 16,
     },
     header: {
       flexDirection: "row",
+      color: themeColors[theme].text,
       alignItems: "center",
       marginTop: 20,
       marginBottom: 10,
@@ -200,6 +204,7 @@ const styling = (theme: ThemeKey) =>
       fontSize: 22,
       fontWeight: "bold",
       marginLeft: 10,
+      color: themeColors[theme].text,
     },
     sectionContainer: {
       marginBottom: 20,
@@ -211,6 +216,7 @@ const styling = (theme: ThemeKey) =>
     },
     sectionTitle: {
       fontSize: 18,
+      color: themeColors[theme].text,
       fontWeight: "bold",
       marginLeft: 10,
     },
@@ -232,11 +238,12 @@ const styling = (theme: ThemeKey) =>
     },
     title: {
       fontSize: 16,
+      color: themeColors[theme].text,
       fontWeight: "bold",
     },
     duration: {
       fontSize: 14,
-      color: "#666",
+      color: themeColors[theme].text,
     },
     bottomPlayer: {
       position: "absolute",

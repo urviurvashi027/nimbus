@@ -28,7 +28,7 @@ const HabitReminderInput: React.FC<HabitReminderInputProps> = ({
   isEditMode,
 }) => {
   const [reminderAt, setReminderAt] = useState<ReminderAt>({
-    time: format(new Date(), "hh:mm:ss"),
+    // time: format(new Date(), "hh:mm:ss"),
   });
   const [userDisplay, setUserDisplay] = useState<string>("");
   const [showReminderAtModal, setShowReminderAtModal] = useState(false);
@@ -59,7 +59,8 @@ const HabitReminderInput: React.FC<HabitReminderInputProps> = ({
       onSelect(result);
     }
     if (isAllDayEnabled) {
-      setUserDisplay(time);
+      setUserDisplay("Select the preset");
+      // setUserDisplay(time);
     } else {
       setUserDisplay("Select the preset");
     }

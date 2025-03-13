@@ -24,12 +24,15 @@ const HabitTypeModal: React.FC<HabitTypeModalProps> = ({
   const { theme } = useContext(ThemeContext);
   const styles = styling(theme);
 
+  console.log("modal loaeded", visible);
+
   return (
     <>
       <Modal
         animationType="slide"
         transparent={true}
         visible={visible}
+        presentationStyle="overFullScreen"
         onRequestClose={onClose}
       >
         <View style={styles.modalOverlay}>

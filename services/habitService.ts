@@ -12,6 +12,7 @@ import {
   HabitDetailResponse,
   HabitTypeResponse,
   HabitTagResponse,
+  HabitUnitesponse,
 } from "@/types/habitTypes";
 import Toast from "react-native-toast-message";
 
@@ -79,6 +80,18 @@ export const getHabitTag = async (): Promise<HabitTagResponse> => {
   }
 };
 
+// get habit tag
+export const getHabitUnitData = async (): Promise<HabitUnitesponse> => {
+  try {
+    const response: AxiosResponse<HabitUnitesponse> = await axios.get(
+      API_ENDPOINTS.habitUnit
+    );
+    return response.data; // Return the list data
+  } catch (error: any) {
+    throw error.response ? error.response.data : error.message;
+  }
+};
+
 // get habit details by id
 export const getHabitDetailsById = async (
   id: string
@@ -94,14 +107,13 @@ export const getHabitDetailsById = async (
 };
 
 // delete habit request
-export const deleteHabit = async (
-  id: HabitDeleteRequest
-): Promise<HabitDeleteResponse> => {
+export const deleteHabit = async (id: number): Promise<HabitDeleteResponse> => {
+  console.log("i am called delete habit");
   try {
-    const response: AxiosResponse<HabitDeleteResponse> = await axios.post(
-      `${API_ENDPOINTS.habitDetailsById}${id}/`,
-      id
+    const response: AxiosResponse<HabitDeleteResponse> = await axios.delete(
+      `${API_ENDPOINTS.habitDetailsById}${id}/`
     );
+    console.log(response.status, "response.data;");
     return response.data; // Return the data containing the token
   } catch (error: any) {
     throw error.response ? error.response.data : error.message;
@@ -117,8 +129,21 @@ export const markHabitDone = async (
       API_ENDPOINTS.habitPatch,
       data
     );
+    console.log(response.status, "response.status", typeof response.status);
+    if (response.status === 204) {
+      Toast.show({
+        type: "success",
+        text1: "Meditation Deleted",
+        text2: "The meditation track was successfully removed.",
+      });
+    }
     return response.data; // Return the list data
   } catch (error: any) {
+    Toast.show({
+      type: "error",
+      text1: "Delete Failed",
+      text2: "Something went wrong. Please try again.",
+    });
     throw error.response ? error.response.data : error.message;
   }
 };

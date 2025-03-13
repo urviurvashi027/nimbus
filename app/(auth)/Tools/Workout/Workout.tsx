@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -9,9 +9,15 @@ import {
   ScrollView,
   Modal,
   ActivityIndicator,
+  Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useVideoPlayer, VideoView } from "expo-video"; // ✅ Import correct expo-video hooks
+
+import { router, useNavigation } from "expo-router";
+import ThemeContext from "@/context/ThemeContext";
+import { themeColors } from "@/constant/Colors";
+import { ScreenView, ThemeKey } from "@/components/Themed";
 
 const fitnessVideos = {
   forYou: [
@@ -52,6 +58,18 @@ const FitnessVideoList = () => {
   const [isPlaying, setIsPlaying] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+
+  const styles = styling(theme);
+
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerShown: false,
+    });
+  }, [navigation]);
 
   // ✅ Initialize Video Player with first video
   const player = useVideoPlayer(currentVideoUrl, (player) => {
@@ -127,7 +145,11 @@ const FitnessVideoList = () => {
             imageStyle={{ borderRadius: 10 }}
           >
             <View style={styles.playButton}>
-              <Ionicons name="play-circle" size={30} color="#fff" />
+              <Ionicons
+                name="play-circle"
+                size={30}
+                color={themeColors[theme].text}
+              />
             </View>
           </ImageBackground>
         )}
@@ -140,121 +162,185 @@ const FitnessVideoList = () => {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.header}>Workout</Text>
-      <Text style={styles.subHeader}>
-        Make workouts part of your daily life.
-      </Text>
+    <ScreenView
+      style={{
+        paddingTop: Platform.OS === "ios" ? 40 : 20,
+      }}
+    >
+      <View style={styles.container}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons
+            name="arrow-back"
+            size={24}
+            color={themeColors[theme].text}
+          />
+        </TouchableOpacity>
+        <ScrollView>
+          <Text style={styles.header}>Workout</Text>
+          <Text style={styles.subHeader}>
+            Make workouts part of your daily life.
+          </Text>
 
-      <Text style={styles.sectionTitle}>For you</Text>
-      <FlatList
-        data={fitnessVideos.forYou}
-        renderItem={renderVideoItem}
-        keyExtractor={(item) => item.id}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-      />
-
-      <Text style={styles.sectionTitle}>All</Text>
-      <FlatList
-        data={fitnessVideos.all}
-        renderItem={renderVideoItem}
-        keyExtractor={(item) => item.id}
-        scrollEnabled={false}
-      />
-
-      {/* Fullscreen Modal */}
-      <Modal visible={isFullscreen} animationType="slide" transparent={true}>
-        <View style={styles.modalContainer}>
-          <TouchableOpacity
-            style={styles.closeButton}
-            onPress={closeFullscreen}
-          >
-            <Ionicons name="close" size={30} color="#fff" />
-          </TouchableOpacity>
-
-          <VideoView
-            style={styles.fullscreenVideo}
-            player={player}
-            allowsFullscreen
-            allowsPictureInPicture
+          <Text style={styles.sectionTitle}>For you</Text>
+          <FlatList
+            data={fitnessVideos.forYou}
+            renderItem={renderVideoItem}
+            keyExtractor={(item) => item.id}
+            horizontal
+            showsHorizontalScrollIndicator={false}
           />
 
-          <View style={styles.fullscreenControls}>
-            <TouchableOpacity onPress={skipBackward}>
-              <Ionicons name="play-back" size={40} color="#fff" />
-            </TouchableOpacity>
+          <Text style={styles.sectionTitle}>All</Text>
+          <FlatList
+            data={fitnessVideos.all}
+            renderItem={renderVideoItem}
+            keyExtractor={(item) => item.id}
+            scrollEnabled={false}
+          />
 
-            <TouchableOpacity onPress={togglePlayPause}>
-              <Ionicons
-                name={isPlaying ? "pause" : "play"}
-                size={50}
-                color="#fff"
+          {/* Fullscreen Modal */}
+          <Modal
+            visible={isFullscreen}
+            animationType="slide"
+            transparent={true}
+          >
+            <View style={styles.modalContainer}>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={closeFullscreen}
+              >
+                <Ionicons name="close" size={30} color="#fff" />
+              </TouchableOpacity>
+
+              <VideoView
+                style={styles.fullscreenVideo}
+                player={player}
+                allowsFullscreen
+                allowsPictureInPicture
               />
-            </TouchableOpacity>
 
-            <TouchableOpacity onPress={skipForward}>
-              <Ionicons name="play-forward" size={40} color="#fff" />
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-    </ScrollView>
+              <View style={styles.fullscreenControls}>
+                <TouchableOpacity onPress={skipBackward}>
+                  <Ionicons name="play-back" size={40} color="#fff" />
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={togglePlayPause}>
+                  <Ionicons
+                    name={isPlaying ? "pause" : "play"}
+                    size={50}
+                    color="#fff"
+                  />
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={skipForward}>
+                  <Ionicons name="play-forward" size={40} color="#fff" />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+        </ScrollView>
+      </View>
+    </ScreenView>
   );
 };
 
-const styles = StyleSheet.create({
-  container: { flex: 1, paddingHorizontal: 20, backgroundColor: "#fff" },
-  header: { fontSize: 26, fontWeight: "bold", marginTop: 20 },
-  subHeader: { fontSize: 14, color: "#777", marginBottom: 20 },
-  sectionTitle: { fontSize: 18, fontWeight: "bold", marginVertical: 10 },
-  videoItem: { flexDirection: "row", alignItems: "center", marginBottom: 15 },
-  videoThumbnail: {
-    width: 120,
-    height: 70,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  playButton: {
-    backgroundColor: "rgba(0,0,0,0.5)",
-    borderRadius: 25,
-    padding: 5,
-  },
-  videoInfo: { marginLeft: 10, flex: 1 },
-  videoTitle: { fontSize: 16, fontWeight: "bold" },
-  videoDuration: { fontSize: 14, color: "#777" },
-  videoContainer: {
-    width: 120,
-    height: 70,
-    borderRadius: 10,
-    overflow: "hidden",
-    position: "relative",
-  },
-  videoPlayer: { width: "100%", height: "100%" },
-  loadingOverlay: {
-    position: "absolute",
-    width: "100%",
-    height: "100%",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
-    borderRadius: 10,
-  },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: "#000",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  closeButton: { position: "absolute", top: 30, right: 20 },
-  fullscreenVideo: { width: "100%", height: 300 },
-  fullscreenControls: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-around",
-    width: "80%",
-    marginTop: 20,
-  },
-});
+const styling = (theme: ThemeKey) =>
+  StyleSheet.create({
+    container: { flex: 1, paddingHorizontal: 20 },
+    backButton: {
+      marginTop: 50,
+      marginBottom: 10,
+    },
+    header: {
+      fontSize: 26,
+      fontWeight: "bold",
+      marginTop: 20,
+      color: themeColors[theme].text,
+    },
+    subHeader: {
+      fontSize: 14,
+      color: themeColors[theme].text,
+      marginBottom: 20,
+    },
+    sectionTitle: {
+      fontSize: 18,
+      fontWeight: "bold",
+      marginVertical: 10,
+      color: themeColors[theme].text,
+    },
+    videoItem: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginBottom: 15,
+      width: "100%",
+      // borderBottomWidth: 1,
+      // paddingBottom: 5,
+      // borderBottomColor: themeColors[theme].divider,
+    },
+    videoThumbnail: {
+      width: 120,
+      height: 70,
+      justifyContent: "center",
+      alignItems: "center",
+      // borderBottomWidth: 4,
+      // borderBottomColor: themeColors[theme].divider,
+    },
+    playButton: {
+      backgroundColor: "rgba(0,0,0,0.5)",
+      borderRadius: 25,
+      padding: 5,
+    },
+    videoInfo: {
+      marginLeft: 10,
+      flex: 1,
+      padding: 20,
+      paddingBottom: 10,
+      borderBottomWidth: 1,
+
+      // paddingBottom: 5,
+      borderBottomColor: themeColors[theme].divider,
+    },
+    videoTitle: {
+      fontSize: 16,
+      fontWeight: "bold",
+      color: themeColors[theme].text,
+    },
+    videoDuration: { fontSize: 14, color: "#777" },
+    videoContainer: {
+      width: 120,
+      height: 70,
+      borderRadius: 10,
+      overflow: "hidden",
+      position: "relative",
+    },
+    videoPlayer: { width: "100%", height: "100%" },
+    loadingOverlay: {
+      position: "absolute",
+      width: "100%",
+      height: "100%",
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: "rgba(0,0,0,0.5)",
+      borderRadius: 10,
+    },
+    modalContainer: {
+      flex: 1,
+      backgroundColor: "#000",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    closeButton: { position: "absolute", top: 30, right: 20 },
+    fullscreenVideo: { width: "100%", height: 300 },
+    fullscreenControls: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-around",
+      width: "80%",
+      marginTop: 20,
+    },
+  });
 
 export default FitnessVideoList;

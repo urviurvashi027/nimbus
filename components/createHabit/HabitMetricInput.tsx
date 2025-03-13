@@ -8,12 +8,14 @@ import ThemeContext from "@/context/ThemeContext";
 import { MetricFormat } from "./Modal/HabitMetricModal";
 import HabitMetricModal from "./Modal/HabitMetricModal";
 import styling from "./style/HabitInputStyle";
+import { getHabitUnitData } from "@/services/habitService";
+import { HabitUnit } from "@/types/habitTypes";
 // import styling from "./style/HabitMetricInputStyle";
 
 type EditData = {
   count: string;
-  unit: string;
-  unitId: number;
+  unit: number;
+  // unitId: number;
 };
 
 interface HabitMetricInputProp {
@@ -28,12 +30,17 @@ const HabitMetricInput: React.FC<HabitMetricInputProp> = ({
   const { theme } = useContext(ThemeContext);
 
   const [habitMetric, setHabitMetric] = useState<MetricFormat | null>(null);
-
+  const [tagList, setTaglist] = useState<HabitUnit[]>([]);
   const [showHabitMetricModal, setShowHabitMetricModal] = useState(false);
 
   // function to handle metric
   const handleHabitMetricSave = (value: MetricFormat) => {
     // console.log(value, "metric value selected");
+    const res = {
+      count: value.count,
+      label: value.label,
+      unit: value.unit,
+    };
     setHabitMetric(value);
     setShowHabitMetricModal(false);
 
@@ -43,6 +50,28 @@ const HabitMetricInput: React.FC<HabitMetricInputProp> = ({
   };
 
   const styles = styling(theme);
+
+  const getHabitUniLtist = async () => {
+    try {
+      const result = await getHabitUnitData();
+      // console.log(result, "result");
+      if (result?.success) {
+        // console.log(result.data, "result.data");
+        setTaglist(result.data);
+      }
+    } catch (error: any) {
+      console.log(error, "API Error Response");
+    }
+  };
+
+  useEffect(() => {
+    console.log("i am called");
+    getHabitUniLtist();
+  }, []);
+
+  useEffect(() => {
+    console.log(showHabitMetricModal, "showHabitMetricModal");
+  }, [showHabitMetricModal]);
 
   useEffect(() => {
     if (isEditMode) {
@@ -72,7 +101,7 @@ const HabitMetricInput: React.FC<HabitMetricInputProp> = ({
             ellipsizeMode="tail"
           >
             {habitMetric
-              ? `Metric: ${habitMetric.count}  ${habitMetric.unit}`
+              ? `Metric: ${habitMetric.count}  ${habitMetric.label}`
               : "Select Metric"}
           </Text>
         </View>
@@ -88,6 +117,7 @@ const HabitMetricInput: React.FC<HabitMetricInputProp> = ({
         visible={showHabitMetricModal}
         onClose={() => setShowHabitMetricModal(false)}
         isEditMode={habitMetric}
+        habitUnitList={tagList}
         onSave={handleHabitMetricSave}
       />
     </>
