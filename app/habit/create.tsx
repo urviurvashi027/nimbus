@@ -134,7 +134,6 @@ export default function HabitBasic() {
   };
 
   const createHabitData = async () => {
-    // setShowSuccess(true);
     if (name && Object.keys(metric).length > 0) {
       const freq = getFrequencyDetail();
 
@@ -173,27 +172,30 @@ export default function HabitBasic() {
   };
 
   const creatHabitApi = async (data: any) => {
+    setShowSuccess(true);
     setIsLoading(true);
     try {
       const result = await createHabit(data);
+      setIsLoading(false);
       if (result?.success) {
-        setIsLoading(false);
+        // console.log("coming inside");
         setShowSuccess(true);
-        router.replace("/(auth)/(tabs)"); // Navigate on success
+        resetData();
+        // router.replace("/(auth)/(tabs)"); // Navigate on success
       }
     } catch (error: any) {
       setIsLoading(false);
     }
+  };
 
-    // if (result && result.success) {
-
-    //   // console.log(result, "succesfully created");
-    //   router.replace("/(auth)/(tabs)");
-    // }
-    // if (result && result.error) {
-    //   setIsLoading(false);
-    //   alert(result);
-    // }
+  const resetData = () => {
+    setName("");
+    sethabitTypeId(0);
+    setTags({});
+    setMetric({});
+    setFrequency(null);
+    setDuration({ all_day: undefined });
+    setReminderAt({});
   };
 
   // function to handle continue click
@@ -296,9 +298,13 @@ export default function HabitBasic() {
 
       <SuccessModal
         visible={showSuccess}
-        onClose={() => setShowSuccess(false)}
+        isLoading={isLoading}
+        onClose={() => {
+          setShowSuccess(false);
+          router.replace("/(auth)/(tabs)");
+        }}
       />
-      <ActivityIndicatorModal visible={isLoading} />
+      {/* <ActivityIndicatorModal visible={isLoading} /> */}
     </>
   );
 }

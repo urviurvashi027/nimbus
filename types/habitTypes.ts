@@ -51,6 +51,8 @@ export interface HabitItem {
   frequency: string;
   reminder_time: string;
   duration: string;
+  metric_count: number;
+  metric_unit: string;
 
   time?: string;
   // TODO Add other fields that are returned in your list items
@@ -119,9 +121,9 @@ export interface HabitTagResponse {
 
 // Habit Delete Request and Response
 export interface HabitDeleteResponse {
-  success: string;
+  success: boolean;
   message: string;
-  data: HabitItem;
+  data: HabitItem | null;
 }
 
 export interface HabitDeleteRequest {
@@ -136,7 +138,11 @@ export interface HabitDoneResponse {
 }
 
 export interface HabitDoneRequest {
-  id: string;
+  completed: boolean;
+  actual_count: {
+    count: number;
+    unit: string;
+  };
 }
 
 // Habit details type

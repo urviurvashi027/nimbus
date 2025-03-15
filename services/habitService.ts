@@ -114,7 +114,13 @@ export const deleteHabit = async (id: number): Promise<HabitDeleteResponse> => {
       `${API_ENDPOINTS.habitDetailsById}${id}/`
     );
     console.log(response.status, "response.data;");
-    return response.data; // Return the data containing the token
+    let obj = { success: false, message: "", data: null };
+    if (response.status == 204) {
+      obj = { success: true, message: "Deleted", data: null };
+    } else {
+      obj = { success: false, message: "Something went wrong", data: null };
+    }
+    return obj; // Return the data containing the token
   } catch (error: any) {
     throw error.response ? error.response.data : error.message;
   }
@@ -122,14 +128,21 @@ export const deleteHabit = async (id: number): Promise<HabitDeleteResponse> => {
 
 // mark habit as done
 export const markHabitDone = async (
-  data: HabitDoneRequest
+  data: HabitDoneRequest,
+  id: any
 ): Promise<HabitDoneResponse> => {
   try {
-    const response: AxiosResponse<HabitDoneResponse> = await axios.post(
-      API_ENDPOINTS.habitPatch,
+    const response: AxiosResponse<HabitDoneResponse> = await axios.patch(
+      `${API_ENDPOINTS.habitPatch}${id}/`,
       data
     );
-    console.log(response.status, "response.status", typeof response.status);
+
+    console.log(
+      response,
+      response.status,
+      "response.status",
+      typeof response.status
+    );
     if (response.status === 204) {
       Toast.show({
         type: "success",

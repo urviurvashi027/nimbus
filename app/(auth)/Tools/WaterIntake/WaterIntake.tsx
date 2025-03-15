@@ -91,7 +91,7 @@ const WaterIntakeModal: React.FC<WaterIntakeProps> = ({ visible, onClose }) => {
       <SettingsModal
         visible={settingsVisible}
         onClose={() => {
-          console.log("water intake form close modal clicked");
+          // console.log("water intake form close modal clicked");
           setSettingsVisible(false);
         }}
       />

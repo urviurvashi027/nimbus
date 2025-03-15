@@ -65,7 +65,7 @@ const HabitMetricInput: React.FC<HabitMetricInputProp> = ({
   };
 
   useEffect(() => {
-    console.log("i am called");
+    // console.log("i am called");
     getHabitUniLtist();
   }, []);
 

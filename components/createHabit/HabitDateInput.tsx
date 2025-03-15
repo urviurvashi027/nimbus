@@ -64,11 +64,11 @@ const HabitDateInput: React.FC<HabitDateInputProps> = ({
 
   useEffect(() => {
     if (isEditMode) {
-      console.log("Edit mode is on", isEditMode);
+      // console.log("Edit mode is on", isEditMode);
       // handleSave(isEditMode);
       setHabitDate(habitDate);
     } else {
-      console.log("Edit mode is off");
+      // console.log("Edit mode is off");
     }
   }, [isEditMode]);
 

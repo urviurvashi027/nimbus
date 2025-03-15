@@ -9,12 +9,12 @@ import Animated, {
   withSpring,
   runOnJS,
 } from "react-native-reanimated";
-import { deleteHabit } from "@/services/habitService";
+import { deleteHabit, markHabitDone } from "@/services/habitService";
 import { useNavigation } from "expo-router";
 import ThemeContext from "@/context/ThemeContext";
 import { themeColors } from "@/constant/Colors";
 import { Ionicons } from "@expo/vector-icons";
-import { HabitItem } from "@/types/habitTypes";
+import { HabitDoneRequest, HabitItem } from "@/types/habitTypes";
 import { ThemeKey } from "../Themed";
 import ActivityIndicatorModal from "../common/ActivityIndicatorModal";
 
@@ -22,13 +22,15 @@ type SwipeableItemProps = {
   item: HabitItem;
   habitItemClick: (id: any) => void;
   habitItemDeleted: (id: any) => void;
+  habitDoneClick: (habitDoneRequest: HabitDoneRequest, id: any) => void;
 };
 
 const SwipeableItem: React.FC<SwipeableItemProps> = (
   props: SwipeableItemProps
 ) => {
-  const { name, id, ...rest } = props.item;
-  const { habitItemClick, habitItemDeleted } = props;
+  console.log(props, "props");
+  const { name, id, metric_count, metric_unit, ...rest } = props.item;
+  const { habitItemClick, habitItemDeleted, habitDoneClick } = props;
   const [showHabitActionModal, setshowHabitActionModal] = useState(false);
   const translateY = useSharedValue(0);
   // ✅ Create a ref for Swipeable
@@ -107,8 +109,16 @@ const SwipeableItem: React.FC<SwipeableItemProps> = (
     //   }
   };
 
-  const markHabitDone = () => {
+  const onHabitDoneClick = () => {
     console.log("OK Done Pressed");
+    const request = {
+      completed: true,
+      actual_count: {
+        count: metric_count,
+        unit: metric_unit,
+      },
+    };
+    habitDoneClick(request, id);
   };
 
   const swipeFromLeftOpen = () => {
@@ -125,7 +135,7 @@ const SwipeableItem: React.FC<SwipeableItemProps> = (
         onPress: () => console.log("Cancel Pressed"),
         style: "cancel",
       },
-      { text: "Done", onPress: markHabitDone },
+      { text: "Done", onPress: onHabitDoneClick },
     ]);
   };
 

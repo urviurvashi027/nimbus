@@ -11,7 +11,7 @@ import React, { useContext, useEffect, useState } from "react";
 import SwipeableItem from "./SwipeableItem";
 import { HabitItem } from "@/types/habitTypes";
 import { router } from "expo-router";
-import { deleteHabit } from "@/services/habitService";
+import { deleteHabit, markHabitDone } from "@/services/habitService";
 import ActivityIndicatorModal from "../common/ActivityIndicatorModal";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -51,30 +51,53 @@ const HabitList: React.FC<HabitListProps> = (props) => {
   // console.log("is loggong", isLoading);
 
   const deleteBackendCall = async (id: number) => {
-    // console.log(id, typeof "id");
-    // const result = await deleteHabit({id });
-    // setIsLoading(true);
     try {
       const result = await deleteHabit(id);
       if (result?.success) {
-        // setIsLoading(false);
-        setShowSuccess(true);
+        // refreshData();
         Toast.show({
           type: "success",
           text1: "Habit Deleted successfuly",
           position: "bottom",
         });
-        // router.replace("/(auth)/(tabs)"); // Navigate on success
       }
     } catch (error: any) {
-      // setIsLoading(false);
+      Toast.show({
+        type: "fail",
+        text1: "Something went wrong",
+        position: "bottom",
+      });
+    } finally {
+      refreshData();
+    }
+  };
+
+  const onHabitMarkDone = async (data: any, id: any) => {
+    try {
+      const result = await markHabitDone(data, id);
+      console.log(result, "result");
+      if (result?.success) {
+        // refreshData();
+        Toast.show({
+          type: "success",
+          text1: "Habit Deleted successfuly",
+          position: "bottom",
+        });
+      }
+    } catch (error: any) {
+      Toast.show({
+        type: "error",
+        text1: "Something went wrong",
+        position: "bottom",
+      });
+    } finally {
+      refreshData();
     }
   };
 
   const habitItemDeleted = (id: number) => {
     console.log(id, "refresh daye habit list");
     deleteBackendCall(id);
-    refreshData();
   };
 
   // test
@@ -103,6 +126,7 @@ const HabitList: React.FC<HabitListProps> = (props) => {
               item={item}
               habitItemDeleted={habitItemDeleted}
               habitItemClick={habitItemClicked}
+              habitDoneClick={onHabitMarkDone}
             />
           )}
           ItemSeparatorComponent={() => <Separator style={style} />}
