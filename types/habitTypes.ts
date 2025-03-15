@@ -53,7 +53,7 @@ export interface HabitItem {
   duration: string;
   metric_count: number;
   metric_unit: string;
-
+  last_completed: string;
   time?: string;
   // TODO Add other fields that are returned in your list items
 }

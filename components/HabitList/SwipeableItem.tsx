@@ -29,7 +29,8 @@ const SwipeableItem: React.FC<SwipeableItemProps> = (
   props: SwipeableItemProps
 ) => {
   console.log(props, "props");
-  const { name, id, metric_count, metric_unit, ...rest } = props.item;
+  const { name, id, last_completed, metric_count, metric_unit, ...rest } =
+    props.item;
   const { habitItemClick, habitItemDeleted, habitDoneClick } = props;
   const [showHabitActionModal, setshowHabitActionModal] = useState(false);
   const translateY = useSharedValue(0);
@@ -93,7 +94,6 @@ const SwipeableItem: React.FC<SwipeableItemProps> = (
   };
 
   const deleteHabitClick = async () => {
-    console.log("Delete habit click", id);
     habitItemDeleted(id);
     // const result = await deleteHabit({ id });
     //   setIsLoading(true);
@@ -110,7 +110,6 @@ const SwipeableItem: React.FC<SwipeableItemProps> = (
   };
 
   const onHabitDoneClick = () => {
-    console.log("OK Done Pressed");
     const request = {
       completed: true,
       actual_count: {
@@ -122,14 +121,7 @@ const SwipeableItem: React.FC<SwipeableItemProps> = (
   };
 
   const swipeFromLeftOpen = () => {
-    // setshowHabitActionModal(true);
-    // alert("Swipe from left");
-
     Alert.alert("Mark Habit Complete", "Mark this habit as done !!!", [
-      // {
-      //   text: "Ask me later",
-      //   onPress: () => console.log("Ask me later pressed"),
-      // },
       {
         text: "Cancel",
         onPress: () => console.log("Cancel Pressed"),
@@ -140,15 +132,7 @@ const SwipeableItem: React.FC<SwipeableItemProps> = (
   };
 
   const swipeFromRightOpen = () => {
-    // alert("Swipe from right");
-    console.log("swipeFromRightOpen");
-    // setshowHabitActionModal(true);
-
     Alert.alert("Delete Habit", "Are you sure to delete this?", [
-      // {
-      //   text: "Ask me later",
-      //   onPress: () => console.log("Ask me later pressed"),
-      // },
       {
         text: "Cancel",
         onPress: () => console.log("Cancel Pressed"),
@@ -164,23 +148,46 @@ const SwipeableItem: React.FC<SwipeableItemProps> = (
 
   return (
     <>
-      <Swipeable
-        renderLeftActions={LeftSwipeActions}
-        renderRightActions={rightSwipeActions}
-        onSwipeableOpen={(direction: string) => {
-          direction === "left" ? swipeFromLeftOpen() : swipeFromRightOpen();
-        }}
-      >
-        <TouchableOpacity onPress={() => habitItemClick(id)}>
-          <View style={styles.itemContainer}>
-            {/* <Text style={styles.emoji}>{emoji}</Text> */}
-            <View style={styles.textContainer}>
-              <Text style={styles.taskName}>{name}</Text>
-              <Text style={styles.taskTime}>{rest.reminder_time}</Text>
+      {!last_completed && (
+        <Swipeable
+          renderLeftActions={LeftSwipeActions}
+          renderRightActions={rightSwipeActions}
+          onSwipeableOpen={(direction: string) => {
+            direction === "left" ? swipeFromLeftOpen() : swipeFromRightOpen();
+          }}
+        >
+          <TouchableOpacity onPress={() => habitItemClick(id)}>
+            <View style={styles.itemContainer}>
+              {/* <Text style={styles.emoji}>{emoji}</Text> */}
+              <View style={styles.textContainer}>
+                <Text style={styles.taskName}>{name}</Text>
+                <Text style={styles.taskTime}>{rest.reminder_time}</Text>
+              </View>
             </View>
-          </View>
-        </TouchableOpacity>
-      </Swipeable>
+          </TouchableOpacity>
+        </Swipeable>
+      )}
+
+      {last_completed && (
+        <View>
+          <TouchableOpacity onPress={() => habitItemClick(id)}>
+            <View style={styles.itemContainer}>
+              {/* <View style={styles.itemContainer}> */}
+              {/* <Text style={styles.emoji}>{emoji}</Text> */}
+              <View style={styles.textContainer}>
+                <Text style={styles.taskName}>{name}</Text>
+                <Text style={styles.taskTime}>{rest.reminder_time}</Text>
+                {/* <Ionicons name="checkmark-done" size={24} /> */}
+              </View>
+              <Ionicons
+                name="checkmark-done"
+                size={24}
+                style={styles.checkIcon}
+              />
+            </View>
+          </TouchableOpacity>
+        </View>
+      )}
 
       {/* Task Type Modal */}
       <DeleteHabitModal
@@ -239,6 +246,9 @@ const styling = (theme: ThemeKey) =>
       backgroundColor: themeColors[theme].primaryColor,
       padding: 15,
       borderRadius: 12,
+    },
+    checkIcon: {
+      color: "green",
     },
   });
 

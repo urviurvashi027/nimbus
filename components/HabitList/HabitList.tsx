@@ -63,7 +63,7 @@ const HabitList: React.FC<HabitListProps> = (props) => {
       }
     } catch (error: any) {
       Toast.show({
-        type: "fail",
+        type: "error",
         text1: "Something went wrong",
         position: "bottom",
       });
@@ -75,12 +75,12 @@ const HabitList: React.FC<HabitListProps> = (props) => {
   const onHabitMarkDone = async (data: any, id: any) => {
     try {
       const result = await markHabitDone(data, id);
-      console.log(result, "result");
+      console.log(result, "result---------");
       if (result?.success) {
         // refreshData();
         Toast.show({
           type: "success",
-          text1: "Habit Deleted successfuly",
+          text1: "Habit marked done successfuly",
           position: "bottom",
         });
       }
