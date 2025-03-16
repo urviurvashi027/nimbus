@@ -17,6 +17,9 @@
       "developmentClient": true
     },
     "production": {
+      "ios": {
+        "artifact": "archive"
+      },
       "android": {
         "gradleCommand": ":app:bundleRelease",
         "buildType": "app-bundle"

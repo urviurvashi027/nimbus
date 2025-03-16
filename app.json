@@ -10,7 +10,8 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.silentBonus.app"
+      "bundleIdentifier": "com.silentBonus.app",
+      "buildNumber": "1.0.0"
     },
     "android": {
       "versionCode": 1,
