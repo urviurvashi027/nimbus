@@ -17,7 +17,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.uurvi027.nimbus"
+      "package": "com.silentBonus.app"
     },
     "web": {
       "bundler": "metro",
