@@ -28,7 +28,7 @@
         <key>CFBundleURLSchemes</key>
         <array>
           <string>myapp</string>
-          <string>com.uurvi027.nimbus</string>
+          <string>com.silentBonus.app</string>
         </array>
       </dict>
     </array>

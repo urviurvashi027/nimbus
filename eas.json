@@ -5,17 +5,23 @@
         "buildType": "apk"
       }
     },
-    "preview2": {
+    "develpment": {
       "android": {
         "gradleCommand": ":app:assembleRelease"
       }
     },
-    "preview3": {
+    "beta": {
       "developmentClient": true
     },
-    "preview4": {
-      "distribution": "internal"
-    },
-    "production": {}
+    "production": {
+      "android": {
+        "gradleCommand": ":app:bundleRelease",
+        "package": "com.silentBonus.app",
+        "buildType": "release",
+        "proguardRules": "proguard-rules.pro"
+      },
+      "distribution": "store",
+      "credentialsSource": "remote"
+    }
   }
 }

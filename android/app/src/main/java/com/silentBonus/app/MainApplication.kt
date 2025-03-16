@@ -1,4 +1,4 @@
-package com.uurvi027.nimbus
+package com.silentBonus.app
 
 import android.app.Application
 import android.content.res.Configuration

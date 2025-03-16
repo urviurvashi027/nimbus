@@ -28,6 +28,7 @@
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="myapp"/>
         <data android:scheme="com.uurvi027.nimbus"/>
+        <data android:scheme="com.silentBonus.app"/>
       </intent-filter>
     </activity>
   </application>

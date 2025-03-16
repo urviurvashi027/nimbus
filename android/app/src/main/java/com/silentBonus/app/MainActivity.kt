@@ -1,4 +1,4 @@
-package com.uurvi027.nimbus
+package com.silentBonus.app
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build
