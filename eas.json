@@ -14,11 +14,12 @@
       "developmentClient": true
     },
     "production": {
+      "cli": {
+        "appVersionSource": "remote"
+      },
       "android": {
         "gradleCommand": ":app:bundleRelease",
-        "package": "com.silentBonus.app",
-        "buildType": "release",
-        "proguardRules": "proguard-rules.pro"
+        "buildType": "app-bundle"
       },
       "distribution": "store",
       "credentialsSource": "remote"
