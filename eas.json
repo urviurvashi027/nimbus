@@ -1,4 +1,7 @@
 {
+  "cli": {
+    "appVersionSource": "remote"
+  },
   "build": {
     "preview": {
       "android": {
@@ -14,9 +17,6 @@
       "developmentClient": true
     },
     "production": {
-      "cli": {
-        "appVersionSource": "remote"
-      },
       "android": {
         "gradleCommand": ":app:bundleRelease",
         "buildType": "app-bundle"
