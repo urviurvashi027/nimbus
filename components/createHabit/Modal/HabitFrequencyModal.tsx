@@ -100,7 +100,6 @@ const HabitFrequencyModal: React.FC<FrequencyModalProps> = ({
       default:
         throw new Error("Unsupported frequency type");
     }
-
     return reminder;
   }
 
@@ -144,7 +143,7 @@ const HabitFrequencyModal: React.FC<FrequencyModalProps> = ({
       <View style={styles.modalOverlay}>
         <View style={styles.modalContainer}>
           <View style={styles.header}>
-            <Text style={styles.title}>Select Frequency</Text>
+            <Text style={styles.title}>Selectt Frequency</Text>
             <TouchableOpacity onPress={onClose}>
               <Ionicons
                 name="close"

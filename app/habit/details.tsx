@@ -94,11 +94,6 @@ const HabitDetails = () => {
     }
   }, [id]);
 
-  // useEffect(() => {
-  //   console.log(`habit data ${habit}`);
-  //   console.log(getStreakData());
-  // }, [habit]);
-
   const getStreakData = () => {
     return {
       score: "65",

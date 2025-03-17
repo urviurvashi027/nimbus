@@ -63,7 +63,7 @@ const styling = (theme: ThemeKey) =>
       fontWeight: "bold",
     },
     item: {
-      color: themeColors[theme].text,
+      color: themeColors.basic.mediumGrey,
       borderColor: themeColors[theme].inpurBorderColor,
     },
   });

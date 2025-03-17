@@ -108,12 +108,10 @@ export const getHabitDetailsById = async (
 
 // delete habit request
 export const deleteHabit = async (id: number): Promise<HabitDeleteResponse> => {
-  console.log("i am called delete habit");
   try {
     const response: AxiosResponse<HabitDeleteResponse> = await axios.delete(
       `${API_ENDPOINTS.habitDetailsById}${id}/`
     );
-    console.log(response.status, "response.data;");
     let obj = { success: false, message: "", data: null };
     if (response.status == 204) {
       obj = { success: true, message: "Deleted", data: null };
@@ -135,13 +133,6 @@ export const markHabitDone = async (
     const response: AxiosResponse<HabitDoneResponse> = await axios.patch(
       `${API_ENDPOINTS.habitPatch}${id}/`,
       data
-    );
-
-    console.log(
-      response,
-      response.status,
-      "response.status",
-      typeof response.status
     );
     if (response.status === 204) {
       Toast.show({

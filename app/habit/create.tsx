@@ -43,8 +43,8 @@ import ActivityIndicatorModal from "@/components/common/ActivityIndicatorModal";
 export default function HabitBasic() {
   // form state
   const [colorSchema, setColorSchema] = useState<
-    "red" | "blue" | "green" | "yellow" | "black"
-  >("red");
+    "#FFEDFA" | "#B4EBE6" | "#F8ED8C" | "#C1CFA1" | "#B7B1F2"
+  >("#FFEDFA");
   const [name, setName] = useState("");
   const [habitTypeId, sethabitTypeId] = useState<number>(0);
   const [tags, setTags] = useState<selectedTag>({} as selectedTag);
@@ -55,7 +55,8 @@ export default function HabitBasic() {
   const [reminderAt, setReminderAt] = useState<ReminderAt>({});
   // api state
   const [isLoading, setIsLoading] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [showResponseModal, setShowResponseModal] = useState(false);
 
   // context
   const { habitData, setHabitData } = useContext(HabitContext);
@@ -84,7 +85,7 @@ export default function HabitBasic() {
 
   // function to handle color selection
   const handleColorSelect = (
-    color: "red" | "blue" | "green" | "yellow" | "black"
+    color: "#FFEDFA" | "#B4EBE6" | "#F8ED8C" | "#C1CFA1" | "#B7B1F2"
   ) => {
     setColorSchema(color);
   };
@@ -133,6 +134,22 @@ export default function HabitBasic() {
       return { ...frequency, ...date };
   };
 
+  const getFormattedTag = () => {
+    let value;
+    if (tags) {
+      let tagList = tags?.old?.map((item, index) => item.id);
+      if (tags.new) {
+        value = { old: tagList, new: [tags.new] };
+      } else {
+        value = { old: tagList };
+      }
+    } else {
+      value = {};
+    }
+
+    return value;
+  };
+
   const createHabitData = async () => {
     if (name && Object.keys(metric).length > 0) {
       const freq = getFrequencyDetail();
@@ -145,7 +162,7 @@ export default function HabitBasic() {
         habit_duration: duration,
         habit_frequency: freq,
         // remind_at: reminderAt,
-        tags: tags,
+        tags: getFormattedTag(),
         ...(reminderAt?.time || reminderAt?.ten_min_before
           ? { remind_at: reminderAt }
           : {}),
@@ -156,9 +173,9 @@ export default function HabitBasic() {
       //   //  result.remind_at = reminderAt;
       // }
 
-      const res = tags.old?.length ? { result, tag: tags } : result;
+      // const res = tags.old?.length ? { ...result, tag: tags } : result;
 
-      creatHabitApi(res);
+      creatHabitApi(result);
     } else {
       const errorMessage = name ? "Please enter metric" : "Please enter name";
       // Show error toast
@@ -172,14 +189,15 @@ export default function HabitBasic() {
   };
 
   const creatHabitApi = async (data: any) => {
-    setShowSuccess(true);
+    setShowResponseModal(true);
     setIsLoading(true);
+
     try {
       const result = await createHabit(data);
-      setIsLoading(false);
+
       if (result?.success) {
-        // console.log("coming inside");
-        setShowSuccess(true);
+        setIsLoading(false);
+        setIsSuccess(true);
         resetData();
         // router.replace("/(auth)/(tabs)"); // Navigate on success
       }
@@ -239,37 +257,46 @@ export default function HabitBasic() {
           <ScrollView>
             <ScreenView
               style={{
-                paddingTop: Platform.OS === "ios" ? 20 : 20,
+                paddingTop: Platform.OS === "ios" ? 20 : 10,
               }}
             >
               {/* <View style={{ backgroundColor: "#dfd9f9" }}> */}
               <View>
-                <Text style={styles.label}>Task Name</Text>
+                <Text style={styles.label}>Habit Name</Text>
                 <FormInput
                   style={styles.input}
                   placeholderTextColor={themeColors.basic.mediumGrey}
-                  placeholder="Enter task name"
+                  placeholder="Enter habit name"
                   value={name}
                   onChangeText={setName}
                 />
 
                 {/* Task Name */}
                 <View style={styles.colorOptionsContainer}>
-                  {["red", "blue", "green", "yellow", "black"].map((color) => (
-                    <TouchableOpacity
-                      key={color}
-                      style={[
-                        styles.colorCircle,
-                        { backgroundColor: color },
-                        colorSchema === color && styles.selectedColor,
-                      ]}
-                      onPress={() =>
-                        handleColorSelect(
-                          color as "red" | "blue" | "green" | "yellow" | "black"
-                        )
-                      }
-                    />
-                  ))}
+                  {["#FFEDFA", "#B4EBE6", "#F8ED8C", "#C1CFA1", "#B7B1F2"].map(
+                    (color) => (
+                      <TouchableOpacity
+                        key={color}
+                        style={[
+                          styles.colorCircle,
+                          { backgroundColor: color },
+                          colorSchema === color && {
+                            borderColor: themeColors.basic.mediumGrey,
+                          },
+                        ]}
+                        onPress={() =>
+                          handleColorSelect(
+                            color as
+                              | "#FFEDFA"
+                              | "#B4EBE6"
+                              | "#F8ED8C"
+                              | "#C1CFA1"
+                              | "#B7B1F2"
+                          )
+                        }
+                      />
+                    )
+                  )}
                 </View>
 
                 <HabitTypeInput onSelect={handleHabitTypeSelect} />
@@ -297,10 +324,11 @@ export default function HabitBasic() {
       </GestureHandlerRootView>
 
       <SuccessModal
-        visible={showSuccess}
+        visible={showResponseModal}
         isLoading={isLoading}
+        isSuccess={isSuccess}
         onClose={() => {
-          setShowSuccess(false);
+          setShowResponseModal(false);
           router.replace("/(auth)/(tabs)");
         }}
       />
@@ -350,7 +378,7 @@ const styling = (theme: ThemeKey) =>
       width: 40,
       height: 40,
       borderRadius: 20,
-      borderWidth: 2,
+      borderWidth: 1,
       borderColor: "transparent",
       justifyContent: "center",
       alignItems: "center",

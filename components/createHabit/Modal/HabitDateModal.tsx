@@ -77,16 +77,12 @@ const HabitDateModal: React.FC<HabitDateModalProps> = ({
 
   useEffect(() => {
     if (isEditMode) {
-      // const {}
-      console.log("Edit mode is on modal", isEditMode);
       setStartDate(isEditMode.start_date);
       if (isEditMode.end_date) {
-        console.log("coming in end date");
         setIsEndDateEnabled(true);
         setEndDate(isEditMode.end_date);
       }
       if (isEditMode.frequency_type) {
-        console.log(isEditMode.frequency_type, "isEditMode.frequency_type");
         setFrequencyDetails(isEditMode);
         // setSelectedFrequency(isEditMode.frequency_type)
       }
@@ -133,42 +129,6 @@ const HabitDateModal: React.FC<HabitDateModalProps> = ({
     return daysMap[day] || "Invalid day";
   }
 
-  function convertToReminder(input: Frequency): ReminderOutput {
-    let reminder: ReminderOutput = {
-      frequency_type: input.frequency_type.toLowerCase() as
-        | "daily"
-        | "weekly"
-        | "monthly",
-      interval: input.interval,
-    };
-
-    switch (input.frequency_type) {
-      case "Daily":
-        // No extra fields are needed for Daily.
-        break;
-
-      case "Weekly":
-        if ("days" in input) {
-          reminder.days_of_week = input.days_of_week.map((day) =>
-            convertDayAbbreviation(day)
-          );
-        }
-        break;
-
-      case "Monthly":
-        if ("dates" in input) {
-          if (reminder.days_of_month)
-            reminder.days_of_month = input.dates as number[];
-        }
-        break;
-
-      default:
-        throw new Error("Unsupported frequency type");
-    }
-
-    return reminder;
-  }
-
   const handleStartDateChange = (selectedDate: Date) => {
     if (selectedDate) {
       setStartDate(selectedDate);
@@ -193,23 +153,65 @@ const HabitDateModal: React.FC<HabitDateModalProps> = ({
     );
   };
 
-  const handleSave = () => {
+  function convertToReminder() {
+    // let reminder: ReminderOutput = {
+    //   frequency_type: input.frequency_type.toLowerCase() as
+    //     | "daily"
+    //     | "weekly"
+    //     | "monthly",
+    //   interval: input.interval,
+    // };
+
     let frequency: Frequency | {} = {};
-    if (selectedFrequency === "Daily") {
-      frequency = { frequency_type: "daily", interval: dailyCount };
-    } else if (selectedFrequency === "Weekly") {
-      frequency = {
-        frequency_type: "weekly",
-        days_of_week: weeklyDays,
-        interval: weeklyCount,
-      };
-    } else if (selectedFrequency === "Monthly") {
-      frequency = {
-        frequency_type: "monthly",
-        interval: monthlyCount,
-        days_of_month: monthlyDates,
-      };
+
+    switch (selectedFrequency) {
+      case "Daily":
+        frequency = { frequency_type: "daily", interval: dailyCount };
+        break;
+
+      case "Weekly":
+        let days: string[] = [];
+        // if ("days" in input) {
+        days = weeklyDays.map((day) => convertDayAbbreviation(day));
+        // }
+        frequency = {
+          frequency_type: "weekly",
+          days_of_week: days,
+          interval: weeklyCount,
+        };
+        break;
+
+      case "Monthly":
+        frequency = {
+          frequency_type: "monthly",
+          interval: monthlyCount,
+          days_of_month: monthlyDates,
+        };
+        break;
+
+      default:
+        throw new Error("Unsupported frequency type");
     }
+    return frequency;
+  }
+
+  const handleSave = () => {
+    let frequency: Frequency | {} = convertToReminder();
+    // if (selectedFrequency === "Daily") {
+    //   frequency = { frequency_type: "daily", interval: dailyCount };
+    // } else if (selectedFrequency === "Weekly") {
+    //   frequency = {
+    //     frequency_type: "weekly",
+    //     days_of_week: weeklyDays,
+    //     interval: weeklyCount,
+    //   };
+    // } else if (selectedFrequency === "Monthly") {
+    //   frequency = {
+    //     frequency_type: "monthly",
+    //     interval: monthlyCount,
+    //     days_of_month: monthlyDates,
+    //   };
+    // }
     let parsedValue = {
       start_date: startDate,
       end_date: isEndDateEnabled ? endDate : undefined,

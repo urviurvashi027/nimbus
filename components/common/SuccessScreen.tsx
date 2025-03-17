@@ -16,29 +16,29 @@ import { Ionicons } from "@expo/vector-icons";
 const SuccessModal = ({
   visible,
   onClose,
+  isSuccess,
   isLoading,
 }: {
   visible: boolean;
   onClose: () => void;
+  isSuccess: boolean;
   isLoading: boolean;
 }) => {
   const { theme } = useContext(ThemeContext);
   const styles = styling(theme);
 
-  console.log("mounted sucess", visible);
-
   return (
     <Modal visible={visible} transparent animationType="slide">
       <View style={styles.modalOverlay}>
         <View style={styles.modalContainer}>
-          <TouchableOpacity onPress={onClose}>
-            <Ionicons name="close" size={24} color={themeColors[theme].text} />
-          </TouchableOpacity>
-          {/* Success GIF */}
-          <Image
-            source={require("../../assets/images/success.gif")} // Replace with your GIF file
-            style={styles.gif}
-          />
+          <View style={{ flexDirection: "row" }}>
+            <TouchableOpacity
+              onPress={onClose}
+              style={{ alignItems: "flex-end", justifyContent: "flex-end" }}
+            >
+              <Ionicons name="close" size={24} color="red" />
+            </TouchableOpacity>
+          </View>
 
           {/* Loading */}
           {isLoading && (
@@ -51,11 +51,28 @@ const SuccessModal = ({
           )}
 
           {/* Success Message */}
-          {!isLoading && (
+          {!isLoading && isSuccess && (
             <>
+              {/* Success GIF */}
+              <Image
+                source={require("../../assets/images/success.gif")} // Replace with your GIF file
+                style={styles.gif}
+              />
               <Text style={styles.successText}>
-                Habit Created Successfully!
+                Habit Created Successfully!!
               </Text>
+
+              {/* Continue Button */}
+              <TouchableOpacity style={styles.button} onPress={onClose}>
+                <Text style={styles.buttonText}>Continue</Text>
+              </TouchableOpacity>
+            </>
+          )}
+
+          {/* Success Message */}
+          {!isLoading && !isSuccess && (
+            <>
+              <Text style={styles.successText}>Failed!!</Text>
 
               {/* Continue Button */}
               <TouchableOpacity style={styles.button} onPress={onClose}>

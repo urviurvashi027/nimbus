@@ -173,7 +173,6 @@ const Tools: React.FC = () => {
         <WaterIntakeModal
           visible={showWaterIntakekModal}
           onClose={() => {
-            // console.log("on closse modal clicked");
             setShowWaterIntakekModal(false);
           }}
         />

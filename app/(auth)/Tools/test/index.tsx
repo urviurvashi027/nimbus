@@ -69,7 +69,6 @@ const MentalHealthTestScreen = () => {
   }, [navigation]);
 
   const onMedicalTestClick = (value: any) => {
-    // console.log(value, "value");
     router.push({
       pathname: "/(auth)/Tools/test/getStared",
       params: { id: value.id },

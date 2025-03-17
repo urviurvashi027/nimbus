@@ -40,7 +40,7 @@ export type HabitType = {
 
 export type HabitTag = {
   id: number;
-  // name: string;
+  name?: string;
 };
 
 export interface HabitItem {

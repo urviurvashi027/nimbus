@@ -47,8 +47,6 @@ const SoundscapeCard = ({ category }: any) => {
     chunkedData.push(category.data.slice(i, i + 3));
   }
 
-  console.log(chunkedData, "chunkedData");
-
   return (
     <View style={[styles.card, { backgroundColor: category.backgroundColor }]}>
       <View style={styles.headerRow}>

@@ -51,7 +51,6 @@ const HabitDurationModal: React.FC<DurationModalProps> = ({
   const styles = styling(theme);
 
   const handleSave = () => {
-    // console.log(allDayEnabled, selection);
     if (allDayEnabled) {
       onSave({ all_day: true });
     } else {
@@ -106,10 +105,6 @@ const HabitDurationModal: React.FC<DurationModalProps> = ({
       }
     }
   }, [isEditMode]);
-
-  useEffect(() => {
-    // console.log(format(pointTime, "hh:mm:ss"), format(endTime, "hh:mm:ss"));
-  }, [pointTime, endTime]);
 
   return (
     <Modal

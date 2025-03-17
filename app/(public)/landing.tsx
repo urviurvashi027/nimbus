@@ -4,6 +4,7 @@ import { View, ScreenView } from "@/components/Themed";
 import { SafeAreaView } from "react-native";
 import SegmentedButton from "@/components/segmentedButton";
 import { router } from "expo-router";
+import { themeColors } from "@/constant/Colors";
 
 export default function login() {
   const firstBtnSegmentBtnClick = () => {
@@ -15,8 +16,8 @@ export default function login() {
   };
 
   return (
-    <SafeAreaView>
-      <ScreenView style={{ padding: 10, marginTop: 0 }}>
+    <ScreenView style={{ padding: 10, marginTop: 0 }}>
+      <SafeAreaView>
         <View style={styles.imageContainer}>
           <Image
             source={require("@/assets/images/loginLatest.png")}
@@ -36,8 +37,8 @@ export default function login() {
             onSecondBtnAction={secondBtnSegmentBtnClick}
           ></SegmentedButton>
         </View>
-      </ScreenView>
-    </SafeAreaView>
+      </SafeAreaView>
+    </ScreenView>
   );
 }
 
@@ -45,8 +46,10 @@ const styles = StyleSheet.create({
   imageContainer: {
     height: "70%",
     borderRadius: 40,
+    backgroundColor: themeColors.basic.primaryColor,
   },
   actionControl: {
+    backgroundColor: themeColors.basic.primaryColor,
     justifyContent: "center",
     alignContent: "center",
   },

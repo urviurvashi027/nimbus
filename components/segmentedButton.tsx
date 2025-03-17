@@ -33,10 +33,6 @@ export default function SegmentedButton(props: segmentedButtonProps) {
 
   const styles = styling(theme);
 
-  // useEffect(() => {
-  //   console.log(theme, "theme from segmented button");
-  // }, [theme]);
-
   return (
     <View style={styles.container}>
       <TouchableOpacity

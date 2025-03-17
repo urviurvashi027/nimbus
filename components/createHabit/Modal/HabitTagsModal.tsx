@@ -82,7 +82,6 @@ const HabitTagsModal: React.FC<TaskTagsModalProps> = ({
   }, [habitTagList]);
 
   const handleSaveClick = (tag: { id: number; name?: string }) => {
-    console.log("Tags Modal:: handleSaveClick", tag);
     setSelectedTag((prev) => {
       // Check if the tag already exists based on `id`
       const tagExists = prev.some((t) => t.id === tag.id);
@@ -96,16 +95,6 @@ const HabitTagsModal: React.FC<TaskTagsModalProps> = ({
     });
     onSelect(tag);
   };
-
-  // useEffect(() => {
-  //   // console.log(selectedTagData?.existing_tag, "selectedTagData from modal");
-  //   if (selectedTagData.length) setSelectedTag(selectedTagData?.existing_tag);
-  // }, [selectedTagData]);
-
-  // useEffect(() => {
-  //   console.log("Tags Modal:: useffect modal selectedTag", selectedTag);
-  //   // if (selectedTag.length) onSelect(selectedTag);
-  // }, [selectedTag]);
 
   useEffect(() => {
     if (selectedTagData.length) setSelectedTag(selectedTagData);

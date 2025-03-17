@@ -94,9 +94,7 @@ const HabitFrequencyInput: React.FC<HabitFrequencyInputProp> = ({
 
   // function to handle frequency save
   const handleFrequencySave = (selectedFrequency: any) => {
-    // console.log(selectedFrequency, "selectedFrequency============= ");
     let userDisplayFreq = formatUserDisplay(selectedFrequency);
-    // console.log(userDisplayFreq, "userDisplayFreq output");
     setUserDisplay(userDisplayFreq);
     setFrequency(selectedFrequency);
     setShowFrequencyModal(false);

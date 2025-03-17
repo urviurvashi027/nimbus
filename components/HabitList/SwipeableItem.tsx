@@ -28,9 +28,15 @@ type SwipeableItemProps = {
 const SwipeableItem: React.FC<SwipeableItemProps> = (
   props: SwipeableItemProps
 ) => {
-  console.log(props, "props");
-  const { name, id, last_completed, metric_count, metric_unit, ...rest } =
-    props.item;
+  const {
+    name,
+    id,
+    last_completed,
+    color,
+    metric_count,
+    metric_unit,
+    ...rest
+  } = props.item;
   const { habitItemClick, habitItemDeleted, habitDoneClick } = props;
   const [showHabitActionModal, setshowHabitActionModal] = useState(false);
   const translateY = useSharedValue(0);
@@ -157,7 +163,7 @@ const SwipeableItem: React.FC<SwipeableItemProps> = (
           }}
         >
           <TouchableOpacity onPress={() => habitItemClick(id)}>
-            <View style={styles.itemContainer}>
+            <View style={[styles.itemContainer, { backgroundColor: color }]}>
               {/* <Text style={styles.emoji}>{emoji}</Text> */}
               <View style={styles.textContainer}>
                 <Text style={styles.taskName}>{name}</Text>
@@ -171,7 +177,7 @@ const SwipeableItem: React.FC<SwipeableItemProps> = (
       {last_completed && (
         <View>
           <TouchableOpacity onPress={() => habitItemClick(id)}>
-            <View style={styles.itemContainer}>
+            <View style={[styles.itemContainer, { backgroundColor: color }]}>
               {/* <View style={styles.itemContainer}> */}
               {/* <Text style={styles.emoji}>{emoji}</Text> */}
               <View style={styles.textContainer}>
@@ -243,7 +249,7 @@ const styling = (theme: ThemeKey) =>
     },
     itemContainer: {
       flexDirection: "row",
-      backgroundColor: themeColors[theme].primaryColor,
+      // backgroundColor: themeColors[theme].primaryColor,
       padding: 15,
       borderRadius: 12,
     },

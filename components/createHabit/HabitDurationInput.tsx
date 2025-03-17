@@ -31,7 +31,6 @@ const HabitDurationInput: React.FC<HabitDurationInputProps> = ({
   const styles = styling(theme);
 
   const handleSave = (selectedDuration: any) => {
-    // console.log(allDayEnabled, selection);
     if (selectedDuration.all_day) {
       onSelect({ all_day: true });
     } else {

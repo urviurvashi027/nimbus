@@ -35,7 +35,6 @@ const MedicalTestScreen = () => {
 
   const [currentStep, setCurrentStep] = useState<number | "result">(0);
   const [selectedAnswers, setSelectedAnswers] = useState({});
-  // console.log(testData, "testDAT");
   const [medicalTestDetails, setMediacalTestDetails] = useState<
     medicalTestData | undefined
   >();
@@ -62,12 +61,10 @@ const MedicalTestScreen = () => {
     selectedOption: any
   ) => {
     setSelectedAnswers({ ...selectedAnswers, [questionId]: selectedOption });
-    // console.log(getScore(selectedOption), "getScore(selectedOption) -----");
     setResponses((prev) => ({
       ...prev,
       [questionId]: { category, score: getScore(selectedOption) },
     }));
-    // console.log(calculateScores());
   };
 
   const getScore = (option: ScoreOption): number => scoreMapping[option];
@@ -97,15 +94,12 @@ const MedicalTestScreen = () => {
       );
     }
 
-    console.log(totalScore, "totalScore");
-
     // let categoryPercentages = {};
     let categoryPercentages: Record<string, number> = {};
     for (const category in categoryScores) {
       categoryPercentages[category] =
         totalScore > 0 ? (categoryScores[category] / totalScore) * 100 : 0;
     }
-    console.log(totalScore, categoryScores, categoryPercentages, "totalScore");
     return { totalScore, categoryScores, categoryPercentages };
   };
 
@@ -148,9 +142,9 @@ const MedicalTestScreen = () => {
     return resultData;
   };
 
-  useEffect(() => {
-    console.log(selectedAnswers, "selectedAnswers");
-  }, [selectedAnswers]);
+  // useEffect(() => {
+  //   console.log(selectedAnswers, "selectedAnswers");
+  // }, [selectedAnswers]);
 
   const handleNext = () => {
     if (medicalTestDetails)
@@ -164,12 +158,9 @@ const MedicalTestScreen = () => {
       }
   };
 
-  // console.log(id, "oiu");
-
   const getTestDetails = (id: string | string[]) => {
     const res = testData.find((item, index) => item.id === id);
     setMediacalTestDetails(res);
-    // console.log(res, "res");
     return res;
   };
 

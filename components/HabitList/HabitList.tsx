@@ -48,8 +48,6 @@ const HabitList: React.FC<HabitListProps> = (props) => {
     router.push({ pathname: "/habit/details", params: { id: id } });
   };
 
-  // console.log("is loggong", isLoading);
-
   const deleteBackendCall = async (id: number) => {
     try {
       const result = await deleteHabit(id);
@@ -75,7 +73,6 @@ const HabitList: React.FC<HabitListProps> = (props) => {
   const onHabitMarkDone = async (data: any, id: any) => {
     try {
       const result = await markHabitDone(data, id);
-      console.log(result, "result---------");
       if (result?.success) {
         // refreshData();
         Toast.show({
@@ -96,7 +93,6 @@ const HabitList: React.FC<HabitListProps> = (props) => {
   };
 
   const habitItemDeleted = (id: number) => {
-    console.log(id, "refresh daye habit list");
     deleteBackendCall(id);
   };
 

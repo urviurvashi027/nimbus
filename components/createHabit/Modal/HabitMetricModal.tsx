@@ -136,6 +136,7 @@ const HabitMetricModal: React.FC<HabitMetricModalProps> = ({
           <View style={styles.inputContainer}>
             <FormInput
               style={styles.input}
+              placeholderTextColor={themeColors.basic.mediumGrey}
               placeholder="Enter target value"
               value={target}
               onChangeText={setTarget}

@@ -92,7 +92,6 @@ const HabitReminderModal: React.FC<ReminderAtModalProps> = ({
   };
 
   const handleTimeChange = (selectedDate: any) => {
-    // console.log(selectedDate, "selectedDate");
     if (selectedDate) {
       setReminderAt(selectedDate);
     }

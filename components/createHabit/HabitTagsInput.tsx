@@ -67,23 +67,7 @@ const HabitTagsInput: React.FC<HabitTagsInputProps> = ({ onSelect }) => {
     updatedTags.splice(index, 1);
     // TODO
     setSelectedTag(updatedTags);
-    // setSelectedTag((prev: any) => ({ ...prev, updatedTags }));
   };
-
-  // useEffect(() => {
-  //   console.log(selectedTag, "selectedTag from useEffect");
-  // }, [selectedTag]);
-
-  //   useEffect(() => {
-  //     if (tagsList.length) {
-  //       setSelectedTaskType(habitTypeList[0]);
-  //     }
-  //   }, [habitTypeList]);
-
-  // const handleNewTag = (newTag: string) => {
-  //   const tag = { name: newTag, id: 0 };
-  //   setSelectedTag((prev: any) => ({ ...prev, existing_tag: tag }));
-  // };
 
   const handleOnSelect = (selectedHabitTag: any, newTag?: string) => {
     if (newTag) {
@@ -100,10 +84,6 @@ const HabitTagsInput: React.FC<HabitTagsInputProps> = ({ onSelect }) => {
 
         return [...prevTags, selectedHabitTag]; // Otherwise, add new tag
       });
-      //   if (!selectedTag.includes(tag)) {
-      //     setSelectedTags([...selectedTags, tag]);
-      //   }
-      // setSelectedTag([...selectedTag, selectedHabitTag]);
     }
   };
 
@@ -179,7 +159,3 @@ const HabitTagsInput: React.FC<HabitTagsInputProps> = ({ onSelect }) => {
 };
 
 export default HabitTagsInput;
-
-// Bug List
-// bug unselect everything and then select on of the value, it will show all selected
-// add new tag not coming with cross

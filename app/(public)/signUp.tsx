@@ -14,13 +14,16 @@ import { ScreenView, TextInput } from "@/components/Themed";
 import ThemeContext from "@/context/ThemeContext";
 import { useAuth } from "@/context/AuthContext";
 import { ThemeKey } from "@/components/Themed";
+import Toast from "react-native-toast-message";
 
 export default function signUp() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [fullName, setfullName] = useState<string>("");
   const [username, setUsername] = useState<string>("");
-  const [visible, setVisible] = useState(false);
+
+  // Custom regex for email validation.
+  const emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
 
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
   const styles = styling(theme);
@@ -46,24 +49,36 @@ export default function signUp() {
   }, [navigation]);
 
   const onCreateAccount = () => {
-    if (!email && !password && !fullName && !username) {
-      if (Platform.OS != "android") {
-        setVisible(true);
-      } else {
-        ToastAndroid.show(
-          "Please enter all the required fields",
-          ToastAndroid.BOTTOM
-        );
+    if (!email || !password || !fullName || !username) {
+      Toast.show({
+        type: "error",
+        text1: "Please fill the required field",
+        position: "bottom",
+      });
+    } else {
+      // Validate email on change.
+      if (!emailRegex.test(email)) {
+        Toast.show({
+          type: "error",
+          text1: "Please enter a valid email address.",
+          position: "bottom",
+        });
       }
-      return;
-    }
 
-    onSignUpClick();
+      onSignUpClick();
+    }
   };
 
   const onSignUpClick = async () => {
     const result = await onRegister!(username, fullName, email, password);
-    if (result && result.success) router.replace("/(public)/signIn");
+    if (result && result.success) {
+      Toast.show({
+        type: "success",
+        text1: "Account created successfuly",
+        position: "bottom",
+      });
+      router.replace("/(public)/signIn");
+    }
     if (result && result.error) {
       alert(result.msg);
     }

@@ -21,11 +21,17 @@ export default {
     tabIconSelected: tintColorLight,
   },
   dark: {
-    text: "#fffdf7",
-    background: "#2f2f2f",
-    tint: tintColorDark,
+    text: "#2f2f2f",
+    background: "#fffdf7",
+    tint: tintColorLight,
     tabIconDefault: "#5f5f5f",
-    tabIconSelected: tintColorDark,
+    tabIconSelected: tintColorLight,
+
+    // text: "#fffdf7",
+    // background: "#2f2f2f",
+    // tint: tintColorDark,
+    // tabIconDefault: "#5f5f5f",
+    // tabIconSelected: tintColorDark,
   },
 };
 
@@ -53,6 +59,8 @@ export const themeColors: ThemeColors = {
     activeColor: "#f5bcdd",
     deactiveColor: "#f6f8fc",
     boxActiveColor: "#f5bcdd",
+
+    // done:#32B744
   },
   light: {
     primaryColor: "#f5bcdd",
@@ -69,15 +77,40 @@ export const themeColors: ThemeColors = {
   },
   dark: {
     primaryColor: "#f5bcdd",
-    text: "#fffdf7",
-    inputLabel: "#f6f8fc",
-    background: "#2f2f2f",
+    text: "#2f2f2f",
+    background: "#fffdf7",
     tint: "#f5bcdd",
-    divider: "#727275",
-    inpurBorderColor: "#5f5f5f",
+    inpurBorderColor: "#d7d9de",
     tabIconDefault: "#5f5f5f",
-    boxShadowColor: "#f5f5f5",
     tabIconSelected: "#f5bcdd",
+    boxShadowColor: "#c6c2c2",
+    inputLabel: "#f6f8fc",
+    divider: "#e6e7eb",
     ...commonColor,
+
+    // dark theme color combination
+    // primaryColor: "#f5bcdd",
+    // text: "#fffdf7",
+    // inputLabel: "#f6f8fc",
+    // background: "#2f2f2f",
+    // tint: "#f5bcdd",
+    // divider: "#727275",
+    // inpurBorderColor: "#5f5f5f",
+    // tabIconDefault: "#5f5f5f",
+    // boxShadowColor: "#f5f5f5",
+    // tabIconSelected: "#f5bcdd",
+    // ...commonColor,
   },
+};
+
+const colors = {
+  placeholder: "",
+  label: "",
+  active: "",
+  deactive: "",
+  lable: "",
+  inputBorder: "",
+  btnBorder: "",
+  text: "",
+  itemDivider: "",
 };

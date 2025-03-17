@@ -35,7 +35,6 @@ const HabitMetricInput: React.FC<HabitMetricInputProp> = ({
 
   // function to handle metric
   const handleHabitMetricSave = (value: MetricFormat) => {
-    // console.log(value, "metric value selected");
     const res = {
       count: value.count,
       label: value.label,
@@ -54,9 +53,7 @@ const HabitMetricInput: React.FC<HabitMetricInputProp> = ({
   const getHabitUniLtist = async () => {
     try {
       const result = await getHabitUnitData();
-      // console.log(result, "result");
       if (result?.success) {
-        // console.log(result.data, "result.data");
         setTaglist(result.data);
       }
     } catch (error: any) {
@@ -65,7 +62,6 @@ const HabitMetricInput: React.FC<HabitMetricInputProp> = ({
   };
 
   useEffect(() => {
-    // console.log("i am called");
     getHabitUniLtist();
   }, []);
 

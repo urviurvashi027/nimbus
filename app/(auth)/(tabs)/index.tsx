@@ -70,10 +70,12 @@ export default function TabOneScreen() {
 const styling = (theme: ThemeKey) =>
   StyleSheet.create({
     gestureContainer: {
+      backgroundColor: themeColors[theme].background,
       flex: 1, // Ensures full screen coverage
     },
     datePanel: {},
     taskListContainer: {
+      backgroundColor: themeColors[theme].background,
       flex: 12, // Takes up the remaining space
       marginTop: 40, // 10px space between FlatList and TaskList
     },
@@ -103,3 +105,9 @@ const styling = (theme: ThemeKey) =>
       backgroundColor: themeColors[theme].background,
     },
   });
+
+// FFEDFA;
+// B4EBE6;
+// F8ED8C;
+// C1CFA1;
+// B7B1F2;

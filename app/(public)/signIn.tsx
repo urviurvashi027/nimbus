@@ -1,9 +1,15 @@
 import React, { useContext, useEffect, useState } from "react";
-import { StyleSheet, useColorScheme } from "react-native";
+import {
+  StyleSheet,
+  View,
+  useColorScheme,
+  Text,
+  TouchableOpacity,
+} from "react-native";
 import { Alert } from "react-native";
 import { router, useNavigation } from "expo-router";
 
-import { View, TextInput, ScreenView } from "@/components/Themed";
+import { TextInput, ScreenView } from "@/components/Themed";
 import { useAuth } from "@/context/AuthContext";
 import { themeColors } from "@/constant/Colors";
 import ThemeContext from "@/context/ThemeContext";
@@ -24,15 +30,12 @@ export default function signIn() {
     navigation.setOptions({
       headerShown: true,
       headerTransparent: true,
-      headerTitle: "Sign In",
       headerBackButtonDisplayMode: "minimal",
-      headerTitleAlign: "center",
       headerTintColor: styles.header.color,
       headerTitleStyle: {
         fontSize: 18,
         color: styles.header,
         paddingTop: 5,
-        height: 40,
       },
     });
   }, [navigation]);
@@ -57,14 +60,16 @@ export default function signIn() {
   };
 
   return (
-    <ScreenView>
+    <ScreenView style={styles.container}>
+      <View style={styles.titleContainer}>
+        <Text style={styles.title}>Sign In</Text>
+      </View>
       <View
         style={{
-          paddingTop: 70,
           marginTop: 30,
+          backgroundColor: themeColors.basic.primaryColor,
         }}
       >
-        {/* <Text style={styles.inputLabel}>Usernames</Text> */}
         <TextInput
           placeholder="Username"
           placeholderTextColor="#cfcac9"
@@ -75,9 +80,9 @@ export default function signIn() {
       <View
         style={{
           marginTop: 30,
+          backgroundColor: themeColors.basic.primaryColor,
         }}
       >
-        {/* <Text style={styles.inputLabel}>Password</Text> */}
         <TextInput
           placeholderTextColor="#cfcac9"
           placeholder="Password"
@@ -88,7 +93,7 @@ export default function signIn() {
       </View>
       <Button
         style={styles.btn}
-        textStyle={styles.btnText}
+        textStyle={styles.signBtnText}
         title="Log in"
         onPress={() => _login(username, password)}
       />
@@ -98,22 +103,70 @@ export default function signIn() {
 
 const styling = (theme: ThemeKey) =>
   StyleSheet.create({
-    container: {
-      marginTop: 60,
-    },
-    header: {
-      color: themeColors[theme]?.text,
-    },
     btn: {
-      marginTop: 60,
-      backgroundColor: themeColors[theme]?.primaryColor,
-      padding: 20,
-      alignItems: "center",
-      borderRadius: 10,
+      padding: 15,
+      borderRadius: 15,
+      backgroundColor: themeColors[theme].backgroundColor,
+      borderColor: themeColors[theme].primaryColor,
+      marginTop: 20,
+      borderWidth: 1,
+      // marginTop: 60,
+      // backgroundColor: themeColors[theme]?.primaryColor,
+      // padding: 20,
+      // alignItems: "center",
+      // borderRadius: 10,
     },
     btnText: {
       color: themeColors[theme]?.text,
       fontWeight: 800,
       fontSize: 18,
+    },
+    container: {
+      paddingTop: 95,
+    },
+    titleContainer: {
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    input: {
+      padding: 15,
+      borderWidth: 1,
+      borderRadius: 15,
+    },
+    header: {
+      color: themeColors[theme]?.text,
+    },
+    createButton: {
+      padding: 15,
+      borderRadius: 15,
+      backgroundColor: themeColors[theme].primaryColor,
+      marginTop: 50,
+    },
+    signInButton: {
+      padding: 15,
+      borderRadius: 15,
+      backgroundColor: themeColors[theme].backgroundColor,
+      borderColor: themeColors[theme].primaryColor,
+      marginTop: 20,
+      borderWidth: 1,
+    },
+    createBtnText: {
+      color: themeColors[theme].text,
+      textAlign: "center",
+      fontSize: 17,
+    },
+    signBtnText: {
+      color: themeColors[theme].primaryColor,
+      textAlign: "center",
+      fontSize: 17,
+    },
+    inputLabel: {
+      color: themeColors[theme].text,
+      marginBottom: 10,
+    },
+    placeholderColor: {},
+    title: {
+      color: themeColors[theme].text,
+      fontSize: 25,
     },
   });
