@@ -13,8 +13,6 @@ interface ResultScreenProps {
 }
 
 const ResultScreen: React.FC<ResultScreenProps> = ({ data }) => {
-  console.log(data, "data Result");
-
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
 
   const styles = styling(theme);

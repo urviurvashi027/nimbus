@@ -35,7 +35,6 @@ const QuestionScreen = ({
   }, [navigation]);
 
   const onOptionSelect = (option: any) => {
-    console.log(option, questionData.id, "option selected");
     setSelectedOption(option);
     onAnswerSelect(questionData.id, questionData.category, option);
   };

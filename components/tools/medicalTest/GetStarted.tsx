@@ -19,7 +19,6 @@ const StartScreen: React.FC<StartScreenProps> = ({
   onStart,
   medicalTestData,
 }) => {
-  // console.log(testData, "testDAT");
   const [medicalTestDetails, setMediacalTestDetails] = useState<
     medicalTestData | undefined
   >();
@@ -29,18 +28,13 @@ const StartScreen: React.FC<StartScreenProps> = ({
 
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
 
-  // console.log(medicalTestData, "medicalTestData");
-
   const styles = styling(theme);
 
   // const getTestDetails = (id: string | string[]) => {
   //   const res = testData.find((item, index) => item.id === id);
   //   setMediacalTestDetails(res);
-  //   console.log(res, "res");
   //   return res;
   // };
-
-  // console.log(id, "oiu");
 
   // useEffect(() => {
   //   if (id) {
