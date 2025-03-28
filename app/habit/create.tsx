@@ -12,6 +12,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
+import EmojiPicker, { type EmojiType } from "rn-emoji-keyboard";
 
 import HabitContext from "@/context/HabitContext";
 import { Button, FormInput, ScreenView } from "@/components/Themed";
@@ -39,6 +40,7 @@ import SubtaskInput from "@/components/createHabit/HabitSubTaskInput";
 import SuccessModal from "@/components/common/SuccessScreen";
 import Toast from "react-native-toast-message";
 import ActivityIndicatorModal from "@/components/common/ActivityIndicatorModal";
+import EmojiInput from "@/components/createHabit/EmojiSelector";
 
 export default function HabitBasic() {
   // form state
@@ -66,6 +68,8 @@ export default function HabitBasic() {
   // navigation setting
   const navigation = useNavigation();
 
+  const [isOpen, setIsOpen] = React.useState<boolean>(false);
+
   useEffect(() => {
     navigation.setOptions({
       headerShown: true,
@@ -73,10 +77,10 @@ export default function HabitBasic() {
       headerTitle: "Habit Basic Details",
       headerBackButtonDisplayMode: "minimal",
       headerTitleAlign: "center",
-      headerTintColor: styles.header.color,
+      // headerTintColor: styles.header.color,
       headerTitleStyle: {
         fontSize: 18,
-        color: styles.header,
+        color: styles.header.color,
         paddingTop: 5,
         height: 40,
       },
@@ -196,8 +200,9 @@ export default function HabitBasic() {
       const result = await createHabit(data);
 
       if (result?.success) {
-        setIsLoading(false);
         setIsSuccess(true);
+        setIsLoading(false);
+
         resetData();
         // router.replace("/(auth)/(tabs)"); // Navigate on success
       }
@@ -221,52 +226,28 @@ export default function HabitBasic() {
     createHabitData();
   };
 
-  // const CustomInput = ({
-  //   label,
-  //   value,
-  //   onChangeText,
-  // }: {
-  //   label: string;
-  //   value: string;
-  //   onChangeText: (text: string) => void;
-  // }) => {
-  //   const [name, setName] = useState(""); // ✅ Define state for input value
-  //   return (
-  //     <View style={styles.customContainer}>
-  //       <Text style={styles.customLabel}>{label}</Text>
-  //       <TextInput
-  //         style={styles.customInput}
-  //         value={name} // ✅ Controlled input
-  //         onChangeText={setName} // ✅ Updates state correctly
-  //         placeholder="Enter Name"
-  //         placeholderTextColor="#999"
-  //       />
-  //     </View>
-  //   );
-  // };
-
   return (
     <>
-      {/* {isLoading ? (
-            <View style={styles.loaderContainer}>
-              <ActivityIndicator size="large" color="blue" />
-            </View>
-          ) : ( */}
-      <GestureHandlerRootView style={styles.gestureContainer}>
+      <GestureHandlerRootView
+        style={[
+          styles.gestureContainer,
+          { backgroundColor: colorSchema || themeColors[theme].background },
+        ]}
+      >
         <SafeAreaView style={styles.gestureContainer}>
           <ScrollView>
             <ScreenView
+              bgColor={colorSchema}
               style={{
                 paddingTop: Platform.OS === "ios" ? 20 : 10,
               }}
             >
-              {/* <View style={{ backgroundColor: "#dfd9f9" }}> */}
+              <EmojiInput />
               <View>
-                <Text style={styles.label}>Habit Name</Text>
-                <FormInput
+                <TextInput
                   style={styles.input}
                   placeholderTextColor={themeColors.basic.mediumGrey}
-                  placeholder="Enter habit name"
+                  placeholder="Enter Habit name"
                   value={name}
                   onChangeText={setName}
                 />
@@ -302,7 +283,6 @@ export default function HabitBasic() {
                 <HabitTypeInput onSelect={handleHabitTypeSelect} />
 
                 <HabitMetricInput onSelect={handleMetricSelect} />
-                {/* <HabitFrequencyInput onSelect={handleFrequencySelect} /> */}
                 <HabitDurationInput onSelect={handleDurationSelect} />
                 <HabitDateInput onSelect={handleHabitStartDate} />
                 <HabitReminderInput
@@ -341,7 +321,6 @@ const styling = (theme: ThemeKey) =>
   StyleSheet.create({
     gestureContainer: {
       flex: 1,
-      backgroundColor: themeColors[theme].background,
     },
     header: {
       color: themeColors[theme]?.text,
@@ -362,12 +341,17 @@ const styling = (theme: ThemeKey) =>
       fontSize: 18,
     },
     input: {
-      borderWidth: 1,
-      borderColor: "#ccc",
+      textAlign: "center",
+      width: "80%",
+      alignSelf: "center",
+      // borderWidth: 1,
+      borderBottomColor: themeColors[theme].inpurBorderColor,
+      borderBottomWidth: 1,
+      // borderColor: "#ccc",
       borderRadius: 5,
       padding: 10,
       fontSize: 16,
-      color: "#333",
+      // color: "#333",
     },
     label: {
       fontSize: 16,

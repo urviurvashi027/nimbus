@@ -48,7 +48,7 @@ export const themeColors: ThemeColors = {
     primaryColor: "#fffdf7",
     secondaryColor: "#f5bcdd",
     tertiaryColor: "#dfd9f9",
-    success: "#b6c682",
+    success: "#32B744",
     danger: "#fa8578",
     warning: "#f5d96e",
     lightGrey: "#f6f8fc",

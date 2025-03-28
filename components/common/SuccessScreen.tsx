@@ -31,15 +31,6 @@ const SuccessModal = ({
     <Modal visible={visible} transparent animationType="slide">
       <View style={styles.modalOverlay}>
         <View style={styles.modalContainer}>
-          <View style={{ flexDirection: "row" }}>
-            <TouchableOpacity
-              onPress={onClose}
-              style={{ alignItems: "flex-end", justifyContent: "flex-end" }}
-            >
-              <Ionicons name="close" size={24} color="red" />
-            </TouchableOpacity>
-          </View>
-
           {/* Loading */}
           {isLoading && (
             <>
@@ -53,19 +44,21 @@ const SuccessModal = ({
           {/* Success Message */}
           {!isLoading && isSuccess && (
             <>
-              {/* Success GIF */}
-              <Image
-                source={require("../../assets/images/success.gif")} // Replace with your GIF file
-                style={styles.gif}
-              />
-              <Text style={styles.successText}>
-                Habit Created Successfully!!
-              </Text>
+              <View style={styles.successView}>
+                {/* Success GIF */}
+                <Image
+                  source={require("../../assets/images/success.jpg")} // Replace with your GIF file
+                  style={styles.gif}
+                />
+                <Text style={styles.successText}>
+                  Habit Created Successfully!!
+                </Text>
 
-              {/* Continue Button */}
-              <TouchableOpacity style={styles.button} onPress={onClose}>
-                <Text style={styles.buttonText}>Continue</Text>
-              </TouchableOpacity>
+                {/* Continue Button */}
+                <TouchableOpacity style={styles.button} onPress={onClose}>
+                  <Text style={styles.buttonText}>Continue</Text>
+                </TouchableOpacity>
+              </View>
             </>
           )}
 
@@ -100,6 +93,10 @@ const styling = (theme: ThemeKey) =>
       borderRadius: 10,
       alignItems: "center",
     },
+    successView: {
+      padding: 30,
+      alignItems: "center",
+    },
     loaderContainer: {
       backgroundColor: "white",
       padding: 20,
@@ -110,11 +107,12 @@ const styling = (theme: ThemeKey) =>
       marginTop: 10,
       fontSize: 16,
       fontWeight: "bold",
-      color: "#333",
+      color: themeColors[theme].text,
     },
     gif: {
       width: 150,
       height: 150,
+      marginBottom: 15,
       resizeMode: "contain",
     },
     successText: {
@@ -126,14 +124,14 @@ const styling = (theme: ThemeKey) =>
     },
     button: {
       marginTop: 20,
-      backgroundColor: themeColors.basic.success,
-      // color: themeColors.basic.success,
+      borderWidth: 2,
+      borderColor: themeColors.basic.success,
       paddingVertical: 12,
       paddingHorizontal: 30,
       borderRadius: 25,
     },
     buttonText: {
-      color: themeColors.basic.primaryColor,
+      color: themeColors.basic.success,
       fontSize: 16,
       fontWeight: "bold",
     },

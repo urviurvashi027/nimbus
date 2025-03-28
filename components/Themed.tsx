@@ -34,7 +34,7 @@ export function useThemeColor(
 ) {
   const theme = useColorScheme() ?? "light";
   const colorFromProps = props[theme];
-
+  console.log(colorFromProps, colorName, theme);
   if (colorFromProps) {
     return colorFromProps;
   } else {
@@ -94,18 +94,18 @@ const btnStyling = (theme: ThemeKey) => StyleSheet.create({});
 
 export function LargeButton() {}
 
-export function ScreenView(props: ViewProps) {
-  const { style, ...otherProps } = props;
+export function ScreenView(props: ViewProps & { bgColor?: string }) {
+  const { style, bgColor, ...otherProps } = props;
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
-  const styles = screenViewStyling(theme);
-
+  const styles = screenViewStyling(theme, bgColor);
   return <DefaultView style={[style, styles.container]} {...otherProps} />;
 }
 
-const screenViewStyling = (theme: ThemeKey) =>
+const screenViewStyling = (theme: ThemeKey, bgColor?: string) =>
   StyleSheet.create({
     container: {
-      backgroundColor: themeColors[theme].background,
+      backgroundColor: bgColor || themeColors[theme].background,
+      // backgroundColor: themeColors[theme].background,
       padding: 15,
       height: "100%",
       // paddingTop: Platform.OS === "ios" ? 50 : 20,
