@@ -17,6 +17,7 @@ import { themeColors } from "@/constant/Colors";
 const QuestionScreen = ({
   questionData,
   totalSteps,
+  color,
   currentStep,
   onAnswerSelect,
   onNext,
@@ -26,7 +27,7 @@ const QuestionScreen = ({
 
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
 
-  const styles = styling(theme);
+  const styles = styling(theme, color);
 
   useEffect(() => {
     navigation.setOptions({
@@ -40,32 +41,46 @@ const QuestionScreen = ({
   };
 
   const onNextClick = () => {
-    setSelectedOption(null);
-    onNext();
+    if (selectedOption) {
+      setSelectedOption(null);
+      onNext();
+    }
   };
 
   return (
     <View style={styles.questionContainer}>
       {/* Top Bar */}
-      <View style={styles.topBar}>
+
+      <TouchableOpacity style={styles.backButton}>
+        <Ionicons
+          name="arrow-back"
+          size={24}
+          color={themeColors.basic.primaryColor}
+          onPress={() => navigation.goBack()}
+        />
+      </TouchableOpacity>
+      {/* <View style={styles.topBar}>
         <TouchableOpacity onPress={() => router.back()}>
           <Text style={styles.backText}>←</Text>
         </TouchableOpacity>
         <Text style={styles.closeText}>Close</Text>
+      </View> */}
+
+      <View style={styles.questionProgress}>
+        {/* Question Progress */}
+        <Text style={styles.questionNumber}>
+          Question {currentStep}/{totalSteps}
+        </Text>
+        <ProgressBar
+          progress={currentStep / totalSteps}
+          color={themeColors.basic.primaryColor}
+          style={styles.progressBar}
+        />
       </View>
 
-      {/* Question Progress */}
-      <Text style={styles.questionNumber}>
-        Question {currentStep}/{totalSteps}
-      </Text>
-      <ProgressBar
-        progress={currentStep / totalSteps}
-        color={themeColors.basic.secondaryColor}
-        style={styles.progressBar}
-      />
-
       {/* Question */}
-      <View>
+      <View style={styles.questionDetails}>
+        <Text style={styles.selectAnswerText}>Select an answer</Text>
         <Text style={styles.questionText}>{questionData.question}</Text>
 
         {/* /end/ */}
@@ -135,20 +150,41 @@ const QuestionScreen = ({
 
 export default QuestionScreen;
 
-const styling = (theme: ThemeKey) =>
+const styling = (theme: ThemeKey, color: string) =>
   StyleSheet.create({
     /** Result Screen **/
     questionContainer: {
       flex: 1,
-      padding: 16,
+      paddingVertical: 16,
+      minHeight: 120,
       // backgroundColor: themeColors.basic.primaryColor,
+    },
+    questionDetails: {
+      padding: 20,
+      paddingBottom: 60,
+      borderRadius: 20,
+      backgroundColor: themeColors.basic.primaryColor,
+    },
+    selectAnswerText: {
+      color: themeColors.basic.lightGrey,
+      fontSize: 13,
+      paddingBottom: 5,
     },
     questionNumber: {
       fontSize: 16,
-      color: themeColors[theme].text,
-      marginBottom: 5,
+      color: themeColors.basic.primaryColor,
+      marginBottom: 10,
     },
-    progressBar: { height: 6, borderRadius: 5, marginBottom: 20 },
+    questionProgress: {
+      paddingVertical: 45,
+    },
+    progressBar: {
+      height: 6,
+      borderRadius: 5,
+      marginBottom: 20,
+      // opacity: 0.1,
+      backgroundColor: color,
+    },
     //new
     topBar: {
       flexDirection: "row",
@@ -158,7 +194,7 @@ const styling = (theme: ThemeKey) =>
     },
     backText: {
       fontSize: 24,
-      color: themeColors[theme].text,
+      color: themeColors.basic.primaryColor,
     },
     closeText: {
       fontSize: 16,
@@ -174,9 +210,10 @@ const styling = (theme: ThemeKey) =>
     },
     //end
 
-    backButton: { position: "absolute", top: 50, left: 20 },
+    backButton: { position: "absolute", top: 10, left: 0 },
     questionText: {
       fontSize: 20,
+      minHeight: 70,
       fontWeight: "bold",
       color: themeColors[theme].text,
       marginBottom: 20,
@@ -189,24 +226,30 @@ const styling = (theme: ThemeKey) =>
     },
     optionButton: {
       // themeColors.basic.secondaryColor
-      backgroundColor: themeColors.basic.secondaryColor,
+      backgroundColor: themeColors.basic.primaryColor,
       padding: 15,
+      borderWidth: 1,
+      borderColor: themeColors.basic.lightGrey,
       borderRadius: 30,
       marginBottom: 10,
       alignItems: "center",
     },
     optionText: {
       fontSize: 16,
-      fontWeight: "bold",
+      // fontWeight: "bold",
       color: themeColors[theme].text,
       // backgroundColor: themeColors[theme].text,
     },
     nextButton: {
-      backgroundColor: "#A2CADE",
+      backgroundColor: color,
       padding: 15,
       borderRadius: 30,
       alignItems: "center",
       marginTop: 20,
     },
-    nextButtonText: { fontSize: 18, fontWeight: "bold" },
+    nextButtonText: {
+      fontSize: 18,
+      fontWeight: "bold",
+      color: themeColors.basic.primaryColor,
+    },
   });

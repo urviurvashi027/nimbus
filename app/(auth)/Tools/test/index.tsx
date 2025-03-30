@@ -137,7 +137,7 @@ const styling = (theme: ThemeKey) =>
       paddingHorizontal: 16,
     },
     backButton: {
-      marginTop: 50,
+      marginTop: 40,
       marginBottom: 10,
     },
     header: {
@@ -169,8 +169,8 @@ const styling = (theme: ThemeKey) =>
     listItem: {
       flexDirection: "row",
       alignItems: "center",
-      paddingVertical: 12,
-      borderBottomWidth: 3,
+      // paddingVertical: 12,
+      borderBottomWidth: 1,
       borderBottomColor: themeColors[theme].divider,
     },
     listImage: {

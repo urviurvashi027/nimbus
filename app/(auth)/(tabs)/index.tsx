@@ -52,13 +52,19 @@ export default function TabOneScreen() {
         {/* Date Panel View */}
         <DatePanel onDateChange={onDateChange} />
 
-        <View style={styles.taskListContainer}>
-          <HabitList
-            data={habitList}
-            style={styles.itemSeparator}
-            refreshData={refreshData}
-          />
-        </View>
+        {habitList.length > 0 ? (
+          <View style={styles.taskListContainer}>
+            <HabitList
+              data={habitList}
+              style={styles.itemSeparator}
+              refreshData={refreshData}
+            />
+          </View>
+        ) : (
+          <View style={styles.taskListContainer}>
+            <Text>Create your first habit by click on add button.</Text>
+          </View>
+        )}
       </GestureHandlerRootView>
       <TouchableOpacity style={styles.floatingButton} onPress={onCreateClick}>
         <Ionicons name="add" size={24} color={styles.iconColor.color} />

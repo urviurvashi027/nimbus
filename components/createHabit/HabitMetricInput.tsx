@@ -65,9 +65,9 @@ const HabitMetricInput: React.FC<HabitMetricInputProp> = ({
     getHabitUniLtist();
   }, []);
 
-  useEffect(() => {
-    console.log(showHabitMetricModal, "showHabitMetricModal");
-  }, [showHabitMetricModal]);
+  // useEffect(() => {
+  //   console.log(showHabitMetricModal, "showHabitMetricModal");
+  // }, [showHabitMetricModal]);
 
   useEffect(() => {
     if (isEditMode) {

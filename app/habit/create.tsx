@@ -247,7 +247,7 @@ export default function HabitBasic() {
                 <TextInput
                   style={styles.input}
                   placeholderTextColor={themeColors.basic.mediumGrey}
-                  placeholder="Enter Habit name"
+                  placeholder="Enter Habitt name"
                   value={name}
                   onChangeText={setName}
                 />

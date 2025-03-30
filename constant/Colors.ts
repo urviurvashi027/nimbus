@@ -51,7 +51,7 @@ export const themeColors: ThemeColors = {
     success: "#32B744",
     danger: "#fa8578",
     warning: "#f5d96e",
-    lightGrey: "#f6f8fc",
+    lightGrey: "#C0C0C0",
     mediumGrey: "#5f5f5f",
     darkGrey: "#2f2f2f",
     commonWhite: "#FFFFFF",

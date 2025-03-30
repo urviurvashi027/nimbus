@@ -1,5 +1,5 @@
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { PieChart } from "react-native-chart-kit";
 
 import testData from "@/constant/data/medicalTest";
@@ -7,6 +7,7 @@ import { router } from "expo-router";
 import { themeColors } from "@/constant/Colors";
 import { ThemeKey } from "@/components/Themed";
 import ThemeContext from "@/context/ThemeContext";
+import AnalyzingResult from "./AnalyzingResult";
 
 interface ResultScreenProps {
   data: any;
@@ -14,8 +15,50 @@ interface ResultScreenProps {
 
 const ResultScreen: React.FC<ResultScreenProps> = ({ data }) => {
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const [loading, setLoading] = useState(true);
+  const [resultData, setResultData] = useState<any>(null);
 
   const styles = styling(theme);
+
+  useEffect(() => {
+    if (false) {
+      // -------------------
+      // ✅ API Scenario
+      // -------------------
+      fetch("https://your-api-endpoint.com/assessment-result")
+        .then((res) => res.json())
+        .then((data) => {
+          setResultData(data);
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.error("API Error:", err);
+          setLoading(false);
+        });
+    } else {
+      // -------------------
+      // ✅ Mock Scenario
+      // -------------------
+      setTimeout(() => {
+        setResultData({
+          score: 73,
+          details: [
+            "Emotional and Psychological Patterns analyzed.",
+            "Social Support and Relationships analyzed.",
+            "Identity and Self-esteem Impact analyzed.",
+          ],
+        });
+        setLoading(false);
+      }, 2000); // simulate 2 seconds
+    }
+  }, []);
+
+  // -------------------
+  // ✅ Conditional Rendering
+  // -------------------
+  if (loading) {
+    return <AnalyzingResult data={data} />;
+  }
 
   return (
     <View style={styles.resultContainer}>

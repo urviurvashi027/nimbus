@@ -89,7 +89,7 @@ const HabitMetricModal: React.FC<HabitMetricModalProps> = ({
 
   useEffect(() => {
     setUnit(habitUnitList);
-    console.log(habitUnitList, units);
+    // console.log(habitUnitList, units);
   }, [habitUnitList]);
 
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);

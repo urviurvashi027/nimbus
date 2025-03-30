@@ -19,6 +19,7 @@ import ThemeContext from "@/context/ThemeContext";
 import { ScreenView, ThemeKey } from "@/components/Themed";
 
 import testData, { medicalTestData } from "@/constant/data/medicalTest";
+import TestResult from "@/components/tools/medicalTest/TestResult";
 
 type ScoreOption = "Never" | "Rarely" | "Sometimes" | "Often" | "VeryOften";
 // Score mapping
@@ -68,6 +69,10 @@ const MedicalTestScreen = () => {
   };
 
   const getScore = (option: ScoreOption): number => scoreMapping[option];
+
+  useEffect(() => {
+    console.log(responses, "responses from useEffect");
+  }, [responses]);
   // const getScore = () => {
 
   // }
@@ -95,11 +100,21 @@ const MedicalTestScreen = () => {
     }
 
     // let categoryPercentages = {};
-    let categoryPercentages: Record<string, number> = {};
+    let categoryPercentages: any = {};
     for (const category in categoryScores) {
+      // (categoryPercentages["label"] = category),
+      //   (categoryPercentages["value"] =
+      //     totalScore > 0 ? (categoryScores[category] / totalScore) * 100 : 0);
+      // { label: "Household dysfunction", value: "0%" },
       categoryPercentages[category] =
         totalScore > 0 ? (categoryScores[category] / totalScore) * 100 : 0;
     }
+
+    console.log(
+      { totalScore, categoryScores, categoryPercentages },
+      "percentage result"
+    );
+
     return { totalScore, categoryScores, categoryPercentages };
   };
 
@@ -126,19 +141,49 @@ const MedicalTestScreen = () => {
       return chartEntry;
     });
   };
+
+  const formattedScores = (data: any) => [
+    ...Object.entries(data.categoryPercentages).map(([key, value]) => ({
+      label: capitalizeFirstLetter(key),
+      score: Math.ceil(value as number),
+    })),
+    { label: "Total Score", score: data.totalScore },
+  ];
+
+  // Utility to capitalize
+  function capitalizeFirstLetter(str: string) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
   const getResultData = () => {
     const scoreResult = calculateScores();
     // Normalize scores to percentages
     const chartDetails = generateChartData(scoreResult.categoryPercentages);
-
+    console.log(formattedScores(scoreResult));
     const resultData = {
-      title: medicalTestDetails?.title,
-      description: medicalTestDetails?.description,
-      image: medicalTestDetails?.image,
-      scores: scoreResult,
-      chartDetails: chartDetails,
+      title: "Courageous Optimist",
+      quote: "“Life is 10% what happens to us and 90% how we react to it.”",
+      image: "anxietyRelease",
+      // description: medicalTestDetails?.description,
+      description: `It appears from your responses that you have demonstrated a high level of resilience despite the difficult moments in your early years.
+It may be helpful to acknowledge both the strength gained from overcoming challenges as well as any residual effects that might need attention.`,
+      tips: [
+        "Regular Check-ins With a Counselor: Even if you feel mostly okay, it’s good to have someone professional you can talk to when you need it.",
+        "Journaling: Writing about your daily experiences can help you understand and manage your emotions better.",
+        "Peer Support: Engage with friends or groups that share your interests to maintain a sense of connection.",
+        "Skill Development: Activities such as workshops or online courses can help you focus on personal growth and build confidence.",
+      ],
+      result: [
+        { label: "Household dysfunction", value: "0%" },
+        { label: "Neglect", value: "9%" },
+        { label: "Abuse", value: "9%" },
+      ],
+      // image: medicalTestDetails?.image,
+      results: formattedScores(scoreResult),
+      // chartDetails: chartDetails,
       //  scores: nedds to be added
     };
+    console.log(resultData, "resultDataresultData");
     return resultData;
   };
 
@@ -173,6 +218,7 @@ const MedicalTestScreen = () => {
 
   return (
     <ScreenView
+      bgColor={medicalTestDetails?.color}
       style={{
         padding: 0,
         paddingTop: Platform.OS === "ios" ? 50 : 20,
@@ -186,11 +232,14 @@ const MedicalTestScreen = () => {
             medicalTestData={medicalTestDetails}
           />
         ) : currentStep === "result" ? (
-          <ResultScreen data={getResultData()} />
+          <TestResult data={getResultData()} />
         ) : (
+          // <ResultScreen data={getResultData()} />
           <QuestionScreen
             questionData={medicalTestDetails?.questions[currentStep - 1]}
             totalSteps={medicalTestDetails?.questions.length}
+            color={medicalTestDetails?.progressBarBg}
+            // color="blue"
             currentStep={currentStep}
             onAnswerSelect={handleAnswerSelect}
             onNext={handleNext}
@@ -210,6 +259,6 @@ const styling = (theme: ThemeKey) =>
       flex: 1,
       // backgroundColor: "blue",
       // backgroundColor: themeColors[theme].background,
-      paddingHorizontal: 16,
+      // paddingHorizontal: 0,
     },
   });
