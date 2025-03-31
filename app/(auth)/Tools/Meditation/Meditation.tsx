@@ -8,6 +8,7 @@ import {
   StyleSheet,
   ScrollView,
   Platform,
+  Dimensions,
 } from "react-native";
 import { Audio } from "expo-av";
 import { Ionicons } from "@expo/vector-icons";
@@ -15,8 +16,12 @@ import { router, useNavigation } from "expo-router";
 import ThemeContext from "@/context/ThemeContext";
 import { themeColors } from "@/constant/Colors";
 import { ScreenView, ThemeKey } from "@/components/Themed";
+import GuidedMeditationCard from "@/components/tools/meditation/FeaturedCard";
 
 const categories = ["All", "Stress & Anxiety", "Self-Care", "Beginner"];
+
+const { width } = Dimensions.get("window"); // get screen width
+const CARD_WIDTH = width * 0.8; // 80% of screen width
 
 type Meditations = {
   id: string;
@@ -26,9 +31,10 @@ type Meditations = {
   image: any; // Replace with actual image
   source: any; // Replace with actual audio
   category: string;
+  isLocked: boolean;
 };
 
-const meditations = [
+const meditations: Meditations[] = [
   {
     id: "1",
     title: "Accept Yourself",
@@ -36,9 +42,9 @@ const meditations = [
     description:
       "Feeling unconditional love and acceptance towards yourself and the world",
     image: require("../../../../assets/images/meditation/acceptYourself.png"), // Replace with actual image
-    source: require("../../../../assets/audio/soundscape/lightRain.mp3"),
-    // z: require("../../../../assets/images/meditation/acceptYourself.png"),
+    source: require("../../../../assets/audio/meditation.mp3"),
     category: "All",
+    isLocked: false,
   },
   {
     id: "2",
@@ -49,6 +55,7 @@ const meditations = [
     description:
       "Feeling unconditional love and acceptance towards yourself and the world",
     category: "Stress & Anxiety",
+    isLocked: true,
   },
   {
     id: "3",
@@ -57,6 +64,7 @@ const meditations = [
     image: require("../../../../assets/images/meditation/innerStrength.png"), // Replace with actual image
     source: require("../../../../assets/audio/soundscape/lightRain.mp3"),
     category: "Self-Care",
+    isLocked: true,
   },
   {
     id: "4",
@@ -68,6 +76,7 @@ const meditations = [
     image: require("../../../../assets/images/meditation/stress.png"), // Replace with actual image
     source: require("../../../../assets/audio/soundscape/lightRain.mp3"),
     category: "All",
+    isLocked: true,
   },
 ];
 
@@ -78,7 +87,29 @@ const recommendations = [
     duration: "10 min",
     description:
       "Feeling unconditional love and acceptance towards yourself and the world",
-    image: "https://via.placeholder.com/150", // Replace with actual image URL
+    image: require("../../../../assets/images/meditation/stress.png"), // Replace with actual image
+    source: require("../../../../assets/audio/soundscape/lightRain.mp3"),
+    category: "All",
+    isLocked: true,
+    color: {
+      cardColor: "#B5A8D5",
+      descriptionColor: "#7A73D1",
+    },
+  },
+  {
+    id: "3",
+    title: "🧘 Find Inner Strength in 5 minutes.",
+    duration: "5 min",
+    description:
+      "Feeling unconditional love and acceptance towards yourself and the world",
+    image: require("../../../../assets/images/meditation/innerStrength.png"), // Replace with actual image
+    source: require("../../../../assets/audio/soundscape/lightRain.mp3"),
+    category: "Self-Care",
+    isLocked: true,
+    color: {
+      cardColor: "#C1D8C3",
+      descriptionColor: "#6A9C89",
+    },
   },
 ];
 
@@ -109,6 +140,9 @@ const Meditation = () => {
   }, [sound]);
 
   const handlePlayPause = async (track: Meditations) => {
+    if (track.isLocked) {
+      return null;
+    }
     if (currentTrack?.id === track.id) {
       if (isPlaying) {
         await sound?.pauseAsync();
@@ -159,19 +193,23 @@ const Meditation = () => {
 
         {/* new Featured section  */}
         <Text style={styles.heading}>For you</Text>
-        <View style={styles.card}>
-          <Image
-            source={require("../../../../assets/images/reflection.png")}
-            style={styles.image}
+
+        {/* new Featured Card */}
+
+        <View>
+          <FlatList
+            horizontal
+            data={recommendations}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item }) => (
+              <GuidedMeditationCard data={item} onPress={handlePlayPause} />
+            )}
+            showsHorizontalScrollIndicator={false}
+            snapToAlignment="start"
+            snapToInterval={CARD_WIDTH + 10} // card width + margin
+            decelerationRate="fast"
+            contentContainerStyle={{ paddingHorizontal: 0 }}
           />
-          <View style={styles.textContainer}>
-            <Text style={styles.title}>Accept Yourself</Text>
-            <Text style={styles.duration}>10 min</Text>
-            <Text style={styles.description}>
-              Feeling unconditional love and acceptance towards yourself and the
-              world !!
-            </Text>
-          </View>
         </View>
 
         {/* Category Tabs */}
@@ -221,7 +259,17 @@ const Meditation = () => {
                 <Image source={item.image} style={styles.listImage} />
                 <View style={styles.listText}>
                   <Text style={styles.listTitle}>{item.title}</Text>
-                  <Text style={styles.listDuration}>{item.duration}</Text>
+                  <View style={styles.itemDetails}>
+                    <Text style={styles.listDuration}>{item.duration}</Text>
+                    {item.isLocked && (
+                      <Ionicons
+                        name="lock-closed"
+                        size={13}
+                        color={themeColors.basic.mediumGrey}
+                        style={styles.lockIcon}
+                      />
+                    )}
+                  </View>
                 </View>
               </TouchableOpacity>
             )}
@@ -270,22 +318,17 @@ const styling = (theme: ThemeKey) =>
       fontWeight: "bold",
       color: themeColors[theme].text,
     },
+
     subHeader: {
-      fontSize: 16,
-      color: themeColors[theme].text,
+      fontSize: 14,
+      color: themeColors.basic.subheader,
       marginBottom: 20,
     },
     tabsWrapper: { marginBottom: 5 },
-    featuredCard: {
-      backgroundColor: "#EEE",
-      borderRadius: 10,
-      padding: 12,
-      marginBottom: 15,
-    },
     emptyText: {
       textAlign: "center",
       fontSize: 16,
-      color: "#999",
+      color: themeColors.basic.mediumGrey,
       marginTop: 20,
     },
     flatListContainer: { flex: 1 },
@@ -296,19 +339,21 @@ const styling = (theme: ThemeKey) =>
       paddingHorizontal: 5,
       paddingVertical: 5,
     },
+    itemDetails: {
+      flexDirection: "row",
+    },
     tab: {
       marginRight: 15,
       paddingVertical: 5,
       paddingHorizontal: 10,
       height: 60,
     },
-    activeTab: { borderBottomWidth: 2, borderBottomColor: "red" },
     tabText: {
       fontSize: 16,
       color: themeColors.basic.mediumGrey,
     },
     activeTabText: {
-      color: themeColors.basic.secondaryColor,
+      color: themeColors.basic.activeText,
       fontWeight: "bold",
     },
     activeTabIndicator: {
@@ -325,65 +370,44 @@ const styling = (theme: ThemeKey) =>
       borderBottomWidth: 1,
       borderBottomColor: themeColors[theme].divider,
     },
-    listImage: { width: 50, height: 50, borderRadius: 25, marginRight: 12 },
+    listImage: { width: 50, height: 50, borderRadius: 25, marginRight: 20 },
     listText: { flex: 1 },
     listTitle: {
       fontSize: 16,
       fontWeight: "bold",
       color: themeColors[theme].text,
+      marginBottom: 5,
     },
-    listDuration: { fontSize: 14, color: "#777" },
+    lockIcon: {
+      marginLeft: 5,
+      marginTop: 1,
+    },
+    listDuration: { fontSize: 14, color: themeColors.basic.mediumGrey },
     bottomPlayer: {
       position: "absolute",
       bottom: 100,
       left: 0,
       right: 0,
-      backgroundColor: "#333",
+      backgroundColor: themeColors.basic.darkGrey,
       padding: 12,
       flexDirection: "row",
       alignItems: "center",
     },
     playerImage: { width: 50, height: 50, borderRadius: 10 },
     playerText: { flex: 1, marginLeft: 10 },
-    playerTitle: { color: "#fff", fontSize: 16, fontWeight: "bold" },
-    playerDuration: { color: "#ccc", fontSize: 14 },
+    playerTitle: {
+      color: themeColors.basic.primaryColor,
+      fontSize: 16,
+      fontWeight: "bold",
+    },
+    playerDuration: { color: themeColors.basic.lightGrey, fontSize: 14 },
 
     // new
     heading: {
       fontSize: 18,
       color: themeColors[theme].text,
       fontWeight: "bold",
-      marginBottom: 10,
-    },
-    card: {
-      backgroundColor: themeColors.basic.tertiaryColor,
-      borderRadius: 10,
-      padding: 25,
-      marginVertical: 30,
-      flexDirection: "row",
-      alignItems: "center",
-    },
-    image: {
-      width: 80,
-      height: 80,
-      borderRadius: 25,
-      marginRight: 15,
-    },
-    textContainer: {
-      flex: 1,
-    },
-    title: {
-      fontSize: 16,
-      fontWeight: "bold",
-    },
-    duration: {
-      fontSize: 14,
-      color: "gray",
-    },
-    description: {
-      fontSize: 12,
-      color: "gray",
-      marginTop: 5,
+      // marginBottom: 7,
     },
   });
 

@@ -59,7 +59,9 @@ export const themeColors: ThemeColors = {
     activeColor: "#f5bcdd",
     deactiveColor: "#f6f8fc",
     boxActiveColor: "#f5bcdd",
-
+    subheader: "#5f5f5f",
+    deactiveText: "",
+    activeText: "#5f5f5f",
     // done:#32B744
   },
   light: {

@@ -133,7 +133,6 @@ const styling = (theme: ThemeKey) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      // backgroundColor: "#fff",
       paddingHorizontal: 16,
     },
     backButton: {
@@ -146,14 +145,12 @@ const styling = (theme: ThemeKey) =>
       fontWeight: "bold",
     },
     subHeader: {
-      fontSize: 16,
-      color: themeColors[theme].text,
-      // color: "#777",
+      fontSize: 14,
+      color: themeColors.basic.subheader,
       marginBottom: 20,
     },
     tabsContainer: {
       marginBottom: 15,
-      // paddingRight: 5,
     },
     activeTab: {
       borderBottomWidth: 2,
@@ -164,12 +161,10 @@ const styling = (theme: ThemeKey) =>
     activeTabText: {
       fontSize: 18,
       color: themeColors.basic.secondaryColor,
-      // color: "#6C5CE7",
     },
     listItem: {
       flexDirection: "row",
       alignItems: "center",
-      // paddingVertical: 12,
       borderBottomWidth: 1,
       borderBottomColor: themeColors[theme].divider,
     },

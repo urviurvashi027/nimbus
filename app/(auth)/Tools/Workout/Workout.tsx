@@ -10,6 +10,7 @@ import {
   Modal,
   ActivityIndicator,
   Platform,
+  Dimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useVideoPlayer, VideoView } from "expo-video"; // ✅ Import correct expo-video hooks
@@ -18,6 +19,11 @@ import { router, useNavigation } from "expo-router";
 import ThemeContext from "@/context/ThemeContext";
 import { themeColors } from "@/constant/Colors";
 import { ScreenView, ThemeKey } from "@/components/Themed";
+import ForYouCard from "@/components/tools/workout/WorkoutFeaturedCard";
+
+const { width } = Dimensions.get("window");
+const CARD_WIDTH = width * 0.8;
+// const CARD_WIDTH = width - 40; // small peeking effect
 
 const fitnessVideos = {
   forYou: [
@@ -25,9 +31,19 @@ const fitnessVideos = {
       id: "1",
       title: "Quick Chest Workout",
       duration: "10 min",
-      image: "https://your-image-url.com/chest.jpg",
+      image: require("../../../../assets/images/ex/exOne.jpg"),
+      isLocked: false,
       videoUrl:
         "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    },
+    {
+      id: "3",
+      title: "Quick Back Workout",
+      duration: "13 min",
+      image: require("../../../../assets/images/ex/exThree.jpg"),
+      isLocked: true,
+      videoUrl:
+        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
     },
   ],
   all: [
@@ -35,7 +51,8 @@ const fitnessVideos = {
       id: "2",
       title: "Easy Abs Workout for Beginners",
       duration: "10 min",
-      image: "https://your-image-url.com/abs.jpg",
+      image: require("../../../../assets/images/ex/exTwo.jpg"),
+      isLocked: true,
       videoUrl:
         "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
     },
@@ -43,7 +60,8 @@ const fitnessVideos = {
       id: "3",
       title: "Quick Back Workout",
       duration: "13 min",
-      image: "https://your-image-url.com/back.jpg",
+      image: require("../../../../assets/images/ex/exThree.jpg"),
+      isLocked: false,
       videoUrl:
         "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
     },
@@ -53,9 +71,9 @@ const fitnessVideos = {
 const FitnessVideoList = () => {
   const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
   const [currentVideoUrl, setCurrentVideoUrl] = useState(
-    fitnessVideos.forYou[0].videoUrl
+    fitnessVideos.all[1].videoUrl
   );
-  const [isPlaying, setIsPlaying] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -74,15 +92,20 @@ const FitnessVideoList = () => {
   // ✅ Initialize Video Player with first video
   const player = useVideoPlayer(currentVideoUrl, (player) => {
     player.loop = true;
-    player.play();
+    if (isPlaying) player.play();
   });
 
-  const handlePlayVideo = (videoId: string, videoUrl: string) => {
+  const handlePlayVideo = (
+    videoId: string,
+    islocked: boolean,
+    videoUrl: string
+  ) => {
+    if (islocked) return;
+    player.play();
     setPlayingVideoId(videoId);
     setCurrentVideoUrl(videoUrl);
     setIsPlaying(true);
     setLoading(true);
-
     setTimeout(() => {
       setLoading(false);
     }, 1500);
@@ -111,6 +134,16 @@ const FitnessVideoList = () => {
 
   const closeFullscreen = () => {
     setIsFullscreen(false);
+    togglePlayPause();
+  };
+
+  const onFeaturePostClick = (
+    id: string,
+    isLocked: boolean,
+    videoUrl: string
+  ) => {
+    handlePlayVideo(id, isLocked, videoUrl);
+    openFullscreen();
   };
 
   const renderVideoItem = ({ item }: any) => {
@@ -119,7 +152,7 @@ const FitnessVideoList = () => {
     return (
       <TouchableOpacity
         style={styles.videoItem}
-        onPress={() => handlePlayVideo(item.id, item.videoUrl)}
+        onPress={() => handlePlayVideo(item.id, item.isLocked, item.videoUrl)}
       >
         {isPlayingThis ? (
           <TouchableOpacity
@@ -128,7 +161,10 @@ const FitnessVideoList = () => {
           >
             {loading && (
               <View style={styles.loadingOverlay}>
-                <ActivityIndicator size="large" color="#fff" />
+                <ActivityIndicator
+                  size="large"
+                  color={themeColors.basic.commonWhite}
+                />
               </View>
             )}
             <VideoView
@@ -140,7 +176,7 @@ const FitnessVideoList = () => {
           </TouchableOpacity>
         ) : (
           <ImageBackground
-            source={{ uri: item.image }}
+            source={item.image}
             style={styles.videoThumbnail}
             imageStyle={{ borderRadius: 10 }}
           >
@@ -148,14 +184,24 @@ const FitnessVideoList = () => {
               <Ionicons
                 name="play-circle"
                 size={30}
-                color={themeColors[theme].text}
+                color={themeColors.basic.commonWhite}
               />
             </View>
           </ImageBackground>
         )}
         <View style={styles.videoInfo}>
           <Text style={styles.videoTitle}>{item.title}</Text>
-          <Text style={styles.videoDuration}>{item.duration}</Text>
+          <View style={styles.itemDetails}>
+            <Text style={styles.videoDuration}>{item.duration}</Text>
+            {item.isLocked && (
+              <Ionicons
+                name="lock-closed"
+                size={13}
+                color={themeColors.basic.mediumGrey}
+                style={styles.lockIcon}
+              />
+            )}
+          </View>
         </View>
       </TouchableOpacity>
     );
@@ -187,10 +233,16 @@ const FitnessVideoList = () => {
           <Text style={styles.sectionTitle}>For you</Text>
           <FlatList
             data={fitnessVideos.forYou}
-            renderItem={renderVideoItem}
+            renderItem={({ item }) => (
+              <ForYouCard item={item} onPress={onFeaturePostClick} />
+            )}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ paddingHorizontal: 0 }}
+            snapToAlignment="start"
+            snapToInterval={CARD_WIDTH + 16}
+            decelerationRate="fast"
             keyExtractor={(item) => item.id}
             horizontal
-            showsHorizontalScrollIndicator={false}
           />
 
           <Text style={styles.sectionTitle}>All</Text>
@@ -212,7 +264,12 @@ const FitnessVideoList = () => {
                 style={styles.closeButton}
                 onPress={closeFullscreen}
               >
-                <Ionicons name="close" size={30} color="#fff" />
+                <Ionicons
+                  name="close"
+                  size={30}
+                  color={themeColors.basic.commonWhite}
+                  style={{ marginTop: 30, marginRight: 10 }}
+                />
               </TouchableOpacity>
 
               <VideoView
@@ -231,7 +288,7 @@ const FitnessVideoList = () => {
                   <Ionicons
                     name={isPlaying ? "pause" : "play"}
                     size={50}
-                    color="#fff"
+                    color={themeColors.basic.commonWhite}
                   />
                 </TouchableOpacity>
 
@@ -249,7 +306,7 @@ const FitnessVideoList = () => {
 
 const styling = (theme: ThemeKey) =>
   StyleSheet.create({
-    container: { flex: 1, paddingHorizontal: 20 },
+    container: { flex: 1, paddingHorizontal: 16 },
     backButton: {
       marginTop: 50,
       marginBottom: 10,
@@ -257,7 +314,6 @@ const styling = (theme: ThemeKey) =>
     header: {
       fontSize: 26,
       fontWeight: "bold",
-      marginTop: 20,
       color: themeColors[theme].text,
     },
     subHeader: {
@@ -271,22 +327,25 @@ const styling = (theme: ThemeKey) =>
       marginVertical: 10,
       color: themeColors[theme].text,
     },
+    lockIcon: {
+      marginLeft: 5,
+      marginTop: 1,
+    },
+    itemDetails: {
+      flexDirection: "row",
+      marginTop: 4,
+    },
     videoItem: {
       flexDirection: "row",
       alignItems: "center",
       marginBottom: 15,
       width: "100%",
-      // borderBottomWidth: 1,
-      // paddingBottom: 5,
-      // borderBottomColor: themeColors[theme].divider,
     },
     videoThumbnail: {
       width: 120,
       height: 70,
       justifyContent: "center",
       alignItems: "center",
-      // borderBottomWidth: 4,
-      // borderBottomColor: themeColors[theme].divider,
     },
     playButton: {
       backgroundColor: "rgba(0,0,0,0.5)",
@@ -299,8 +358,6 @@ const styling = (theme: ThemeKey) =>
       padding: 20,
       paddingBottom: 10,
       borderBottomWidth: 1,
-
-      // paddingBottom: 5,
       borderBottomColor: themeColors[theme].divider,
     },
     videoTitle: {
@@ -308,7 +365,7 @@ const styling = (theme: ThemeKey) =>
       fontWeight: "bold",
       color: themeColors[theme].text,
     },
-    videoDuration: { fontSize: 14, color: "#777" },
+    videoDuration: { fontSize: 14, color: themeColors.basic.mediumGrey },
     videoContainer: {
       width: 120,
       height: 70,
