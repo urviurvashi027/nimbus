@@ -41,15 +41,6 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="tools"
-        options={{
-          tabBarLabel: "Tools",
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="construct-outline" size={24} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
         name="self-care"
         options={{
           tabBarLabel: "Self Care",
@@ -58,6 +49,16 @@ export default function TabLayout() {
           ),
         }}
       ></Tabs.Screen>
+      <Tabs.Screen
+        name="tools"
+        options={{
+          tabBarLabel: "Tools",
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="construct-outline" size={24} color={color} />
+          ),
+        }}
+      />
+
       <Tabs.Screen
         name="setting"
         options={{

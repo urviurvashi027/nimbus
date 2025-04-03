@@ -29,7 +29,7 @@ const journalData = [
     title: "Reflection",
     description: "Clarify the purpose and meaning of your life.",
     icon: require("../../assets/images/reflection.png"), // Replace with actual image
-    locked: true,
+    locked: false,
     questions: [
       "What is your biggest life lesson?",
       "How have your experiences shaped you?",
@@ -53,7 +53,7 @@ const journalData = [
     title: "When ypu feel Anxious",
     description: "You will have peace and tranquility here",
     icon: require("../../assets/images/anxious.png"), // Replace with actual image
-    locked: false,
+    locked: true,
     questions: [
       "What is your biggest life lesson?",
       "How have your experiences shaped you?",
@@ -65,7 +65,7 @@ const journalData = [
     title: "When you fell Sad",
     description: "Here's candy for you",
     icon: require("../../assets/images/sad.png"), // Replace with actual image
-    locked: false,
+    locked: true,
     questions: [
       "What is your biggest life lesson?",
       "How have your experiences shaped you?",
@@ -101,7 +101,7 @@ const journalData = [
     title: "When work makes you angry",
     description: "Dont let anger control you",
     icon: require("../../assets/images/angry.png"), // Replace with actual image
-    locked: false,
+    locked: true,
     questions: [
       "What is your biggest life lesson?",
       "How have your experiences shaped you?",
@@ -113,7 +113,7 @@ const journalData = [
     title: "You need to communicate",
     description: "Communication is the bridge to building goog relationship",
     icon: require("../../assets/images/communicate.png"), // Replace with actual image
-    locked: false,
+    locked: true,
     questions: [
       "What is your biggest life lesson?",
       "How have your experiences shaped you?",

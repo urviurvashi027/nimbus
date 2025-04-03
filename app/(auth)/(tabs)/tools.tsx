@@ -2,7 +2,6 @@ import {
   View,
   Text,
   Image,
-  useColorScheme,
   TouchableOpacity,
   StyleSheet,
   ScrollView,
@@ -13,32 +12,23 @@ import { router, useNavigation } from "expo-router";
 
 import ThemeContext from "@/context/ThemeContext";
 import { themeColors } from "@/constant/Colors";
-import SleepModal from "../Tools/Sleep/Sleep";
-import WaterIntakeModal from "../Tools/WaterIntake/WaterIntake";
-import ThingsToDoModal from "../Tools/ThingsToDo/ThingsToDo";
+import SleepModal from "../SelfCare/Sleep/Sleep";
+import WaterIntakeModal from "../SelfCare/WaterIntake/WaterIntake";
+import ThingsToDoModal from "../SelfCare/ThingsToDo/ThingsToDo";
 import { ScreenView } from "@/components/Themed";
-import MasterClass from "@/components/tools/VideoListCard";
+// import MasterClass from "@/components/tools/VideoListCard";
 import { ThemeKey } from "@/components/Themed";
-
-// import DrinkIcon from "@/assets/images/Options/drink.png";
-// import ThingToDoIcon from "@/assets/images/Options/things.png";
-// import FitnessIcon from "@/assets/images/Options/Fitness.png";
-// import ReflectionIcon from "@/assets/images/Options/Reflection.png";
-// import SleepIcon from "@/assets/images/Options/Sleep.png";
-// import SoundsScapeIcon from "@/assets/images/Options/SoundsScape.png";
-// import MeditationIcon from "@/assets/images/Options/Meditation.png";
-// import TestIcon from "@/assets/images/Options/Test.png";
-// import TherapyIcon from "@/assets/images/Options/drink.png";
-
-// const { theme, toggleTheme } = useContext(ThemeContext);
+import TrendingCardCarousel from "@/components/tools/common/TrendingCardCarousel";
+import MoodTrackerModal from "../Tools/MoodTracker/MoodTracker";
 
 const Tools: React.FC = () => {
   const navigation = useNavigation();
-  const [selectedButton, setSelectedButton] = useState("");
+  // const [selectedButton, setSelectedButton] = useState("");
 
-  const [showWaterIntakekModal, setShowWaterIntakekModal] = useState(false);
-  const [showSleepTagsModal, setShowSleepTagsModal] = useState(false);
-  const [showThingsToDoTagsModal, setShowThingsToDoTagsModal] = useState(false);
+  const [showMoodTracker, setShowMoodTracker] = useState(false);
+  const [mood, setMood] = useState<string | null>(null);
+  // const [showSleepTagsModal, setShowSleepTagsModal] = useState(false);
+  // const [showThingsToDoTagsModal, setShowThingsToDoTagsModal] = useState(false);
 
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
 
@@ -47,63 +37,107 @@ const Tools: React.FC = () => {
   const buttons = [
     {
       id: 1,
-      label: "Test",
+      label: "Routine",
       action: "navigate",
-      screen: "/(auth)/Tools/test",
-      icon: require("../../../assets/images/options/test.png"),
+      screen: "/(auth)/Tools/Routine/Routine",
+      icon: require("../../../assets/images/tools/1.png"),
     },
     {
       id: 2,
-      label: "Drink",
+      label: "Mood Tracker",
       action: "modal",
-      screen: "waterIntake",
-      icon: require("../../../assets/images/options/drink.png"),
+      screen: "moodTracker",
+      icon: require("../../../assets/images/tools/2.png"),
     },
     {
       id: 3,
-      label: "Meditation",
+      label: "Recipe",
       action: "navigate",
-      screen: "/(auth)/Tools/Meditation/Meditation",
-      icon: require("../../../assets/images/options/meditation.png"),
+      screen: "/(auth)/Tools/Recipe/Recipe",
+      icon: require("../../../assets/images/tools/3.png"),
     },
     {
       id: 4,
-      label: "Workout",
+      label: "Article",
       action: "navigate",
-      screen: "/(auth)/Tools/Workout/Workout",
-      icon: require("../../../assets/images/options/fitness.png"),
+      screen: "/(auth)/Tools/Article/Article",
+      icon: require("../../../assets/images/tools/4.png"),
     },
     {
       id: 5,
-      label: "Soundscape",
+      label: "AI Scanner",
       action: "navigate",
-      screen: "/(auth)/Tools/Soundscape/Soundscape",
-      icon: require("../../../assets/images/options/soundscape.png"),
+      screen: "/(auth)/Tools/AIScanner/AIScanner",
+      icon: require("../../../assets/images/tools/5.png"),
     },
     {
       id: 6,
-      label: "Reflection",
+      label: "Products",
       action: "navigate",
-      screen: "/(auth)/Tools/Reflections/Reflection",
-      icon: require("../../../assets/images/options/reflection.png"),
-    },
-    {
-      id: 7,
-      label: "Sleep",
-      action: "modal",
-      screen: "Sleep",
-      icon: require("../../../assets/images/options/sleep.png"),
-    },
-    {
-      id: 8,
-      label: "Things To Do",
-      action: "modal",
-      screen: "thingsToDo",
-      icon: require("../../../assets/images/options/things.png"),
+      screen: "/(auth)/Tools/AIScanner/AIScanner",
+      icon: require("../../../assets/images/tools/5.png"),
     },
   ];
 
+  const routineDate = [
+    {
+      id: "1",
+      // title: "Restart your life in 50 days!",
+      image: require("../../../assets/images/routine/1.png"), // make sure these match your design
+    },
+    {
+      id: "2",
+      // title: "Less Awkward First Date Tricks",
+      image: require("../../../assets/images/routine/2.png"),
+    },
+    {
+      id: "3",
+      // title: "Restart your life in 50 days!",
+      image: require("../../../assets/images/routine/3.png"), // make sure these match your design
+    },
+    {
+      id: "4",
+      // title: "Less Awkward First Date Tricks",
+      image: require("../../../assets/images/routine/4.png"),
+    },
+    {
+      id: "5",
+      // title: "Restart your life in 50 days!",
+      image: require("../../../assets/images/routine/5.png"), // make sure these match your design
+    },
+    {
+      id: "6",
+      // title: "Less Awkward First Date Tricks",
+      image: require("../../../assets/images/routine/6.png"),
+    },
+    {
+      id: "7",
+      // title: "Restart your life in 50 days!",
+      image: require("../../../assets/images/routine/7.png"), // make sure these match your design
+    },
+    {
+      id: "8",
+      // title: "Less Awkward First Date Tricks",
+      image: require("../../../assets/images/routine/8.png"),
+    },
+    {
+      id: "9",
+      // title: "Restart your life in 50 days!",
+      image: require("../../../assets/images/routine/9.png"), // make sure these match your design
+    },
+  ];
+
+  // const handleButtonPress = (button: any) => {
+  //   if (button.action === "navigate") {
+  //     // router.push("/");
+  //     router.push(button.screen);
+  //   } else if (button.action === "modal") {
+  //     getModalInfo(button.screen);
+  //   }
+  // };
+
   const handleButtonPress = (button: any) => {
+    console.log("coming here");
     if (button.action === "navigate") {
       // router.push("/");
       router.push(button.screen);
@@ -113,17 +147,21 @@ const Tools: React.FC = () => {
   };
 
   const getModalInfo = (modalName: string) => {
+    console.log(modalName, "modalName");
     switch (modalName) {
-      case "Sleep":
-        setShowSleepTagsModal(true);
-        break;
-      case "thingsToDo":
-        setShowThingsToDoTagsModal(true);
-        break;
-      case "waterIntake":
-        setShowWaterIntakekModal(true);
+      case "moodTracker":
+        setShowMoodTracker(true);
         break;
     }
+  };
+
+  const handleCardPress = (id: string) => {
+    console.log("Pressed card id:", id);
+  };
+
+  const handleSelectMood = (selectedMood: string) => {
+    setMood(selectedMood);
+    console.log("Selected Mood:", selectedMood);
   };
 
   return (
@@ -161,26 +199,54 @@ const Tools: React.FC = () => {
             </View>
           ))}
         </ScrollView>
-        <MasterClass />
+        {/* <MasterClass /> */}
 
-        {/* Sleep Modal */}
-        <SleepModal
-          visible={showSleepTagsModal}
-          onClose={() => setShowSleepTagsModal(false)}
-        />
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <TrendingCardCarousel
+            title="New and Trending"
+            data={routineDate}
+            onPress={handleCardPress}
+          />
 
-        {/* Water Modal */}
-        <WaterIntakeModal
-          visible={showWaterIntakekModal}
-          onClose={() => {
-            setShowWaterIntakekModal(false);
-          }}
-        />
+          <TrendingCardCarousel
+            title="New and Trending"
+            data={routineDate}
+            onPress={handleCardPress}
+          />
 
-        {/* Things To Do Modal */}
-        <ThingsToDoModal
-          isVisible={showThingsToDoTagsModal}
-          onClose={() => setShowThingsToDoTagsModal(false)}
+          <TrendingCardCarousel
+            title="New and Trending"
+            data={routineDate}
+            onPress={handleCardPress}
+          />
+
+          <TrendingCardCarousel
+            title="New and Trending"
+            data={routineDate}
+            onPress={handleCardPress}
+          />
+
+          <TrendingCardCarousel
+            title="New and Trending"
+            data={routineDate}
+            onPress={handleCardPress}
+          />
+        </ScrollView>
+
+        {/* <ScrollView>
+          <TrendingCardCarousel
+            title="New and Trending"
+            data={routineDate}
+            onPress={handleCardPress}
+          />
+        </ScrollView> */}
+
+        {/* Mood Tracker Modal */}
+        {mood && <Text style={{ marginTop: 20 }}>Selected Mood: {mood}</Text>}
+        <MoodTrackerModal
+          visible={showMoodTracker}
+          onClose={() => setShowMoodTracker(false)}
+          onSelectMood={handleSelectMood}
         />
       </View>
     </ScreenView>

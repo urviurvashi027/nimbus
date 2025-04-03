@@ -1,0 +1,235 @@
+import React, { useContext } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+  ScrollView,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+
+import { themeColors } from "@/constant/Colors";
+import ThemeContext from "@/context/ThemeContext";
+import { ThemeKey } from "@/components/Themed";
+import HorizontalListCardScroll from "@/components/tools/common/HorizontalListCardScroll";
+import HorizontalBannerCardScroll from "@/components/tools/common/HorizontalBannerCardScroll";
+
+//dummy data
+import audioTracks from "@/constant/data/soundtrack";
+import { router } from "expo-router";
+import HorizontalBanner from "@/components/tools/common/HorizontalBanner";
+
+const banners = [
+  {
+    id: "1",
+    title: "Project 50 Challenge:",
+    subtitle: "Restart Your Life!",
+    buttonText: "Join Now",
+    image: require("../../../../assets/images/meditation/acceptYourself.png"), // Replace with your own image
+  },
+  {
+    id: "2",
+    title: "Healthy Habits",
+    subtitle: "Start Small!",
+    buttonText: "Get Started",
+    image: require("../../../../assets/images/mentalTest/selfLove.png"),
+    // image: require("./assets/banner2.jpg"), // Replace with your own image
+  },
+  {
+    id: "3",
+    title: "Restart",
+    subtitle: "Start Small!",
+    buttonText: "Get Started",
+    image: require("../../../../assets/images/mentalTest/selfLove.png"),
+    // image: require("./assets/banner2.jpg"), // Replace with your own image
+  },
+];
+
+const SleepModal = ({ visible, onClose }: any) => {
+  const onModalClose = () => {
+    console.log("modal cloe clicked");
+    onClose();
+  };
+
+  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+
+  const styles = styling(theme);
+
+  const handleBannerPress = (id: string) => {
+    console.log("Banner pressed:", id);
+  };
+
+  const onClickOfAll = () => {
+    router.push("/Tools/Soundscape/Soundscape");
+  };
+
+  return (
+    <Modal
+      animationType="slide"
+      presentationStyle="fullScreen"
+      visible={visible}
+      // transparent={true}
+    >
+      <View style={styles.modalContainer}>
+        {/* Back Button */}
+        <TouchableOpacity style={styles.backButton} onPress={onModalClose}>
+          <Ionicons name="arrow-back" size={24} color="black" />
+        </TouchableOpacity>
+
+        <View style={styles.modalContent}>
+          <ScrollView style={styles.scrollView}>
+            <Text style={styles.header}>Better Sleep</Text>
+            <Text style={styles.subHeader}>Good Sleep is your super power</Text>
+
+            {/* Start Tracking Button */}
+            <TouchableOpacity style={styles.startButton}>
+              <Text style={styles.startButtonText}>START</Text>
+              <Text style={styles.startButtonSubText}>Tracking</Text>
+            </TouchableOpacity>
+
+            {/* Sleep Report */}
+            <View style={styles.reportPanel}>
+              <Text style={styles.reportTitle}>SLEEP REPORT</Text>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.daysRow}
+              >
+                {["30", "31", "1", "2", "3", "4", "5"].map((day, index) => (
+                  <TouchableOpacity key={index} style={styles.dayCircle}>
+                    <Text style={styles.dayText}>{day}</Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+
+              <TouchableOpacity style={styles.demoButton}>
+                <Text style={styles.demoButtonText}>View Demo Report</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Sleep Aids */}
+            <View style={styles.sleepAidSection}>
+              <Text style={styles.reportTitle}>SLEEP AIDSs</Text>
+            </View>
+
+            <HorizontalListCardScroll
+              title="Soundscape"
+              // key={category.title}
+              description="The sound of nature gives you better sleep."
+              backgroundColor="#fbfcb3"
+              itemList={audioTracks}
+              onClickOfAll={onClickOfAll}
+            />
+
+            <HorizontalBanner data={banners} onPress={handleBannerPress} />
+            {/* <HorizontalBannerCardScroll
+              title="Soundscape"
+              // key={category.title}
+              description="The sound of nature gives you better sleep."
+              backgroundColor="#f5f5f5"
+              itemList={audioTracks}
+            /> */}
+          </ScrollView>
+        </View>
+      </View>
+    </Modal>
+  );
+};
+
+const styling = (theme: ThemeKey) =>
+  StyleSheet.create({
+    modalContainer: {
+      flex: 1,
+      paddingVertical: 46,
+    },
+    subHeader: {
+      fontSize: 14,
+      color: themeColors.basic.subheader,
+      paddingHorizontal: 15,
+      marginBottom: 20,
+    },
+    header: {
+      paddingHorizontal: 15,
+      fontSize: 26,
+      fontWeight: "bold",
+      color: themeColors[theme].text,
+    },
+    backButton: {
+      position: "absolute",
+      top: 90,
+      left: 20,
+      zIndex: 999, // <--- try adding this
+    },
+    modalContent: {
+      marginTop: 50,
+    },
+    scrollView: {
+      marginTop: 30,
+      paddingHorizontal: 16,
+    },
+    startButton: {
+      alignSelf: "center",
+      marginVertical: 30,
+      width: 200,
+      height: 200,
+      borderRadius: 100,
+      backgroundColor: "#7A4DF3",
+      justifyContent: "center",
+      alignItems: "center",
+      elevation: 5,
+    },
+    startButtonText: {
+      color: "white",
+      fontSize: 24,
+      fontWeight: "bold",
+    },
+    startButtonSubText: {
+      color: "white",
+      fontSize: 14,
+      marginTop: 5,
+    },
+    reportPanel: {
+      backgroundColor: "#1C1C2E",
+      borderRadius: 20,
+      padding: 20,
+      marginTop: 20,
+    },
+    reportTitle: {
+      color: "#A6A6A6",
+      fontSize: 12,
+      marginBottom: 10,
+    },
+    daysRow: {
+      flexDirection: "row",
+      marginBottom: 20,
+    },
+    dayCircle: {
+      width: 45,
+      height: 45,
+      borderRadius: 25,
+      backgroundColor: "#2C2C44",
+      justifyContent: "center",
+      alignItems: "center",
+      marginRight: 10,
+    },
+    dayText: {
+      color: "white",
+      fontSize: 16,
+    },
+    demoButton: {
+      backgroundColor: "#7A4DF3",
+      borderRadius: 20,
+      paddingVertical: 15,
+      alignItems: "center",
+    },
+    demoButtonText: {
+      color: "white",
+      fontSize: 16,
+    },
+    sleepAidSection: {
+      marginTop: 30,
+    },
+  });
+
+export default SleepModal;
