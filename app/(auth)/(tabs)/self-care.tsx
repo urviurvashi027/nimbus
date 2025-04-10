@@ -2,24 +2,39 @@ import {
   View,
   Text,
   Image,
-  useColorScheme,
   TouchableOpacity,
   StyleSheet,
   ScrollView,
   Platform,
+  SafeAreaView,
+  FlatList,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { router, useNavigation } from "expo-router";
 
 import ThemeContext from "@/context/ThemeContext";
 import { themeColors } from "@/constant/Colors";
-import SleepModal from "../SelfCare/Sleep/Sleep";
-import WaterIntakeModal from "../SelfCare/WaterIntake/WaterIntake";
-import ThingsToDoModal from "../SelfCare/ThingsToDo/ThingsToDo";
 import { ScreenView } from "@/components/Themed";
 import MasterClass from "@/components/tools/VideoListCard";
 import { ThemeKey } from "@/components/Themed";
 import TrendingCardCarousel from "@/components/tools/common/TrendingCardCarousel";
+import ReelCard from "@/components/common/ReelCard";
+import SleepModal from "../SelfCare/Sleep/Sleep";
+import WaterIntakeModal from "../SelfCare/WaterIntake/WaterIntake";
+import ThingsToDoModal from "../SelfCare/ThingsToDo/ThingsToDo";
+import HorizontalListCardScroll from "@/components/tools/common/HorizontalListCardScroll";
+import audioTracks from "@/constant/data/soundtrack";
+import {
+  buttons as NavigationButton,
+  NavigationButtonType,
+} from "@/constant/data/selfCareButton";
+import { RoutineData, RoutineType } from "@/constant/data/RotuineData";
+import VideoClassCard from "@/components/selfCare/VideoClassCard";
+import { masterClassData } from "@/constant/data/videoClass";
+import { medTests } from "@/constant/data/medicalTest";
+import { meditationsList } from "@/constant/data/meditation";
+import HorizontalBanner from "@/components/tools/common/HorizontalBanner";
+import { banners } from "@/constant/data/banner";
 
 const SelfCare: React.FC = () => {
   const navigation = useNavigation();
@@ -33,122 +48,16 @@ const SelfCare: React.FC = () => {
 
   const styles = styling(theme);
 
-  const buttons = [
-    {
-      id: 1,
-      label: "Test",
-      action: "navigate",
-      screen: "/(auth)/SelfCare/test",
-      icon: require("../../../assets/images/options/test.png"),
-    },
-    {
-      id: 2,
-      label: "Drink",
-      action: "modal",
-      screen: "waterIntake",
-      icon: require("../../../assets/images/options/drink.png"),
-    },
-    {
-      id: 3,
-      label: "Meditation",
-      action: "navigate",
-      screen: "/(auth)/SelfCare/Meditation/Meditation",
-      icon: require("../../../assets/images/options/meditation.png"),
-    },
-    {
-      id: 4,
-      label: "Workout",
-      action: "navigate",
-      screen: "/(auth)/SelfCare/Workout/Workout",
-      icon: require("../../../assets/images/options/fitness.png"),
-    },
-    {
-      id: 5,
-      label: "Soundscape",
-      action: "navigate",
-      screen: "/(auth)/SelfCare/Soundscape/Soundscape",
-      icon: require("../../../assets/images/options/soundscape.png"),
-    },
-    {
-      id: 6,
-      label: "Reflection",
-      action: "navigate",
-      screen: "/(auth)/SelfCare/Reflections/Reflection",
-      icon: require("../../../assets/images/options/reflection.png"),
-    },
-    {
-      id: 7,
-      label: "Sleep",
-      action: "modal",
-      screen: "Sleep",
-      icon: require("../../../assets/images/options/sleep.png"),
-    },
-    {
-      id: 8,
-      label: "Things To Do",
-      action: "modal",
-      screen: "thingsToDo",
-      icon: require("../../../assets/images/options/things.png"),
-    },
-  ];
-
-  const data = [
-    {
-      id: "1",
-      // title: "Restart your life in 50 days!",
-      image: require("../../../assets/images/routine/1.png"), // make sure these match your design
-    },
-    {
-      id: "2",
-      // title: "Less Awkward First Date Tricks",
-      image: require("../../../assets/images/routine/2.png"),
-    },
-    {
-      id: "3",
-      // title: "Restart your life in 50 days!",
-      image: require("../../../assets/images/routine/3.png"), // make sure these match your design
-    },
-    {
-      id: "4",
-      // title: "Less Awkward First Date Tricks",
-      image: require("../../../assets/images/routine/4.png"),
-    },
-    {
-      id: "5",
-      // title: "Restart your life in 50 days!",
-      image: require("../../../assets/images/routine/5.png"), // make sure these match your design
-    },
-    {
-      id: "6",
-      // title: "Less Awkward First Date Tricks",
-      image: require("../../../assets/images/routine/6.png"),
-    },
-    {
-      id: "7",
-      // title: "Restart your life in 50 days!",
-      image: require("../../../assets/images/routine/7.png"), // make sure these match your design
-    },
-    {
-      id: "8",
-      // title: "Less Awkward First Date Tricks",
-      image: require("../../../assets/images/routine/8.png"),
-    },
-    {
-      id: "9",
-      // title: "Restart your life in 50 days!",
-      image: require("../../../assets/images/routine/9.png"), // make sure these match your design
-    },
-  ];
-
-  const handleButtonPress = (button: any) => {
+  // Funstion called on click of navigation button clicked
+  const handleNavigationButtonPress = (button: NavigationButtonType) => {
     if (button.action === "navigate") {
-      // router.push("/");
       router.push(button.screen);
     } else if (button.action === "modal") {
       getModalInfo(button.screen);
     }
   };
 
+  // helper function to enable the modal
   const getModalInfo = (modalName: string) => {
     switch (modalName) {
       case "Sleep":
@@ -167,85 +76,173 @@ const SelfCare: React.FC = () => {
     console.log("Pressed card id:", id);
   };
 
+  // function to be called on click of all button horizontalListCard
+  const onClickOfAll = (title: string) => {
+    switch (title) {
+      case "medicalTest":
+        router.push("/(auth)/SelfCare/test");
+        break;
+      case "soundscape":
+        router.push("/(auth)/SelfCare/Soundscape/Soundscape");
+        break;
+      case "meditation":
+        router.push("/(auth)/SelfCare/Meditation/Meditation");
+        break;
+      case "routine":
+        router.push("/(auth)/Tools/Routine/Routine");
+        break;
+    }
+  };
+
+  const handleBannerPress = (id: string) => {
+    console.log("Banner pressed:", id);
+  };
+
   return (
     <ScreenView
       style={{
         paddingTop: Platform.OS === "ios" ? 80 : 20,
       }}
     >
-      <View style={styles.container}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.scrollView}
-        >
-          {buttons.map((button) => (
-            <View style={styles.buttonContainer} key={button.id}>
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() => handleButtonPress(button)}
-              >
-                {/* <View> */}
-                {/* source={button.icon} */}
-                <Image
-                  style={styles.buttonIcon}
-                  alt={button.label}
-                  // source={require("../../../assets/images/options/drink.png")}
-                  source={
-                    button.icon
-                      ? String(button.icon)
-                      : require("../../../assets/images/options/drink.png")
-                  }
-                />
-              </TouchableOpacity>
-              <Text style={styles.buttonLabel}>{button.label}</Text>
-            </View>
-          ))}
-        </ScrollView>
-        <MasterClass />
+      <SafeAreaView style={{ flex: 1, padding: 0 }}>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View style={styles.screenTitle}>
+            <Text style={styles.screenTitleText}>Self Care</Text>
+          </View>
+          {/* Navigation Button */}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.navigationScrollView}
+            contentContainerStyle={{ paddingHorizontal: 0 }}
+          >
+            {NavigationButton.map((button: NavigationButtonType) => (
+              <View style={styles.navigationButtonContainer} key={button.id}>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => handleNavigationButtonPress(button)}
+                >
+                  <Image
+                    style={styles.buttonIcon}
+                    source={
+                      button.icon
+                        ? String(button.icon)
+                        : require("../../../assets/images/options/drink.png")
+                    }
+                  />
+                </TouchableOpacity>
+                <Text style={styles.buttonLabel}>{button.label}</Text>
+              </View>
+            ))}
+          </ScrollView>
 
-        <ScrollView>
+          {/* MasterClass Section */}
+          {/* <MasterClass /> */}
+
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={{ padding: 16 }}
+          >
+            {masterClassData.map((card) => (
+              <VideoClassCard
+                key={card.id}
+                title={card.title}
+                coachName={card.coachName}
+                thumbnail={require("../../../assets/images/workout.jpg")}
+                onPress={() => console.log("Clicked on", card.title)}
+              />
+            ))}
+          </ScrollView>
+
+          {/* Well Being Class */}
+          <HorizontalListCardScroll
+            title="Soundscape"
+            description="The sound of nature gives you better sleep."
+            backgroundColor="#FFF085"
+            itemList={audioTracks}
+            onClickOfAll={() => onClickOfAll("soundscape")}
+          />
+
+          {/* AudioBook */}
           <TrendingCardCarousel
-            title="New and Trending"
-            data={data}
+            title="New and Trendings"
+            data={RoutineData}
+            onClickOfAll={() => onClickOfAll("routine")}
             onPress={handleCardPress}
           />
+
+          {/* Medical Test */}
+          <HorizontalListCardScroll
+            title="Medical Test"
+            description="Mental health is everything"
+            backgroundColor="#B7B1F2"
+            noOfRows={2}
+            itemList={medTests}
+            onClickOfAll={() => onClickOfAll("medicalTest")}
+          />
+
+          <HorizontalBanner data={banners} onPress={handleBannerPress} />
+
+          {/* Meditation */}
+          <HorizontalListCardScroll
+            title="Meditation"
+            description="Now is a great time to be present. Now is good, too. And now"
+            backgroundColor="#7A73D1"
+            itemList={meditationsList}
+            onClickOfAll={() => onClickOfAll("meditation")}
+          />
+
+          {/* Motivation */}
         </ScrollView>
+      </SafeAreaView>
 
-        {/* Sleep Modal */}
-        <SleepModal
-          visible={showSleepTagsModal}
-          onClose={() => setShowSleepTagsModal(false)}
-        />
+      {/* Modal Details */}
+      {/* Sleep Modal */}
+      <SleepModal
+        visible={showSleepTagsModal}
+        onClose={() => setShowSleepTagsModal(false)}
+      />
 
-        {/* Water Modal */}
-        <WaterIntakeModal
-          visible={showWaterIntakekModal}
-          onClose={() => {
-            setShowWaterIntakekModal(false);
-          }}
-        />
+      {/* Water Modal */}
+      <WaterIntakeModal
+        visible={showWaterIntakekModal}
+        onClose={() => {
+          setShowWaterIntakekModal(false);
+        }}
+      />
 
-        {/* Things To Do Modal */}
-        <ThingsToDoModal
-          isVisible={showThingsToDoTagsModal}
-          onClose={() => setShowThingsToDoTagsModal(false)}
-        />
-      </View>
+      {/* Things To Do Modal */}
+      <ThingsToDoModal
+        isVisible={showThingsToDoTagsModal}
+        onClose={() => setShowThingsToDoTagsModal(false)}
+      />
     </ScreenView>
   );
 };
 
 const styling = (theme: ThemeKey) =>
   StyleSheet.create({
-    container: {
-      // flex: 1,
+    screenTitle: {
+      paddingHorizontal: 10,
+      marginBottom: 30,
     },
-    scrollView: {
+    screenTitleText: {
+      fontSize: 35,
+      fontWeight: "bold",
+    },
+    navigationScrollView: {
       height: 100,
       marginBottom: 20,
     },
-    buttonContainer: {
+    header: {
+      fontSize: 22,
+      fontWeight: "bold",
+      marginLeft: 20,
+      marginBottom: 10,
+      marginTop: 10,
+    },
+    navigationButtonContainer: {
       alignItems: "center",
     },
     content: {
@@ -255,9 +252,6 @@ const styling = (theme: ThemeKey) =>
       width: 60,
       height: 60,
       borderRadius: 25, // Makes the button rounded
-      // backgroundColor: "#007BFF",
-      // justifyContent: "center",
-      // alignItems: "center",
       marginHorizontal: 8, // Space between buttons
     },
     buttonIcon: {

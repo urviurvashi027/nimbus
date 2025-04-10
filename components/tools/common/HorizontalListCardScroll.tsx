@@ -6,35 +6,106 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import ThemeContext from "@/context/ThemeContext";
 import { ThemeKey } from "@/components/Themed";
 import { themeColors } from "@/constant/Colors";
 import { TrackType } from "@/constant/data/soundtrack";
+import { router } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { Audio } from "expo-av";
 
 interface PropType {
   backgroundColor: string;
   title: string;
   description: string;
   itemList: Array<TrackType | any>;
+  noOfRows?: number;
   onClickOfAll: () => void;
 }
 
 const HorizontalListCardScroll: React.FC<PropType> = (props) => {
-  const { backgroundColor, title, description, onClickOfAll, itemList } = props;
+  const {
+    backgroundColor,
+    title,
+    description,
+    onClickOfAll,
+    itemList,
+    noOfRows,
+  } = props;
   // console.log(itemList, "itemList");
-
+  const [currentTrack, setCurrentTrack] = useState<TrackType | null>(null);
+  const [sound, setSound] = useState<Audio.Sound | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [showForYou, setShowForYou] = useState(true);
+  const [showLibrary, setShowLibrary] = useState(true);
   // Split data into rows of 3 items each
   const chunkedData = [];
-  for (let i = 0; i < itemList.length; i += 3) {
-    chunkedData.push(itemList.slice(i, i + 3));
+  const rowCount = noOfRows || 3;
+  for (let i = 0; i < itemList.length; i += rowCount) {
+    chunkedData.push(itemList.slice(i, i + rowCount));
   }
 
-  console.log(chunkedData, backgroundColor, "chunkedData");
+  // console.log(chunkedData, backgroundColor, "chunkedData");
 
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
 
   const styles = styling(theme, backgroundColor);
+
+  const handleItemClick = (title: string, entry: any) => {
+    console.log("I am clicked", title, entry);
+    switch (title) {
+      case "Soundscape":
+      case "Meditation":
+        handlePlayPause(entry);
+        break;
+      case "Medical Test":
+        router.push({
+          pathname: "/(auth)/SelfCare/test/getStared",
+          params: { id: entry.id },
+        });
+        break;
+    }
+  };
+
+  useEffect(() => {
+    return sound
+      ? () => {
+          sound.unloadAsync();
+        }
+      : undefined;
+  }, [sound]);
+
+  const handlePlayPause = async (track: any) => {
+    try {
+      if (currentTrack?.id === track.id) {
+        if (isPlaying) {
+          await sound?.pauseAsync();
+        } else {
+          await sound?.playAsync();
+        }
+        setIsPlaying(!isPlaying);
+        return;
+      }
+
+      if (sound) {
+        await sound.unloadAsync();
+      }
+
+      const { sound: newSound } = await Audio.Sound.createAsync(track.source);
+      setSound(newSound);
+      setCurrentTrack(track);
+      setIsPlaying(true);
+      await newSound.playAsync();
+    } catch (error) {
+      console.error("Error playing audio:", error);
+    }
+  };
+
+  const onCloseModal = (currentTrack: any) => {
+    // handlePlayPause(currentTrack);
+    setCurrentTrack(null);
+  };
 
   return (
     <View style={[styles.card, { backgroundColor: backgroundColor }]}>
@@ -53,17 +124,46 @@ const HorizontalListCardScroll: React.FC<PropType> = (props) => {
         renderItem={({ item }) => (
           <View style={styles.rowContainer}>
             {item.map((entry: any) => (
-              <View key={entry.id} style={styles.itemRow}>
-                <Image source={entry.image} style={styles.itemImage} />
-                <View style={styles.itemInfo}>
-                  <Text style={styles.itemTitle}>{entry.title}</Text>
-                  <Text style={styles.itemDuration}>{entry.duration}</Text>
+              <TouchableOpacity
+                key={entry.id}
+                onPress={() => handleItemClick(title, entry)}
+              >
+                <View style={styles.itemRow}>
+                  <Image source={entry.image} style={styles.itemImage} />
+                  <View style={styles.itemInfo}>
+                    <Text style={styles.itemTitle}>{entry.title}</Text>
+                    {entry.duration && (
+                      <Text style={styles.itemDuration}>{entry.duration}</Text>
+                    )}
+                  </View>
                 </View>
-              </View>
+              </TouchableOpacity>
             ))}
           </View>
         )}
       />
+      {/* Bottom Player */}
+      {currentTrack && (
+        <View style={styles.bottomPlayer}>
+          <Image source={currentTrack.image} style={styles.playerImage} />
+          <View style={styles.playerText}>
+            <Text style={styles.playerTitle}>{currentTrack.title}</Text>
+            <Text style={styles.playerDuration}>
+              {currentTrack.duration} · Soundscape
+            </Text>
+          </View>
+          <TouchableOpacity onPress={() => handlePlayPause(currentTrack)}>
+            <Ionicons
+              name={isPlaying ? "pause" : "play"}
+              size={24}
+              color="white"
+            />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => onCloseModal(currentTrack)}>
+            <Ionicons name="close" size={24} color="white" />
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 };
@@ -89,7 +189,7 @@ const styling = (theme: ThemeKey, color: string) =>
       fontSize: 18,
       fontWeight: "bold",
       marginBottom: 5,
-      color: themeColors.basic.mediumGrey,
+      color: themeColors.basic.commonBlack,
     },
     cardDescription: {
       fontSize: 14,
@@ -160,5 +260,33 @@ const styling = (theme: ThemeKey, color: string) =>
     itemDuration: {
       fontSize: 12,
       color: "#666",
+    },
+    bottomPlayer: {
+      position: "absolute",
+      bottom: 0,
+      left: 0,
+      right: 0,
+      backgroundColor: "#333",
+      padding: 10,
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    playerImage: {
+      width: 50,
+      height: 50,
+      borderRadius: 10,
+    },
+    playerText: {
+      flex: 1,
+      marginLeft: 10,
+    },
+    playerTitle: {
+      color: "#fff",
+      fontSize: 16,
+      fontWeight: "bold",
+    },
+    playerDuration: {
+      color: "#ccc",
+      fontSize: 14,
     },
   });

@@ -8,6 +8,7 @@ export type medicalTestData = {
   image?: ImageKey;
   progressBarBg?: string;
   content: any;
+  imageUrl?: any;
   questions: Array<{
     id: string;
     question: string;
@@ -163,6 +164,7 @@ A roadmap to gradually overcome the lasting impact of childhood trauma.`,
     title: "Quick ADHD Test",
     color: "#F16767",
     image: "anxietyRelease",
+    imageUrl: require("../../assets/images/meditation/anxietyRelease.png"),
     progressBarBg: "#b31aff",
     description: `Welcome to our self-screening questionnaire for Attention-Deficit/Hyperactivity Disorder (ADHD).
 ADHD can affect your ability to focus, control impulses, and manage time effectively.
@@ -332,5 +334,43 @@ const result = {
   image: require("../../assets/images/lonely.png"), // Replace with actual image
   //  scores: nedds to be added
 };
+
+export const medTests = [
+  {
+    id: "1",
+    title: "Childhood Trauma Test",
+    image: require("../../assets/images/mentalTest/childhoodTrauma.png"), // Replace with actual image
+  },
+  {
+    id: "2",
+    title: "Quick ADHD Test",
+    image: require("../../assets/images/mentalTest/ADHD.png"),
+  },
+  {
+    id: "3",
+    title: "3 Minutes Depression Test",
+    image: require("../../assets/images/mentalTest/depressionTest.png"),
+  },
+  {
+    id: "4",
+    title: "Toxic Personality Test",
+    image: require("../../assets/images/mentalTest/toxicPersonality.png"),
+  },
+  {
+    id: "5",
+    title: "Emotional Quotient",
+    image: require("../../assets/images/mentalTest/EQ.png"),
+  },
+  {
+    id: "6",
+    title: "Inner Self",
+    image: require("../../assets/images/mentalTest/innerSelf.png"),
+  },
+  {
+    id: "7",
+    title: "Self Toxic",
+    image: require("../../assets/images/mentalTest/selfLove.png"),
+  },
+];
 
 export default testData;

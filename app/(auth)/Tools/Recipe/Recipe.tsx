@@ -134,8 +134,6 @@ const RecipeScreen = () => {
             contentContainerStyle={{ paddingBottom: 100 }}
             renderItem={({ item }) => (
               <RoutineCard
-                // title={item.title}
-                // subtitle={item.subtitle}
                 image={item.image}
                 tag={item.tag}
                 height={item.height}

@@ -14,46 +14,9 @@ import { router, useNavigation } from "expo-router";
 import { ScreenView, ThemeKey } from "@/components/Themed";
 import ThemeContext from "@/context/ThemeContext";
 import { themeColors } from "@/constant/Colors";
+import { medTests } from "@/constant/data/medicalTest";
 
 const categories = ["All"];
-
-const tests = [
-  {
-    id: "1",
-    title: "Childhood Trauma Test",
-    image: require("../../../../assets/images/mentalTest/childhoodTrauma.png"), // Replace with actual image
-  },
-  {
-    id: "2",
-    title: "Quick ADHD Test",
-    image: require("../../../../assets/images/mentalTest/ADHD.png"),
-  },
-  {
-    id: "3",
-    title: "3 Minutes Depression Test",
-    image: require("../../../../assets/images/mentalTest/depressionTest.png"),
-  },
-  {
-    id: "4",
-    title: "Toxic Personality Test",
-    image: require("../../../../assets/images/mentalTest/toxicPersonality.png"),
-  },
-  {
-    id: "5",
-    title: "Emotional Quotient",
-    image: require("../../../../assets/images/mentalTest/EQ.png"),
-  },
-  {
-    id: "6",
-    title: "Inner Self",
-    image: require("../../../../assets/images/mentalTest/innerSelf.png"),
-  },
-  {
-    id: "7",
-    title: "Self Toxic",
-    image: require("../../../../assets/images/mentalTest/selfLove.png"),
-  },
-];
 
 const MentalHealthTestScreen = () => {
   const navigation = useNavigation();
@@ -70,7 +33,7 @@ const MentalHealthTestScreen = () => {
 
   const onMedicalTestClick = (value: any) => {
     router.push({
-      pathname: "/(auth)/Tools/test/getStared",
+      pathname: "/(auth)/SelfCare/test/getStared",
       params: { id: value.id },
     });
     // router.push("/(auth)/Tools/test/getStared");
@@ -112,7 +75,7 @@ const MentalHealthTestScreen = () => {
 
         {/* Test List */}
         <FlatList
-          data={tests}
+          data={medTests}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <TouchableOpacity

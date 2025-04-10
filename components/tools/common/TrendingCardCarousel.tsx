@@ -1,5 +1,8 @@
 // TrendingCardCarousel.tsx
-import React from "react";
+import { ThemeKey } from "@/components/Themed";
+import { themeColors } from "@/constant/Colors";
+import ThemeContext from "@/context/ThemeContext";
+import React, { useContext } from "react";
 import {
   View,
   Text,
@@ -20,6 +23,7 @@ interface TrendingCardCarouselProps {
   title: string;
   data: CardData[];
   onPress: (id: string) => void;
+  onClickOfAll: () => void;
 }
 
 const { width } = Dimensions.get("window");
@@ -28,12 +32,16 @@ const TrendingCardCarousel: React.FC<TrendingCardCarouselProps> = ({
   title,
   data,
   onPress,
+  onClickOfAll,
 }) => {
+  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+
+  const styles = styling(theme);
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerText}>{title}</Text>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={onClickOfAll}>
           <Text style={styles.seeAll}>All ➤</Text>
         </TouchableOpacity>
       </View>
@@ -62,49 +70,56 @@ const TrendingCardCarousel: React.FC<TrendingCardCarouselProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    marginVertical: 20,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingHorizontal: 10,
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  headerText: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  seeAll: {
-    fontSize: 14,
-    color: "#666",
-  },
-  cardWrapper: {
-    marginRight: 20,
-  },
-  card: {
-    width: width * 0.55,
-    height: width * 0.75,
-    borderRadius: 20,
-    overflow: "hidden",
-    justifyContent: "flex-end",
-    padding: 10,
-  },
-  cardImage: {
-    borderRadius: 20,
-    resizeMode: "cover",
-  },
-  cardTitle: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-    backgroundColor: "rgba(0,0,0,0.3)",
-    padding: 5,
-    borderRadius: 5,
-    alignSelf: "flex-start",
-  },
-});
+const styling = (theme: ThemeKey) =>
+  StyleSheet.create({
+    container: {
+      marginVertical: 35,
+      // backgroundColor: "red",
+    },
+    header: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      paddingHorizontal: 10,
+      alignItems: "center",
+      marginBottom: 20,
+    },
+    headerText: {
+      fontSize: 20,
+      color: themeColors[theme].text,
+      fontWeight: "bold",
+    },
+    seeAll: {
+      fontSize: 14,
+      color: "#666",
+    },
+    cardWrapper: {
+      marginRight: 20,
+      backgroundColor: "#FBE4D6",
+      borderRadius: 20,
+      width: width * 0.55,
+      height: width * 0.75,
+    },
+    card: {
+      width: width * 0.55,
+      height: width * 0.75,
+      borderRadius: 20,
+      overflow: "hidden",
+      justifyContent: "flex-end",
+      padding: 10,
+    },
+    cardImage: {
+      borderRadius: 20,
+      resizeMode: "cover",
+    },
+    cardTitle: {
+      color: themeColors[theme].text,
+      fontSize: 16,
+      fontWeight: "bold",
+      backgroundColor: "rgba(0,0,0,0.3)",
+      padding: 5,
+      borderRadius: 5,
+      alignSelf: "flex-start",
+    },
+  });
 
 export default TrendingCardCarousel;

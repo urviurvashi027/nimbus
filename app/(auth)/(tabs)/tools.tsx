@@ -6,6 +6,7 @@ import {
   StyleSheet,
   ScrollView,
   Platform,
+  FlatList,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { router, useNavigation } from "expo-router";
@@ -20,6 +21,8 @@ import { ScreenView } from "@/components/Themed";
 import { ThemeKey } from "@/components/Themed";
 import TrendingCardCarousel from "@/components/tools/common/TrendingCardCarousel";
 import MoodTrackerModal from "../Tools/MoodTracker/MoodTracker";
+import { LifeHacks, OrganisedReels } from "@/constant/data/reelsData";
+import ReelCard from "@/components/common/ReelCard";
 
 const Tools: React.FC = () => {
   const navigation = useNavigation();
@@ -33,6 +36,30 @@ const Tools: React.FC = () => {
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
 
   const styles = styling(theme);
+
+  const reels = [
+    {
+      id: "1",
+      title: "Me+ AI Helps You Generate Cleaning...",
+      badgeText: "Me+ Clean ✨",
+      views: "1M+",
+      thumbnail: require("../../../assets/images/gratitude.png"),
+    },
+    {
+      id: "2",
+      title: "The FlyLady Cleaning Method",
+      badgeText: "15-min Clean",
+      views: "5M+",
+      thumbnail: require("../../../assets/images/overeat.png"),
+    },
+    {
+      id: "3",
+      title: "Test",
+      badgeText: "15-min Clean",
+      views: "5M+",
+      thumbnail: require("../../../assets/images/selfAffirmation.png"),
+    },
+  ];
 
   const buttons = [
     {
@@ -202,6 +229,24 @@ const Tools: React.FC = () => {
         {/* <MasterClass /> */}
 
         <ScrollView showsVerticalScrollIndicator={false}>
+          {/* Reel Scroll */}
+          <Text style={styles.header}>To be Organized</Text>
+          <FlatList
+            data={reels}
+            keyExtractor={(item) => item.id}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ paddingLeft: 20 }}
+            renderItem={({ item }) => (
+              <ReelCard
+                title={item.title}
+                views={item.views}
+                badgeText={item.badgeText}
+                thumbnail={item.thumbnail}
+                onPress={() => console.log("Clicked:", item.title)}
+              />
+            )}
+          />
           <TrendingCardCarousel
             title="New and Trending"
             data={routineDate}
@@ -257,6 +302,13 @@ const styling = (theme: ThemeKey) =>
   StyleSheet.create({
     container: {
       // flex: 1,
+    },
+    header: {
+      fontSize: 22,
+      fontWeight: "bold",
+      marginLeft: 20,
+      marginBottom: 10,
+      marginTop: 10,
     },
     scrollView: {
       height: 100,

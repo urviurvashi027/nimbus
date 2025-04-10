@@ -18,33 +18,8 @@ import HorizontalBannerCardScroll from "@/components/tools/common/HorizontalBann
 //dummy data
 import audioTracks from "@/constant/data/soundtrack";
 import { router } from "expo-router";
+import { banners } from "@/constant/data/banner";
 import HorizontalBanner from "@/components/tools/common/HorizontalBanner";
-
-const banners = [
-  {
-    id: "1",
-    title: "Project 50 Challenge:",
-    subtitle: "Restart Your Life!",
-    buttonText: "Join Now",
-    image: require("../../../../assets/images/meditation/acceptYourself.png"), // Replace with your own image
-  },
-  {
-    id: "2",
-    title: "Healthy Habits",
-    subtitle: "Start Small!",
-    buttonText: "Get Started",
-    image: require("../../../../assets/images/mentalTest/selfLove.png"),
-    // image: require("./assets/banner2.jpg"), // Replace with your own image
-  },
-  {
-    id: "3",
-    title: "Restart",
-    subtitle: "Start Small!",
-    buttonText: "Get Started",
-    image: require("../../../../assets/images/mentalTest/selfLove.png"),
-    // image: require("./assets/banner2.jpg"), // Replace with your own image
-  },
-];
 
 const SleepModal = ({ visible, onClose }: any) => {
   const onModalClose = () => {
@@ -61,7 +36,7 @@ const SleepModal = ({ visible, onClose }: any) => {
   };
 
   const onClickOfAll = () => {
-    router.push("/Tools/Soundscape/Soundscape");
+    router.push("/(auth)/SelfCare/Soundscape/Soundscape");
   };
 
   return (
@@ -115,7 +90,6 @@ const SleepModal = ({ visible, onClose }: any) => {
 
             <HorizontalListCardScroll
               title="Soundscape"
-              // key={category.title}
               description="The sound of nature gives you better sleep."
               backgroundColor="#fbfcb3"
               itemList={audioTracks}
@@ -123,13 +97,6 @@ const SleepModal = ({ visible, onClose }: any) => {
             />
 
             <HorizontalBanner data={banners} onPress={handleBannerPress} />
-            {/* <HorizontalBannerCardScroll
-              title="Soundscape"
-              // key={category.title}
-              description="The sound of nature gives you better sleep."
-              backgroundColor="#f5f5f5"
-              itemList={audioTracks}
-            /> */}
           </ScrollView>
         </View>
       </View>

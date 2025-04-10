@@ -13,6 +13,39 @@ export interface TrackType {
   };
 }
 
+export const forYouTracks: TrackType[] = [
+  {
+    id: "1",
+    title: "Rainstorm",
+    duration: "61 min",
+    image: require("../../assets/images/soundscape/lightRain.png"), // Replace with actual image
+    source: require("../../assets/audio/soundscape/lightRain.mp3"),
+    description:
+      "Feeling unconditional love and acceptance towards yourself and the world",
+    category: "All",
+    isLocked: true,
+    color: {
+      cardColor: "#B5A8D5",
+      descriptionColor: "#7A73D1",
+    },
+  },
+  {
+    id: "16",
+    title: "Seagul",
+    duration: "3 min",
+    image: require("../../assets/images/soundscape/bird.png"), // Replace with actual image
+    source: require("../../assets/audio/soundscape/seagulls.mp3"), // Replace with actual audio file
+    category: "All",
+    description:
+      "Feeling unconditional love and acceptance towards yourself and the world",
+    isLocked: true,
+    color: {
+      cardColor: "#C1D8C3",
+      descriptionColor: "#6A9C89",
+    },
+  },
+];
+
 const audioTracks: TrackType[] = [
   {
     id: "1",

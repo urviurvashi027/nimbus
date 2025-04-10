@@ -12,7 +12,10 @@ import {
 import { Audio } from "expo-av";
 import { Ionicons } from "@expo/vector-icons";
 
-import libraryTracks from "@/constant/data/soundtrack";
+import libraryTracks, {
+  TrackType,
+  forYouTracks,
+} from "@/constant/data/soundtrack";
 import { useNavigation } from "expo-router";
 import ThemeContext from "@/context/ThemeContext";
 import { ScreenView, ThemeKey } from "@/components/Themed";
@@ -22,54 +25,8 @@ import SoundscapeFeaturedCard from "@/components/selfCare/soundscape/FeaturedCar
 const { width } = Dimensions.get("window"); // get screen width
 const CARD_WIDTH = width * 0.8; // 80% of screen width
 
-// Define a type for the track
-interface Track {
-  id: string;
-  title: string;
-  duration: string;
-  description: string;
-  image: any; // Image source (can be refined later)
-  source: any; // Audio source (can be refined later)
-  category: string;
-  isLocked: boolean;
-  color: any;
-}
-
-const forYouTracks: Track[] = [
-  {
-    id: "1",
-    title: "Rainstorm",
-    duration: "61 min",
-    image: require("../../../../assets/images/soundscape/lightRain.png"), // Replace with actual image
-    source: require("../../../../assets/audio/soundscape/lightRain.mp3"),
-    description:
-      "Feeling unconditional love and acceptance towards yourself and the world",
-    category: "All",
-    isLocked: true,
-    color: {
-      cardColor: "#B5A8D5",
-      descriptionColor: "#7A73D1",
-    },
-  },
-  {
-    id: "16",
-    title: "Seagul",
-    duration: "3 min",
-    image: require("../../../../assets/images/soundscape/bird.png"), // Replace with actual image
-    source: require("../../../../assets/audio/soundscape/seagulls.mp3"), // Replace with actual audio file
-    category: "All",
-    description:
-      "Feeling unconditional love and acceptance towards yourself and the world",
-    isLocked: true,
-    color: {
-      cardColor: "#C1D8C3",
-      descriptionColor: "#6A9C89",
-    },
-  },
-];
-
 const Soundscape = () => {
-  const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
+  const [currentTrack, setCurrentTrack] = useState<TrackType | null>(null);
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showForYou, setShowForYou] = useState(true);
