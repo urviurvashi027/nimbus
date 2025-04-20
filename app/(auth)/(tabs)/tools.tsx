@@ -13,9 +13,6 @@ import { router, useNavigation } from "expo-router";
 
 import ThemeContext from "@/context/ThemeContext";
 import { themeColors } from "@/constant/Colors";
-import SleepModal from "../SelfCare/Sleep/Sleep";
-import WaterIntakeModal from "../SelfCare/WaterIntake/WaterIntake";
-import ThingsToDoModal from "../SelfCare/ThingsToDo/ThingsToDo";
 import { ScreenView } from "@/components/Themed";
 // import MasterClass from "@/components/tools/VideoListCard";
 import { ThemeKey } from "@/components/Themed";
@@ -23,6 +20,10 @@ import TrendingCardCarousel from "@/components/tools/common/TrendingCardCarousel
 import MoodTrackerModal from "../Tools/MoodTracker/MoodTracker";
 import { LifeHacks, OrganisedReels } from "@/constant/data/reelsData";
 import ReelCard from "@/components/common/ReelCard";
+
+import { recipeData } from "@/constant/data/recipeData";
+import { articleData } from "@/constant/data/articleDetails";
+import { routineDetails } from "@/constant/data/routineData";
 
 const Tools: React.FC = () => {
   const navigation = useNavigation();
@@ -106,63 +107,6 @@ const Tools: React.FC = () => {
     },
   ];
 
-  const routineDate = [
-    {
-      id: "1",
-      // title: "Restart your life in 50 days!",
-      image: require("../../../assets/images/routine/1.png"), // make sure these match your design
-    },
-    {
-      id: "2",
-      // title: "Less Awkward First Date Tricks",
-      image: require("../../../assets/images/routine/2.png"),
-    },
-    {
-      id: "3",
-      // title: "Restart your life in 50 days!",
-      image: require("../../../assets/images/routine/3.png"), // make sure these match your design
-    },
-    {
-      id: "4",
-      // title: "Less Awkward First Date Tricks",
-      image: require("../../../assets/images/routine/4.png"),
-    },
-    {
-      id: "5",
-      // title: "Restart your life in 50 days!",
-      image: require("../../../assets/images/routine/5.png"), // make sure these match your design
-    },
-    {
-      id: "6",
-      // title: "Less Awkward First Date Tricks",
-      image: require("../../../assets/images/routine/6.png"),
-    },
-    {
-      id: "7",
-      // title: "Restart your life in 50 days!",
-      image: require("../../../assets/images/routine/7.png"), // make sure these match your design
-    },
-    {
-      id: "8",
-      // title: "Less Awkward First Date Tricks",
-      image: require("../../../assets/images/routine/8.png"),
-    },
-    {
-      id: "9",
-      // title: "Restart your life in 50 days!",
-      image: require("../../../assets/images/routine/9.png"), // make sure these match your design
-    },
-  ];
-
-  // const handleButtonPress = (button: any) => {
-  //   if (button.action === "navigate") {
-  //     // router.push("/");
-  //     router.push(button.screen);
-  //   } else if (button.action === "modal") {
-  //     getModalInfo(button.screen);
-  //   }
-  // };
-
   const handleButtonPress = (button: any) => {
     console.log("coming here");
     if (button.action === "navigate") {
@@ -189,6 +133,33 @@ const Tools: React.FC = () => {
   const handleSelectMood = (selectedMood: string) => {
     setMood(selectedMood);
     console.log("Selected Mood:", selectedMood);
+  };
+
+  const onClickOfArticleAll = () => {
+    router.push("/(auth)/Tools/Article/Article");
+  };
+
+  const onClickOfRoutineAll = () => {
+    router.push("/(auth)/Tools/Routine/Routine");
+  };
+
+  const onClickOfRecipeAll = () => {
+    router.push("/(auth)/Tools/Recipe/Recipe");
+  };
+
+  const onClickOfSkincareRoutineAll = () => {
+    console.log("I am clicked");
+    router.push({
+      pathname: "/(auth)/Tools/Routine/Routine",
+      params: { filter: "Skincare" },
+    });
+  };
+
+  const onClickOfHacksRoutineAll = () => {
+    router.push({
+      pathname: "/(auth)/Tools/Routine/Routine",
+      params: { filter: "Hacks" },
+    });
   };
 
   return (
@@ -248,33 +219,38 @@ const Tools: React.FC = () => {
             )}
           />
           <TrendingCardCarousel
-            title="New and Trending"
-            data={routineDate}
+            title="Routine"
+            data={routineDetails}
             onPress={handleCardPress}
+            onClickOfAll={onClickOfRoutineAll}
           />
 
           <TrendingCardCarousel
-            title="New and Trending"
-            data={routineDate}
+            title="Article"
+            data={articleData}
             onPress={handleCardPress}
+            onClickOfAll={onClickOfArticleAll}
           />
 
           <TrendingCardCarousel
-            title="New and Trending"
-            data={routineDate}
+            title="Recipe"
+            data={recipeData}
             onPress={handleCardPress}
+            onClickOfAll={onClickOfRecipeAll}
           />
 
           <TrendingCardCarousel
-            title="New and Trending"
-            data={routineDate}
+            title="Hello Beautiful"
+            data={routineDetails}
             onPress={handleCardPress}
+            onClickOfAll={onClickOfSkincareRoutineAll}
           />
 
           <TrendingCardCarousel
-            title="New and Trending"
-            data={routineDate}
+            title="Life Hacks You Can't Miss"
+            data={routineDetails}
             onPress={handleCardPress}
+            onClickOfAll={onClickOfHacksRoutineAll}
           />
         </ScrollView>
 

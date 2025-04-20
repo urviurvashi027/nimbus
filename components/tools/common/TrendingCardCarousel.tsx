@@ -23,7 +23,7 @@ interface TrendingCardCarouselProps {
   title: string;
   data: CardData[];
   onPress: (id: string) => void;
-  onClickOfAll: () => void;
+  onClickOfAll?: () => void;
 }
 
 const { width } = Dimensions.get("window");

@@ -28,7 +28,7 @@ import {
   buttons as NavigationButton,
   NavigationButtonType,
 } from "@/constant/data/selfCareButton";
-import { RoutineData, RoutineType } from "@/constant/data/RotuineData";
+import { RoutineData, RoutineType } from "@/constant/data/routineData";
 import VideoClassCard from "@/components/selfCare/VideoClassCard";
 import { masterClassData } from "@/constant/data/videoClass";
 import { medTests } from "@/constant/data/medicalTest";
