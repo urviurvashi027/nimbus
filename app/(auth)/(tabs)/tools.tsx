@@ -7,6 +7,7 @@ import {
   ScrollView,
   Platform,
   FlatList,
+  SafeAreaView,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { router, useNavigation } from "expo-router";
@@ -93,19 +94,42 @@ const Tools: React.FC = () => {
     },
     {
       id: 5,
+      label: "Calorie Cal",
+      action: "navigate",
+      screen: "/(auth)/Tools/CalorieCal/CalorieCalculator",
+      icon: require("../../../assets/images/tools/5.png"),
+    },
+    {
+      id: 6,
+      label: "Protein Cal",
+      action: "navigate",
+      screen: "/(auth)/Tools/ProtienCal/ProteinCalculator",
+      icon: require("../../../assets/images/tools/6.png"),
+    },
+    {
+      id: 7,
+      label: "Body Shape Cal",
+      action: "navigate",
+      screen: "/(auth)/Tools/BodyShapeCal/BodyShapeCalculator",
+      icon: require("../../../assets/images/tools/7.png"),
+    },
+    {
+      id: 8,
       label: "AI Scanner",
       action: "navigate",
       screen: "/(auth)/Tools/AIScanner/AIScanner",
       icon: require("../../../assets/images/tools/5.png"),
     },
     {
-      id: 6,
+      id: 9,
       label: "Products",
       action: "navigate",
       screen: "/(auth)/Tools/AIScanner/AIScanner",
       icon: require("../../../assets/images/tools/5.png"),
     },
   ];
+
+  // router.push("/(auth)/Tools/BodyShapeCal/BodyShapeCalculator")
 
   const handleButtonPress = (button: any) => {
     console.log("coming here");
@@ -168,7 +192,10 @@ const Tools: React.FC = () => {
         paddingTop: Platform.OS === "ios" ? 80 : 20,
       }}
     >
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.screenTitle}>
+          <Text style={styles.screenTitleText}>Toolss</Text>
+        </View>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -269,7 +296,7 @@ const Tools: React.FC = () => {
           onClose={() => setShowMoodTracker(false)}
           onSelectMood={handleSelectMood}
         />
-      </View>
+      </SafeAreaView>
     </ScreenView>
   );
 };
@@ -277,7 +304,16 @@ const Tools: React.FC = () => {
 const styling = (theme: ThemeKey) =>
   StyleSheet.create({
     container: {
-      // flex: 1,
+      flex: 1,
+      padding: 0,
+    },
+    screenTitle: {
+      paddingHorizontal: 10,
+      marginBottom: 30,
+    },
+    screenTitleText: {
+      fontSize: 30,
+      fontWeight: "bold",
     },
     header: {
       fontSize: 22,
@@ -287,11 +323,12 @@ const styling = (theme: ThemeKey) =>
       marginTop: 10,
     },
     scrollView: {
-      height: 100,
+      // height: 100,
       marginBottom: 20,
     },
     buttonContainer: {
       alignItems: "center",
+      marginBottom: 30,
     },
     content: {
       padding: 0,

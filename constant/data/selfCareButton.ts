@@ -17,8 +17,10 @@ export const buttons: NavigationButtonType[] = [
   {
     id: 2,
     label: "Drink",
-    action: "modal",
-    screen: "waterIntake",
+    // action: "modal",
+    // screen: "Sleep",
+    action: "navigate",
+    screen: "/(auth)/SelfCare/WaterIntake/WaterIntake",
     icon: require("../../assets/images/options/drink.png"),
   },
   {

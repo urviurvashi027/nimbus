@@ -1,187 +1,171 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Modal } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Modal,
+  StyleSheet,
+  Dimensions,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-const predefinedAmounts = [12, 16, 20, 24, 30];
+const predefinedAmounts = [150, 300, 500, 800, 1000];
 
-interface AddWaterProps {
-  visible: boolean;
-  onClose: () => void;
-  onAddWater: any;
-}
-
-const AddWaterModal: React.FC<AddWaterProps> = ({
-  visible,
-  onClose,
-  onAddWater,
-}) => {
+export default function HydrationModal({ visible, onClose, onAddWater }: any) {
   const [amount, setAmount] = useState("");
 
-  const handleKeyPress = (key: any) => {
-    if (key === "backspace") {
-      setAmount((prev) => prev.slice(0, -1));
-    } else if (key === "confirm") {
-      if (amount) {
-        onAddWater(parseInt(amount, 10));
-        setAmount("");
-        onClose();
-      }
-    } else {
-      setAmount((prev) => (prev.length < 4 ? prev + key : prev));
+  const handleNumberPress = (num: any) => {
+    setAmount((prev) => prev + num);
+  };
+
+  const handleDelete = () => setAmount((prev) => prev.slice(0, -1));
+
+  const handlePreset = (val: any) => setAmount(val.toString());
+
+  const handleAdd = () => {
+    const value = Number(amount);
+    if (value <= 0 || value > 3000) {
+      alert("Please enter a value between 0–3000ml");
+      return;
     }
+    console.log(value, "water intake value");
+    onAddWater(value);
+    onClose();
   };
 
   return (
     <Modal visible={visible} animationType="slide" transparent>
-      <View style={styles.modalContainer}>
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity onPress={onClose}>
-            <Text style={styles.cancelText}>Cancel</Text>
+      <View style={styles.overlay}>
+        <View style={styles.modal}>
+          <TouchableOpacity style={styles.close} onPress={onClose}>
+            <Ionicons name="close" size={24} />
           </TouchableOpacity>
-          <Text style={styles.headerText}>Add Water</Text>
-          <TouchableOpacity onPress={() => handleKeyPress("confirm")}>
-            <Text style={styles.addText}>Add Water</Text>
-          </TouchableOpacity>
-        </View>
+          <Text style={styles.title}>Stay Hydrated</Text>
 
-        {/* Input Display */}
-        <Text style={styles.amountText}>{amount || "0"} oz</Text>
+          <Text style={styles.input}>
+            {amount || 0}
+            <Text style={{ fontSize: 18 }}>ml</Text>
+          </Text>
 
-        {/* Predefined Water Amounts */}
-        <View style={styles.amountRow}>
-          {predefinedAmounts.map((value) => (
-            <TouchableOpacity
-              key={value}
-              style={styles.amountButton}
-              onPress={() => setAmount(value.toString())}
-            >
-              <Ionicons name="calendar-outline" size={20} color="black" />
-              <Text style={styles.amountButtonText}>{value}oz</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+          <View style={styles.presets}>
+            {predefinedAmounts.map((val) => (
+              <TouchableOpacity key={val} onPress={() => handlePreset(val)}>
+                <View style={styles.presetBtn}>
+                  <Text>{val === 1000 ? "1L" : `${val}ml`}</Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
 
-        {/* Numeric Keypad */}
-        <View style={styles.keypad}>
-          {[
-            "7",
-            "8",
-            "9",
-            "4",
-            "5",
-            "6",
-            "1",
-            "2",
-            "3",
-            "backspace",
-            "0",
-            "confirm",
-          ].map((key) => (
-            <TouchableOpacity
-              key={key}
-              style={[
-                styles.key,
-                key === "confirm"
-                  ? styles.confirmKey
-                  : key === "backspace"
-                  ? styles.backKey
-                  : null,
-              ]}
-              onPress={() => handleKeyPress(key)}
-            >
-              {key === "backspace" ? (
-                <Ionicons name="calendar-outline" size={20} color="black" />
-              ) : // <Icon name="arrow-left" size={20} color="black" />
-              key === "confirm" ? (
-                <Ionicons name="calendar-outline" size={20} color="white" />
-              ) : (
-                // <Icon name="check" size={20} color="white" />
-                <Text style={styles.keyText}>{key}</Text>
-              )}
-            </TouchableOpacity>
-          ))}
+          <View style={styles.keypad}>
+            {[
+              ["7", "8", "9"],
+              ["4", "5", "6"],
+              ["1", "2", "3"],
+              ["clear", "0", "ok"],
+            ].map((row, i) => (
+              <View key={i} style={styles.keypadRow}>
+                {row.map((key) => (
+                  <TouchableOpacity
+                    key={key}
+                    onPress={() =>
+                      key === "clear"
+                        ? handleDelete()
+                        : key === "ok"
+                        ? handleAdd()
+                        : handleNumberPress(key)
+                    }
+                    style={[
+                      styles.key,
+                      key === "clear" && styles.clearKey,
+                      key === "ok" && styles.okKey,
+                    ]}
+                  >
+                    <Text style={styles.keyText}>
+                      {key === "clear" ? "⌫" : key === "ok" ? "✓" : key}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            ))}
+          </View>
         </View>
       </View>
     </Modal>
   );
-};
+}
+
+const screenWidth = Dimensions.get("window").width;
 
 const styles = StyleSheet.create({
-  modalContainer: {
+  overlay: {
     flex: 1,
+    backgroundColor: "rgba(0,0,0,0.4)",
     justifyContent: "flex-end",
-    backgroundColor: "#E3F2FD", // Light blue background
-    padding: 40,
   },
-  header: {
+  modal: {
+    backgroundColor: "white",
+    borderTopRightRadius: 24,
+    borderTopLeftRadius: 24,
+    padding: 20,
+    paddingBottom: 40,
+    elevation: 10,
+  },
+  close: {
+    backgroundColor: "red",
+    position: "absolute",
+    right: 20,
+    top: 20,
+  },
+  title: {
+    textAlign: "center",
+    fontSize: 20,
+    fontWeight: "600",
+    marginTop: 10,
+    marginBottom: 20,
+  },
+  input: {
+    fontSize: 36,
+    textAlign: "center",
+    fontWeight: "600",
+    marginVertical: 10,
+  },
+  presets: {
     flexDirection: "row",
     justifyContent: "space-between",
-    padding: 20,
-    backgroundColor: "white",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    marginVertical: 15,
   },
-  cancelText: {
-    fontSize: 16,
-    color: "black",
-  },
-  headerText: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  addText: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "black",
-  },
-  amountText: {
-    fontSize: 36,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginVertical: 10,
-  },
-  amountRow: {
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-    marginVertical: 10,
-  },
-  amountButton: {
-    alignItems: "center",
-    backgroundColor: "#E3F2FD",
+  presetBtn: {
+    backgroundColor: "#E6F0FA",
     padding: 10,
     borderRadius: 10,
-  },
-  amountButtonText: {
-    fontSize: 14,
-    marginTop: 5,
+    minWidth: screenWidth / 6,
+    alignItems: "center",
   },
   keypad: {
+    marginTop: 10,
+  },
+  keypadRow: {
     flexDirection: "row",
-    flexWrap: "wrap",
-    backgroundColor: "white",
-    paddingBottom: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    justifyContent: "space-between",
+    marginVertical: 5,
   },
   key: {
-    width: "33%",
-    height: 60,
+    backgroundColor: "#F2F2F2",
+    width: screenWidth / 4.2,
+    padding: 15,
+    borderRadius: 10,
     alignItems: "center",
-    justifyContent: "center",
+  },
+  clearKey: {
+    backgroundColor: "#CCE0F5",
+  },
+  okKey: {
+    backgroundColor: "#CCE0F5",
   },
   keyText: {
-    fontSize: 24,
-    fontWeight: "bold",
-  },
-  backKey: {
-    backgroundColor: "#E3F2FD",
-    borderRadius: 10,
-  },
-  confirmKey: {
-    backgroundColor: "black",
-    borderRadius: 10,
+    fontSize: 20,
+    color: "black",
   },
 });
-
-export default AddWaterModal;

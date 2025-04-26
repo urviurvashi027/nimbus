@@ -51,6 +51,7 @@ const SelfCare: React.FC = () => {
   // Funstion called on click of navigation button clicked
   const handleNavigationButtonPress = (button: NavigationButtonType) => {
     if (button.action === "navigate") {
+      // router.push("/(auth)/SelfCare/WaterIntake/WaterIntake")
       router.push(button.screen);
     } else if (button.action === "modal") {
       getModalInfo(button.screen);
@@ -105,40 +106,39 @@ const SelfCare: React.FC = () => {
       }}
     >
       <SafeAreaView style={{ flex: 1, padding: 0 }}>
+        <View style={styles.screenTitle}>
+          <Text style={styles.screenTitleText}>Self Care</Text>
+        </View>
+        {/* Navigation Button */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.navigationScrollView}
+          contentContainerStyle={{ paddingHorizontal: 0 }}
+        >
+          {NavigationButton.map((button: NavigationButtonType) => (
+            <View style={styles.navigationButtonContainer} key={button.id}>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => handleNavigationButtonPress(button)}
+              >
+                <Image
+                  style={styles.buttonIcon}
+                  source={
+                    button.icon
+                      ? String(button.icon)
+                      : require("../../../assets/images/options/drink.png")
+                  }
+                />
+              </TouchableOpacity>
+              <Text style={styles.buttonLabel}>{button.label}</Text>
+            </View>
+          ))}
+        </ScrollView>
+
+        {/* MasterClass Section */}
+        {/* <MasterClass /> */}
         <ScrollView showsVerticalScrollIndicator={false}>
-          <View style={styles.screenTitle}>
-            <Text style={styles.screenTitleText}>Self Care</Text>
-          </View>
-          {/* Navigation Button */}
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.navigationScrollView}
-            contentContainerStyle={{ paddingHorizontal: 0 }}
-          >
-            {NavigationButton.map((button: NavigationButtonType) => (
-              <View style={styles.navigationButtonContainer} key={button.id}>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => handleNavigationButtonPress(button)}
-                >
-                  <Image
-                    style={styles.buttonIcon}
-                    source={
-                      button.icon
-                        ? String(button.icon)
-                        : require("../../../assets/images/options/drink.png")
-                    }
-                  />
-                </TouchableOpacity>
-                <Text style={styles.buttonLabel}>{button.label}</Text>
-              </View>
-            ))}
-          </ScrollView>
-
-          {/* MasterClass Section */}
-          {/* <MasterClass /> */}
-
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -204,13 +204,13 @@ const SelfCare: React.FC = () => {
         onClose={() => setShowSleepTagsModal(false)}
       />
 
-      {/* Water Modal */}
+      {/* Water Modal
       <WaterIntakeModal
         visible={showWaterIntakekModal}
         onClose={() => {
           setShowWaterIntakekModal(false);
         }}
-      />
+      /> */}
 
       {/* Things To Do Modal */}
       <ThingsToDoModal
@@ -228,11 +228,11 @@ const styling = (theme: ThemeKey) =>
       marginBottom: 30,
     },
     screenTitleText: {
-      fontSize: 35,
+      fontSize: 30,
       fontWeight: "bold",
     },
     navigationScrollView: {
-      height: 100,
+      // height: 100,
       marginBottom: 20,
     },
     header: {
@@ -244,6 +244,7 @@ const styling = (theme: ThemeKey) =>
     },
     navigationButtonContainer: {
       alignItems: "center",
+      marginBottom: 30,
     },
     content: {
       padding: 0,
