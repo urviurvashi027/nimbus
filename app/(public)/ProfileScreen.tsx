@@ -15,31 +15,38 @@ import ThemeContext from "@/context/ThemeContext";
 import { useAuth } from "@/context/AuthContext";
 import { ThemeKey } from "@/components/Themed";
 import Toast from "react-native-toast-message";
+import { useOnboarding } from "@/context/OnBoardingContext";
 
 export default function signUp() {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [fullName, setfullName] = useState<string>("");
-  const [mobile, setMobile] = useState<string>("");
-  const [username, setUsername] = useState<string>("");
+  const [age, setAge] = useState<string>("");
+  const [weight, setWeight] = useState<string>("");
+  const [height, setHeight] = useState<string>("");
 
-  // Custom regex for email validation.
-  const emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+  const { onboardingData, setDynamicAnswer, setProfileInfo } = useOnboarding();
 
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
   const styles = styling(theme);
 
   const navigation = useNavigation();
-  const { onRegister } = useAuth();
   const router = useRouter();
+
+  const handleProfileSubmit = async () => {
+    if (!age || !height || !weight) {
+      alert("Please fill all fields");
+      return;
+    }
+
+    setProfileInfo({ age, height, weight });
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    router.push("/(public)/OnboardingFinalSubmit");
+  };
 
   useEffect(() => {
     navigation.setOptions({
       headerShown: true,
       headerTransparent: true,
-      headerTitle: "Sign In",
       headerBackButtonDisplayMode: "minimal",
-      headerTitleAlign: "center",
+      // headerTitle: "abdbd",
       headerTintColor: styles.header.color,
       headerTitleStyle: {
         fontSize: 18,
@@ -50,51 +57,31 @@ export default function signUp() {
   }, [navigation]);
 
   const onCreateAccount = () => {
-    if (!email || !password || !fullName || !username) {
+    if (!age || !weight || !height) {
       Toast.show({
         type: "error",
         text1: "Please fill the required field",
         position: "bottom",
       });
     } else {
+      handleProfileSubmit();
       // Validate email on change.
-      if (!emailRegex.test(email)) {
-        Toast.show({
-          type: "error",
-          text1: "Please enter a valid email address.",
-          position: "bottom",
-        });
-      }
+      //   if (!emailRegex.test(email)) {
+      //     Toast.show({
+      //       type: "error",
+      //       text1: "Please enter a valid email address.",
+      //       position: "bottom",
+      //     });
+      //   }
 
-      onSignUpClick();
-    }
-  };
-
-  const onSignUpClick = async () => {
-    const result = await onRegister!(
-      username,
-      fullName,
-      mobile,
-      email,
-      password
-    );
-    if (result && result.success) {
-      Toast.show({
-        type: "success",
-        text1: "Account created successfuly",
-        position: "bottom",
-      });
-      router.replace("/(public)/signIn");
-    }
-    if (result && result.error) {
-      alert(result.msg);
+      // router.push("/(public)/OnboardingFinalSubmit");
     }
   };
 
   return (
     <ScreenView style={styles.container}>
       <View style={styles.titleContainer}>
-        <Text style={styles.title}>Create An Account</Text>
+        <Text style={styles.title}>Basic Details</Text>
       </View>
 
       <View
@@ -104,9 +91,9 @@ export default function signUp() {
       >
         <TextInput
           style={styles.input}
-          placeholder="Enter Full Name"
+          placeholder="Enter Your age"
           placeholderTextColor="gray"
-          onChangeText={(value) => setfullName(value)}
+          onChangeText={(value) => setAge(value)}
         ></TextInput>
       </View>
 
@@ -117,9 +104,9 @@ export default function signUp() {
       >
         <TextInput
           style={styles.input}
-          placeholder="Enter User Name"
+          placeholder="Enter Your Weight"
           placeholderTextColor="gray"
-          onChangeText={(value) => setUsername(value)}
+          onChangeText={(value) => setWeight(value)}
         ></TextInput>
       </View>
 
@@ -130,13 +117,13 @@ export default function signUp() {
       >
         <TextInput
           style={styles.input}
-          placeholder="Enter Mobile"
+          placeholder="Enter Your Height"
           placeholderTextColor="gray"
-          onChangeText={(value) => setMobile(value)}
+          onChangeText={(value) => setHeight(value)}
         ></TextInput>
       </View>
 
-      <View
+      {/* <View
         style={{
           marginTop: 30,
         }}
@@ -147,9 +134,9 @@ export default function signUp() {
           placeholderTextColor="gray"
           onChangeText={(value) => setEmail(value)}
         ></TextInput>
-      </View>
+      </View> */}
 
-      <View
+      {/* <View
         style={{
           marginTop: 30,
         }}
@@ -161,24 +148,22 @@ export default function signUp() {
           placeholder="Enter Password"
           onChangeText={(value) => setPassword(value)}
         ></TextInput>
-      </View>
+      </View> */}
 
       {/* Sign In Button */}
       <View>
         <TouchableOpacity style={styles.createButton} onPress={onCreateAccount}>
-          <Text style={styles.createBtnText}>Create Account</Text>
+          <Text style={styles.createBtnText}>Submit</Text>
         </TouchableOpacity>
       </View>
 
       {/* Create Account Button */}
-      {/* <View> */}
-      <TouchableOpacity
+      {/* <TouchableOpacity
         style={styles.signInButton}
         onPress={() => router.replace("/(public)/signIn")}
       >
         <Text style={styles.signBtnText}>Sign In</Text>
-      </TouchableOpacity>
-      {/* </View> */}
+      </TouchableOpacity> */}
     </ScreenView>
   );
 }

@@ -10,6 +10,7 @@ import HabitContext from "@/context/HabitContext";
 import { useColorScheme } from "@/components/UseColorScheme";
 import AuthProvider from "@/context/AuthContext";
 import { HabitCreateRequest } from "@/types/habitTypes";
+import { OnboardingProvider } from "@/context/OnBoardingContext";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -53,6 +54,7 @@ function RootLayoutNav() {
     <AuthProvider>
       <ThemeProvider>
         <HabitContext.Provider value={{ habitData, setHabitData }}>
+          {/* <OnboardingProvider> */}
           <Stack>
             <Stack.Screen
               name="(auth)/(tabs)"
@@ -64,6 +66,7 @@ function RootLayoutNav() {
             />
           </Stack>
           <Toast />
+          {/* </OnboardingProvider> */}
         </HabitContext.Provider>
       </ThemeProvider>
     </AuthProvider>

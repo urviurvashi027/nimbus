@@ -22,6 +22,7 @@ interface AuthProps {
     // test added optional paramter
     email: string,
     password: string,
+    mobile: string,
     username?: string,
     fullname?: string
   ) => Promise<any>;
@@ -99,6 +100,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   const _register = async (
     userName: string,
     fullName: string,
+    mobile: string,
     email?: string,
     password?: string
   ) => {
@@ -106,6 +108,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       const request = {
         username: userName,
         email,
+        mobile,
         full_name: fullName,
         password,
       };
@@ -133,7 +136,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
       const { success, message, data } = result;
 
-      if (success) {
+      if (success && "email" in data) {
         const { username, email, id, ...tokens } = data; // Destructuring user details separately
         const userInfo = {
           userId: id,

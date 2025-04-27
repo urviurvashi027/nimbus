@@ -12,6 +12,7 @@ import { themeColors } from "@/constant/Colors";
 import { getHabitList } from "@/services/habitService";
 import { HabitItem } from "@/types/habitTypes";
 import { ThemeKey } from "@/components/Themed";
+import NewUserScreen from "../FirstTimeUser/NewUserScreen";
 
 export default function TabOneScreen() {
   const [habitList, setHabitList] = useState<HabitItem[]>([]);
@@ -62,7 +63,8 @@ export default function TabOneScreen() {
           </View>
         ) : (
           <View style={styles.taskListContainer}>
-            <Text>Create your first habit by click on add button.</Text>
+            <NewUserScreen></NewUserScreen>
+            {/* <Text>Create your first habit by click on add button.</Text> */}
           </View>
         )}
       </GestureHandlerRootView>

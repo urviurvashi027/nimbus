@@ -62,3 +62,7 @@ export const logout = async (data: LogoutRequest): Promise<LogoutResponse> => {
     throw error.response ? error.response.data : error.message;
   }
 };
+
+export async function postOnboardingData(data: any) {
+  return data;
+}
