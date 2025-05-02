@@ -78,7 +78,6 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const loadToken = async () => {
-      await SecureStore.deleteItemAsync(TOKEN_KEY);
       // await SecureStore.deleteItemAsync(TOKEN_KEY);
       const token = await SecureStore.getItem(TOKEN_KEY);
       const userInfo = await SecureStore.getItem(USER_KEY);

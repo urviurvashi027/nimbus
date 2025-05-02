@@ -8,8 +8,8 @@ import { themeColors } from "@/constant/Colors";
 
 export default function login() {
   const firstBtnSegmentBtnClick = () => {
-    router.push("/(public)/onboardingScreen");
-    // router.push("/(public)/signUp");
+    // router.push("/(public)/onboardingScreen");
+    router.push("/(public)/signUp");
   };
 
   const secondBtnSegmentBtnClick = () => {

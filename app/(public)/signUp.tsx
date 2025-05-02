@@ -84,7 +84,8 @@ export default function signUp() {
         text1: "Account created successfuly",
         position: "bottom",
       });
-      router.replace("/(public)/signIn");
+      router.push("/(public)/onboardingScreen");
+      // router.replace("/(public)/signIn");
     }
     if (result && result.error) {
       alert(result.msg);

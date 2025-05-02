@@ -21,7 +21,8 @@ const OnboardingFinalSubmit: React.FC = ({}) => {
       console.log("Submitting data:", onboardingData); // Debug
       await postOnboardingData(onboardingData);
       resetOnboardingData();
-      router.replace("/(public)/signUp");
+      router.replace("/(public)/signIn");
+      // router.replace("/(public)/signUp");
       // navigation.replace("Register"); // After onboarding, go to Register Screen
     } catch (error) {
       console.error(error);

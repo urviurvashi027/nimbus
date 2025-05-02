@@ -54,19 +54,19 @@ function RootLayoutNav() {
     <AuthProvider>
       <ThemeProvider>
         <HabitContext.Provider value={{ habitData, setHabitData }}>
-          {/* <OnboardingProvider> */}
-          <Stack>
-            <Stack.Screen
-              name="(auth)/(tabs)"
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="(public)/landing"
-              options={{ headerShown: false }}
-            />
-          </Stack>
-          <Toast />
-          {/* </OnboardingProvider> */}
+          <OnboardingProvider>
+            <Stack>
+              <Stack.Screen
+                name="(auth)/(tabs)"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="(public)/landing"
+                options={{ headerShown: false }}
+              />
+            </Stack>
+            <Toast />
+          </OnboardingProvider>
         </HabitContext.Provider>
       </ThemeProvider>
     </AuthProvider>
