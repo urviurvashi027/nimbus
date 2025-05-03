@@ -331,7 +331,7 @@ const result = {
   title: "Resilient Wanderer",
   description:
     "It appears from your responses that you have a unique set of strengths...",
-  image: require("../../assets/images/lonely.png"), // Replace with actual image
+  image: require("../../assets/images/journaling/lonely.png"), // Replace with actual image
   //  scores: nedds to be added
 };
 
@@ -344,7 +344,7 @@ export const medTests = [
   {
     id: "2",
     title: "Quick ADHD Test",
-    image: require("../../assets/images/mentalTest/ADHD.png"),
+    image: require("../../assets/images/mentalTest/adhdTest.png"),
   },
   {
     id: "3",
@@ -359,7 +359,7 @@ export const medTests = [
   {
     id: "5",
     title: "Emotional Quotient",
-    image: require("../../assets/images/mentalTest/EQ.png"),
+    image: require("../../assets/images/mentalTest/eqTest.png"),
   },
   {
     id: "6",

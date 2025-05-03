@@ -44,7 +44,7 @@ const forYou: Track[] = [
     id: "1",
     title: "Self Affirmation",
     duration: "61 min",
-    image: require("../../../../assets/images/selfAffirmation.png"), // Replace with actual image
+    image: require("../../../../assets/images/journaling/selfAffirmation.png"), // Replace with actual image
     // source: require("../../../../assets/audio/soundscape/lightRain.mp3"),
     description:
       "Feeling unconditional love and acceptance towards yourself and the world",
@@ -59,7 +59,7 @@ const forYou: Track[] = [
     id: "16",
     title: "Practice Gratitude",
     duration: "3 min",
-    image: require("../../../../assets/images/gratitude.png"), // Replace with actual image
+    image: require("../../../../assets/images/journaling/gratitude.png"), // Replace with actual image
     // source: require("../../../../assets/audio/soundscape/seagulls.mp3"), // Replace with actual audio file
     category: "All",
     description:

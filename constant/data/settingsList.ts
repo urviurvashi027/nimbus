@@ -3,20 +3,20 @@ export const Section: any[] = [
     header: "Perference",
     icon: "settings",
     items: [
-      {
-        id: "globe",
-        icon: "globe",
-        color: "#dfd9f9",
-        type: "link",
-        label: "Language",
-      },
-      {
-        id: "showCollabotors",
-        icon: "people",
-        color: "#dfd9f9",
-        type: "toggle",
-        label: "Show Collabortors",
-      },
+      // {
+      //   id: "globe",
+      //   icon: "globe",
+      //   color: "#dfd9f9",
+      //   type: "link",
+      //   label: "Language",
+      // },
+      // {
+      //   id: "showCollabotors",
+      //   icon: "people",
+      //   color: "#dfd9f9",
+      //   type: "toggle",
+      //   label: "Show Collabortors",
+      // },
       {
         id: "navigation",
         icon: "navigate",
@@ -24,20 +24,20 @@ export const Section: any[] = [
         type: "link",
         label: "Location",
       },
-      {
-        id: "wifi",
-        icon: "wifi",
-        color: "#dfd9f9",
-        type: "toggle",
-        label: "Use Wifi",
-      },
-      {
-        id: "darkmode",
-        icon: "moon",
-        color: "#dfd9f9",
-        type: "toogle",
-        label: "Dark Mode",
-      },
+      // {
+      //   id: "wifi",
+      //   icon: "wifi",
+      //   color: "#dfd9f9",
+      //   type: "toggle",
+      //   label: "Use Wifi",
+      // },
+      // {
+      //   id: "darkmode",
+      //   icon: "moon",
+      //   color: "#dfd9f9",
+      //   type: "toogle",
+      //   label: "Dark Mode",
+      // },
     ],
   },
   {
@@ -65,7 +65,7 @@ export const Section: any[] = [
     icon: "document",
     items: [
       {
-        id: "save",
+        id: "onboarding",
         icon: "save",
         color: "#dfd9f9",
         type: "link",
@@ -81,3 +81,17 @@ export const Section: any[] = [
     ],
   },
 ];
+// Account Setting::
+// Notification - Morning Check-in, nightly review, log your mood, streak save
+//Routine setting - sorting, week start on, move completed task down,
+// sound effect
+// Help and feedback::
+//help center - Faq
+// feedback
+// privacy policy
+// term of servcie
+
+// social media
+// discord group
+// instgram
+// facebbok

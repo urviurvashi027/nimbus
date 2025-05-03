@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -12,9 +12,11 @@ import { themeColors } from "@/constant/Colors";
 // import styling from "@/components/createHabit/style/HabitDateModalStyle";
 import ThemeContext from "@/context/ThemeContext";
 import { ThemeKey } from "@/components/Themed";
-import WaterIntakeGoalModal from "./WaterIntakeGoal";
+import WaterIntakeGoalModal from "./component/WaterIntakeGoal";
 import HabitReminderInput from "@/components/createHabit/HabitReminderInput";
-import { ReminderAt } from "@/components/createHabit/Modal/HabitReminderModal";
+import HabitReminderModal, {
+  ReminderAt,
+} from "@/components/createHabit/Modal/HabitReminderModal";
 import WeatherModal from "./component/WeatherModal";
 import UnitInputModal from "./component/LiquidUnit";
 
@@ -23,52 +25,43 @@ interface WaterIntakeProps {
   onClose: () => void;
 }
 
+interface UnitType {
+  weight?: string;
+  liquid?: string;
+}
+
 const SettingsModal: React.FC<WaterIntakeProps> = ({ visible, onClose }) => {
-  const [showReminderModal, setShowRemindersModal] = useState(false);
+  const [userInfo, setUserInfo] = useState({
+    gender: "",
+    weight: "",
+    activity: "",
+    weather: "",
+  });
   const [showWaterIntakeGoalModal, setWaterIntakeGoalModal] = useState(false);
-  const [showUnitModal, setShowUnitModal] = useState(false);
   const [isAddRoutineEnable, setAddRouitneEnable] = useState(false);
 
   const [unitModalVisible, setUnitModalVisible] = useState(false);
-  const [selectedWeightUnit, setSelectedWeightUnit] = useState("");
-  const [selectedLiquidUnit, setSelectedLiquidUnit] = useState("");
+  const [selectedUnit, setSelectedUnit] = useState<UnitType>();
 
   const [reminderAt, setReminderAt] = useState<ReminderAt>({});
-  const settingsOptions = [
-    {
-      id: "1",
-      icon: "notifications",
-      title: "Reminders",
-      value: "Off",
-    },
-    {
-      id: "2",
-      icon: "water",
-      title: "Water intake goal",
-      value: "73oz",
-    },
-    { id: "3", icon: "scale", title: "Units", value: "Lbs, oz" },
-  ];
+  const [showReminderModal, setShowRemindersModal] = useState(false);
 
-  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext);
   const styles = styling(theme);
 
-  const handleOnCloseWaterIntakeSetting = () => {
+  const handleOnSaveWaterIntakeSetting = (data: any) => {
+    setUserInfo(data);
     setWaterIntakeGoalModal(false);
   };
 
   const handlePanelClick = (item: any) => {
-    console.log("Panel clicekced", item);
     if (item == "water") {
-      console.log("coming here");
       setWaterIntakeGoalModal(true);
     }
     if (item == "reminders") {
-      console.log("coming here");
-      setWaterIntakeGoalModal(true);
+      setShowRemindersModal(true);
     }
     if (item == "units") {
-      console.log("coming here");
       setUnitModalVisible(true);
     }
   };
@@ -78,9 +71,22 @@ const SettingsModal: React.FC<WaterIntakeProps> = ({ visible, onClose }) => {
   };
 
   // function to handle reminder selection
-  const handleReminderSelect = (value: any) => {
-    setReminderAt(value);
+  // const handleReminderSelect = (value: any) => {
+  //   setReminderAt(value);
+  // };
+
+  const onSaveClick = () => {
+    onClose();
   };
+
+  const handleHabitReminder = (reminderAt: any) => {
+    console.log(reminderAt, "--------- reminerAt --------");
+    setReminderAt({ time: reminderAt });
+  };
+
+  // useEffect(() => {
+  //   console.log("from usefeefect", selectedUnit);
+  // }, [selectedUnit]);
 
   return (
     <>
@@ -106,7 +112,7 @@ const SettingsModal: React.FC<WaterIntakeProps> = ({ visible, onClose }) => {
               style={styles.optionIcon}
             />
             <Text style={styles.optionText}>Reminders</Text>
-            <Text style={styles.optionValue}>item.value</Text>
+            <Text style={styles.optionValue}>kk</Text>
           </TouchableOpacity>
 
           {/* Water Intake Goal */}
@@ -121,7 +127,7 @@ const SettingsModal: React.FC<WaterIntakeProps> = ({ visible, onClose }) => {
               style={styles.optionIcon}
             />
             <Text style={styles.optionText}>Water</Text>
-            <Text style={styles.optionValue}>item.value</Text>
+            <Text style={styles.optionValue}>{userInfo?.gender}</Text>
           </TouchableOpacity>
 
           {/* Units */}
@@ -136,30 +142,45 @@ const SettingsModal: React.FC<WaterIntakeProps> = ({ visible, onClose }) => {
               style={styles.optionIcon}
             />
             <Text style={styles.optionText}>Unit</Text>
-            <Text style={styles.optionValue}>item.value</Text>
-            {/* <Ionicons name="calendar-outline" size={20} color="black" /> */}
+            {(selectedUnit?.liquid || selectedUnit?.weight) && (
+              <Text style={styles.optionValue}>
+                {selectedUnit?.liquid},{selectedUnit?.weight}
+              </Text>
+            )}
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.saveButton}>
+          <TouchableOpacity style={styles.saveButton} onPress={onSaveClick}>
             <Text style={styles.saveText}>Save</Text>
           </TouchableOpacity>
         </View>
 
-        <WaterIntakeGoalModal
-          visible={showWaterIntakeGoalModal}
-          onClose={handleOnCloseWaterIntakeSetting}
+        {/* Habit reminder modal */}
+        <HabitReminderModal
+          visible={showReminderModal}
+          onClose={() => setShowRemindersModal(false)}
+          isAllDayEnabled={isAllDayEnabled()}
+          onSave={handleHabitReminder}
+          // isEditMode={isEditMode}
         />
 
+        {/* water intake setting modal */}
+        <WaterIntakeGoalModal
+          visible={showWaterIntakeGoalModal}
+          onClose={() => setWaterIntakeGoalModal(false)}
+          onSaveData={handleOnSaveWaterIntakeSetting}
+        />
+
+        {/* unit modal */}
         <UnitInputModal
           visible={unitModalVisible}
-          selectedWeight={selectedWeightUnit}
-          selectedLiquid={selectedLiquidUnit}
+          selectedWeight={selectedUnit?.weight}
+          selectedLiquid={selectedUnit?.liquid}
           onClose={() => setUnitModalVisible(false)}
-          onSelect={(value: any, selectedUnit: any) => {
-            console.log("unit selction done", value);
-            // setSelectedLiquidUnit(value);
-            // setSelectedWeightUnit(value);
-            // setUnit(selectedUnit);
+          onSelect={(unitType: string, unitValue: string) => {
+            console.log("unit selction done", selectedUnit);
+            if (unitType && unitValue) {
+              setSelectedUnit({ ...selectedUnit, [unitType]: unitValue });
+            }
           }}
         />
       </Modal>
@@ -189,7 +210,11 @@ const styling = (theme: ThemeKey) =>
       fontWeight: "bold",
     },
     saveButton: {
+      alignItems: "center",
+      justifyContent: "center",
       padding: 10,
+      // width: "40%",
+      backgroundColor: themeColors.basic.secondaryColor,
     },
     saveText: {
       fontSize: 16,

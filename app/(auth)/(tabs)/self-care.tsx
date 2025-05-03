@@ -127,7 +127,7 @@ const SelfCare: React.FC = () => {
                   source={
                     button.icon
                       ? String(button.icon)
-                      : require("../../../assets/images/options/drink.png")
+                      : require("../../../assets/images/buttonLogo/drink.png")
                   }
                 />
               </TouchableOpacity>

@@ -47,7 +47,7 @@ const UnitInputModal = ({
                 key={option}
                 onPress={() => {
                   setSelectedWeightUnit(option);
-                  onSelect(option);
+                  onSelect("weight", option);
                 }}
                 style={[styles.optionRow, isSelected && styles.selectedRow]}
               >
@@ -70,7 +70,7 @@ const UnitInputModal = ({
                 key={option}
                 onPress={() => {
                   setSelectedLiquidUnit(option);
-                  onSelect(option);
+                  onSelect("liquid", option);
                 }}
                 style={[styles.optionRow, isSelected && styles.selectedRow]}
               >

@@ -66,7 +66,7 @@ export default function profile() {
               <Image
                 alt="profile image"
                 style={styles.profileAvatar}
-                source={require("../../../assets/images/login.jpg")}
+                source={require("../../../assets/images/loginLatest.png")}
               />
 
               <View style={styles.profileActions}>

@@ -31,7 +31,7 @@ const fitnessVideos = {
       id: "1",
       title: "Quick Chest Workout",
       duration: "10 min",
-      image: require("../../../../assets/images/ex/exOne.jpg"),
+      image: require("../../../../assets/images/workout/1.jpg"),
       isLocked: false,
       videoUrl:
         "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
@@ -40,7 +40,7 @@ const fitnessVideos = {
       id: "3",
       title: "Quick Back Workout",
       duration: "13 min",
-      image: require("../../../../assets/images/ex/exThree.jpg"),
+      image: require("../../../../assets/images/workout/2.jpg"),
       isLocked: true,
       videoUrl:
         "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
@@ -51,16 +51,16 @@ const fitnessVideos = {
       id: "2",
       title: "Easy Abs Workout for Beginners",
       duration: "10 min",
-      image: require("../../../../assets/images/ex/exTwo.jpg"),
+      image: require("../../../../assets/images/workout/3.jpg"),
       isLocked: true,
       videoUrl:
         "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
     },
     {
-      id: "3",
+      id: "4",
       title: "Quick Back Workout",
       duration: "13 min",
-      image: require("../../../../assets/images/ex/exThree.jpg"),
+      image: require("../../../../assets/images/workout/2.jpg"),
       isLocked: false,
       videoUrl:
         "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",

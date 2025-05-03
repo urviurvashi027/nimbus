@@ -45,21 +45,21 @@ const Tools: React.FC = () => {
       title: "Me+ AI Helps You Generate Cleaning...",
       badgeText: "Me+ Clean ✨",
       views: "1M+",
-      thumbnail: require("../../../assets/images/gratitude.png"),
+      thumbnail: require("../../../assets/images/journaling/gratitude.png"),
     },
     {
       id: "2",
       title: "The FlyLady Cleaning Method",
       badgeText: "15-min Clean",
       views: "5M+",
-      thumbnail: require("../../../assets/images/overeat.png"),
+      thumbnail: require("../../../assets/images/journaling/overeat.png"),
     },
     {
       id: "3",
       title: "Test",
       badgeText: "15-min Clean",
       views: "5M+",
-      thumbnail: require("../../../assets/images/selfAffirmation.png"),
+      thumbnail: require("../../../assets/images/journaling/selfAffirmation.png"),
     },
   ];
 
@@ -69,63 +69,63 @@ const Tools: React.FC = () => {
       label: "Routine",
       action: "navigate",
       screen: "/(auth)/Tools/Routine/Routine",
-      icon: require("../../../assets/images/tools/1.png"),
+      icon: require("../../../assets/images/buttonLogo/routine.png"),
     },
     {
       id: 2,
       label: "Mood Tracker",
       action: "modal",
       screen: "moodTracker",
-      icon: require("../../../assets/images/tools/2.png"),
+      icon: require("../../../assets/images/buttonLogo/mood.png"),
     },
     {
       id: 3,
       label: "Recipe",
       action: "navigate",
       screen: "/(auth)/Tools/Recipe/Recipe",
-      icon: require("../../../assets/images/tools/3.png"),
+      icon: require("../../../assets/images/buttonLogo/recipe.png"),
     },
     {
       id: 4,
       label: "Article",
       action: "navigate",
       screen: "/(auth)/Tools/Article/Article",
-      icon: require("../../../assets/images/tools/4.png"),
+      icon: require("../../../assets/images/buttonLogo/article.png"),
     },
     {
       id: 5,
       label: "Calorie Cal",
       action: "navigate",
       screen: "/(auth)/Tools/CalorieCal/CalorieCalculator",
-      icon: require("../../../assets/images/tools/5.png"),
+      icon: require("../../../assets/images/buttonLogo/kcal.png"),
     },
     {
       id: 6,
       label: "Protein Cal",
       action: "navigate",
       screen: "/(auth)/Tools/ProtienCal/ProteinCalculator",
-      icon: require("../../../assets/images/tools/6.png"),
+      icon: require("../../../assets/images/buttonLogo/protein.png"),
     },
     {
       id: 7,
       label: "Body Shape Cal",
       action: "navigate",
       screen: "/(auth)/Tools/BodyShapeCal/BodyShapeCalculator",
-      icon: require("../../../assets/images/tools/7.png"),
+      icon: require("../../../assets/images/buttonLogo/bodyShape.png"),
     },
     {
       id: 8,
       label: "AI Scanner",
       action: "navigate",
       screen: "/(auth)/Tools/AIScanner/AIScanner",
-      icon: require("../../../assets/images/tools/5.png"),
+      icon: require("../../../assets/images/buttonLogo/kcal.png"),
     },
     {
       id: 9,
       label: "Products",
       action: "navigate",
       screen: "/(auth)/Tools/AIScanner/AIScanner",
-      icon: require("../../../assets/images/tools/5.png"),
+      icon: require("../../../assets/images/buttonLogo/kcal.png"),
     },
   ];
 
@@ -216,7 +216,7 @@ const Tools: React.FC = () => {
                   source={
                     button.icon
                       ? String(button.icon)
-                      : require("../../../assets/images/options/drink.png")
+                      : require("../../../assets/images/buttonLogo/drink.png")
                   }
                 />
               </TouchableOpacity>

@@ -77,7 +77,7 @@ const MasterClass = () => {
               source={
                 item.thumbnail
                   ? String(item.thumbnail)
-                  : require("../../assets/images/options/drink.png")
+                  : require("../../assets/images/buttonLogo/drink.png")
               }
             />
             {/* <Image source={{ uri: item.thumbnail }} style={styles.thumbnail} /> */}

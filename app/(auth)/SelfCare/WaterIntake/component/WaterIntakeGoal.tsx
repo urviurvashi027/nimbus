@@ -12,24 +12,26 @@ import { themeColors } from "@/constant/Colors";
 // import styling from "@/components/createHabit/style/HabitDateModalStyle";
 import ThemeContext from "@/context/ThemeContext";
 import { ThemeKey } from "@/components/Themed";
-import GenderModal from "./component/GenderModal";
-import WeightInputModal from "./component/WeightInputModal";
-import ActivityModal from "./component/ActivityModal";
-import WeatherModal from "./component/WeatherModal";
+import GenderModal from "./GenderModal";
+import WeightInputModal from "./WeightInputModal";
+import ActivityModal from "./ActivityModal";
+import WeatherModal from "./WeatherModal";
 
 interface WaterIntakeProps {
   visible: boolean;
+  onSaveData: (data: any) => void;
   onClose: () => void;
 }
 
 const WaterIntakeGoalModal: React.FC<WaterIntakeProps> = ({
   visible,
   onClose,
+  onSaveData,
 }) => {
   const [genderModalVisible, setGenderModalVisible] = useState(false);
   const [selectedGender, setSelectedGender] = useState("");
   const [weightModalVisible, setWeightModalVisible] = useState(false);
-  const [weight, setWeight] = useState(73.9);
+  const [weight, setWeight] = useState();
   const [activityModalVisible, setActivityModalVisible] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState("");
   const [weatherModalVisible, setWeatherModalVisible] = useState(false);
@@ -37,50 +39,41 @@ const WaterIntakeGoalModal: React.FC<WaterIntakeProps> = ({
 
   const [unit, setUnit] = useState("Kg");
 
-  const settingsOptions = [
-    {
-      id: "1",
-      icon: "notifications",
-      title: "Gender",
-      value: "Off",
-    },
-    {
-      id: "2",
-      icon: "water",
-      title: "Weight",
-      value: "73oz",
-    },
-    { id: "3", icon: "scale", title: "Activity", value: "Lbs, oz" },
-    { id: "4", icon: "scale", title: "Weather", value: "Lbs, oz" },
-  ];
-
-  console.log("I am loading water intake modal");
-
-  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext);
   const styles = styling(theme);
 
   const handlePanelClick = (item: any) => {
-    console.log("Panel clicekced", item);
     if (item == "Gender") {
-      console.log("coming here");
       setGenderModalVisible(true);
     }
     if (item == "Weight") {
-      console.log("coming here");
       setWeightModalVisible(true);
     }
     if (item == "Activity") {
-      console.log("coming here");
       setActivityModalVisible(true);
     }
     if (item == "Weather") {
-      console.log("coming here");
       setWeatherModalVisible(true);
     }
   };
 
+  const onSaveClick = () => {
+    const data = {
+      gender: selectedGender,
+      weight: `${weight}`,
+      activity: selectedActivity,
+      weather: selectedWeather,
+    };
+    onSaveData(data);
+  };
+
   return (
-    <Modal visible={visible} animationType="slide" transparent>
+    <Modal
+      visible={visible}
+      animationType="slide"
+      presentationStyle="overFullScreen"
+      transparent
+    >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContainer}>
           {/* Header */}
@@ -119,7 +112,12 @@ const WaterIntakeGoalModal: React.FC<WaterIntakeProps> = ({
               style={styles.optionIcon}
             />
             <Text style={styles.optionText}>Weight</Text>
-            <Text style={styles.optionValue}>{weight}</Text>
+            {weight && (
+              <Text style={styles.optionValue}>
+                {weight}
+                {unit}
+              </Text>
+            )}
           </TouchableOpacity>
 
           {/* Activity Input */}
@@ -149,10 +147,10 @@ const WaterIntakeGoalModal: React.FC<WaterIntakeProps> = ({
               style={styles.optionIcon}
             />
             <Text style={styles.optionText}>Weather</Text>
-            <Text style={styles.optionValue}>{selectedActivity}</Text>
+            <Text style={styles.optionValue}>{selectedWeather}</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.saveButton}>
+          <TouchableOpacity style={styles.saveButton} onPress={onSaveClick}>
             <Text style={styles.saveText}>Save</Text>
           </TouchableOpacity>
         </View>
@@ -163,9 +161,19 @@ const WaterIntakeGoalModal: React.FC<WaterIntakeProps> = ({
         onClose={() => setActivityModalVisible(false)}
         selectedGender={selectedActivity}
         onSelect={(val: any) => {
-          console.log(val, "activity");
           setSelectedActivity(val);
           setActivityModalVisible(false);
+        }}
+      />
+
+      <WeatherModal
+        visible={weatherModalVisible}
+        initialValue={selectedWeather.toString()}
+        initialUnit={unit}
+        onClose={() => setWeatherModalVisible(false)}
+        onSelect={(value: any, selectedUnit: any) => {
+          setSelectedWeather(value);
+          setUnit(selectedUnit);
         }}
       />
 
@@ -182,33 +190,11 @@ const WaterIntakeGoalModal: React.FC<WaterIntakeProps> = ({
 
       <WeightInputModal
         visible={weightModalVisible}
-        initialValue={weight.toString()}
+        initialValue={weight}
         initialUnit={unit}
         onClose={() => setWeightModalVisible(false)}
         onSelect={(value: any, selectedUnit: any) => {
           setWeight(value);
-          setUnit(selectedUnit);
-        }}
-      />
-
-      {/* <WeightInputModal
-        visible={weightModalVisible}
-        initialValue={weight.toString()}
-        initialUnit={unit}
-        onClose={() => setWeightModalVisible(false)}
-        onSelect={(value: any, selectedUnit: any) => {
-          setWeight(value);
-          setUnit(selectedUnit);
-        }}
-      /> */}
-
-      <WeatherModal
-        visible={weatherModalVisible}
-        initialValue={selectedWeather.toString()}
-        initialUnit={unit}
-        onClose={() => setWeatherModalVisible(false)}
-        onSelect={(value: any, selectedUnit: any) => {
-          setSelectedWeather(value);
           setUnit(selectedUnit);
         }}
       />
@@ -220,23 +206,17 @@ const styling = (theme: ThemeKey) =>
   StyleSheet.create({
     modalOverlay: {
       flex: 1,
+      // zIndex: 10, // make sure it’s above
       // zIndex: 9999,
-      backgroundColor: "rgba(0,0,0,0.5)",
+      backgroundColor: themeColors.basic.commonWhite,
       //   justifyContent: "center",
       //   alignItems: "center",
     },
     modalContainer: {
-      //   width: "90%",
-      //   backgroundColor: themeColors[theme].background,
-      //   borderRadius: 10,
-      //   padding: 20,
-      //   maxHeight: "90%",
-
+      padding: 20,
       flex: 1,
-      //   backgroundColor: "red",
       paddingHorizontal: 20,
       paddingTop: 80,
-      //   maxHeight: "90%",
     },
     header: {
       flexDirection: "row",
@@ -252,7 +232,11 @@ const styling = (theme: ThemeKey) =>
       fontWeight: "bold",
     },
     saveButton: {
+      alignItems: "center",
+      justifyContent: "center",
       padding: 10,
+      // width: "40%",
+      backgroundColor: themeColors.basic.secondaryColor,
     },
     saveText: {
       fontSize: 16,
@@ -261,7 +245,7 @@ const styling = (theme: ThemeKey) =>
     },
     optionRow: {
       flexDirection: "row",
-      backgroundColor: "white",
+      backgroundColor: "#f8f8f3",
       padding: 20,
       borderRadius: 10,
       marginBottom: 10,
@@ -274,7 +258,6 @@ const styling = (theme: ThemeKey) =>
     optionText: {
       flex: 1,
       fontSize: 16,
-      // marginRight: 10,
       fontWeight: "bold",
     },
     optionValue: {

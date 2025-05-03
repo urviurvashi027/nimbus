@@ -12,23 +12,23 @@ import {
 const activities = [
   {
     text: "Clean your comb",
-    image: require("../../../../assets/images/travel.png"),
+    image: require("../../../../assets/images/journaling/travel.png"),
   },
   {
     text: "Drink water",
-    image: require("../../../../assets/images/travel.png"),
+    image: require("../../../../assets/images/journaling/travel.png"),
   },
   {
     text: "Take a deep breath",
-    image: require("../../../../assets/images/travel.png"),
+    image: require("../../../../assets/images/journaling/travel.png"),
   },
   {
     text: "Stretch your body",
-    image: require("../../../../assets/images/travel.png"),
+    image: require("../../../../assets/images/journaling/travel.png"),
   },
   {
     text: "Write a journal",
-    image: require("../../../../assets/images/travel.png"),
+    image: require("../../../../assets/images/journaling/travel.png"),
   },
 ];
 
