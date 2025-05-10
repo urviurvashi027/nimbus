@@ -49,14 +49,14 @@ export default function OnboardingScreen() {
     if (currentStep < onboardingSteps.length - 1) {
       setCurrentStep(currentStep + 1); // Go to next question
     } else {
-      router.push("/(public)/ProfileScreen");
+      router.push("/(auth)/OnBoarding/ProfileScreen");
       // router.push("/(public)/(onboarding)/screen/OnboardingFinalSubmit"); // After last step, submit
     }
   };
 
   return (
     <ImageBackground
-      source={require("../../assets/images/onboarding.png")}
+      source={require("../../../assets/images/onboarding.png")}
       style={styles.background}
     >
       {/* Sun and Bird Animation if needed */}

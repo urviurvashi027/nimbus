@@ -27,8 +27,6 @@ export default function FeedbackModal({
 
   const styles = styling(theme);
 
-  const navigation = useNavigation();
-
   const submitBug = () => {
     console.log("feedback:::", feedback);
   };

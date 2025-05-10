@@ -18,6 +18,8 @@ import FeedbackModal from "@/components/setting/Feeback";
 import PrivacyPolicyModal from "@/components/setting/PrivacyPoilcy";
 import TermsModal from "@/components/setting/TermsAndService";
 import FAQModal from "@/components/setting/HelpCenter";
+import WarningBanner from "@/components/common/BannerWarning";
+import { router } from "expo-router";
 
 type ThemeKey = "basic" | "light" | "dark";
 
@@ -38,6 +40,10 @@ export default function profile() {
   const [showTermsAndServiceModal, setShowTermsAndServiceModal] =
     useState(false);
   const [showFAQModal, setShowFAQModal] = useState(false);
+
+  const [isOnboardingComplete, setIsOnboardingComplete] = useState(false);
+
+  isOnboardingComplete;
 
   // others
   const [user, setUser] = useState<any>();
@@ -110,6 +116,11 @@ export default function profile() {
   };
   const handleOnSaveNotification = () => {};
 
+  const handleGoToOnboarding = () => {
+    console.log("banner warning clicked");
+    router.push("/(auth)/OnBoarding/onboardingScreen");
+  };
+
   return (
     // <ScreenView>
     <GestureHandlerRootView style={styles.gestureContainer}>
@@ -135,6 +146,19 @@ export default function profile() {
               Tower B, Assetz 63 degree East
             </Text>
           </View>
+
+          <View style={styles.bannerContainer}>
+            {!isOnboardingComplete && (
+              <WarningBanner
+                message="Your onboarding is incomplete. Some features may not work as expected."
+                ctaText="Complete Onboarding"
+                onPress={handleGoToOnboarding}
+              />
+            )}
+
+            {/* ... other settings items */}
+          </View>
+
           {Section.map(({ header, items }) => (
             <View style={styles.section} key={header}>
               <Text style={styles.sectionHeader}>{header}</Text>
@@ -245,6 +269,11 @@ const styling = (theme: ThemeKey) =>
     },
     container: {
       paddingVertical: 24,
+    },
+    bannerContainer: {
+      flex: 1,
+      padding: 20,
+      backgroundColor: "#fff",
     },
     profile: {
       padding: 24,

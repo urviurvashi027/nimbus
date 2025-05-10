@@ -38,7 +38,8 @@ export default function signUp() {
 
     setProfileInfo({ age, height, weight });
     await new Promise((resolve) => setTimeout(resolve, 300));
-    router.push("/(public)/OnboardingFinalSubmit");
+    router.push("/(auth)/OnBoarding/OnboardingFinalSubmit");
+    // router.push("/(public)/OnboardingFinalSubmit");
   };
 
   useEffect(() => {
