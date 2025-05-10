@@ -11,6 +11,13 @@ import { StoreKey } from "@/constant/Constant";
 import { themeColors } from "@/constant/Colors";
 import { ScreenView } from "@/components/Themed";
 import ThemeContext from "@/context/ThemeContext";
+import NotificationTypeModal from "@/components/setting/NotificationTypeSetting";
+import RoutineSettingModal from "@/components/setting/RoutineSetting";
+import ReportBugModal from "@/components/setting/ReportBug";
+import FeedbackModal from "@/components/setting/Feeback";
+import PrivacyPolicyModal from "@/components/setting/PrivacyPoilcy";
+import TermsModal from "@/components/setting/TermsAndService";
+import FAQModal from "@/components/setting/HelpCenter";
 
 type ThemeKey = "basic" | "light" | "dark";
 
@@ -21,6 +28,18 @@ type FormState = {
 };
 
 export default function profile() {
+  // modal states
+  const [showNotificationModal, setShowNotificationModal] = useState(false);
+  const [showRoutineSettingModal, setShowRoutineSettingModal] = useState(false);
+  const [showReportBugModal, setShowReportBugModal] = useState(false);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+
+  const [showPrivatePolicyModal, setShowPrivatePrivacyModal] = useState(false);
+  const [showTermsAndServiceModal, setShowTermsAndServiceModal] =
+    useState(false);
+  const [showFAQModal, setShowFAQModal] = useState(false);
+
+  // others
   const [user, setUser] = useState<any>();
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
 
@@ -56,6 +75,41 @@ export default function profile() {
     value ? toggleTheme("dark") : toggleTheme("light");
   };
 
+  const onSettingPanelClick = (type: string, label: string) => {
+    console.log("setting panel click data", type, label);
+    if (type === "modal") {
+      handleModalVisibilty(label);
+    }
+  };
+
+  const handleModalVisibilty = (label: string) => {
+    switch (label) {
+      case "Notification":
+        setShowNotificationModal(true);
+        break;
+      case "Routine Setting":
+        setShowRoutineSettingModal(true);
+        break;
+      case "Report Bug":
+        setShowReportBugModal(true);
+        break;
+      case "Feedback":
+        setShowFeedbackModal(true);
+        break;
+      case "Privacy Policy":
+        setShowPrivatePrivacyModal(true);
+        break;
+      case "Terms and Services":
+        setShowTermsAndServiceModal(true);
+        break;
+
+      case "Help Center":
+        setShowFAQModal(true);
+        break;
+    }
+  };
+  const handleOnSaveNotification = () => {};
+
   return (
     // <ScreenView>
     <GestureHandlerRootView style={styles.gestureContainer}>
@@ -74,7 +128,6 @@ export default function profile() {
               </View>
             </View>
           </TouchableOpacity>
-
           <View>
             <Text style={styles.profileName}>{user?.userName}</Text>
 
@@ -82,7 +135,6 @@ export default function profile() {
               Tower B, Assetz 63 degree East
             </Text>
           </View>
-
           {Section.map(({ header, items }) => (
             <View style={styles.section} key={header}>
               <Text style={styles.sectionHeader}>{header}</Text>
@@ -101,7 +153,10 @@ export default function profile() {
                   icon: any;
                   color: string;
                 }) => (
-                  <TouchableOpacity key={icon} onPress={() => {}}>
+                  <TouchableOpacity
+                    key={icon}
+                    onPress={() => onSettingPanelClick(type, label)}
+                  >
                     <View style={styles.row}>
                       <View
                         style={[styles.rowIcon, { backgroundColor: color }]}
@@ -128,7 +183,7 @@ export default function profile() {
                         />
                       )}
 
-                      {type === "link" && (
+                      {type === "modal" && (
                         <Ionicons
                           name="chevron-forward"
                           color="#0c0c0c"
@@ -144,6 +199,37 @@ export default function profile() {
           <TouchableOpacity style={styles.logout} onPress={onLogoutClick}>
             <Text>Logout</Text>
           </TouchableOpacity>
+          {/* Notification Setting Modal */}
+          <NotificationTypeModal
+            visible={showNotificationModal}
+            onClose={() => setShowNotificationModal(false)}
+            // onSaveData={handleOnSaveNotification}
+          />
+          {/* Routine Setting Modal */}
+          <RoutineSettingModal
+            visible={showRoutineSettingModal}
+            onClose={() => setShowRoutineSettingModal(false)}
+          />
+          <ReportBugModal
+            visible={showReportBugModal}
+            onClose={() => setShowReportBugModal(false)}
+          />
+          <FeedbackModal
+            visible={showFeedbackModal}
+            onClose={() => setShowFeedbackModal(false)}
+          />
+          <PrivacyPolicyModal
+            visible={showPrivatePolicyModal}
+            onClose={() => setShowPrivatePrivacyModal(false)}
+          />
+          <TermsModal
+            visible={showTermsAndServiceModal}
+            onClose={() => setShowTermsAndServiceModal(false)}
+          />
+          <FAQModal
+            visible={showFAQModal}
+            onClose={() => setShowFAQModal(false)}
+          />
         </ScrollView>
       </SafeAreaView>
     </GestureHandlerRootView>

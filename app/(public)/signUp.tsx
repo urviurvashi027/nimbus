@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Platform,
   ToastAndroid,
+  // TextInput,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigation, useRouter } from "expo-router";
@@ -16,12 +17,19 @@ import { useAuth } from "@/context/AuthContext";
 import { ThemeKey } from "@/components/Themed";
 import Toast from "react-native-toast-message";
 
+import { getOtp, verifyOtp } from "@/services/loginService";
+
 export default function signUp() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [fullName, setfullName] = useState<string>("");
   const [mobile, setMobile] = useState<string>("");
   const [username, setUsername] = useState<string>("");
+  const [error, setError] = useState("");
+  const [otpSent, setOtpSent] = useState<boolean>(false);
+  const [otpVerified, setOtpVerified] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
+  const [otp, setOtp] = useState("");
 
   // Custom regex for email validation.
   const emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
@@ -50,7 +58,7 @@ export default function signUp() {
   }, [navigation]);
 
   const onCreateAccount = () => {
-    if (!email || !password || !fullName || !username) {
+    if (!email || !password || !fullName || !username || !mobile) {
       Toast.show({
         type: "error",
         text1: "Please fill the required field",
@@ -92,6 +100,83 @@ export default function signUp() {
     }
   };
 
+  const getOtpCall = async () => {
+    const result = await getOtp({ phone_number: `+91${mobile}` });
+    if (result && result.success) {
+      setOtpSent(true);
+      setLoading(false);
+      Toast.show({
+        type: "success",
+        text1: "OTP sent",
+        position: "bottom",
+      });
+    }
+    if (result && result.error) {
+      alert(result.error);
+    }
+  };
+
+  const verifyOtpCall = async (mobileNumber: string, enteredOtp: string) => {
+    const result = await verifyOtp({
+      phone_number: mobileNumber,
+      otp: enteredOtp,
+    });
+    setLoading(true);
+
+    if (result && result.success) {
+      setOtpVerified(true);
+      setLoading(false);
+      setOtpSent(false);
+      Toast.show({
+        type: "success",
+        text1: "OTP Verified",
+        position: "bottom",
+      });
+    }
+    if (result && result.error) {
+      Toast.show({
+        type: "error",
+        text1: "Invalid Otp",
+        position: "bottom",
+      });
+      setOtpVerified(false);
+      alert(result.error);
+    }
+  };
+
+  useEffect(() => {
+    if (mobile.length === 10) {
+      getOtpCall();
+      // setError("");
+    } else {
+      // setError("Mobile number must be 10 digits");
+    }
+  }, [mobile]);
+
+  useEffect(() => {
+    if (otp.length === 6) {
+      verifyOtpCall(`+91${mobile}`, otp);
+      setError("");
+    } else {
+      // setError("Mobile number must be 10 digits");
+    }
+  }, [otp]);
+
+  const handleMobileChange = (value: string) => {
+    const numeric = value.replace(/[^0-9]/g, "");
+    setMobile(numeric);
+    if (numeric.length === 10) {
+      setError("");
+    } else {
+      setError("Mobile number must be 10 digits");
+    }
+  };
+
+  const handleOtpChange = (value: string) => {
+    const cleaned = value.replace(/[^0-9]/g, "").slice(0, 6);
+    setOtp(cleaned);
+  };
+
   return (
     <ScreenView style={styles.container}>
       <View style={styles.titleContainer}>
@@ -124,18 +209,38 @@ export default function signUp() {
         ></TextInput>
       </View>
 
-      <View
-        style={{
-          marginTop: 30,
-        }}
-      >
+      <View style={styles.inputContainer}>
+        <View style={styles.codeBox}>
+          <Text style={styles.countryCode}>+91</Text>
+        </View>
         <TextInput
-          style={styles.input}
-          placeholder="Enter Mobile"
+          style={styles.mobileInput}
+          placeholder="Enter Mobile Number"
           placeholderTextColor="gray"
-          onChangeText={(value) => setMobile(value)}
-        ></TextInput>
+          keyboardType="number-pad"
+          maxLength={10}
+          value={mobile}
+          onChangeText={handleMobileChange}
+        />
       </View>
+
+      {/* OTP Input */}
+      {otpSent && (
+        <View
+          style={{
+            marginTop: 30,
+          }}
+        >
+          <TextInput
+            style={styles.input}
+            placeholder="Enter OTP"
+            placeholderTextColor="gray"
+            maxLength={6}
+            value={otp}
+            onChangeText={handleOtpChange}
+          ></TextInput>
+        </View>
+      )}
 
       <View
         style={{
@@ -164,6 +269,9 @@ export default function signUp() {
         ></TextInput>
       </View>
 
+      <View>
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+      </View>
       {/* Sign In Button */}
       <View>
         <TouchableOpacity style={styles.createButton} onPress={onCreateAccount}>
@@ -179,7 +287,6 @@ export default function signUp() {
       >
         <Text style={styles.signBtnText}>Sign In</Text>
       </TouchableOpacity>
-      {/* </View> */}
     </ScreenView>
   );
 }
@@ -233,5 +340,35 @@ const styling = (theme: ThemeKey) =>
     title: {
       color: themeColors[theme].text,
       fontSize: 25,
+    },
+    codeBox: {
+      justifyContent: "center",
+      alignItems: "center",
+      paddingHorizontal: 8,
+    },
+    inputContainer: {
+      flexDirection: "row",
+      marginTop: 30,
+      alignItems: "center", // align vertically
+      // backgroundColor: "red",
+    },
+    countryCode: {
+      fontSize: 16,
+      marginRight: 8,
+      width: 40,
+      color: "#000",
+    },
+    mobileInput: {
+      flex: 1,
+      fontSize: 16,
+      lineHeight: 22, // keeps consistent spacing
+      minWidth: 200,
+      // width: "100%",
+      // color: "#000",
+    },
+    errorText: {
+      color: "red",
+      fontSize: 13,
+      marginTop: 6,
     },
   });

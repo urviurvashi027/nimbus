@@ -7,6 +7,10 @@ import {
   SignupResponse,
   LogoutRequest,
   LogoutResponse,
+  GetOtpRequest,
+  GetOtpResponse,
+  VerifyOtpRequest,
+  VerifyOtpResponse,
 } from "@/types/loginTypes";
 import Toast from "react-native-toast-message";
 
@@ -42,6 +46,32 @@ export const signup = async (data: SignupRequest): Promise<SignupResponse> => {
   try {
     const response: AxiosResponse<SignupResponse> = await axios.post(
       API_ENDPOINTS.register,
+      data
+    );
+    return response.data; // Return the data containing the token
+  } catch (error: any) {
+    throw error.response ? error.response.data : error.message;
+  }
+};
+
+export const getOtp = async (data: GetOtpRequest): Promise<GetOtpResponse> => {
+  try {
+    const response: AxiosResponse<GetOtpResponse> = await axios.post(
+      API_ENDPOINTS.getOtp,
+      data
+    );
+    return response.data; // Return the data containing the token
+  } catch (error: any) {
+    throw error.response ? error.response.data : error.message;
+  }
+};
+
+export const verifyOtp = async (
+  data: VerifyOtpRequest
+): Promise<VerifyOtpResponse> => {
+  try {
+    const response: AxiosResponse<VerifyOtpResponse> = await axios.post(
+      API_ENDPOINTS.verifyOtp,
       data
     );
     return response.data; // Return the data containing the token

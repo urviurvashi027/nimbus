@@ -53,10 +53,13 @@ function useProtectedRoute(authState: {
     const inAuthGroup = segments[0] === "(auth)";
 
     if (!authState.authenticated && inAuthGroup) {
+      console.log("cominge here 1");
       router.replace("/landing");
     } else if (authState.authenticated && !inAuthGroup) {
+      console.log("cominge here 2");
       router.replace("/(auth)/(tabs)");
     } else {
+      console.log("cominge here 3");
       router.replace("/landing");
     }
   }, [authState.authenticated]);
@@ -78,7 +81,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const loadToken = async () => {
-      // await SecureStore.deleteItemAsync(TOKEN_KEY);
+      await SecureStore.deleteItemAsync(TOKEN_KEY);
       const token = await SecureStore.getItem(TOKEN_KEY);
       const userInfo = await SecureStore.getItem(USER_KEY);
 

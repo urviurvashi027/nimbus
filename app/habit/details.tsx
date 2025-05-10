@@ -43,7 +43,7 @@ const HabitDetails = () => {
       headerBackButtonDisplayMode: "minimal",
       headerTitleAlign: "center",
       headerTintColor: styles.header.color,
-      headerRight: () => <Button title="Edit" onPress={onEditClick} />,
+      // headerRight: () => <Button title="Edit" onPress={onEditClick} />,
       headerTitleStyle: {
         fontSize: 18,
         color: styles.header,

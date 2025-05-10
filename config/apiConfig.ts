@@ -20,6 +20,8 @@ export const API_ENDPOINTS = {
   login: `${BASE_URL}/auth/login/`,
   register: `${BASE_URL}/auth/register/`,
   logout: `${BASE_URL}/auth/logout/`,
+  getOtp: `${BASE_URL}/auth/request-phone-otp/`,
+  verifyOtp: `${BASE_URL}/auth/verify-phone-otp/`,
 
   createHabit: `${BASE_URL}/api/habits/`,
 
@@ -35,5 +37,8 @@ export const API_ENDPOINTS = {
   getSoundscapeList: `${BASE_URL}/habits/list`,
   downloadMedia: `${BASE_URL}/habits/list`,
   getWorkoutVideo: `${BASE_URL}/habits/list`,
+
+  // getOtp: `${BASE_URL}/auth/request-phone-otp/`,
+  // verifyOtp: `${BASE_URL}/auth/verify-phone-otp/`,
   // Add more API endpoints as needed
 };

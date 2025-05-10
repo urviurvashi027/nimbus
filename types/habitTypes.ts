@@ -95,6 +95,7 @@ export interface HabitTypeResponse {
   message: string;
   data: HabitType[];
   error_code?: string;
+  error?: any;
 }
 
 export interface HabitUnit {

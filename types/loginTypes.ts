@@ -44,6 +44,29 @@ export interface SignupRequest {
   password?: string;
 }
 
+export interface GetOtpRequest {
+  phone_number: string;
+}
+
+export interface GetOtpResponse {
+  success: boolean;
+  message: string;
+  data: any;
+  error?: string;
+}
+
+export interface VerifyOtpRequest {
+  phone_number: string;
+  otp: string;
+}
+
+export interface VerifyOtpResponse {
+  success: boolean;
+  message: string;
+  data: any;
+  error?: string;
+}
+
 export interface SignupResponse {
   success: boolean;
   message: string;
