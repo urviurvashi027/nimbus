@@ -154,8 +154,20 @@ export default function HabitBasic() {
     return value;
   };
 
+  const getErrMessage = () => {
+    let msg;
+    if (!name) msg = "Please enter name";
+    if (!Object.keys(metric).length) msg = "Please enter metric";
+    if (!Object.keys(reminderAt).length) msg = "Please set reminder";
+    return msg;
+  };
+
   const createHabitData = async () => {
-    if (name && Object.keys(metric).length > 0) {
+    if (
+      name &&
+      Object.keys(metric).length > 0 &&
+      Object.keys(reminderAt).length > 0
+    ) {
       const freq = getFrequencyDetail();
 
       let result = {
@@ -182,11 +194,12 @@ export default function HabitBasic() {
       creatHabitApi(result);
     } else {
       const errorMessage = name ? "Please enter metric" : "Please enter name";
+      const msg = getErrMessage();
       // Show error toast
       Toast.show({
         type: "error",
         text1: "Required Field Empty",
-        text2: errorMessage,
+        text2: msg,
         position: "bottom",
       });
     }
@@ -247,7 +260,7 @@ export default function HabitBasic() {
                 <TextInput
                   style={styles.input}
                   placeholderTextColor={themeColors.basic.mediumGrey}
-                  placeholder="Enter Habitt name"
+                  placeholder="Enter habit name"
                   value={name}
                   onChangeText={setName}
                 />

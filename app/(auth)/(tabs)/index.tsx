@@ -51,7 +51,7 @@ export default function TabOneScreen() {
     <ScreenView style={{ paddingTop: Platform.OS === "ios" ? 50 : 20 }}>
       <GestureHandlerRootView style={styles.gestureContainer}>
         {/* Date Panel View */}
-        <DatePanel onDateChange={onDateChange} />
+        {habitList.length > 0 && <DatePanel onDateChange={onDateChange} />}
 
         {habitList.length > 0 ? (
           <View style={styles.taskListContainer}>
@@ -64,7 +64,6 @@ export default function TabOneScreen() {
         ) : (
           <View style={styles.taskListContainer}>
             <NewUserScreen></NewUserScreen>
-            {/* <Text>Create your first habit by click on add button.</Text> */}
           </View>
         )}
       </GestureHandlerRootView>

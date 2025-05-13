@@ -9,7 +9,6 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { format } from "date-fns";
-import DateTimePicker from "@react-native-community/datetimepicker";
 
 import { Text } from "../../Themed";
 import ThemeContext from "@/context/ThemeContext";
@@ -53,8 +52,6 @@ const HabitReminderModal: React.FC<ReminderAtModalProps> = ({
   const [selection, setSelection] = useState("");
   const [error, setError] = useState("");
 
-  const { habitData, setHabitData } = useContext(HabitContext);
-
   useEffect(() => {
     if (isAllDayEnabled) {
       setLabel("You have selected All day in habit duration specify time");
@@ -92,6 +89,10 @@ const HabitReminderModal: React.FC<ReminderAtModalProps> = ({
   };
 
   const handleTimeChange = (selectedDate: any) => {
+    console.log(selectedDate, "selectedDate");
+    const time24 = format(new Date(selectedDate), "HH:mm");
+    const time12 = format(new Date(selectedDate), "hh:mm a");
+    console.log(time24, time12, "--selectedDate-- 12/24");
     if (selectedDate) {
       setReminderAt(selectedDate);
     }

@@ -92,8 +92,9 @@ const styles = StyleSheet.create({
   banner: {
     width: width - 50,
     height: 150,
-    marginHorizontal: 10,
+    marginHorizontal: 5,
     borderRadius: 20,
+    marginVertical: 20,
     flexDirection: "row",
     overflow: "hidden",
     alignItems: "center",

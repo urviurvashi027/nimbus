@@ -5,6 +5,7 @@ export const masterClassData = [
     coachName: "Korphy",
     thumbnail: require("../../assets/images/workout.jpg"),
     videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
+    isLocked: false,
   },
   {
     id: "2",
@@ -12,6 +13,7 @@ export const masterClassData = [
     coachName: "Korphy",
     thumbnail: require("../../assets/images/workout.jpg"),
     videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
+    isLocked: true,
   },
   {
     id: "3",
@@ -19,6 +21,7 @@ export const masterClassData = [
     coachName: "Korphy",
     thumbnail: require("../../assets/images/workout.jpg"),
     videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
+    isLocked: true,
   },
   {
     id: "4",
@@ -26,5 +29,6 @@ export const masterClassData = [
     coachName: "Korphy",
     thumbnail: require("../../assets/images/workout.jpg"),
     videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
+    isLocked: true,
   },
 ];

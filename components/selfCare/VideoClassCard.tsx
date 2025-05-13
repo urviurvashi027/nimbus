@@ -15,9 +15,8 @@ const MasterclassCard: React.FC<VideoClassCardType> = ({
   thumbnail,
   onPress,
 }) => {
-  //  thumbnail={require("../../../assets/images/workout.jpg")}
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress}>
+    <View style={styles.card}>
       <View style={styles.imageWrapper}>
         <Image source={thumbnail} style={styles.image} />
         <Text style={styles.courses}>9 courses</Text>
@@ -31,12 +30,12 @@ const MasterclassCard: React.FC<VideoClassCardType> = ({
           </Text>
         </View>
         <View>
-          <TouchableOpacity style={styles.playButton}>
+          <TouchableOpacity style={styles.playButton} onPress={onPress}>
             <Text style={styles.playText}>Play</Text>
           </TouchableOpacity>
         </View>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 };
 
@@ -44,6 +43,7 @@ export default MasterclassCard;
 
 const styles = StyleSheet.create({
   card: {
+    padding: 0,
     borderRadius: 16,
     overflow: "hidden",
     backgroundColor: "#E8F2FF",

@@ -97,7 +97,7 @@ const HabitMetricInput: React.FC<HabitMetricInputProp> = ({
             ellipsizeMode="tail"
           >
             {habitMetric
-              ? `Metric: ${habitMetric.count}  ${habitMetric.label}`
+              ? `${habitMetric.count} ${habitMetric.label}`
               : "Select Metric"}
           </Text>
         </View>

@@ -40,6 +40,9 @@ const HabitReminderInput: React.FC<HabitReminderInputProps> = ({
   const handleHabitReminder = (reminderAt: any) => {
     setReminderAt(reminderAt);
     if (reminderAt.time) {
+      console.log(reminderAt.time, "reminderAt.time");
+      // const time12 = format(new Date(reminderAt.time), "hh:mm a");
+      // setUserDisplay(time12);
       setUserDisplay(reminderAt.time);
       onSelect(reminderAt);
     }

@@ -113,15 +113,15 @@ const Tools: React.FC = () => {
       screen: "/(auth)/Tools/BodyShapeCal/BodyShapeCalculator",
       icon: require("../../../assets/images/buttonLogo/bodyShape.png"),
     },
+    // {
+    //   id: 8,
+    //   label: "AI Scanner",
+    //   action: "navigate",
+    //   screen: "/(auth)/Tools/AIScanner/AIScanner",
+    //   icon: require("../../../assets/images/buttonLogo/kcal.png"),
+    // },
     {
       id: 8,
-      label: "AI Scanner",
-      action: "navigate",
-      screen: "/(auth)/Tools/AIScanner/AIScanner",
-      icon: require("../../../assets/images/buttonLogo/kcal.png"),
-    },
-    {
-      id: 9,
       label: "Products",
       action: "navigate",
       screen: "/(auth)/Tools/AIScanner/AIScanner",

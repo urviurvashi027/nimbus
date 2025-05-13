@@ -173,7 +173,7 @@ export default HorizontalListCardScroll;
 const styling = (theme: ThemeKey, color: string) =>
   StyleSheet.create({
     card: {
-      margin: 10,
+      marginVertical: 20,
       borderRadius: 15,
       padding: 15,
       borderWidth: 1,

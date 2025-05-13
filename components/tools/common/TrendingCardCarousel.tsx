@@ -73,7 +73,7 @@ const TrendingCardCarousel: React.FC<TrendingCardCarouselProps> = ({
 const styling = (theme: ThemeKey) =>
   StyleSheet.create({
     container: {
-      marginVertical: 35,
+      marginVertical: 30,
       // backgroundColor: "red",
     },
     header: {
@@ -105,7 +105,7 @@ const styling = (theme: ThemeKey) =>
       borderRadius: 20,
       overflow: "hidden",
       justifyContent: "flex-end",
-      padding: 10,
+      // padding: 10,
     },
     cardImage: {
       borderRadius: 20,

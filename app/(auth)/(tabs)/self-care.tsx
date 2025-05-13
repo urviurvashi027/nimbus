@@ -35,12 +35,13 @@ import { medTests } from "@/constant/data/medicalTest";
 import { meditationsList } from "@/constant/data/meditation";
 import HorizontalBanner from "@/components/tools/common/HorizontalBanner";
 import { banners } from "@/constant/data/banner";
+import PricingModal from "@/components/common/PricingModal";
 
 const SelfCare: React.FC = () => {
   const navigation = useNavigation();
   const [selectedButton, setSelectedButton] = useState("");
 
-  const [showWaterIntakekModal, setShowWaterIntakekModal] = useState(false);
+  const [showPricingModal, setShowPricingModal] = useState(false);
   const [showSleepTagsModal, setShowSleepTagsModal] = useState(false);
   const [showThingsToDoTagsModal, setShowThingsToDoTagsModal] = useState(false);
 
@@ -66,9 +67,6 @@ const SelfCare: React.FC = () => {
         break;
       case "thingsToDo":
         setShowThingsToDoTagsModal(true);
-        break;
-      case "waterIntake":
-        setShowWaterIntakekModal(true);
         break;
     }
   };
@@ -97,6 +95,15 @@ const SelfCare: React.FC = () => {
 
   const handleBannerPress = (id: string) => {
     console.log("Banner pressed:", id);
+  };
+
+  const handleWorkoutVideoClicked = (card: any) => {
+    console.log(card, card.isLocked, "workout video clicked");
+    if (card.isLocked) {
+      setShowPricingModal(true);
+    } else {
+      setShowPricingModal(false);
+    }
   };
 
   return (
@@ -142,7 +149,7 @@ const SelfCare: React.FC = () => {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            style={{ padding: 16 }}
+            style={{ paddingTop: 16, paddingLeft: 0, paddingBottom: 20 }}
           >
             {masterClassData.map((card) => (
               <VideoClassCard
@@ -150,7 +157,7 @@ const SelfCare: React.FC = () => {
                 title={card.title}
                 coachName={card.coachName}
                 thumbnail={require("../../../assets/images/workout.jpg")}
-                onPress={() => console.log("Clicked on", card.title)}
+                onPress={() => handleWorkoutVideoClicked(card)}
               />
             ))}
           </ScrollView>
@@ -204,13 +211,15 @@ const SelfCare: React.FC = () => {
         onClose={() => setShowSleepTagsModal(false)}
       />
 
-      {/* Water Modal
-      <WaterIntakeModal
-        visible={showWaterIntakekModal}
+      <PricingModal
+        visible={showPricingModal}
         onClose={() => {
-          setShowWaterIntakekModal(false);
+          setShowPricingModal(false);
         }}
-      /> */}
+        onSeizePress={() => {
+          console.log("onSeizeClicked");
+        }}
+      />
 
       {/* Things To Do Modal */}
       <ThingsToDoModal
@@ -224,7 +233,7 @@ const SelfCare: React.FC = () => {
 const styling = (theme: ThemeKey) =>
   StyleSheet.create({
     screenTitle: {
-      paddingHorizontal: 10,
+      // paddingHorizontal: 10,
       marginBottom: 30,
     },
     screenTitleText: {
@@ -253,7 +262,7 @@ const styling = (theme: ThemeKey) =>
       width: 60,
       height: 60,
       borderRadius: 25, // Makes the button rounded
-      marginHorizontal: 8, // Space between buttons
+      marginRight: 8, // Space between buttons
     },
     buttonIcon: {
       width: 60,

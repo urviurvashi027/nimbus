@@ -252,7 +252,7 @@ const HabitDateModal: React.FC<HabitDateModalProps> = ({
           ></DatePicker>
 
           <View style={styles.toggleContainer}>
-            <Text style={styles.label}>Repeate</Text>
+            <Text style={styles.label}>Repeat</Text>
             <Switch
               value={isReapeatEnabled}
               thumbColor={themeColors.basic.primaryColor}
