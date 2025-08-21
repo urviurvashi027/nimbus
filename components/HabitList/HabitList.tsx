@@ -5,24 +5,27 @@ import {
   FlatList,
   StatusBar,
   StyleSheet,
+  TouchableOpacity,
 } from "react-native";
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import SwipeableItem from "./SwipeableItem";
+import { HabitItem } from "@/types/habitTypes";
+import { router } from "expo-router";
+import { deleteHabit, markHabitDone } from "@/services/habitService";
+import ActivityIndicatorModal from "../common/ActivityIndicatorModal";
+import { Ionicons } from "@expo/vector-icons";
 
-type ThemeKey = "basic" | "light" | "dark";
-
-export interface HabitItemProps {
-  id: string;
-  emoji: string;
-  name: string;
-  time: string;
-  // isDone: boolean;
-  //   onToggle: (isDone: boolean) => void;
-}
+import ThemeContext from "@/context/ThemeContext";
+import DatePanel from "@/components/homeScreen/DatePanel";
+import { themeColors } from "@/constant/Colors";
+import { ThemeKey } from "../Themed";
+import Toast from "react-native-toast-message";
+// import { ThemeKey } from "../Themed";
 
 interface HabitListProps {
-  data: Array<HabitItemProps>;
+  data: Array<HabitItem>;
   style: any;
+  refreshData: () => void;
 }
 
 const Separator = (props: any) => {
@@ -31,7 +34,82 @@ const Separator = (props: any) => {
 };
 
 const HabitList: React.FC<HabitListProps> = (props) => {
-  const { style, data, ...otherProps } = props;
+  const { style, data, refreshData, ...otherProps } = props;
+  // api state
+  // const [isLoading, setIsLoading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  // const [isVisible, setisVisible] = useState<boolean>(false);
+
+  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+
+  const styles = styling(theme);
+
+  const habitItemClicked = (id: any) => {
+    router.push({ pathname: "/habit/details", params: { id: id } });
+  };
+
+  const deleteBackendCall = async (id: number) => {
+    try {
+      const result = await deleteHabit(id);
+      if (result?.success) {
+        // refreshData();
+        Toast.show({
+          type: "success",
+          text1: "Habit Deleted successfuly",
+          position: "bottom",
+        });
+      }
+    } catch (error: any) {
+      Toast.show({
+        type: "error",
+        text1: "Something went wrong",
+        position: "bottom",
+      });
+    } finally {
+      refreshData();
+    }
+  };
+
+  const onHabitMarkDone = async (data: any, id: any) => {
+    try {
+      const result = await markHabitDone(data, id);
+      if (result?.success) {
+        // refreshData();
+        Toast.show({
+          type: "success",
+          text1: "Habit marked done successfuly",
+          position: "bottom",
+        });
+      }
+    } catch (error: any) {
+      Toast.show({
+        type: "error",
+        text1: "Something went wrong",
+        position: "bottom",
+      });
+    } finally {
+      refreshData();
+    }
+  };
+
+  const habitItemDeleted = (id: number) => {
+    deleteBackendCall(id);
+  };
+
+  // test
+
+  // const onModalClick = () => {
+  //   console.log("modal clicked");
+  //   setisVisible(true);
+  // };
+
+  const handleOnSelect = (sm: any) => {
+    console.log("sm:amy", sm);
+  };
+
+  // useEffect(() => {
+  //   console.log(isVisible, "from index");
+  // }, [isVisible]);
   return (
     <>
       {/* <StatusBar /> */}
@@ -39,17 +117,54 @@ const HabitList: React.FC<HabitListProps> = (props) => {
         <FlatList
           data={data}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <SwipeableItem {...item} />}
+          renderItem={({ item }) => (
+            <SwipeableItem
+              item={item}
+              habitItemDeleted={habitItemDeleted}
+              habitItemClick={habitItemClicked}
+              habitDoneClick={onHabitMarkDone}
+            />
+          )}
           ItemSeparatorComponent={() => <Separator style={style} />}
         />
       </SafeAreaView>
+      {/* <TouchableOpacity style={styles.floatingButtonTow} onPress={onModalClick}>
+        <Ionicons name="add" size={20} color={styles.iconColor.color} />
+      </TouchableOpacity> */}
+      {/* <HabitTypeModal
+        habitTypeList={[]}
+        visible={isVisible}
+        onClose={() => setisVisible(false)}
+        onSelect={handleOnSelect}
+      /> */}
+      {/* {isLoading && <ActivityIndicatorModal visible={isLoading} />} */}
     </>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
+const styling = (theme: ThemeKey) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+    },
+    iconColor: {
+      color: themeColors[theme].text,
+    },
+    floatingButtonTow: {
+      position: "absolute",
+      right: 100,
+      bottom: 20,
+      width: 40,
+      height: 40,
+      borderRadius: 30,
+      backgroundColor: themeColors[theme].background,
+      justifyContent: "center",
+      alignItems: "center",
+      shadowColor: themeColors[theme].shadowColor,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.8,
+      shadowRadius: 2,
+      elevation: 5,
+    },
+  });
 export default HabitList;

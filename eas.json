@@ -1,0 +1,29 @@
+{
+  "cli": {
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "preview": {
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "develpment": {
+      "android": {
+        "gradleCommand": ":app:assembleRelease"
+      }
+    },
+    "beta": {
+      "developmentClient": true
+    },
+    "production": {
+      "ios": {},
+      "android": {
+        "gradleCommand": ":app:bundleRelease",
+        "buildType": "app-bundle"
+      },
+      "distribution": "store",
+      "credentialsSource": "remote"
+    }
+  }
+}

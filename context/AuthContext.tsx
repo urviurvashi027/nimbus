@@ -3,7 +3,7 @@ import { useContext, useState } from "react";
 import { router, useSegments } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import axios from "axios";
-import { login, signup, logout } from "@/service/loginService";
+import { login, signup, logout } from "@/services/loginService";
 
 type User = {
   userId: number | null;
@@ -22,6 +22,7 @@ interface AuthProps {
     // test added optional paramter
     email: string,
     password: string,
+    mobile: string,
     username?: string,
     fullname?: string
   ) => Promise<any>;
@@ -51,15 +52,15 @@ function useProtectedRoute(authState: {
 
     const inAuthGroup = segments[0] === "(auth)";
 
-    // console.log(inAuthGroup, authState, "from auth group");
-
     if (!authState.authenticated && inAuthGroup) {
-      router.replace("/login");
+      console.log("cominge here 1");
+      router.replace("/landing");
     } else if (authState.authenticated && !inAuthGroup) {
+      console.log("cominge here 2");
       router.replace("/(auth)/(tabs)");
     } else {
-      // console.log("coming in else part");
-      router.replace("/login");
+      console.log("cominge here 3");
+      router.replace("/landing");
     }
   }, [authState.authenticated]);
 }
@@ -81,11 +82,9 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const loadToken = async () => {
       await SecureStore.deleteItemAsync(TOKEN_KEY);
-      // await SecureStore.deleteItemAsync(TOKEN_KEY);
       const token = await SecureStore.getItem(TOKEN_KEY);
       const userInfo = await SecureStore.getItem(USER_KEY);
 
-      // console.log("Auth Context File: 1# Use Effect --> stored token", token);
       if (token) {
         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
         setAuthState({
@@ -103,6 +102,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   const _register = async (
     userName: string,
     fullName: string,
+    mobile: string,
     email?: string,
     password?: string
   ) => {
@@ -110,19 +110,18 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       const request = {
         username: userName,
         email,
+        mobile,
         full_name: fullName,
         password,
       };
       return await signup(request);
       // return await axios.post(`${URL}/register/`, { email, password });
     } catch (e) {
-      // console.log(`Auth Context File: 2# register ---> error ${e}`);
       return { error: true, msg: (e as any).response.data.msg };
     }
   };
 
   const _login = async (userName: string, password: string) => {
-    // console.log(userName, password);
     try {
       const request = {
         username: userName,
@@ -130,8 +129,6 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       };
 
       const result = await login(request);
-
-      // console.log(`file auth context:: login result---->`, result.data);
 
       // const result = {
       //   data: {
@@ -141,7 +138,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
       const { success, message, data } = result;
 
-      if (success) {
+      if (success && "email" in data) {
         const { username, email, id, ...tokens } = data; // Destructuring user details separately
         const userInfo = {
           userId: id,
@@ -171,13 +168,11 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
       return result;
     } catch (e) {
-      // console.log(`Auth Context File: 2# login ----> error ${e}`);
       return { error: true, msg: (e as any).response.data.msg };
     }
   };
 
   // const login = (username: string, password: string) => {
-  //   console.log("login", username, password);
   //   setUser({
   //     id: "1",
   //     username: username,
@@ -187,7 +182,6 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   // };
 
   const _logout = async () => {
-    // console.log("logout called");
     const ref = await SecureStore.getItem(REFRESH_TOKEN);
     try {
       const request = {

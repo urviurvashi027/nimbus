@@ -26,16 +26,15 @@ export type TextProps = ThemeProps & DefaultText["props"];
 export type ViewProps = ThemeProps & DefaultView["props"];
 export type TextInputProps = ThemeProps & DefaultTextInput["props"];
 
-type ThemeKey = "basic" | "light" | "dark";
+export type ThemeKey = "basic" | "light" | "dark";
 
 export function useThemeColor(
   props: { light?: string; dark?: string },
   colorName: keyof typeof Colors.light & keyof typeof Colors.dark
 ) {
   const theme = useColorScheme() ?? "light";
-  // console.log(theme, "theme");
   const colorFromProps = props[theme];
-
+  // console.log(colorFromProps, colorName, theme);
   if (colorFromProps) {
     return colorFromProps;
   } else {
@@ -48,7 +47,6 @@ export function Text(props: TextProps) {
   const color = useThemeColor({ light: lightColor, dark: darkColor }, "text");
 
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
-  console.log("Text styling", theme);
   const styles = textStyling(theme);
 
   return <DefaultText style={[styles.textStyle, style]} {...otherProps} />;
@@ -83,7 +81,6 @@ export const Button = ({
   textStyle?: any;
 }) => {
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
-  console.log("Text styling", theme);
   const styles = btnStyling(theme);
 
   return (
@@ -97,20 +94,25 @@ const btnStyling = (theme: ThemeKey) => StyleSheet.create({});
 
 export function LargeButton() {}
 
-export function ScreenView(props: ViewProps) {
-  const { style, ...otherProps } = props;
+export function ScreenView(
+  props: ViewProps & { bgColor?: string; padding?: number }
+) {
+  const { style, bgColor, padding, ...otherProps } = props;
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
-  const styles = screenViewStyling(theme);
-  console.log(style, "screnview");
-
+  const styles = screenViewStyling(theme, bgColor, padding);
   return <DefaultView style={[style, styles.container]} {...otherProps} />;
 }
 
-const screenViewStyling = (theme: ThemeKey) =>
+const screenViewStyling = (
+  theme: ThemeKey,
+  bgColor?: string,
+  padding?: number
+) =>
   StyleSheet.create({
     container: {
-      backgroundColor: themeColors[theme].background,
-      padding: 15,
+      backgroundColor: bgColor || themeColors[theme].background,
+      // backgroundColor: themeColors[theme].background,
+      padding: padding || 15,
       height: "100%",
       // paddingTop: Platform.OS === "ios" ? 50 : 20,
     },

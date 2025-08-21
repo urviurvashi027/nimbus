@@ -1,21 +1,45 @@
+// Account Setting::
+
+// Notification - Morning Check-in, nightly review, log your mood, streak save
+// Routine Setting - sorting, week start on, move completed task down,
+// sound effect
+
+// Help and feedback::
+// help center - Faq
+// feedback  -- modal -- input box, button
+// privacy policy -- modal, privacyPolicy
+// term of servcie -- modal, term of service
+
+// social media ::
+// discord group -- link, details
+// instgram -- link, details
+// facebbok -- link, details
+
 export const Section: any[] = [
   {
     header: "Perference",
     icon: "settings",
     items: [
       {
-        id: "globe",
-        icon: "globe",
+        id: "notification",
+        icon: "notifications-outline",
         color: "#dfd9f9",
-        type: "link",
-        label: "Language",
+        type: "modal",
+        label: "Notification",
       },
       {
-        id: "showCollabotors",
+        id: "routineSetting",
         icon: "people",
         color: "#dfd9f9",
-        type: "toggle",
-        label: "Show Collabortors",
+        type: "modal",
+        label: "Routine Setting",
+      },
+      {
+        id: "soundEffect",
+        icon: "musical-notes-outline",
+        color: "#dfd9f9",
+        type: "toogle",
+        label: "Sound Effect",
       },
       {
         id: "navigation",
@@ -24,59 +48,73 @@ export const Section: any[] = [
         type: "link",
         label: "Location",
       },
-      {
-        id: "wifi",
-        icon: "wifi",
-        color: "#dfd9f9",
-        type: "toggle",
-        label: "Use Wifi",
-      },
-      {
-        id: "darkmode",
-        icon: "moon",
-        color: "#dfd9f9",
-        type: "toogle",
-        label: "Dark Mode",
-      },
     ],
   },
   {
-    header: "Help",
+    header: "Help and feedback",
     icon: "help-circle",
     items: [
       {
-        id: "bug",
-        icon: "flag",
+        id: "helpCenter",
+        icon: "help",
         color: "#dfd9f9",
-        type: "link",
+        type: "modal",
+        label: "Help Center",
+      },
+      {
+        id: "bug",
+        icon: "bug-outline",
+        color: "#dfd9f9",
+        type: "modal",
         label: "Report Bug",
       },
       {
-        id: "mail",
+        id: "feedback",
         icon: "mail",
         color: "#dfd9f9",
-        type: "link",
-        label: "Contact us",
+        type: "modal",
+        label: "Feedback",
+      },
+      {
+        id: "privacyPolicy",
+        icon: "contract",
+        color: "#dfd9f9",
+        type: "modal",
+        label: "Privacy Policy",
+      },
+      {
+        id: "terms",
+        icon: "document-outline",
+        color: "#dfd9f9",
+        type: "modal",
+        label: "Terms and Services",
       },
     ],
   },
   {
-    header: "Content",
+    header: "Social Media",
     icon: "document",
     items: [
       {
-        id: "save",
-        icon: "save",
+        id: "discord",
+        icon: "logo-discord",
         color: "#dfd9f9",
         type: "link",
-        label: "Saved",
+        label: "Discord",
       },
       {
-        id: "download",
-        icon: "download",
+        id: "instagram",
+        icon: "logo-instagram",
         color: "#dfd9f9",
         type: "link",
-        label: "Downloads",
+        label: "Instagram",
+      },
+      {
+        id: "facebook",
+        icon: "logo-facebook",
+        color: "#dfd9f9",
+        type: "link",
+        label: "Facebook",
       },
     ],
   },

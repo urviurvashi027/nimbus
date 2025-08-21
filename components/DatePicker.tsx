@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Button, TouchableOpacity, View, StyleSheet } from "react-native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { Ionicons } from "@expo/vector-icons";
@@ -11,12 +11,13 @@ type ThemeKey = "basic" | "light" | "dark";
 
 interface DatePicker {
   label: string;
+  selectedDateValue: Date;
   onConfirmDate: (selectedDate: Date) => void;
   minimumDate: Date;
 }
 
 const DatePicker = (props: DatePicker) => {
-  const { onConfirmDate, label, minimumDate } = props;
+  const { onConfirmDate, label, minimumDate, selectedDateValue } = props;
 
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -29,9 +30,11 @@ const DatePicker = (props: DatePicker) => {
     setDatePickerVisibility(false);
   };
 
+  useEffect(() => {
+    setSelectedDate(selectedDateValue);
+  }, [selectedDateValue]);
+
   const handleConfirm = (date: any) => {
-    console.warn("A date has been picked: ", date);
-    console.warn("A date has been picked: ", date);
     hideDatePicker();
     setSelectedDate(date);
     onConfirmDate(date);

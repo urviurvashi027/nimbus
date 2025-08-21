@@ -1,7 +1,7 @@
-import { View, Text, StyleSheet } from "react-native";
-import React, { useContext, useState } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import React, { useContext, useRef, useState } from "react";
 import Swipeable from "react-native-gesture-handler/ReanimatedSwipeable";
-import { HabitItemProps } from "./HabitList";
+// import { HabitItemProps } from "./HabitList";
 import DeleteHabitModal from "../modal/deleteHabitModal";
 import Animated, {
   useAnimatedStyle,
@@ -9,17 +9,44 @@ import Animated, {
   withSpring,
   runOnJS,
 } from "react-native-reanimated";
-import { deleteHabit } from "@/service/habitService";
+import { deleteHabit, markHabitDone } from "@/services/habitService";
 import { useNavigation } from "expo-router";
 import ThemeContext from "@/context/ThemeContext";
 import { themeColors } from "@/constant/Colors";
 import { Ionicons } from "@expo/vector-icons";
+import { HabitDoneRequest, HabitItem } from "@/types/habitTypes";
+import { ThemeKey } from "../Themed";
+import ActivityIndicatorModal from "../common/ActivityIndicatorModal";
 
-type ThemeKey = "basic" | "light" | "dark";
+type SwipeableItemProps = {
+  item: HabitItem;
+  habitItemClick: (id: any) => void;
+  habitItemDeleted: (id: any) => void;
+  habitDoneClick: (habitDoneRequest: HabitDoneRequest, id: any) => void;
+};
 
-const SwipeableItem: React.FC<HabitItemProps> = ({ name, time, id, emoji }) => {
+const SwipeableItem: React.FC<SwipeableItemProps> = (
+  props: SwipeableItemProps
+) => {
+  const {
+    name,
+    id,
+    last_completed,
+    color,
+    metric_count,
+    metric_unit,
+    ...rest
+  } = props.item;
+  const { habitItemClick, habitItemDeleted, habitDoneClick } = props;
   const [showHabitActionModal, setshowHabitActionModal] = useState(false);
   const translateY = useSharedValue(0);
+  // ✅ Create a ref for Swipeable
+  // const swipeableRef = useRef<Swipeable>(null as any);
+
+  //   // ✅ Function to close swipe manually
+  //   const closeSwipe = () => {
+  //     swipeableRef.current?.close();
+  //   };
 
   const navigation = useNavigation();
 
@@ -73,16 +100,52 @@ const SwipeableItem: React.FC<HabitItemProps> = ({ name, time, id, emoji }) => {
   };
 
   const deleteHabitClick = async () => {
-    // console.log(`delete is confirm for the id : ${id}`);
+    habitItemDeleted(id);
     // const result = await deleteHabit({ id });
+    //   setIsLoading(true);
+    //   try {
+    //     const result = await habitItemDeleted(data);
+    //     if (result?.success) {
+    //       setIsLoading(false);
+    //       setShowSuccess(true);
+    //       router.replace("/(auth)/(tabs)"); // Navigate on success
+    //     }
+    //   } catch (error: any) {
+    //     setIsLoading(false);
+    //   }
+  };
+
+  const onHabitDoneClick = () => {
+    const request = {
+      completed: true,
+      actual_count: {
+        count: metric_count,
+        unit: metric_unit,
+      },
+    };
+    habitDoneClick(request, id);
   };
 
   const swipeFromLeftOpen = () => {
-    // setshowHabitActionModal(true);
-    // alert("Swipe from left");
+    Alert.alert("Mark Habit Complete", "Mark this habit as done !!!", [
+      {
+        text: "Cancel",
+        onPress: () => console.log("Cancel Pressed"),
+        style: "cancel",
+      },
+      { text: "Done", onPress: onHabitDoneClick },
+    ]);
   };
+
   const swipeFromRightOpen = () => {
-    // alert("Swipe from right");
+    Alert.alert("Delete Habit", "Are you sure to delete this?", [
+      {
+        text: "Cancel",
+        onPress: () => console.log("Cancel Pressed"),
+        style: "cancel",
+      },
+      { text: "Delete", onPress: deleteHabitClick },
+    ]);
   };
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -91,36 +154,57 @@ const SwipeableItem: React.FC<HabitItemProps> = ({ name, time, id, emoji }) => {
 
   return (
     <>
-      <Swipeable
-        renderLeftActions={LeftSwipeActions}
-        renderRightActions={rightSwipeActions}
-        onSwipeableOpen={(direction: string) => {
-          console.log(direction); // "left" | "right"
-          direction === "left" ? swipeFromLeftOpen() : swipeFromRightOpen();
-        }}
-      >
-        {/* <Animated.View style={[styles.container, animatedStyle]}>
-          <Text style={styles.emoji}>{emoji}</Text>
-          <View style={styles.textContainer}>
-            <Text style={styles.taskName}>{name}</Text>
-            <Text style={styles.taskTime}>{time}</Text>
-          </View>
-        </Animated.View> */}
+      {!last_completed && (
+        <Swipeable
+          renderLeftActions={LeftSwipeActions}
+          renderRightActions={rightSwipeActions}
+          onSwipeableOpen={(direction: string) => {
+            direction === "left" ? swipeFromLeftOpen() : swipeFromRightOpen();
+          }}
+        >
+          <TouchableOpacity onPress={() => habitItemClick(id)}>
+            <View style={[styles.itemContainer, { backgroundColor: color }]}>
+              {/* <Text style={styles.emoji}>{emoji}</Text> */}
+              <View style={styles.textContainer}>
+                <Text style={styles.taskName}>{name}</Text>
+                <Text style={styles.taskTime}>{rest.reminder_time}</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        </Swipeable>
+      )}
 
-        <View style={styles.itemContainer}>
-          <Text style={styles.emoji}>{emoji}</Text>
-          <View style={styles.textContainer}>
-            <Text style={styles.taskName}>{name}</Text>
-            <Text style={styles.taskTime}>{time}</Text>
-          </View>
+      {last_completed && (
+        <View>
+          <TouchableOpacity onPress={() => habitItemClick(id)}>
+            <View style={[styles.itemContainer, { backgroundColor: color }]}>
+              {/* <View style={styles.itemContainer}> */}
+              {/* <Text style={styles.emoji}>{emoji}</Text> */}
+              <View style={styles.textContainer}>
+                <Text style={styles.taskName}>{name}</Text>
+                <Text style={styles.taskTime}>{rest.reminder_time}</Text>
+                {/* <Ionicons name="checkmark-done" size={24} /> */}
+              </View>
+              <Ionicons
+                name="checkmark-done"
+                size={24}
+                style={styles.checkIcon}
+              />
+            </View>
+          </TouchableOpacity>
         </View>
-      </Swipeable>
+      )}
 
       {/* Task Type Modal */}
       <DeleteHabitModal
         visible={showHabitActionModal}
-        onClose={() => setshowHabitActionModal(false)}
-        onDelete={deleteHabitClick}
+        header="Delete Habit"
+        title="Are you sure !!"
+        content="Do you want to delete this task?"
+        primaryBtnText="Yes"
+        secondaryBtnText="Cancel"
+        secondaryBtnClick={() => setshowHabitActionModal(false)}
+        primaryBtnClick={deleteHabitClick}
         // onSelect={(type) => setTaskType(type)}
       />
     </>
@@ -165,9 +249,12 @@ const styling = (theme: ThemeKey) =>
     },
     itemContainer: {
       flexDirection: "row",
-      backgroundColor: themeColors[theme].primaryColor,
+      // backgroundColor: themeColors[theme].primaryColor,
       padding: 15,
       borderRadius: 12,
+    },
+    checkIcon: {
+      color: "green",
     },
   });
 

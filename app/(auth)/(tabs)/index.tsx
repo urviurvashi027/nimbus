@@ -1,47 +1,90 @@
-import { Platform, StyleSheet, TouchableOpacity } from "react-native";
-
+import {
+  ActivityIndicator,
+  Platform,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import { View, Text, ScreenView } from "@/components/Themed";
 import { router } from "expo-router";
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { Ionicons } from "@expo/vector-icons";
+
 import ThemeContext from "@/context/ThemeContext";
 import DatePanel from "@/components/homeScreen/DatePanel";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import HabitList from "@/components/HabitList/HabitList";
-import { tasks } from "@/constant/data/taskList";
-import { Ionicons } from "@expo/vector-icons";
 import { themeColors } from "@/constant/Colors";
-
-type ThemeKey = "basic" | "light" | "dark";
+import { getHabitList } from "@/services/habitService";
+import { HabitItem } from "@/types/habitTypes";
+import { ThemeKey } from "@/components/Themed";
+import NewUserScreen from "../FirstTimeUser/NewUserScreen";
 
 export default function TabOneScreen() {
-  const onContinueClick = () => {
-    router.push("/create-habit/habitBasic");
-  };
-
+  const [habitList, setHabitList] = useState<HabitItem[]>([]);
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const [loading, setLoading] = useState(true);
 
   const styles = styling(theme);
 
-  // useEffect(() => {
-  //   // console.log(theme, "dicover theme");
-  // }, [theme]);
+  // create button click
+  const onCreateClick = () => {
+    router.push("/habit/create");
+  };
 
   // function to be called whenever date changes
-  const onDateChange = (val: any) => {
-    // console.log(val, "value of changed date from index");
+  const onDateChange = (val: any) => {};
+
+  const getHabitListData = async () => {
+    try {
+      const result = await getHabitList();
+      if (result?.success) {
+        setHabitList(result.data);
+        setLoading(false);
+      }
+    } catch (error: any) {
+      console.log(error, "API Error Response");
+    }
   };
+
+  useEffect(() => {
+    getHabitListData();
+  }, []);
+
+  const refreshData = () => {
+    getHabitListData();
+  };
+
+  if (loading) {
+    return (
+      <ActivityIndicator
+        size="large"
+        color="#8E8E93"
+        // style={scrollerStyles.loader}
+      />
+    );
+  }
 
   return (
     <ScreenView style={{ paddingTop: Platform.OS === "ios" ? 50 : 20 }}>
       <GestureHandlerRootView style={styles.gestureContainer}>
         {/* Date Panel View */}
-        <DatePanel onDateChange={onDateChange} />
+        {habitList.length > 0 && <DatePanel onDateChange={onDateChange} />}
 
-        <View style={styles.taskListContainer}>
-          <HabitList data={tasks} style={styles.itemSeparator} />
-        </View>
+        {habitList.length > 0 ? (
+          <View style={styles.taskListContainer}>
+            <HabitList
+              data={habitList}
+              style={styles.itemSeparator}
+              refreshData={refreshData}
+            />
+          </View>
+        ) : (
+          <View style={styles.taskListContainer}>
+            <NewUserScreen></NewUserScreen>
+          </View>
+        )}
       </GestureHandlerRootView>
-      <TouchableOpacity style={styles.floatingButton} onPress={onContinueClick}>
+      <TouchableOpacity style={styles.floatingButton} onPress={onCreateClick}>
         <Ionicons name="add" size={24} color={styles.iconColor.color} />
       </TouchableOpacity>
     </ScreenView>
@@ -51,17 +94,12 @@ export default function TabOneScreen() {
 const styling = (theme: ThemeKey) =>
   StyleSheet.create({
     gestureContainer: {
+      backgroundColor: themeColors[theme].background,
       flex: 1, // Ensures full screen coverage
     },
-    // heading: {
-    //   paddingTop: 10,
-    // },
-    // headingText: {
-    //   fontWeight: 600,
-    //   fontSize: 18,
-    // },
     datePanel: {},
     taskListContainer: {
+      backgroundColor: themeColors[theme].background,
       flex: 12, // Takes up the remaining space
       marginTop: 40, // 10px space between FlatList and TaskList
     },
@@ -91,3 +129,9 @@ const styling = (theme: ThemeKey) =>
       backgroundColor: themeColors[theme].background,
     },
   });
+
+// FFEDFA;
+// B4EBE6;
+// F8ED8C;
+// C1CFA1;
+// B7B1F2;
