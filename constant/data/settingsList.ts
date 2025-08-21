@@ -48,20 +48,6 @@ export const Section: any[] = [
         type: "link",
         label: "Location",
       },
-      // {
-      //   id: "wifi",
-      //   icon: "wifi",
-      //   color: "#dfd9f9",
-      //   type: "toggle",
-      //   label: "Use Wifi",
-      // },
-      // {
-      //   id: "darkmode",
-      //   icon: "moon",
-      //   color: "#dfd9f9",
-      //   type: "toogle",
-      //   label: "Dark Mode",
-      // },
     ],
   },
   {

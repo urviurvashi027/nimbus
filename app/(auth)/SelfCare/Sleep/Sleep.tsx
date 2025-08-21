@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -15,13 +15,13 @@ import { ThemeKey } from "@/components/Themed";
 import HorizontalListCardScroll from "@/components/tools/common/HorizontalListCardScroll";
 import HorizontalBannerCardScroll from "@/components/tools/common/HorizontalBannerCardScroll";
 
-//dummy data
-import audioTracks from "@/constant/data/soundtrack";
 import { router } from "expo-router";
 import { banners } from "@/constant/data/banner";
 import HorizontalBanner from "@/components/tools/common/HorizontalBanner";
+import { getSoundscapeList } from "@/services/toolService";
 
 const SleepModal = ({ visible, onClose }: any) => {
+  const [libraryTracks, setLibraryTracks] = useState<any>([]);
   const onModalClose = () => {
     console.log("modal cloe clicked");
     onClose();
@@ -38,6 +38,37 @@ const SleepModal = ({ visible, onClose }: any) => {
   const onClickOfAll = () => {
     router.push("/(auth)/SelfCare/Soundscape/Soundscape");
   };
+
+  const getSoundscapeListData = async () => {
+    try {
+      const result = await getSoundscapeList();
+      // Check if 'result' and 'result.data' exist and is an array
+      if (result && Array.isArray(result)) {
+        const processedArticles = result.map((tracks: any) => {
+          // Assign a random tag from the 'tags' arra
+
+          // Return a new object with the original properties plus the new ones
+          return {
+            ...tracks, // Spread operator to keep original properties
+            uri: tracks.image,
+          };
+        });
+
+        // console.log(processedArticles, "processedArticles sleep");
+        // setShowLibrary(true);
+        setLibraryTracks(processedArticles);
+      } else {
+        // Handle the case where the data is not in the expected format
+        console.error("API response data is not an array:", result);
+      }
+    } catch (error: any) {
+      console.log(error, "API Error Response");
+    }
+  };
+
+  useEffect(() => {
+    getSoundscapeListData();
+  }, []);
 
   return (
     <Modal
@@ -92,7 +123,7 @@ const SleepModal = ({ visible, onClose }: any) => {
               title="Soundscape"
               description="The sound of nature gives you better sleep."
               backgroundColor="#fbfcb3"
-              itemList={audioTracks}
+              itemList={libraryTracks}
               onClickOfAll={onClickOfAll}
             />
 

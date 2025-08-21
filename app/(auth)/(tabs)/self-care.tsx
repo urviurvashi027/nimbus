@@ -7,39 +7,46 @@ import {
   ScrollView,
   Platform,
   SafeAreaView,
-  FlatList,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { router, useNavigation } from "expo-router";
-
+// application level import
 import ThemeContext from "@/context/ThemeContext";
 import { themeColors } from "@/constant/Colors";
-import { ScreenView } from "@/components/Themed";
-import MasterClass from "@/components/tools/VideoListCard";
-import { ThemeKey } from "@/components/Themed";
-import TrendingCardCarousel from "@/components/tools/common/TrendingCardCarousel";
-import ReelCard from "@/components/common/ReelCard";
-import SleepModal from "../SelfCare/Sleep/Sleep";
-import WaterIntakeModal from "../SelfCare/WaterIntake/WaterIntake";
-import ThingsToDoModal from "../SelfCare/ThingsToDo/ThingsToDo";
-import HorizontalListCardScroll from "@/components/tools/common/HorizontalListCardScroll";
-import audioTracks from "@/constant/data/soundtrack";
 import {
   buttons as NavigationButton,
   NavigationButtonType,
 } from "@/constant/data/selfCareButton";
-import { RoutineData, RoutineType } from "@/constant/data/routineData";
-import VideoClassCard from "@/components/selfCare/VideoClassCard";
-import { masterClassData } from "@/constant/data/videoClass";
-import { medTests } from "@/constant/data/medicalTest";
-import { meditationsList } from "@/constant/data/meditation";
-import HorizontalBanner from "@/components/tools/common/HorizontalBanner";
 import { banners } from "@/constant/data/banner";
+// Need to remove these data once api is integrated
+import { medTests } from "@/constant/data/medicalTest";
+import { RoutineData, RoutineType } from "@/constant/data/routineData";
+
+import { ScreenView } from "@/components/Themed";
+import { ThemeKey } from "@/components/Themed";
+import TrendingCardCarousel from "@/components/tools/common/TrendingCardCarousel";
+import HorizontalListCardScroll from "@/components/tools/common/HorizontalListCardScroll";
+import VideoClassCard from "@/components/selfCare/VideoClassCard";
+import HorizontalBanner from "@/components/tools/common/HorizontalBanner";
 import PricingModal from "@/components/common/PricingModal";
+import SleepModal from "../SelfCare/Sleep/Sleep";
+import ThingsToDoModal from "../SelfCare/ThingsToDo/ThingsToDo";
+
+import {
+  getMeditationAudioList,
+  getMentalTestList,
+  getWorkoutVideo,
+} from "@/services/selfCareService";
+import { getSoundscapeList } from "@/services/toolService";
 
 const SelfCare: React.FC = () => {
   const navigation = useNavigation();
   const [selectedButton, setSelectedButton] = useState("");
+
+  const [videoList, setVideoList] = useState<any[]>([]);
+  const [meditationList, setMeditationList] = useState<any[]>([]);
+  const [libraryTracks, setLibraryTracks] = useState<any[]>([]);
+  const [medicalListData, setMedicalListData] = useState<any[]>([]);
 
   const [showPricingModal, setShowPricingModal] = useState(false);
   const [showSleepTagsModal, setShowSleepTagsModal] = useState(false);
@@ -52,12 +59,96 @@ const SelfCare: React.FC = () => {
   // Funstion called on click of navigation button clicked
   const handleNavigationButtonPress = (button: NavigationButtonType) => {
     if (button.action === "navigate") {
-      // router.push("/(auth)/SelfCare/WaterIntake/WaterIntake")
       router.push(button.screen);
     } else if (button.action === "modal") {
       getModalInfo(button.screen);
     }
   };
+
+  const getWorkoutListData = async () => {
+    // need to add filters functionality and category param changes
+    try {
+      const result = await getWorkoutVideo();
+      // Check if 'result' and 'result.data' exist and is an array
+      if (result && Array.isArray(result)) {
+        const processedVideo = result.map((item: any) => {
+          return {
+            ...item, // Spread operator to keep original properties
+            isLocked: false,
+            coachName: "UU",
+            image: {
+              uri: item.image,
+            },
+          };
+        });
+
+        setVideoList(processedVideo);
+      } else {
+        // Handle the case where the data is not in the expected format
+        console.error("API response data is not an array:", result);
+      }
+    } catch (error: any) {
+      console.log(error, "API Error Response");
+    }
+  };
+
+  const getMeditationlList = async () => {
+    // need to add filters functionality and category param changes
+    try {
+      const result = await getMeditationAudioList();
+      // Check if 'result' and 'result.data' exist and is an array
+      if (result && Array.isArray(result)) {
+        const processedAudio = result.map((item: any) => {
+          return {
+            ...item, // Spread operator to keep original properties
+            isLocked: false,
+            coachName: "UU",
+            image: {
+              uri: item.image,
+            },
+          };
+        });
+        setMeditationList(processedAudio);
+      } else {
+        // Handle the case where the data is not in the expected format
+        console.error("API response data is not an array:", result);
+      }
+    } catch (error: any) {
+      console.log(error, "API Error Response");
+    }
+  };
+
+  const getSoundscapeListData = async () => {
+    try {
+      const result = await getSoundscapeList();
+      // Check if 'result' and 'result.data' exist and is an array
+      if (result && Array.isArray(result)) {
+        const processedArticles = result.map((tracks: any) => {
+          return {
+            ...tracks, // Spread operator to keep original properties
+            image: {
+              uri: tracks.image,
+            },
+          };
+        });
+        setLibraryTracks(processedArticles);
+      } else {
+        // Handle the case where the data is not in the expected format
+        console.error("API response data is not an array:", result);
+      }
+    } catch (error: any) {
+      console.log(error, "API Error Response");
+    }
+  };
+
+  useEffect(() => {
+    getSoundscapeListData();
+  }, []);
+
+  useEffect(() => {
+    getWorkoutListData();
+    getMeditationlList();
+  }, []);
 
   // helper function to enable the modal
   const getModalInfo = (modalName: string) => {
@@ -98,13 +189,34 @@ const SelfCare: React.FC = () => {
   };
 
   const handleWorkoutVideoClicked = (card: any) => {
-    console.log(card, card.isLocked, "workout video clicked");
     if (card.isLocked) {
       setShowPricingModal(true);
     } else {
       setShowPricingModal(false);
     }
   };
+
+  // TODO ADD MEDTEST API DATA
+  const getMentalListData = async () => {
+    // need to add filters functionality and category param changes
+    try {
+      const result = await getMentalTestList();
+      // Check if 'result' and 'result.data' exist and is an array
+      if (result && Array.isArray(result)) {
+        console.log(result, "medialTestk");
+        setMedicalListData(result);
+      } else {
+        // Handle the case where the data is not in the expected format
+        console.error("API response data is not an array:", typeof result);
+      }
+    } catch (error: any) {
+      console.log(error, "API Error Response");
+    }
+  };
+
+  useEffect(() => {
+    // getMentalListData();
+  }, []);
 
   return (
     <ScreenView
@@ -123,24 +235,23 @@ const SelfCare: React.FC = () => {
           style={styles.navigationScrollView}
           contentContainerStyle={{ paddingHorizontal: 0 }}
         >
-          {NavigationButton.map((button: NavigationButtonType) => (
-            <View style={styles.navigationButtonContainer} key={button.id}>
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() => handleNavigationButtonPress(button)}
-              >
-                <Image
-                  style={styles.buttonIcon}
-                  source={
-                    button.icon
-                      ? String(button.icon)
-                      : require("../../../assets/images/buttonLogo/drink.png")
-                  }
-                />
-              </TouchableOpacity>
-              <Text style={styles.buttonLabel}>{button.label}</Text>
-            </View>
-          ))}
+          {NavigationButton.map((button: NavigationButtonType) => {
+            const IconComponent = button.icon;
+            return (
+              <View style={styles.navigationButtonContainer} key={button.id}>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => handleNavigationButtonPress(button)}
+                >
+                  <IconComponent
+                    width={styles.buttonIcon.width}
+                    height={styles.buttonIcon.height}
+                  />
+                </TouchableOpacity>
+                <Text style={styles.buttonLabel}>{button.label}</Text>
+              </View>
+            );
+          })}
         </ScrollView>
 
         {/* MasterClass Section */}
@@ -151,28 +262,29 @@ const SelfCare: React.FC = () => {
             showsHorizontalScrollIndicator={false}
             style={{ paddingTop: 16, paddingLeft: 0, paddingBottom: 20 }}
           >
-            {masterClassData.map((card) => (
+            {videoList.map((card) => (
               <VideoClassCard
                 key={card.id}
                 title={card.title}
-                coachName={card.coachName}
-                thumbnail={require("../../../assets/images/workout.jpg")}
+                coachName={card?.coachName}
+                thumbnail={card.image}
                 onPress={() => handleWorkoutVideoClicked(card)}
               />
             ))}
           </ScrollView>
 
-          {/* Well Being Class */}
+          {/* {Soundscpae} */}
           <HorizontalListCardScroll
             title="Soundscape"
             description="The sound of nature gives you better sleep."
             backgroundColor="#FFF085"
-            itemList={audioTracks}
+            itemList={libraryTracks}
             onClickOfAll={() => onClickOfAll("soundscape")}
           />
 
           {/* AudioBook */}
           <TrendingCardCarousel
+            type="rotuine"
             title="New and Trendings"
             data={RoutineData}
             onClickOfAll={() => onClickOfAll("routine")}
@@ -196,7 +308,7 @@ const SelfCare: React.FC = () => {
             title="Meditation"
             description="Now is a great time to be present. Now is good, too. And now"
             backgroundColor="#7A73D1"
-            itemList={meditationsList}
+            itemList={meditationList}
             onClickOfAll={() => onClickOfAll("meditation")}
           />
 
@@ -253,6 +365,7 @@ const styling = (theme: ThemeKey) =>
     },
     navigationButtonContainer: {
       alignItems: "center",
+      textAlign: "center",
       marginBottom: 30,
     },
     content: {
@@ -262,7 +375,7 @@ const styling = (theme: ThemeKey) =>
       width: 60,
       height: 60,
       borderRadius: 25, // Makes the button rounded
-      marginRight: 8, // Space between buttons
+      marginRight: 10, // Space between buttons
     },
     buttonIcon: {
       width: 60,
@@ -270,7 +383,8 @@ const styling = (theme: ThemeKey) =>
       borderRadius: 25, // Makes the button rounded
     },
     buttonLabel: {
-      paddingTop: 10,
+      paddingTop: 15,
+      textAlign: "center",
       color: themeColors[theme].text,
       fontSize: 10,
     },

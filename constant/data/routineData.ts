@@ -5,7 +5,7 @@ export const routineDetails = [
     id: "1",
     actionButton: "Add to routine",
     title: "routine 1",
-    image: require("../../assets/images/recipe/1.png"),
+    image: require("../../assets/images/mentalTest/childhoodTrauma.png"),
     metaInfo: {
       points: 4,
       time: "4 min",
@@ -36,7 +36,7 @@ export const routineDetails = [
   {
     id: "2",
     title: "routine 2",
-    image: require("../../assets/images/recipe/1.png"),
+    image: require("../../assets/images/mentalTest/childhoodTrauma.png"),
     metaInfo: {
       points: 4,
       time: "4 min",
@@ -67,7 +67,7 @@ export const routineDetails = [
   {
     id: "3",
     title: "Routine 3",
-    image: require("../../assets/images/recipe/1.png"),
+    image: require("../../assets/images/mentalTest/childhoodTrauma.png"),
     metaInfo: {
       points: 4,
       time: "4 min",

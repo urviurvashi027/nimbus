@@ -43,7 +43,6 @@ export default function signIn() {
   const styles = styling(theme);
 
   const onLoginClick = async () => {
-    // router.replace("/(auth)/(tabs)");
     try {
       const result = await onLogin!(username, password);
       if (result?.success) {

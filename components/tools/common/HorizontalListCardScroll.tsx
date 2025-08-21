@@ -33,7 +33,9 @@ const HorizontalListCardScroll: React.FC<PropType> = (props) => {
     itemList,
     noOfRows,
   } = props;
+
   // console.log(itemList, "itemList");
+
   const [currentTrack, setCurrentTrack] = useState<TrackType | null>(null);
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -92,7 +94,10 @@ const HorizontalListCardScroll: React.FC<PropType> = (props) => {
         await sound.unloadAsync();
       }
 
-      const { sound: newSound } = await Audio.Sound.createAsync(track.source);
+      // const { sound: newSound } = await Audio.Sound.createAsync(track.source);
+      const { sound: newSound } = await Audio.Sound.createAsync(
+        typeof track.source === "string" ? { uri: track.source } : track.source
+      );
       setSound(newSound);
       setCurrentTrack(track);
       setIsPlaying(true);
@@ -102,8 +107,11 @@ const HorizontalListCardScroll: React.FC<PropType> = (props) => {
     }
   };
 
-  const onCloseModal = (currentTrack: any) => {
+  const onCloseModal = async (currentTrack: any) => {
     // handlePlayPause(currentTrack);
+    if (isPlaying) {
+      await sound?.pauseAsync();
+    }
     setCurrentTrack(null);
   };
 

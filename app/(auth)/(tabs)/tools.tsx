@@ -12,129 +12,147 @@ import {
 import React, { useContext, useEffect, useState } from "react";
 import { router, useNavigation } from "expo-router";
 
-import ThemeContext from "@/context/ThemeContext";
+import {
+  buttons as NavigationButton,
+  NavigationButtonType,
+} from "@/constant/data/toolsButton";
 import { themeColors } from "@/constant/Colors";
+// import { routineDetails } from "@/constant/data/routineData";
+
+import ThemeContext from "@/context/ThemeContext";
+
 import { ScreenView } from "@/components/Themed";
-// import MasterClass from "@/components/tools/VideoListCard";
 import { ThemeKey } from "@/components/Themed";
 import TrendingCardCarousel from "@/components/tools/common/TrendingCardCarousel";
 import MoodTrackerModal from "../Tools/MoodTracker/MoodTracker";
-import { LifeHacks, OrganisedReels } from "@/constant/data/reelsData";
-import ReelCard from "@/components/common/ReelCard";
+import VideoScroller from "@/components/tools/videoScroller/VideoScroller";
+import AudiobookScroller from "@/components/tools/audioScroller/AudioScroller";
 
-import { recipeData } from "@/constant/data/recipeData";
-import { articleData } from "@/constant/data/articleDetails";
-import { routineDetails } from "@/constant/data/routineData";
+import {
+  getArticleList,
+  getRecipeList,
+  getRoutineList,
+} from "@/services/toolService";
 
 const Tools: React.FC = () => {
   const navigation = useNavigation();
+  // const [showSleepTagsModal, setShowSleepTagsModal] = useState(false);
+  // const [showThingsToDoTagsModal, setShowThingsToDoTagsModal] = useState(false);
   // const [selectedButton, setSelectedButton] = useState("");
 
   const [showMoodTracker, setShowMoodTracker] = useState(false);
   const [mood, setMood] = useState<string | null>(null);
-  // const [showSleepTagsModal, setShowSleepTagsModal] = useState(false);
-  // const [showThingsToDoTagsModal, setShowThingsToDoTagsModal] = useState(false);
+  // Data set states
+  const [articleList, setArticleList] = useState<any[] | undefined>();
+  const [recipeList, setRecipeList] = useState<any[] | undefined>();
+  const [routineSkincare, setRoutineSkincareList] = useState<
+    any[] | undefined
+  >();
+  const [routineWellness, setRoutineWellnessList] = useState<
+    any[] | undefined
+  >();
+  const [routineFitness, setRutineFitnessList] = useState<any[] | undefined>();
 
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
 
   const styles = styling(theme);
 
-  const reels = [
-    {
-      id: "1",
-      title: "Me+ AI Helps You Generate Cleaning...",
-      badgeText: "Me+ Clean ✨",
-      views: "1M+",
-      thumbnail: require("../../../assets/images/journaling/gratitude.png"),
-    },
-    {
-      id: "2",
-      title: "The FlyLady Cleaning Method",
-      badgeText: "15-min Clean",
-      views: "5M+",
-      thumbnail: require("../../../assets/images/journaling/overeat.png"),
-    },
-    {
-      id: "3",
-      title: "Test",
-      badgeText: "15-min Clean",
-      views: "5M+",
-      thumbnail: require("../../../assets/images/journaling/selfAffirmation.png"),
-    },
-  ];
+  // ------------------------------- API CALLS ---------------------------------------
 
-  const buttons = [
-    {
-      id: 1,
-      label: "Routine",
-      action: "navigate",
-      screen: "/(auth)/Tools/Routine/Routine",
-      icon: require("../../../assets/images/buttonLogo/routine.png"),
-    },
-    {
-      id: 2,
-      label: "Mood Tracker",
-      action: "modal",
-      screen: "moodTracker",
-      icon: require("../../../assets/images/buttonLogo/mood.png"),
-    },
-    {
-      id: 3,
-      label: "Recipe",
-      action: "navigate",
-      screen: "/(auth)/Tools/Recipe/Recipe",
-      icon: require("../../../assets/images/buttonLogo/recipe.png"),
-    },
-    {
-      id: 4,
-      label: "Article",
-      action: "navigate",
-      screen: "/(auth)/Tools/Article/Article",
-      icon: require("../../../assets/images/buttonLogo/article.png"),
-    },
-    {
-      id: 5,
-      label: "Calorie Cal",
-      action: "navigate",
-      screen: "/(auth)/Tools/CalorieCal/CalorieCalculator",
-      icon: require("../../../assets/images/buttonLogo/kcal.png"),
-    },
-    {
-      id: 6,
-      label: "Protein Cal",
-      action: "navigate",
-      screen: "/(auth)/Tools/ProtienCal/ProteinCalculator",
-      icon: require("../../../assets/images/buttonLogo/protein.png"),
-    },
-    {
-      id: 7,
-      label: "Body Shape Cal",
-      action: "navigate",
-      screen: "/(auth)/Tools/BodyShapeCal/BodyShapeCalculator",
-      icon: require("../../../assets/images/buttonLogo/bodyShape.png"),
-    },
-    // {
-    //   id: 8,
-    //   label: "AI Scanner",
-    //   action: "navigate",
-    //   screen: "/(auth)/Tools/AIScanner/AIScanner",
-    //   icon: require("../../../assets/images/buttonLogo/kcal.png"),
-    // },
-    {
-      id: 8,
-      label: "Products",
-      action: "navigate",
-      screen: "/(auth)/Tools/AIScanner/AIScanner",
-      icon: require("../../../assets/images/buttonLogo/kcal.png"),
-    },
-  ];
+  // Fetch Recipe List
+  const getRecipeListData = async () => {
+    // need to add filters functionality and category param changes
+    try {
+      const result = await getRecipeList();
+      // Check if 'result' and 'result.data' exist and is an array
+      if (result && Array.isArray(result)) {
+        const processedRecipes = result.map((article: any) => {
+          // Return a new object with the original properties plus the new ones
+          return {
+            ...article, // Spread operator to keep original properties
+            image: {
+              uri: article.image,
+            },
+          };
+        });
+        setRecipeList(processedRecipes);
+      } else {
+        // Handle the case where the data is not in the expected format
+        console.error("API response data is not an array:", result);
+      }
+    } catch (error: any) {
+      console.log(error, "API Error Response");
+    }
+  };
 
-  // router.push("/(auth)/Tools/BodyShapeCal/BodyShapeCalculator")
+  // Fetch article List
+  const getArticleListData = async () => {
+    // need to add filters functionality and category param changes
+    try {
+      const result = await getArticleList();
+      // Check if 'result' and 'result.data' exist and is an array
+      if (result && Array.isArray(result)) {
+        const processedArticles = result.map((article: any) => {
+          // Return a new object with the original properties plus the new ones
+          return {
+            ...article, // Spread operator to keep original properties
+            image: {
+              uri: article.image,
+            },
+          };
+        });
+        setArticleList(processedArticles);
+      } else {
+        // Handle the case where the data is not in the expected format
+        console.error("API response data is not an array:", result);
+      }
+    } catch (error: any) {
+      console.log(error, "API Error Response");
+    }
+  };
+
+  // Fetch article List
+  const getRoutineData = async (category?: string) => {
+    // need to add filters functionality and category param changes
+    try {
+      const result = await getRoutineList(category);
+      // Check if 'result' and 'result.data' exist and is an array
+      if (result && Array.isArray(result)) {
+        const processedArticles = result.map((article: any) => {
+          // Return a new object with the original properties plus the new ones
+          return {
+            ...article, // Spread operator to keep original properties
+            image: {
+              uri: article.image,
+            },
+          };
+        });
+        if (category === "beauty") {
+          setRoutineSkincareList(processedArticles);
+        } else if (category === "wellness") {
+          setRoutineWellnessList(processedArticles);
+        } else if (category === "fitness") {
+          setRutineFitnessList(processedArticles);
+        }
+      } else {
+        // Handle the case where the data is not in the expected format
+        console.error("API response data is not an array:", result);
+      }
+    } catch (error: any) {
+      console.log(error, "API Error Response");
+    }
+  };
+
+  useEffect(() => {
+    getArticleListData();
+    getRecipeListData();
+    getRoutineData("fitness");
+    getRoutineData("beauty");
+    getRoutineData("wellness");
+  }, []);
 
   const handleButtonPress = (button: any) => {
-    console.log("coming here");
     if (button.action === "navigate") {
-      // router.push("/");
       router.push(button.screen);
     } else if (button.action === "modal") {
       getModalInfo(button.screen);
@@ -142,7 +160,6 @@ const Tools: React.FC = () => {
   };
 
   const getModalInfo = (modalName: string) => {
-    console.log(modalName, "modalName");
     switch (modalName) {
       case "moodTracker":
         setShowMoodTracker(true);
@@ -150,13 +167,15 @@ const Tools: React.FC = () => {
     }
   };
 
-  const handleCardPress = (id: string) => {
-    console.log("Pressed card id:", id);
+  const handleCardPress = (id: string, type: string) => {
+    router.push({
+      pathname: "/(auth)/Tools/Details/Details",
+      params: { id: id, type: type },
+    });
   };
 
   const handleSelectMood = (selectedMood: string) => {
     setMood(selectedMood);
-    console.log("Selected Mood:", selectedMood);
   };
 
   const onClickOfArticleAll = () => {
@@ -172,7 +191,6 @@ const Tools: React.FC = () => {
   };
 
   const onClickOfSkincareRoutineAll = () => {
-    console.log("I am clicked");
     router.push({
       pathname: "/(auth)/Tools/Routine/Routine",
       params: { filter: "Skincare" },
@@ -194,100 +212,83 @@ const Tools: React.FC = () => {
     >
       <SafeAreaView style={styles.container}>
         <View style={styles.screenTitle}>
-          <Text style={styles.screenTitleText}>Toolss</Text>
+          <Text style={styles.screenTitleText}>Tools</Text>
         </View>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
           style={styles.scrollView}
         >
-          {buttons.map((button) => (
-            <View style={styles.buttonContainer} key={button.id}>
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() => handleButtonPress(button)}
-              >
-                {/* <View> */}
-                {/* source={button.icon} */}
-                <Image
-                  style={styles.buttonIcon}
-                  alt={button.label}
-                  // source={require("../../../assets/images/options/drink.png")}
-                  source={
-                    button.icon
-                      ? String(button.icon)
-                      : require("../../../assets/images/buttonLogo/drink.png")
-                  }
-                />
-              </TouchableOpacity>
-              <Text style={styles.buttonLabel}>{button.label}</Text>
-            </View>
-          ))}
+          {NavigationButton.map((button: NavigationButtonType) => {
+            const IconComponent = button.icon;
+            return (
+              <View style={styles.buttonContainer} key={button.id}>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => handleButtonPress(button)}
+                >
+                  <IconComponent
+                    width={styles.buttonIcon.width}
+                    height={styles.buttonIcon.height}
+                  />
+                </TouchableOpacity>
+                <Text style={styles.buttonLabel}>{button.label}</Text>
+              </View>
+            );
+          })}
         </ScrollView>
-        {/* <MasterClass /> */}
 
+        {/* Verticle Scroll View */}
         <ScrollView showsVerticalScrollIndicator={false}>
           {/* Reel Scroll */}
-          <Text style={styles.header}>To be Organized</Text>
-          <FlatList
-            data={reels}
-            keyExtractor={(item) => item.id}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ paddingLeft: 20 }}
-            renderItem={({ item }) => (
-              <ReelCard
-                title={item.title}
-                views={item.views}
-                badgeText={item.badgeText}
-                thumbnail={item.thumbnail}
-                onPress={() => console.log("Clicked:", item.title)}
-              />
-            )}
-          />
+          <VideoScroller />
+          {/* Audio Book Scroll */}
+          <AudiobookScroller />
+
+          {/* Wellness Routine Template */}
           <TrendingCardCarousel
-            title="Routine"
-            data={routineDetails}
+            type="routine"
+            title="Wellness Routine"
+            data={routineWellness ?? []}
             onPress={handleCardPress}
             onClickOfAll={onClickOfRoutineAll}
           />
 
+          {/* Article Template */}
           <TrendingCardCarousel
             title="Article"
-            data={articleData}
+            type="article"
+            data={articleList ?? []}
             onPress={handleCardPress}
             onClickOfAll={onClickOfArticleAll}
           />
-
+          {/* Recipe Template */}
           <TrendingCardCarousel
-            title="Recipe"
-            data={recipeData}
+            type="recipe"
+            title="Quick Recipe"
+            data={recipeList ?? []}
             onPress={handleCardPress}
             onClickOfAll={onClickOfRecipeAll}
           />
 
+          {/* Skin Care Routine Template */}
           <TrendingCardCarousel
+            type="routine"
             title="Hello Beautiful"
-            data={routineDetails}
+            data={routineSkincare ?? []}
             onPress={handleCardPress}
             onClickOfAll={onClickOfSkincareRoutineAll}
           />
 
+          {/* Fitness Routine Template */}
           <TrendingCardCarousel
+            type="routine"
             title="Life Hacks You Can't Miss"
-            data={routineDetails}
+            data={routineFitness ?? []}
             onPress={handleCardPress}
             onClickOfAll={onClickOfHacksRoutineAll}
           />
         </ScrollView>
-
-        {/* <ScrollView>
-          <TrendingCardCarousel
-            title="New and Trending"
-            data={routineDate}
-            onPress={handleCardPress}
-          />
-        </ScrollView> */}
 
         {/* Mood Tracker Modal */}
         {mood && <Text style={{ marginTop: 20 }}>Selected Mood: {mood}</Text>}

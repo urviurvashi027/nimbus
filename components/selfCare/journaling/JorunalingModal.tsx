@@ -11,36 +11,43 @@ import {
 import { ProgressBar } from "react-native-paper"; // For progress bar
 import { Ionicons } from "@expo/vector-icons"; // For icons
 import { themeColors } from "@/constant/Colors";
+import {
+  getJournalEntry,
+  submitJournalEntry,
+} from "@/services/selfCareService";
 
-const JournalModal = ({ visible, onClose, questions }: any) => {
+const JournalModal = ({ visible, onClose, questions, templateId }: any) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [answers, setAnswers] = useState(Array(questions.length).fill(""));
+  const [answers, setAnswers] = useState<any[]>([]);
   const [showResult, setShowResult] = useState(false);
-
-  // useEffect(() => {
-  //   console.log(questions.length, "i am called");
-  //   setShowResult(false);
-  // }, []);
 
   const handleNext = () => {
     if (!answers[0]) return;
     if (currentIndex < questions.length - 1) {
       setCurrentIndex(currentIndex + 1);
-      console.log("answer", answers);
     } else {
-      const hasEmpty = answers.some((item) => item.trim() === "");
+      const hasEmpty = answers.some((item: any) => item.answer?.trim() === "");
       if (hasEmpty) {
         console.log("Cannot proceed, array has empty strings");
       } else {
-        const result = answers.map((item: any, index: number) => ({
-          question: index + 1,
-          value: item,
-        }));
-        console.log(result, "result");
-        setShowResult(true);
-
-        // onClose(result); // Close modal when all questions are answered
+        const res = {
+          template_id: templateId,
+          answers: answers,
+        };
+        submitJournal(res);
       }
+    }
+  };
+
+  const submitJournal = async (data: any) => {
+    try {
+      const result = await submitJournalEntry!(data);
+      if (result.status === "success") {
+        setShowResult(true);
+        getJournalListData();
+      }
+    } catch (error: any) {
+      console.log(error, "API Error Response");
     }
   };
 
@@ -50,11 +57,34 @@ const JournalModal = ({ visible, onClose, questions }: any) => {
   };
 
   useEffect(() => {
-    if (visible) {
+    if (visible && questions.length) {
       setCurrentIndex(0);
-      setAnswers(Array(questions.length).fill("")); // Reset answers as well if needed
+      setAnswers(
+        questions.map((q: any, index: number) => {
+          return {
+            id: q.id ?? index + 1,
+            answer: "",
+          };
+        })
+      );
     }
   }, [questions, visible]);
+
+  const getJournalListData = async () => {
+    // need to add filters functionality and category param changes
+    try {
+      const result = await getJournalEntry();
+      // Check if 'result' and 'result.data' exist and is an array
+      if (result && Array.isArray(result)) {
+        console.log(result);
+      } else {
+        // Handle the case where the data is not in the expected format
+        console.error("API response data is not an array:", result);
+      }
+    } catch (error: any) {
+      console.log(error, "API Error Response");
+    }
+  };
 
   return (
     <Modal
@@ -102,20 +132,18 @@ const JournalModal = ({ visible, onClose, questions }: any) => {
               />
             </View>
             {/* Question */}
-            <Text style={styles.question}>{questions[currentIndex]}</Text>
+            <Text style={styles.question}>{questions[currentIndex]?.text}</Text>
             {/* Answer Input */}
             <TextInput
               style={styles.input}
               placeholder="Type your response here..."
-              value={answers[currentIndex]}
+              value={answers[currentIndex]?.answer ?? ""}
               onChangeText={(text) => {
                 const newAnswers = [...answers];
-                newAnswers[currentIndex] = text;
-                const res = {
-                  currentIndex: text,
-                };
-                // const newData = [...newAnswers, res];
-                setAnswers(newAnswers);
+                if (newAnswers[currentIndex]) {
+                  newAnswers[currentIndex].answer = text;
+                  setAnswers(newAnswers);
+                }
               }}
               multiline
             />

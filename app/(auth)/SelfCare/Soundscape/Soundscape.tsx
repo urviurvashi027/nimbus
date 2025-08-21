@@ -12,15 +12,13 @@ import {
 import { Audio } from "expo-av";
 import { Ionicons } from "@expo/vector-icons";
 
-import libraryTracks, {
-  TrackType,
-  forYouTracks,
-} from "@/constant/data/soundtrack";
+import { TrackType, forYouTracks } from "@/constant/data/soundtrack";
 import { useNavigation } from "expo-router";
 import ThemeContext from "@/context/ThemeContext";
 import { ScreenView, ThemeKey } from "@/components/Themed";
 import { themeColors } from "@/constant/Colors";
 import SoundscapeFeaturedCard from "@/components/selfCare/soundscape/FeaturedCard";
+import { getSoundscapeList } from "@/services/toolService";
 
 const { width } = Dimensions.get("window"); // get screen width
 const CARD_WIDTH = width * 0.8; // 80% of screen width
@@ -32,11 +30,52 @@ const Soundscape = () => {
   const [showForYou, setShowForYou] = useState(true);
   const [showLibrary, setShowLibrary] = useState(true);
 
+  const [libraryTracks, setLibraryTracks] = useState<any[] | undefined>();
+
   const navigation = useNavigation();
 
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
 
   const styles = styling(theme);
+
+  //libraryTracks
+  // need to integrate audio functionality and image check
+  const getSoundscapeListData = async () => {
+    try {
+      const result = await getSoundscapeList();
+      // Check if 'result' and 'result.data' exist and is an array
+      if (result && Array.isArray(result)) {
+        const processedArticles = result.map((tracks: any) => {
+          // Assign a random tag from the 'tags' arra
+
+          // Return a new object with the original properties plus the new ones
+          return {
+            ...tracks, // Spread operator to keep original properties
+            image: {
+              uri: tracks.image,
+            },
+          };
+        });
+
+        // console.log(processedArticles, "processedArticles sound");
+        setShowLibrary(true);
+        setLibraryTracks(processedArticles);
+      } else {
+        // Handle the case where the data is not in the expected format
+        console.error("API response data is not an array:", result);
+      }
+    } catch (error: any) {
+      console.log(error, "API Error Response");
+    }
+  };
+
+  useEffect(() => {
+    getSoundscapeListData();
+  }, []);
+
+  const refreshData = () => {
+    getSoundscapeListData();
+  };
 
   useEffect(() => {
     navigation.setOptions({
@@ -53,6 +92,7 @@ const Soundscape = () => {
   }, [sound]);
 
   const handlePlayPause = async (track: any) => {
+    console.log(track, "track");
     try {
       if (currentTrack?.id === track.id) {
         if (isPlaying) {
@@ -68,7 +108,10 @@ const Soundscape = () => {
         await sound.unloadAsync();
       }
 
-      const { sound: newSound } = await Audio.Sound.createAsync(track.source);
+      // const { sound: newSound } = await Audio.Sound.createAsync(track.source);
+      const { sound: newSound } = await Audio.Sound.createAsync({
+        uri: track.source,
+      });
       setSound(newSound);
       setCurrentTrack(track);
       setIsPlaying(true);

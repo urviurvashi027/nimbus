@@ -17,66 +17,76 @@ import { ScreenView, ThemeKey } from "@/components/Themed";
 import { Ionicons } from "@expo/vector-icons";
 import { themeColors } from "@/constant/Colors";
 import ThemeContext from "@/context/ThemeContext";
+import { getRoutineList } from "@/services/toolService";
 // import ArticleCard from "../../../../components/tools/RoutineCard";
 
 const filters = [
   "All",
   "Fitness",
   "Skincare",
-  "Relax",
-  "Mindfulness",
-  "Home Chores",
+  "Wellness",
+  "Parenting",
   "Hacks",
 ];
 
-const data = [
-  {
-    id: "1",
-    // title: "Restart your life in 50 days!",
-    tag: "Fitness",
-    height: 250,
-    image: require("../../../../assets/images/routine/1.png"),
-  },
-  {
-    id: "2",
-    // title: "Less Awkward First Date Tricks",
-    tag: "Skincare",
-    height: 280,
-    image: require("../../../../assets/images/routine/2.png"),
-  },
-  {
-    id: "3",
-    // title: "Relaxing During Workdays: ADHD",
-    tag: "Mindfulness",
-    height: 220,
-    image: require("../../../../assets/images/routine/3.png"),
-  },
-  {
-    id: "4",
-    // title: "Pro Routine for Managing Anxiety",
-    tag: "Mindfulness",
-    height: 270,
-    image: require("../../../../assets/images/routine/5.png"),
-  },
-  {
-    id: "5",
-    // title: "Tidy Desk, Clear Mind",
-    tag: "Fitness",
-    height: 230,
-    image: require("../../../../assets/images/routine/6.png"),
-  },
-  {
-    id: "6",
-    // title: "Must-Have Back-to-School Essentials",
-    tag: "Fitness",
-    height: 240,
-    image: require("../../../../assets/images/routine/7.png"),
-  },
-];
+// Define the possible keys for your map
+type FilterCategory =
+  | "Fitness"
+  | "Skincare"
+  | "Wellness"
+  | "Parenting"
+  | "Hacks";
+
+// const data = [
+//   {
+//     id: "1",
+//     // title: "Restart your life in 50 days!",
+//     tag: "Fitness",
+//     height: 250,
+//     image: require("../../../../assets/images/routine/1.png"),
+//   },
+//   {
+//     id: "2",
+//     // title: "Less Awkward First Date Tricks",
+//     tag: "Skincare",
+//     height: 280,
+//     image: require("../../../../assets/images/routine/2.png"),
+//   },
+//   {
+//     id: "3",
+//     // title: "Relaxing During Workdays: ADHD",
+//     tag: "Mindfulness",
+//     height: 220,
+//     image: require("../../../../assets/images/routine/3.png"),
+//   },
+//   {
+//     id: "4",
+//     // title: "Pro Routine for Managing Anxiety",
+//     tag: "Mindfulness",
+//     height: 270,
+//     image: require("../../../../assets/images/routine/5.png"),
+//   },
+//   {
+//     id: "5",
+//     // title: "Tidy Desk, Clear Mind",
+//     tag: "Fitness",
+//     height: 230,
+//     image: require("../../../../assets/images/routine/6.png"),
+//   },
+//   {
+//     id: "6",
+//     // title: "Must-Have Back-to-School Essentials",
+//     tag: "Fitness",
+//     height: 240,
+//     image: require("../../../../assets/images/routine/7.png"),
+//   },
+// ];
 
 const RoutineScreen = () => {
   const [selected, setSelected] = useState("All");
-  const [filteredData, setFilteredData] = useState(data);
+  const [routineList, setRoutineList] = useState<any[] | undefined>();
+  const [filteredData, setFilteredData] = useState<any[] | undefined>();
+  // const [filteredData, setFilteredData] = useState(data);
   const { filter } = useLocalSearchParams();
 
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
@@ -85,33 +95,90 @@ const RoutineScreen = () => {
 
   const navigation = useNavigation();
 
-  useEffect(() => {
-    console.log(filter, "filter");
-    if (filter) {
-      const type = Array.isArray(filter) ? filter[0] : filter; // ✅ Ensure id is a string
-      console.log(type, "filter type");
-      handleFilter(filter);
+  const getRoutineListData = async (category?: string) => {
+    const tags = [
+      "All",
+      "Skincare",
+      "Wellness",
+      "Parenting",
+      "Fitness",
+      "Hacks",
+    ];
+    const heights = [250, 280, 220, 270, 230, 240];
+
+    // need to add filters functionality and category param changes
+    try {
+      const result = await getRoutineList(category);
+      // Check if 'result' and 'result.data' exist and is an array
+      if (result && Array.isArray(result)) {
+        const processedArticles = result.map((article: any) => {
+          // Assign a random tag from the 'tags' array
+          const randomTag = tags[Math.floor(Math.random() * tags.length)];
+
+          // Assign a random height from the 'heights' array
+          const randomHeight =
+            heights[Math.floor(Math.random() * heights.length)];
+
+          // Return a new object with the original properties plus the new ones
+          return {
+            ...article, // Spread operator to keep original properties
+            // category: randomTag,
+            height: randomHeight,
+            image: {
+              uri: article.image,
+            },
+          };
+        });
+
+        // console.log(processedArticles, "processedArticles srticle");
+        setFilteredData(processedArticles);
+        setRoutineList(processedArticles);
+      } else {
+        // Handle the case where the data is not in the expected format
+        console.error("API response data is not an array:", result);
+      }
+    } catch (error: any) {
+      console.log(error, "API Error Response");
     }
-  }, [filter]);
+  };
+
+  useEffect(() => {
+    getRoutineListData();
+  }, []);
 
   const handleFilter = (filter: any) => {
+    console.log(filter);
     setSelected(filter);
     if (filter === "All") {
-      setFilteredData(data);
+      getRoutineListData();
     } else {
-      const updatedData = data.filter((item) => item.tag === filter);
-      console.log(updatedData, "updatedData");
-      setFilteredData(updatedData);
+      const tags = [
+        "All",
+        "Skincare",
+        "Wellness",
+        "Parenting",
+        "Fitness",
+        "Hacks",
+      ];
+      const filterMap = {
+        Skincare: "skincare",
+        Wellness: "wellness",
+        Parenting: "parenting",
+        Fitness: "fitness",
+        Hacks: "hacks",
+      };
+
+      const filterKey = filter as FilterCategory;
+
+      getRoutineListData(filterMap[filterKey]);
     }
   };
 
   const handleItemClick = (item: any) => {
-    // console.log("Item Clciked", item);
     router.push({
       pathname: "/(auth)/Tools/Details/Details",
       params: { id: item.id, type: "routine" },
     });
-    // router.push("/(auth)/Tools/Details/Details");
   };
 
   useEffect(() => {

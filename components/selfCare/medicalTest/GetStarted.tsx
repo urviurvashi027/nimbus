@@ -18,7 +18,6 @@ import { BlurView } from "@react-native-community/blur";
 import testData from "@/constant/data/medicalTest";
 import { getImage } from "@/utils/getImage";
 import { medicalTestData, imageMap } from "@/constant/data/medicalTest";
-// import d from "../../../assets/images/meditation/anxietyRelease.png";
 
 interface StartScreenProps {
   onStart: () => void;

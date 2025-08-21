@@ -20,59 +20,18 @@ import ThemeContext from "@/context/ThemeContext";
 import { themeColors } from "@/constant/Colors";
 import { ScreenView, ThemeKey } from "@/components/Themed";
 import ForYouCard from "@/components/selfCare/workout/WorkoutFeaturedCard";
+import { getWorkoutVideo } from "@/services/selfCareService";
 
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = width * 0.8;
-// const CARD_WIDTH = width - 40; // small peeking effect
-
-const fitnessVideos = {
-  forYou: [
-    {
-      id: "1",
-      title: "Quick Chest Workout",
-      duration: "10 min",
-      image: require("../../../../assets/images/workout/1.jpg"),
-      isLocked: false,
-      videoUrl:
-        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    },
-    {
-      id: "3",
-      title: "Quick Back Workout",
-      duration: "13 min",
-      image: require("../../../../assets/images/workout/2.jpg"),
-      isLocked: true,
-      videoUrl:
-        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
-    },
-  ],
-  all: [
-    {
-      id: "2",
-      title: "Easy Abs Workout for Beginners",
-      duration: "10 min",
-      image: require("../../../../assets/images/workout/3.jpg"),
-      isLocked: true,
-      videoUrl:
-        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-    },
-    {
-      id: "4",
-      title: "Quick Back Workout",
-      duration: "13 min",
-      image: require("../../../../assets/images/workout/2.jpg"),
-      isLocked: false,
-      videoUrl:
-        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
-    },
-  ],
-};
 
 const FitnessVideoList = () => {
+  const [forYouSectionData, setForYouSectionData] = useState<any[]>([]);
+  const [videoList, setVideoList] = useState<any[]>([]);
+
   const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
-  const [currentVideoUrl, setCurrentVideoUrl] = useState(
-    fitnessVideos.all[1].videoUrl
-  );
+
+  const [currentVideoUrl, setCurrentVideoUrl] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -82,6 +41,76 @@ const FitnessVideoList = () => {
   const styles = styling(theme);
 
   const navigation = useNavigation();
+
+  const getWorkoutListData = async () => {
+    // need to add filters functionality and category param changes
+    try {
+      const result = await getWorkoutVideo();
+      // Check if 'result' and 'result.data' exist and is an array
+      if (result && Array.isArray(result)) {
+        const processedVideo = result.map((item: any) => {
+          // Assign a random tag from the 'tags' array
+          // Return a new object with the original properties plus the new ones
+          return {
+            ...item, // Spread operator to keep original properties
+            isLocked: false,
+            coachName: "UU",
+            image: {
+              uri: item.image,
+            },
+          };
+        });
+
+        setVideoList(processedVideo);
+      } else {
+        // Handle the case where the data is not in the expected format
+        console.error("API response data is not an array:", result);
+      }
+    } catch (error: any) {
+      console.log(error, "API Error Response");
+    }
+  };
+
+  const getForYouSectionData = async () => {
+    // need to add filters functionality and category param changes
+    try {
+      const result = await getWorkoutVideo();
+      // Check if 'result' and 'result.data' exist and is an array
+      if (result && Array.isArray(result)) {
+        const processedVideo = result.map((item: any) => {
+          // Assign a random tag from the 'tags' array
+          // Return a new object with the original properties plus the new ones
+          return {
+            ...item, // Spread operator to keep original properties
+            title: "testing Section Data",
+            isLocked: false,
+            coachName: "UU",
+            image: {
+              uri: item.image,
+            },
+          };
+        });
+
+        setForYouSectionData(processedVideo);
+      } else {
+        // Handle the case where the data is not in the expected format
+        console.error("API response data is not an array:", result);
+      }
+    } catch (error: any) {
+      console.log(error, "API Error Response");
+    }
+  };
+
+  useEffect(() => {
+    getWorkoutListData();
+    getForYouSectionData();
+  }, []);
+
+  useEffect(() => {
+    if (videoList.length) {
+      setPlayingVideoId(videoList[0].source);
+    }
+  }, [videoList]);
 
   useEffect(() => {
     navigation.setOptions({
@@ -152,7 +181,7 @@ const FitnessVideoList = () => {
     return (
       <TouchableOpacity
         style={styles.videoItem}
-        onPress={() => handlePlayVideo(item.id, item.isLocked, item.videoUrl)}
+        onPress={() => handlePlayVideo(item.id, item.isLocked, item.source)}
       >
         {isPlayingThis ? (
           <TouchableOpacity
@@ -192,7 +221,7 @@ const FitnessVideoList = () => {
         <View style={styles.videoInfo}>
           <Text style={styles.videoTitle}>{item.title}</Text>
           <View style={styles.itemDetails}>
-            <Text style={styles.videoDuration}>{item.duration}</Text>
+            <Text style={styles.videoDuration}>{item.duration} min</Text>
             {item.isLocked && (
               <Ionicons
                 name="lock-closed"
@@ -224,81 +253,87 @@ const FitnessVideoList = () => {
             color={themeColors[theme].text}
           />
         </TouchableOpacity>
-        <ScrollView>
-          <Text style={styles.header}>Workout</Text>
-          <Text style={styles.subHeader}>
-            Make workouts part of your daily life.
-          </Text>
+        {videoList.length ? (
+          <ScrollView>
+            <Text style={styles.header}>Workout</Text>
+            <Text style={styles.subHeader}>
+              Make workouts part of your daily life.
+            </Text>
 
-          <Text style={styles.sectionTitle}>For you</Text>
-          <FlatList
-            data={fitnessVideos.forYou}
-            renderItem={({ item }) => (
-              <ForYouCard item={item} onPress={onFeaturePostClick} />
-            )}
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ paddingHorizontal: 0 }}
-            snapToAlignment="start"
-            snapToInterval={CARD_WIDTH + 16}
-            decelerationRate="fast"
-            keyExtractor={(item) => item.id}
-            horizontal
-          />
+            <Text style={styles.sectionTitle}>For you</Text>
+            <FlatList
+              data={forYouSectionData}
+              renderItem={({ item }) => (
+                <ForYouCard item={item} onPress={onFeaturePostClick} />
+              )}
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ paddingHorizontal: 0 }}
+              snapToAlignment="start"
+              snapToInterval={CARD_WIDTH + 16}
+              decelerationRate="fast"
+              keyExtractor={(item) => item.id}
+              horizontal
+            />
 
-          <Text style={styles.sectionTitle}>All</Text>
-          <FlatList
-            data={fitnessVideos.all}
-            renderItem={renderVideoItem}
-            keyExtractor={(item) => item.id}
-            scrollEnabled={false}
-          />
+            <Text style={styles.sectionTitle}>All</Text>
+            <FlatList
+              data={videoList}
+              renderItem={renderVideoItem}
+              keyExtractor={(item) => item.id}
+              scrollEnabled={false}
+            />
 
-          {/* Fullscreen Modal */}
-          <Modal
-            visible={isFullscreen}
-            animationType="slide"
-            transparent={true}
-          >
-            <View style={styles.modalContainer}>
-              <TouchableOpacity
-                style={styles.closeButton}
-                onPress={closeFullscreen}
-              >
-                <Ionicons
-                  name="close"
-                  size={30}
-                  color={themeColors.basic.commonWhite}
-                  style={{ marginTop: 30, marginRight: 10 }}
-                />
-              </TouchableOpacity>
-
-              <VideoView
-                style={styles.fullscreenVideo}
-                player={player}
-                allowsFullscreen
-                allowsPictureInPicture
-              />
-
-              <View style={styles.fullscreenControls}>
-                <TouchableOpacity onPress={skipBackward}>
-                  <Ionicons name="play-back" size={40} color="#fff" />
-                </TouchableOpacity>
-
-                <TouchableOpacity onPress={togglePlayPause}>
+            {/* Fullscreen Modal */}
+            <Modal
+              visible={isFullscreen}
+              animationType="slide"
+              transparent={true}
+            >
+              <View style={styles.modalContainer}>
+                <TouchableOpacity
+                  style={styles.closeButton}
+                  onPress={closeFullscreen}
+                >
                   <Ionicons
-                    name={isPlaying ? "pause" : "play"}
-                    size={50}
+                    name="close"
+                    size={30}
                     color={themeColors.basic.commonWhite}
+                    style={{ marginTop: 30, marginRight: 10 }}
                   />
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={skipForward}>
-                  <Ionicons name="play-forward" size={40} color="#fff" />
-                </TouchableOpacity>
+                <VideoView
+                  style={styles.fullscreenVideo}
+                  player={player}
+                  allowsFullscreen
+                  allowsPictureInPicture
+                />
+
+                <View style={styles.fullscreenControls}>
+                  <TouchableOpacity onPress={skipBackward}>
+                    <Ionicons name="play-back" size={40} color="#fff" />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity onPress={togglePlayPause}>
+                    <Ionicons
+                      name={isPlaying ? "pause" : "play"}
+                      size={50}
+                      color={themeColors.basic.commonWhite}
+                    />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity onPress={skipForward}>
+                    <Ionicons name="play-forward" size={40} color="#fff" />
+                  </TouchableOpacity>
+                </View>
               </View>
-            </View>
-          </Modal>
-        </ScrollView>
+            </Modal>
+          </ScrollView>
+        ) : (
+          <View>
+            <Text>Loading ....</Text>
+          </View>
+        )}
       </View>
     </ScreenView>
   );

@@ -18,11 +18,8 @@ import { themeColors } from "@/constant/Colors";
 import { ScreenView, ThemeKey } from "@/components/Themed";
 import GuidedMeditationCard from "@/components/selfCare/meditation/FeaturedCard";
 
-import {
-  meditationsList,
-  Meditations,
-  recommendations,
-} from "@/constant/data/meditation";
+import { Meditations } from "@/constant/data/meditation";
+import { getMeditationAudioList } from "@/services/selfCareService";
 
 const categories = ["All", "Stress & Anxiety", "Self-Care", "Beginner"];
 
@@ -32,6 +29,7 @@ const CARD_WIDTH = width * 0.8; // 80% of screen width
 const Meditation = () => {
   const [currentCategory, setCurrentCategory] = useState("All");
   const [currentTrack, setCurrentTrack] = useState<Meditations | null>(null);
+  const [meditationList, setMeditationList] = useState<any[]>([]);
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -55,6 +53,44 @@ const Meditation = () => {
       : undefined;
   }, [sound]);
 
+  const getMeditationlList = async () => {
+    const tags = ["All", "Stress & Anxiety", "Self-Care", "Beginner"];
+
+    // need to add filters functionality and category param changes
+    try {
+      const result = await getMeditationAudioList();
+      // Check if 'result' and 'result.data' exist and is an array
+      if (result && Array.isArray(result)) {
+        const processedAudio = result.map((item: any) => {
+          const randomTag = tags[Math.floor(Math.random() * tags.length)];
+          // Assign a random tag from the 'tags' array
+          // Return a new object with the original properties plus the new ones
+          return {
+            ...item, // Spread operator to keep original properties
+            tag: randomTag,
+            isLocked: false,
+            coachName: "UU",
+            image: {
+              uri: item.image,
+            },
+          };
+        });
+        // console.log(processedAudio, "processedVideo Meditatio +++++++=");
+        // setFilteredData(processedAudio);
+        setMeditationList(processedAudio);
+      } else {
+        // Handle the case where the data is not in the expected format
+        console.error("API response data is not an array:", result);
+      }
+    } catch (error: any) {
+      console.log(error, "API Error Response");
+    }
+  };
+
+  useEffect(() => {
+    getMeditationlList();
+  }, []);
+
   const handlePlayPause = async (track: Meditations) => {
     if (track.isLocked) {
       return null;
@@ -73,7 +109,10 @@ const Meditation = () => {
       await sound.unloadAsync();
     }
 
-    const { sound: newSound } = await Audio.Sound.createAsync(track.source);
+    // const { sound: newSound } = await Audio.Sound.createAsync(track.source);
+    const { sound: newSound } = await Audio.Sound.createAsync(
+      typeof track.source === "string" ? { uri: track.source } : track.source
+    );
     setSound(newSound);
     setCurrentTrack(track);
     setIsPlaying(true);
@@ -81,7 +120,7 @@ const Meditation = () => {
   };
 
   // Filter meditations dynamically
-  const filteredMeditations = meditationsList.filter(
+  const filteredMeditations = meditationList.filter(
     (item) => item.category === currentCategory || currentCategory === "All"
   );
 
@@ -115,7 +154,7 @@ const Meditation = () => {
         <View>
           <FlatList
             horizontal
-            data={recommendations}
+            data={meditationList}
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item }) => (
               <GuidedMeditationCard data={item} onPress={handlePlayPause} />

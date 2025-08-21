@@ -15,6 +15,7 @@ import { ScreenView, ThemeKey } from "@/components/Themed";
 import ThemeContext from "@/context/ThemeContext";
 import { themeColors } from "@/constant/Colors";
 import { medTests } from "@/constant/data/medicalTest";
+import { getMentalTestList } from "@/services/selfCareService";
 
 const categories = ["All"];
 
@@ -38,6 +39,28 @@ const MentalHealthTestScreen = () => {
     });
     // router.push("/(auth)/Tools/test/getStared");
   };
+
+  // TODO ADD MEDTEST API DATA
+
+  const getMentalListData = async () => {
+    // need to add filters functionality and category param changes
+    try {
+      const result = await getMentalTestList();
+      // Check if 'result' and 'result.data' exist and is an array
+      if (result && Array.isArray(result)) {
+        console.log(result);
+      } else {
+        // Handle the case where the data is not in the expected format
+        console.error("API response data is not an array:", result);
+      }
+    } catch (error: any) {
+      console.log(error, "API Error Response");
+    }
+  };
+
+  useEffect(() => {
+    getMentalListData();
+  }, []);
 
   return (
     <ScreenView

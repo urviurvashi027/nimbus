@@ -19,7 +19,7 @@ export type medicalTestData = {
 };
 
 export const imageMap: Record<string, any> = {
-  anxietyRelease: require("../../assets/images/meditation/anxietyRelease.png"),
+  anxietyRelease: require("../../assets/images/mentalTest/eqTest.png"),
   // traumaRelease: require("../../assets/images/meditation/traumaRelease.png"),
   // add other images here
 };
@@ -164,7 +164,7 @@ A roadmap to gradually overcome the lasting impact of childhood trauma.`,
     title: "Quick ADHD Test",
     color: "#F16767",
     image: "anxietyRelease",
-    imageUrl: require("../../assets/images/meditation/anxietyRelease.png"),
+    imageUrl: require("../../assets/images/mentalTest/eqTest.png"),
     progressBarBg: "#b31aff",
     description: `Welcome to our self-screening questionnaire for Attention-Deficit/Hyperactivity Disorder (ADHD).
 ADHD can affect your ability to focus, control impulses, and manage time effectively.
@@ -331,7 +331,7 @@ const result = {
   title: "Resilient Wanderer",
   description:
     "It appears from your responses that you have a unique set of strengths...",
-  image: require("../../assets/images/journaling/lonely.png"), // Replace with actual image
+  image: require("../../assets/images/mentalTest/eqTest.png"), // Replace with actual image
   //  scores: nedds to be added
 };
 

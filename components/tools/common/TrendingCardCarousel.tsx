@@ -21,8 +21,9 @@ interface CardData {
 
 interface TrendingCardCarouselProps {
   title: string;
+  type: string;
   data: CardData[];
-  onPress: (id: string) => void;
+  onPress: (id: string, type: string) => void;
   onClickOfAll?: () => void;
 }
 
@@ -31,6 +32,7 @@ const { width } = Dimensions.get("window");
 const TrendingCardCarousel: React.FC<TrendingCardCarouselProps> = ({
   title,
   data,
+  type,
   onPress,
   onClickOfAll,
 }) => {
@@ -53,7 +55,7 @@ const TrendingCardCarousel: React.FC<TrendingCardCarouselProps> = ({
         contentContainerStyle={{ paddingLeft: 20 }}
         renderItem={({ item }) => (
           <TouchableOpacity
-            onPress={() => onPress(item.id)}
+            onPress={() => onPress(item.id, type)}
             style={styles.cardWrapper}
           >
             <ImageBackground
@@ -61,7 +63,9 @@ const TrendingCardCarousel: React.FC<TrendingCardCarouselProps> = ({
               style={styles.card}
               imageStyle={styles.cardImage}
             >
-              {item.title && <Text style={styles.cardTitle}>{item.title}</Text>}
+              {item.title && type === "test" && (
+                <Text style={styles.cardTitle}>{item.title}</Text>
+              )}
             </ImageBackground>
           </TouchableOpacity>
         )}

@@ -22,6 +22,7 @@ const TaskCard: React.FC<TaskCardType> = ({
   selected,
   onToggle,
 }) => {
+  console.log(color, "tsks");
   return (
     <TouchableOpacity
       onPress={onToggle}

@@ -22,7 +22,7 @@ interface itemDetails {
   source: any; // Audio source (can be refined later)
   category: string;
   isLocked: boolean;
-  color: any;
+  // color: any;
 }
 
 interface SoundscapeFeauturedCardProps {
@@ -34,10 +34,10 @@ const SoundscapeFeaturedCard: React.FC<SoundscapeFeauturedCardProps> = ({
   data,
   onPress,
 }) => {
-  const { image, title, color, duration, description } = data;
+  const { image, title, duration, description } = data;
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
 
-  const styles = styling(theme, color);
+  const styles = styling(theme);
   return (
     <Pressable onPress={() => onPress(data)} style={styles.card}>
       <View>
@@ -59,11 +59,11 @@ const SoundscapeFeaturedCard: React.FC<SoundscapeFeauturedCardProps> = ({
   );
 };
 
-const styling = (theme: ThemeKey, color: any) =>
+const styling = (theme: ThemeKey) =>
   StyleSheet.create({
     card: {
       marginVertical: 20,
-      backgroundColor: color.cardColor,
+      backgroundColor: "#B5A8D5",
       borderRadius: 15,
       marginRight: 16,
       width: CARD_WIDTH, // controlled card width
@@ -99,7 +99,7 @@ const styling = (theme: ThemeKey, color: any) =>
       marginTop: 2,
     },
     footer: {
-      backgroundColor: color.descriptionColor,
+      backgroundColor: "#7A73D1",
       padding: 15,
       borderRadius: 10,
       marginTop: 12,

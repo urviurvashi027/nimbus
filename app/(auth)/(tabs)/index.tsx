@@ -1,4 +1,9 @@
-import { Platform, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  ActivityIndicator,
+  Platform,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import { View, Text, ScreenView } from "@/components/Themed";
 import { router } from "expo-router";
 import React, { useContext, useEffect, useState } from "react";
@@ -17,6 +22,7 @@ import NewUserScreen from "../FirstTimeUser/NewUserScreen";
 export default function TabOneScreen() {
   const [habitList, setHabitList] = useState<HabitItem[]>([]);
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const [loading, setLoading] = useState(true);
 
   const styles = styling(theme);
 
@@ -33,6 +39,7 @@ export default function TabOneScreen() {
       const result = await getHabitList();
       if (result?.success) {
         setHabitList(result.data);
+        setLoading(false);
       }
     } catch (error: any) {
       console.log(error, "API Error Response");
@@ -46,6 +53,16 @@ export default function TabOneScreen() {
   const refreshData = () => {
     getHabitListData();
   };
+
+  if (loading) {
+    return (
+      <ActivityIndicator
+        size="large"
+        color="#8E8E93"
+        // style={scrollerStyles.loader}
+      />
+    );
+  }
 
   return (
     <ScreenView style={{ paddingTop: Platform.OS === "ios" ? 50 : 20 }}>

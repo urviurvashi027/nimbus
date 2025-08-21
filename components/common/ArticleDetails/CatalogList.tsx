@@ -3,12 +3,12 @@ import React from "react";
 import { de } from "rn-emoji-keyboard";
 
 interface CatalogListType {
-  catalog: any;
+  catalog: Array<{ title: string; content: string }>;
   onPress: any;
 }
 
 const CatalogList: React.FC<CatalogListType> = ({ catalog, onPress }) => {
-  console.log("from catalog List", catalog);
+  // console.log("from catalog List", catalog);
   return (
     <View>
       <Text style={styles.heading}>Catalog</Text>

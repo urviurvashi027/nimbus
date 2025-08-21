@@ -17,64 +17,32 @@ import { ScreenView, ThemeKey } from "@/components/Themed";
 import { Ionicons } from "@expo/vector-icons";
 import { themeColors } from "@/constant/Colors";
 import ThemeContext from "@/context/ThemeContext";
+import { getArticleList } from "@/services/toolService";
 
 const filters = [
   "All",
   "Herbs",
   "Mindfulness",
-  "Fitness",
-  "Food",
-  "Productivity",
+  "Meditation",
+  "Epigenetics",
+  "Neuroplasticity",
 ];
 
-const data = [
-  {
-    id: "1",
-    // title: "Restart your life in 50 days!",
-    tag: "Fitness",
-    height: 250,
-    image: require("../../../../assets/images/article/1.png"),
-  },
-  {
-    id: "2",
-    // title: "Less Awkward First Date Tricks",
-    tag: "Mindfulness",
-    height: 280,
-    image: require("../../../../assets/images/article/2.png"),
-  },
-  {
-    id: "3",
-    // title: "Relaxing During Workdays: ADHD",
-    tag: "Fitness",
-    height: 220,
-    image: require("../../../../assets/images/article/3.png"),
-  },
-  {
-    id: "4",
-    // title: "Pro article for Managing Anxiety",
-    tag: "Food",
-    height: 270,
-    image: require("../../../../assets/images/article/5.png"),
-  },
-  {
-    id: "5",
-    // title: "Tidy Desk, Clear Mind",
-    tag: "Productivity",
-    height: 230,
-    image: require("../../../../assets/images/article/6.png"),
-  },
-  {
-    id: "6",
-    // title: "Must-Have Back-to-School Essentials",
-    tag: "Productivity",
-    height: 240,
-    image: require("../../../../assets/images/article/7.png"),
-  },
-];
+// Define the possible keys for your map
+type FilterCategory =
+  | "Herbs"
+  | "Mindfulness"
+  | "Meditation"
+  | "Epigenetics"
+  | "Neuroplasticity";
 
 const ArticleScreen = () => {
   const [selected, setSelected] = useState("All");
-  const [filteredData, setFilteredData] = useState(data);
+  // const [filteredData, setFilteredData] = useState(data);
+
+  const [articleList, setArticleList] = useState<any[] | undefined>();
+
+  const [filteredData, setFilteredData] = useState<any[] | undefined>();
 
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
 
@@ -82,25 +50,87 @@ const ArticleScreen = () => {
 
   const navigation = useNavigation();
 
+  const getArticleListData = async (category?: string) => {
+    const tags = [
+      "All",
+      "Herbs",
+      "Mindfulness",
+      "Meditation",
+      "Epigenetics",
+      "Neuroplasticity",
+    ];
+
+    const heights = [250, 280, 220, 270, 230, 240];
+
+    // need to add filters functionality and category param changes
+    try {
+      const result = await getArticleList(category);
+      // Check if 'result' and 'result.data' exist and is an array
+      if (result && Array.isArray(result)) {
+        const processedArticles = result.map((article: any) => {
+          // Assign a random tag from the 'tags' array
+          const randomTag = tags[Math.floor(Math.random() * tags.length)];
+
+          // Assign a random height from the 'heights' array
+          const randomHeight =
+            heights[Math.floor(Math.random() * heights.length)];
+
+          // Return a new object with the original properties plus the new ones
+          return {
+            ...article, // Spread operator to keep original properties
+            category: randomTag,
+            height: randomHeight,
+            image: {
+              uri: article.image,
+            },
+          };
+        });
+
+        // console.log(processedArticles, "processedArticles srticle");
+        setFilteredData(processedArticles);
+        setArticleList(processedArticles);
+      } else {
+        // Handle the case where the data is not in the expected format
+        console.error("API response data is not an array:", result);
+      }
+    } catch (error: any) {
+      console.log(error, "API Error Response");
+    }
+  };
+
+  useEffect(() => {
+    getArticleListData();
+  }, []);
+
+  const refreshData = () => {
+    getArticleListData();
+  };
+
   const handleFilter = (filter: any) => {
-    // console.log("coming here", "handleFilter", filter);
+    console.log(filter);
     setSelected(filter);
     if (filter === "All") {
-      setFilteredData(data);
+      getArticleListData();
     } else {
-      const updatedData = data.filter((item) => item.tag === filter);
-      // console.log(updatedData, "updatedData");
-      setFilteredData(updatedData);
+      const filterMap = {
+        Herbs: "healingHerbs",
+        Mindfulness: "mindfullness",
+        Meditation: "meditation",
+        Epigenetics: "epigenetics",
+        Neuroplasticity: "neuroplasticity",
+      };
+
+      const filterKey = filter as FilterCategory;
+
+      getArticleListData(filterMap[filterKey]);
     }
   };
 
   const handleItemClick = (item: any) => {
-    // console.log("Item Clciked", item);
     router.push({
       pathname: "/(auth)/Tools/Details/Details",
       params: { id: item.id, type: "article" },
     });
-    // router.push("/(auth)/Tools/Details/Details");
   };
 
   useEffect(() => {
@@ -167,7 +197,6 @@ const ArticleScreen = () => {
                 tag={item.tag}
                 height={item.height}
                 onPress={() => handleItemClick(item)}
-                // onPress={() => console.log(item)}
               />
             )}
           />

@@ -4,7 +4,7 @@ export const banners = [
     title: "Project 50 Challenge:",
     subtitle: "Restart Your Life!",
     buttonText: "Join Now",
-    image: require("../../assets/images/meditation/acceptYourself.png"), // Replace with your own image
+    image: require("../../assets/images/mentalTest/childhoodTrauma.png"), // Replace with your own image
   },
   {
     id: "2",

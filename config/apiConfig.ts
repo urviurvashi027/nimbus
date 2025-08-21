@@ -33,12 +33,26 @@ export const API_ENDPOINTS = {
   habitUnit: `${BASE_URL}/api/habit-units/`,
   habitPatch: `${BASE_URL}/api/habits/`,
 
-  toolList: `${BASE_URL}/habits/list`,
-  getSoundscapeList: `${BASE_URL}/habits/list`,
-  downloadMedia: `${BASE_URL}/habits/list`,
-  getWorkoutVideo: `${BASE_URL}/habits/list`,
+  getArticleList: `${BASE_URL}/media/media-assets/?type=article`,
+  getArticleDetails: `${BASE_URL}/media/media-assets/`,
+  getSoundscapeList: `${BASE_URL}/media/media-assets/?type=soundscape`,
+  getJournalList: `${BASE_URL}/assesment/journal-templates/`,
+  submitJournal: `${BASE_URL}/assesment/journal-entries/`,
+  getJournalEntry: `${BASE_URL}/assesment/journal-entries/`,
+  getWorkoutVideoList: `${BASE_URL}/media/media-assets/?type=video`,
+  getRecipeList: `${BASE_URL}/media/media-assets/?type=recipe`,
+  getRoutineTemplate: `${BASE_URL}/media/media-assets/?type=routineTemplate`,
+  //TODO: category Data fix
+  getShortVideoList: `${BASE_URL}/media/media-assets/?type=shortVideo`,
+  getAudioBookList: `${BASE_URL}/media/media-assets/?type=meditation&category=audioBook`,
+  getMeditationList: `${BASE_URL}/media/media-assets/?type=meditation&category=breathwork`,
 
-  // getOtp: `${BASE_URL}/auth/request-phone-otp/`,
-  // verifyOtp: `${BASE_URL}/auth/verify-phone-otp/`,
+  getMentalTestList: `${BASE_URL}/assesment/assessments/`,
+
+  // getSoundscapeDetials: `${BASE_URL}/habits/list`,
+  // toolList: `${BASE_URL}/habits/list`,
+  // downloadMedia: `${BASE_URL}/habits/list`,
+  // getWorkoutVideo: `${BASE_URL}/habits/list`,
+
   // Add more API endpoints as needed
 };

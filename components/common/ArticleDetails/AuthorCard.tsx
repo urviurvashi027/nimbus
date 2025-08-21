@@ -11,8 +11,8 @@ const AuthorCard: React.FC<AuthorCardType> = ({ author }) => {
     <View style={styles.card}>
       {/* <Image source={{ uri: author.avatar }} style={styles.avatar} /> */}
       <View style={styles.info}>
-        <Text style={styles.name}>{author.name}</Text>
-        <Text style={styles.role}>{author.role}</Text>
+        <Text style={styles.name}>{author.name ?? "Test Name"}</Text>
+        <Text style={styles.role}>{author.role ?? "Test Role"}</Text>
       </View>
     </View>
   );

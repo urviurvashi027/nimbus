@@ -19,18 +19,19 @@ const CARD_WIDTH = width * 0.8;
 
 interface ForYouCardProps {
   item: any;
-  onPress: (videoId: string, islocked: boolean, videoUrl: string) => void;
+  onPress: (videoId: string, islocked: boolean, source: string) => void;
 }
 
 const ForYouCard: React.FC<ForYouCardProps> = ({ item, onPress }) => {
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
 
   const styles = styling(theme);
+
   return (
     <>
       <Pressable
         style={styles.card}
-        onPress={() => onPress(item.id, item.isLocked, item.videoUrl)}
+        onPress={() => onPress(item.id, item.isLocked, item.source)}
       >
         <ImageBackground
           source={item.image}

@@ -18,11 +18,9 @@ import ThemeContext from "@/context/ThemeContext";
 import { ThemeKey } from "@/components/Themed";
 import { themeColors } from "@/constant/Colors";
 import JournalModal from "@/components/selfCare/journaling/JorunalingModal";
-import JournalItem from "@/components/selfCare/journaling/JournalingItem";
+import JournalItem from "@/components/selfCare/journaling/JournalItem";
 import ReflectionFeaturedCard from "@/components/selfCare/reflection/ReflectionFeatureCard";
-// dummy data
-
-import journalData from "@/constant/data/journalingList";
+import { getJournalList } from "@/services/selfCareService";
 
 const { width } = Dimensions.get("window"); // get screen width
 const CARD_WIDTH = width * 0.8; // 80% of screen width
@@ -44,8 +42,7 @@ const forYou: Track[] = [
     id: "1",
     title: "Self Affirmation",
     duration: "61 min",
-    image: require("../../../../assets/images/journaling/selfAffirmation.png"), // Replace with actual image
-    // source: require("../../../../assets/audio/soundscape/lightRain.mp3"),
+    image: require("../../../../assets/images/mentalTest/adhdTest.png"), // Replace with actual image
     description:
       "Feeling unconditional love and acceptance towards yourself and the world",
     category: "All",
@@ -59,7 +56,7 @@ const forYou: Track[] = [
     id: "16",
     title: "Practice Gratitude",
     duration: "3 min",
-    image: require("../../../../assets/images/journaling/gratitude.png"), // Replace with actual image
+    image: require("../../../../assets/images/mentalTest/adhdTest.png"), // Replace with actual image
     // source: require("../../../../assets/audio/soundscape/seagulls.mp3"), // Replace with actual audio file
     category: "All",
     description:
@@ -74,11 +71,18 @@ const forYou: Track[] = [
 
 const Reflection = () => {
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedQuestions, setSelectedQuestions] = useState([]);
+  const [selectedQuestions, setSelectedQuestions] = useState<
+    { id: number; text: string }[]
+  >([]);
   const [showForYou, setShowForYou] = useState(true);
   const [showLibrary, setShowLibrary] = useState(true);
 
-  const handlePress = (questions: any) => {
+  const [journalList, setJournalList] = useState<any[] | undefined>();
+  const [templateId, setTemplateId] = useState<number>();
+
+  //
+  const handlePress = (questions: any[], templateId: number) => {
+    setTemplateId(templateId);
     setSelectedQuestions(questions); // Store selected questions
     setModalVisible(true); // Open modal
   };
@@ -87,6 +91,40 @@ const Reflection = () => {
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
 
   const styles = styling(theme);
+
+  const getJournalListData = async () => {
+    // need to add filters functionality and category param changes
+    try {
+      const result = await getJournalList();
+      // Check if 'result' and 'result.data' exist and is an array
+      if (result && Array.isArray(result)) {
+        const processedList = result.map((item: any) => {
+          // Return a new object with the original properties plus the new ones
+          return {
+            ...item, // Spread operator to keep original properties
+            icon: {
+              uri: "https://nimbus-fe-assets.s3.amazonaws.com/images/soundscape/peace.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIATTSKFUTAYTULL4XE%2F20250801%2Feu-north-1%2Fs3%2Faws4_request&X-Amz-Date=20250801T140236Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=f9eab29722216ed07fafc2f1a802c10f9ca4214e88fac8862eb5f69cf3d74033",
+            },
+          };
+        });
+
+        setJournalList(processedList);
+      } else {
+        // Handle the case where the data is not in the expected format
+        console.error("API response data is not an array:", result);
+      }
+    } catch (error: any) {
+      console.log(error, "API Error Response");
+    }
+  };
+
+  useEffect(() => {
+    getJournalListData();
+  }, []);
+
+  const refreshData = () => {
+    getJournalListData();
+  };
 
   useEffect(() => {
     navigation.setOptions({
@@ -151,7 +189,7 @@ const Reflection = () => {
             {/* Journaling List */}
             <Text style={styles.sectionTitle}>All</Text>
             <FlatList
-              data={journalData}
+              data={journalList}
               renderItem={({ item }) => (
                 <JournalItem item={item} onPress={handlePress} />
               )}
@@ -163,6 +201,7 @@ const Reflection = () => {
           <JournalModal
             visible={modalVisible}
             onClose={onModalClosed}
+            templateId={templateId}
             questions={selectedQuestions}
           />
         </View>
