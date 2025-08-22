@@ -53,15 +53,6 @@ const mockVideoData: VideoData[] = [
     views: "800K+ views",
   },
 ];
-
-// export const fetchVideos = (): Promise<VideoData[]> => {
-//   return new Promise((resolve) => {
-//     setTimeout(() => {
-//       resolve(mockVideoData);
-//     }, 1000);
-//   });
-// };
-
 // VideoScroller Component
 const VideoScroller: React.FC = () => {
   const [videos, setVideos] = useState<VideoData[]>([]);
@@ -78,19 +69,11 @@ const VideoScroller: React.FC = () => {
         if (result && Array.isArray(result)) {
           const processedVideo = result.map((item: any) => {
             const randomTag = views[Math.floor(Math.random() * views.length)];
-            // Assign a random tag from the 'tags' array
-            // Return a new object with the original properties plus the new ones
             return {
               ...item, // Spread operator to keep original properties
               views: randomTag,
-              // isLocked: false,
-              // coachName: "UU",
-              // image: {
-              //   uri: item.image,
-              // },
             };
           });
-          // console.log(processedVideo, "processedVideo Meditatio +++++++=");
           setVideos(processedVideo);
         }
       } catch (error) {
@@ -158,12 +141,9 @@ const videoScrollerStyles = StyleSheet.create({
     fontWeight: "bold",
     color: "#1C1C1E",
     marginBottom: 20,
-    paddingHorizontal: 20,
     fontFamily: Platform.OS === "ios" ? "Avenir-Heavy" : "Roboto-Bold",
   },
-  listContentContainer: {
-    paddingLeft: 20,
-  },
+  listContentContainer: {},
   loader: {
     flex: 1,
     justifyContent: "center",
