@@ -1,11 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import {
-  StyleSheet,
-  View,
-  useColorScheme,
-  Text,
-  TouchableOpacity,
-} from "react-native";
+import { StyleSheet, View, Text } from "react-native";
 import { Alert } from "react-native";
 import { router, useNavigation } from "expo-router";
 
@@ -32,6 +26,7 @@ export default function signIn() {
       headerTransparent: true,
       headerBackButtonDisplayMode: "minimal",
       headerTintColor: styles.header.color,
+      headerTitle: "",
       headerTitleStyle: {
         fontSize: 18,
         color: styles.header,
@@ -110,11 +105,6 @@ const styling = (theme: ThemeKey) =>
       borderColor: themeColors[theme].primaryColor,
       marginTop: 20,
       borderWidth: 1,
-      // marginTop: 60,
-      // backgroundColor: themeColors[theme]?.primaryColor,
-      // padding: 20,
-      // alignItems: "center",
-      // borderRadius: 10,
     },
     btnText: {
       color: themeColors[theme]?.text,

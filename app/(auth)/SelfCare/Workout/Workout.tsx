@@ -78,8 +78,6 @@ const FitnessVideoList = () => {
       // Check if 'result' and 'result.data' exist and is an array
       if (result && Array.isArray(result)) {
         const processedVideo = result.map((item: any) => {
-          // Assign a random tag from the 'tags' array
-          // Return a new object with the original properties plus the new ones
           return {
             ...item, // Spread operator to keep original properties
             title: "testing Section Data",
@@ -341,7 +339,7 @@ const FitnessVideoList = () => {
 
 const styling = (theme: ThemeKey) =>
   StyleSheet.create({
-    container: { flex: 1, paddingHorizontal: 16 },
+    container: { flex: 1, paddingHorizontal: 10 },
     backButton: {
       marginTop: 50,
       marginBottom: 10,

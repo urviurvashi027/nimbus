@@ -7,13 +7,10 @@ import {
   StyleSheet,
   Platform,
 } from "react-native";
-// import { Audio, AVPlaybackStatus } from "expo-av";
-// import { Ionicons } from "@expo/vector-icons";
-// import Slider from "@react-native-community/slider";
+
 import { getAudioBookList } from "@/services/toolService";
 import AudiobookThumbnail from "./components/AudiobookThumbnail";
 import FullScreenAudioPlayer from "./components/FullScreenAudioPlayer";
-import { de } from "rn-emoji-keyboard";
 
 // --- TYPES ---
 export interface AudiobookData {
@@ -53,7 +50,6 @@ const AudiobookScroller: React.FC = () => {
             }
           );
 
-          // console.log(processedAudiobooks, "Processed Audiobooks +++++++=");
           setAudiobooks(processedAudiobooks); // Set state with the corrected data
         }
       } catch (error) {
@@ -121,12 +117,9 @@ const scrollerStyles = StyleSheet.create({
     fontWeight: "bold",
     color: "#1C1C1E",
     marginBottom: 20,
-    paddingHorizontal: 20,
     fontFamily: Platform.OS === "ios" ? "Avenir-Heavy" : "Roboto-Bold",
   },
-  listContentContainer: {
-    paddingLeft: 20,
-  },
+  listContentContainer: {},
   loader: {
     flex: 1,
     justifyContent: "center",

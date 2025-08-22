@@ -38,7 +38,6 @@ const Soundscape = () => {
 
   const styles = styling(theme);
 
-  //libraryTracks
   // need to integrate audio functionality and image check
   const getSoundscapeListData = async () => {
     try {
@@ -46,9 +45,6 @@ const Soundscape = () => {
       // Check if 'result' and 'result.data' exist and is an array
       if (result && Array.isArray(result)) {
         const processedArticles = result.map((tracks: any) => {
-          // Assign a random tag from the 'tags' arra
-
-          // Return a new object with the original properties plus the new ones
           return {
             ...tracks, // Spread operator to keep original properties
             image: {
@@ -56,8 +52,6 @@ const Soundscape = () => {
             },
           };
         });
-
-        // console.log(processedArticles, "processedArticles sound");
         setShowLibrary(true);
         setLibraryTracks(processedArticles);
       } else {
@@ -107,8 +101,6 @@ const Soundscape = () => {
       if (sound) {
         await sound.unloadAsync();
       }
-
-      // const { sound: newSound } = await Audio.Sound.createAsync(track.source);
       const { sound: newSound } = await Audio.Sound.createAsync({
         uri: track.source,
       });
@@ -215,7 +207,7 @@ const styling = (theme: ThemeKey) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      paddingHorizontal: 16,
+      paddingHorizontal: 10,
     },
     header: {
       fontSize: 26,

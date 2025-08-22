@@ -80,7 +80,6 @@ const Reflection = () => {
   const [journalList, setJournalList] = useState<any[] | undefined>();
   const [templateId, setTemplateId] = useState<number>();
 
-  //
   const handlePress = (questions: any[], templateId: number) => {
     setTemplateId(templateId);
     setSelectedQuestions(questions); // Store selected questions
@@ -216,8 +215,7 @@ const styling = (theme: ThemeKey) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      // backgroundColor: themeColors[theme].background,
-      paddingHorizontal: 16,
+      paddingHorizontal: 10,
     },
     backButton: {
       marginTop: 50,

@@ -10,7 +10,6 @@ import {
 
 // --- TYPES ---
 export interface VideoData {
-  // views: string;
   id: number;
   title: string;
   image: string;
@@ -58,9 +57,6 @@ const thumbnailStyles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 8,
       },
-      android: {
-        elevation: 5,
-      },
     }),
   },
   imageBackground: {
@@ -82,7 +78,6 @@ const thumbnailStyles = StyleSheet.create({
     color: "white",
     fontSize: 16,
     fontWeight: "bold",
-    // fontFamily: Platform.OS === "ios" ? "Avenir" : "Roboto",
     textShadowColor: "rgba(0, 0, 0, 0.75)",
     textShadowOffset: { width: -1, height: 1 },
     textShadowRadius: 10,
@@ -91,7 +86,6 @@ const thumbnailStyles = StyleSheet.create({
     color: "white",
     fontSize: 12,
     fontWeight: "500",
-    // fontFamily: Platform.OS === "ios" ? "Avenir" : "Roboto",
     marginTop: 4,
     textShadowColor: "rgba(0, 0, 0, 0.75)",
     textShadowOffset: { width: -1, height: 1 },

@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { Audio } from "expo-av";
 import { Ionicons } from "@expo/vector-icons";
-import { router, useNavigation } from "expo-router";
+import { useNavigation } from "expo-router";
 import ThemeContext from "@/context/ThemeContext";
 import { themeColors } from "@/constant/Colors";
 import { ScreenView, ThemeKey } from "@/components/Themed";
@@ -63,8 +63,6 @@ const Meditation = () => {
       if (result && Array.isArray(result)) {
         const processedAudio = result.map((item: any) => {
           const randomTag = tags[Math.floor(Math.random() * tags.length)];
-          // Assign a random tag from the 'tags' array
-          // Return a new object with the original properties plus the new ones
           return {
             ...item, // Spread operator to keep original properties
             tag: randomTag,
@@ -75,8 +73,6 @@ const Meditation = () => {
             },
           };
         });
-        // console.log(processedAudio, "processedVideo Meditatio +++++++=");
-        // setFilteredData(processedAudio);
         setMeditationList(processedAudio);
       } else {
         // Handle the case where the data is not in the expected format
@@ -108,8 +104,6 @@ const Meditation = () => {
     if (sound) {
       await sound.unloadAsync();
     }
-
-    // const { sound: newSound } = await Audio.Sound.createAsync(track.source);
     const { sound: newSound } = await Audio.Sound.createAsync(
       typeof track.source === "string" ? { uri: track.source } : track.source
     );
@@ -260,7 +254,7 @@ const Meditation = () => {
 
 const styling = (theme: ThemeKey) =>
   StyleSheet.create({
-    container: { flex: 1, paddingHorizontal: 16 },
+    container: { flex: 1, paddingHorizontal: 10 },
     backButton: {
       marginTop: 50,
       marginBottom: 10,
@@ -356,12 +350,10 @@ const styling = (theme: ThemeKey) =>
     },
     playerDuration: { color: themeColors.basic.lightGrey, fontSize: 14 },
 
-    // new
     heading: {
       fontSize: 18,
       color: themeColors[theme].text,
       fontWeight: "bold",
-      // marginBottom: 7,
     },
   });
 

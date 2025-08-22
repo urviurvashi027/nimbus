@@ -1,7 +1,6 @@
 import {
   View,
   Text,
-  Image,
   TouchableOpacity,
   StyleSheet,
   ScrollView,
@@ -214,9 +213,9 @@ const SelfCare: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    // getMentalListData();
-  }, []);
+  // useEffect(() => {
+  //   // getMentalListData();
+  // }, []);
 
   return (
     <ScreenView
@@ -255,7 +254,6 @@ const SelfCare: React.FC = () => {
         </ScrollView>
 
         {/* MasterClass Section */}
-        {/* <MasterClass /> */}
         <ScrollView showsVerticalScrollIndicator={false}>
           <ScrollView
             horizontal
@@ -345,7 +343,6 @@ const SelfCare: React.FC = () => {
 const styling = (theme: ThemeKey) =>
   StyleSheet.create({
     screenTitle: {
-      // paddingHorizontal: 10,
       marginBottom: 30,
     },
     screenTitleText: {
@@ -353,7 +350,6 @@ const styling = (theme: ThemeKey) =>
       fontWeight: "bold",
     },
     navigationScrollView: {
-      // height: 100,
       marginBottom: 20,
     },
     header: {
@@ -365,7 +361,6 @@ const styling = (theme: ThemeKey) =>
     },
     navigationButtonContainer: {
       alignItems: "center",
-      textAlign: "center",
       marginBottom: 30,
     },
     content: {
@@ -375,7 +370,7 @@ const styling = (theme: ThemeKey) =>
       width: 60,
       height: 60,
       borderRadius: 25, // Makes the button rounded
-      marginRight: 10, // Space between buttons
+      marginRight: 8, // Space between buttons
     },
     buttonIcon: {
       width: 60,
@@ -383,8 +378,7 @@ const styling = (theme: ThemeKey) =>
       borderRadius: 25, // Makes the button rounded
     },
     buttonLabel: {
-      paddingTop: 15,
-      textAlign: "center",
+      paddingTop: 10,
       color: themeColors[theme].text,
       fontSize: 10,
     },

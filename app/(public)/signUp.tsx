@@ -1,12 +1,4 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Platform,
-  ToastAndroid,
-  // TextInput,
-} from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigation, useRouter } from "expo-router";
 
@@ -45,7 +37,7 @@ export default function signUp() {
     navigation.setOptions({
       headerShown: true,
       headerTransparent: true,
-      headerTitle: "Sign In",
+      headerTitle: "",
       headerBackButtonDisplayMode: "minimal",
       headerTitleAlign: "center",
       headerTintColor: styles.header.color,
@@ -92,8 +84,7 @@ export default function signUp() {
         text1: "Account created successfuly",
         position: "bottom",
       });
-      router.push("/(public)/onboardingScreen");
-      // router.replace("/(public)/signIn");
+      router.push("/OnBoarding/ProfileScreen");
     }
     if (result && result.error) {
       alert(result.msg);
@@ -280,7 +271,6 @@ export default function signUp() {
       </View>
 
       {/* Create Account Button */}
-      {/* <View> */}
       <TouchableOpacity
         style={styles.signInButton}
         onPress={() => router.replace("/(public)/signIn")}
@@ -350,7 +340,6 @@ const styling = (theme: ThemeKey) =>
       flexDirection: "row",
       marginTop: 30,
       alignItems: "center", // align vertically
-      // backgroundColor: "red",
     },
     countryCode: {
       fontSize: 16,
@@ -363,8 +352,6 @@ const styling = (theme: ThemeKey) =>
       fontSize: 16,
       lineHeight: 22, // keeps consistent spacing
       minWidth: 200,
-      // width: "100%",
-      // color: "#000",
     },
     errorText: {
       color: "red",

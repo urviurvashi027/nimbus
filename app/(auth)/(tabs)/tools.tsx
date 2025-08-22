@@ -1,25 +1,21 @@
 import {
   View,
   Text,
-  Image,
   TouchableOpacity,
   StyleSheet,
   ScrollView,
   Platform,
-  FlatList,
   SafeAreaView,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { router, useNavigation } from "expo-router";
-
+// application level import
+import ThemeContext from "@/context/ThemeContext";
 import {
   buttons as NavigationButton,
   NavigationButtonType,
 } from "@/constant/data/toolsButton";
 import { themeColors } from "@/constant/Colors";
-// import { routineDetails } from "@/constant/data/routineData";
-
-import ThemeContext from "@/context/ThemeContext";
 
 import { ScreenView } from "@/components/Themed";
 import { ThemeKey } from "@/components/Themed";
@@ -36,10 +32,6 @@ import {
 
 const Tools: React.FC = () => {
   const navigation = useNavigation();
-  // const [showSleepTagsModal, setShowSleepTagsModal] = useState(false);
-  // const [showThingsToDoTagsModal, setShowThingsToDoTagsModal] = useState(false);
-  // const [selectedButton, setSelectedButton] = useState("");
-
   const [showMoodTracker, setShowMoodTracker] = useState(false);
   const [mood, setMood] = useState<string | null>(null);
   // Data set states
@@ -151,7 +143,7 @@ const Tools: React.FC = () => {
     getRoutineData("wellness");
   }, []);
 
-  const handleButtonPress = (button: any) => {
+  const handleNavigationButtonPress = (button: any) => {
     if (button.action === "navigate") {
       router.push(button.screen);
     } else if (button.action === "modal") {
@@ -210,22 +202,24 @@ const Tools: React.FC = () => {
         paddingTop: Platform.OS === "ios" ? 80 : 20,
       }}
     >
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={{ flex: 1, padding: 0 }}>
         <View style={styles.screenTitle}>
           <Text style={styles.screenTitleText}>Tools</Text>
         </View>
+        {/* Navigation Button */}
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          style={styles.scrollView}
+          style={styles.navigationScrollView}
+          contentContainerStyle={{ paddingHorizontal: 0 }}
         >
           {NavigationButton.map((button: NavigationButtonType) => {
             const IconComponent = button.icon;
             return (
-              <View style={styles.buttonContainer} key={button.id}>
+              <View style={styles.navigationButtonContainer} key={button.id}>
                 <TouchableOpacity
                   style={styles.button}
-                  onPress={() => handleButtonPress(button)}
+                  onPress={() => handleNavigationButtonPress(button)}
                 >
                   <IconComponent
                     width={styles.buttonIcon.width}
@@ -239,7 +233,10 @@ const Tools: React.FC = () => {
         </ScrollView>
 
         {/* Verticle Scroll View */}
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          style={{ paddingTop: 16, paddingLeft: 0, paddingBottom: 20 }}
+        >
           {/* Reel Scroll */}
           <VideoScroller />
           {/* Audio Book Scroll */}
@@ -323,11 +320,10 @@ const styling = (theme: ThemeKey) =>
       marginBottom: 10,
       marginTop: 10,
     },
-    scrollView: {
-      // height: 100,
+    navigationScrollView: {
       marginBottom: 20,
     },
-    buttonContainer: {
+    navigationButtonContainer: {
       alignItems: "center",
       marginBottom: 30,
     },
@@ -338,9 +334,6 @@ const styling = (theme: ThemeKey) =>
       width: 60,
       height: 60,
       borderRadius: 25, // Makes the button rounded
-      // backgroundColor: "#007BFF",
-      // justifyContent: "center",
-      // alignItems: "center",
       marginHorizontal: 8, // Space between buttons
     },
     buttonIcon: {

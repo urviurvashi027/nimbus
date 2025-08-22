@@ -1,4 +1,3 @@
-// TrendingCardCarousel.tsx
 import { ThemeKey } from "@/components/Themed";
 import { themeColors } from "@/constant/Colors";
 import ThemeContext from "@/context/ThemeContext";
@@ -52,7 +51,7 @@ const TrendingCardCarousel: React.FC<TrendingCardCarouselProps> = ({
         horizontal
         showsHorizontalScrollIndicator={false}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={{ paddingLeft: 20 }}
+        contentContainerStyle={{ paddingLeft: 0 }}
         renderItem={({ item }) => (
           <TouchableOpacity
             onPress={() => onPress(item.id, type)}
@@ -78,12 +77,10 @@ const styling = (theme: ThemeKey) =>
   StyleSheet.create({
     container: {
       marginVertical: 30,
-      // backgroundColor: "red",
     },
     header: {
       flexDirection: "row",
       justifyContent: "space-between",
-      paddingHorizontal: 10,
       alignItems: "center",
       marginBottom: 20,
     },
