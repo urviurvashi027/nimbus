@@ -1,15 +1,18 @@
 import { ScreenView, ThemeKey } from "@/components/Themed";
 import { themeColors } from "@/constant/Colors";
 import ThemeContext from "@/context/ThemeContext";
+import { getProteinIntakeInfo } from "@/services/toolService";
+import {
+  proteinIntakeCalculatorRequest,
+  proteinIntakeCalculatorResponse,
+} from "@/types/toolsTypes";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "expo-router";
 import React, { useContext, useEffect, useState } from "react";
 import {
   Text,
   TextInput,
-  Button,
   StyleSheet,
-  ScrollView,
   Platform,
   View,
   TouchableOpacity,
@@ -21,12 +24,44 @@ type activityList = {
   value: string;
   id: number;
 };
+
+type genderItem = {
+  label: string;
+  value: string;
+  id: number;
+};
+
 const activityLevelList = [
-  { label: "Sedentary (little/no exercise)", value: "1.2", id: 1 },
-  { label: "Lightly active (1-3 days/week)", value: "1.375", id: 2 },
-  { label: "Moderately active (3-5 days/week)", value: "1.55", id: 3 },
-  { label: "Very active (6-7 days/week)", value: "1.725", id: 4 },
-  { label: "Super active (physical job)", value: "1.9", id: 5 },
+  {
+    label: "Sedentary (little/no exercise)",
+    keyword: "sedentary",
+    value: "1.2",
+    id: 1,
+  },
+  {
+    label: "Lightly active (1-3 days/week)",
+    keyword: "light",
+    value: "1.375",
+    id: 2,
+  },
+  {
+    label: "Moderately active (3-5 days/week)",
+    keyword: "moderate",
+    value: "1.55",
+    id: 3,
+  },
+  {
+    label: "Very active (6-7 days/week)",
+    keyword: "active",
+    value: "1.725",
+    id: 4,
+  },
+  {
+    label: "Super active (physical job)",
+    keyword: "very_active",
+    value: "1.9",
+    id: 5,
+  },
 ];
 
 const genderList = [
@@ -39,7 +74,7 @@ export default function ProteinCalculator() {
   const [gender, setGender] = useState("male");
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
-  //   const [activity, setActivity] = useState("sedentary");
+
   const [protein, setProtein] = useState<string | null>(null);
 
   const [openActivityLevel, setOpenActivityLevel] = useState(false);
@@ -49,6 +84,11 @@ export default function ProteinCalculator() {
   const [openGenderSelect, setOpenGenderSelect] = useState(false);
   const [genderValue, setGenderValue] = useState(0);
   const [selectedGender, setSelectedGender] = useState<activityList[]>([]);
+
+  const [result, setResult] = useState<proteinIntakeCalculatorResponse | null>(
+    null
+  );
+
   const [error, setError] = useState("");
 
   const { theme } = useContext(ThemeContext);
@@ -81,6 +121,8 @@ export default function ProteinCalculator() {
       (item, index) => item.id === activityLevelValue
     );
 
+    const gender = genderList.find((item, index) => item.id === genderValue);
+
     switch (al?.label) {
       case "Sedentary (little/no exercise)":
         multiplier = 0.8;
@@ -101,9 +143,29 @@ export default function ProteinCalculator() {
         multiplier = 1.0;
     }
 
-    console.log(weightNum, multiplier, "kjkjkjkjkjkjkj");
     const result = (weightNum * multiplier).toFixed(1);
     setProtein(`${result} grams of protein per day`);
+
+    const request = {
+      weight: weight,
+      height: height,
+      age: age,
+      gender: gender?.value || "",
+      activityLevel: al?.keyword || "",
+    };
+
+    onSubmitClick(request);
+  };
+
+  const onSubmitClick = async (request: proteinIntakeCalculatorRequest) => {
+    try {
+      const result = await getProteinIntakeInfo(request);
+      if (result) {
+        setResult(result);
+      }
+    } catch (error: any) {
+      console.log(error, "API Error Response");
+    }
   };
 
   return (
@@ -201,10 +263,18 @@ export default function ProteinCalculator() {
           </View>
         </TouchableOpacity>
 
-        {protein && (
-          <Text style={styles.result}>
-            Recommended Protein Intake: {protein}
-          </Text>
+        {result && (
+          <View>
+            <Text style={styles.result}>
+              Recommended Protein Intake: {result.recommendedIntake.grams} gms
+            </Text>
+
+            <Text style={styles.result}>
+              Recommended Protein Intake Range:{" "}
+              {result.generalRange.minimumGrams} gms -{" "}
+              {result.generalRange.highActivityGrams} gms
+            </Text>
+          </View>
         )}
       </View>
     </ScreenView>
@@ -266,10 +336,9 @@ const styling = (theme: ThemeKey) =>
       color: themeColors.basic.mediumGrey,
     },
     result: {
-      fontSize: 18,
-      color: "#333",
+      fontSize: 15,
       marginTop: 20,
-      textAlign: "center",
+      color: themeColors[theme].text,
     },
     saveButton: {
       marginVertical: 15,

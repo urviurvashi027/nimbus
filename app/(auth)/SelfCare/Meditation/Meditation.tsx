@@ -13,12 +13,16 @@ import {
 import { Audio } from "expo-av";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "expo-router";
-import ThemeContext from "@/context/ThemeContext";
-import { themeColors } from "@/constant/Colors";
-import { ScreenView, ThemeKey } from "@/components/Themed";
-import GuidedMeditationCard from "@/components/selfCare/meditation/FeaturedCard";
 
-import { Meditations } from "@/constant/data/meditation";
+import ThemeContext from "@/context/ThemeContext";
+
+import { themeColors } from "@/constant/Colors";
+
+import { ScreenView, ThemeKey } from "@/components/Themed";
+import MeditationFeautredCard from "@/components/selfCare/meditation/MeditationFeautredCard";
+
+import { Meditations } from "@/types/toolsTypes";
+
 import { getMeditationAudioList } from "@/services/selfCareService";
 
 const categories = ["All", "Stress & Anxiety", "Self-Care", "Beginner"];
@@ -114,9 +118,18 @@ const Meditation = () => {
   };
 
   // Filter meditations dynamically
-  const filteredMeditations = meditationList.filter(
-    (item) => item.category === currentCategory || currentCategory === "All"
-  );
+  // const filteredMeditations = meditationList.filter(
+  //   (item) => item.category === currentCategory || currentCategory === "All"
+  // );
+
+  // Define your color palette. Add as many colors as you like.
+  const colorPalette = [
+    { bgColor: "#fadbd8", color: "#f19c94" },
+    { bgColor: "#d5f5e3", color: "#acebc8" },
+    { bgColor: "#f8e187", color: "#fbedb7" },
+    { bgColor: "#d6eaf8", color: "#95c9ed" },
+    { bgColor: "#E8DAEF", color: "#c7a5d8" },
+  ];
 
   return (
     <ScreenView
@@ -150,8 +163,12 @@ const Meditation = () => {
             horizontal
             data={meditationList}
             keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item }) => (
-              <GuidedMeditationCard data={item} onPress={handlePlayPause} />
+            renderItem={({ item, index }) => (
+              <MeditationFeautredCard
+                data={item}
+                onPress={handlePlayPause}
+                cardColor={colorPalette[index % colorPalette.length]}
+              />
             )}
             showsHorizontalScrollIndicator={false}
             snapToAlignment="start"
@@ -194,7 +211,7 @@ const Meditation = () => {
         {/* Wrap FlatList inside View to prevent shrinking */}
         <View style={{ flex: 1 }}>
           <FlatList
-            data={filteredMeditations}
+            data={meditationList}
             keyExtractor={(item) => item.id}
             contentContainerStyle={{ flexGrow: 1 }} // ✅ Ensures it fills space
             ListEmptyComponent={() => (
@@ -254,7 +271,10 @@ const Meditation = () => {
 
 const styling = (theme: ThemeKey) =>
   StyleSheet.create({
-    container: { flex: 1, paddingHorizontal: 10 },
+    container: {
+      flex: 1,
+      // paddingHorizontal: 10
+    },
     backButton: {
       marginTop: 50,
       marginBottom: 10,

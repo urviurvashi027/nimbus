@@ -48,11 +48,7 @@ export const API_ENDPOINTS = {
   getMeditationList: `${BASE_URL}/media/media-assets/?type=meditation&category=breathwork`,
 
   getMentalTestList: `${BASE_URL}/assesment/assessments/`,
-
-  // getSoundscapeDetials: `${BASE_URL}/habits/list`,
-  // toolList: `${BASE_URL}/habits/list`,
-  // downloadMedia: `${BASE_URL}/habits/list`,
-  // getWorkoutVideo: `${BASE_URL}/habits/list`,
-
-  // Add more API endpoints as needed
+  calorieCalculator: `${BASE_URL}/calculators/calories/`,
+  proteinIntakeCalculator: `${BASE_URL}/calculators/protein/`,
+  bodyShapeCalculator: `${BASE_URL}/calculators/body_shape/`,
 };

@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Platform,
   Dimensions,
+  SafeAreaView,
 } from "react-native";
 import { Audio } from "expo-av";
 import { Ionicons } from "@expo/vector-icons";
@@ -17,7 +18,7 @@ import { useNavigation } from "expo-router";
 import ThemeContext from "@/context/ThemeContext";
 import { ScreenView, ThemeKey } from "@/components/Themed";
 import { themeColors } from "@/constant/Colors";
-import SoundscapeFeaturedCard from "@/components/selfCare/soundscape/FeaturedCard";
+import SoundscapeFeaturedCard from "@/components/selfCare/soundscape/SoundscapeFeaturedCard";
 import { getSoundscapeList } from "@/services/toolService";
 
 const { width } = Dimensions.get("window"); // get screen width
@@ -27,14 +28,24 @@ const Soundscape = () => {
   const [currentTrack, setCurrentTrack] = useState<TrackType | null>(null);
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [showForYou, setShowForYou] = useState(true);
-  const [showLibrary, setShowLibrary] = useState(true);
+  const [showForYou, setShowForYou] = useState(false);
+  const [showLibrary, setShowLibrary] = useState(false);
 
   const [libraryTracks, setLibraryTracks] = useState<any[] | undefined>();
+  const [favTracks, setFavTracks] = useState<any[] | undefined>();
 
   const navigation = useNavigation();
 
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+
+  // Define your color palette. Add as many colors as you like.
+  const colorPalette = [
+    { bgColor: "#fadbd8", color: "#f19c94" },
+    { bgColor: "#d5f5e3", color: "#acebc8" },
+    { bgColor: "#f8e187", color: "#fbedb7" },
+    { bgColor: "#d6eaf8", color: "#95c9ed" },
+    { bgColor: "#E8DAEF", color: "#c7a5d8" },
+  ];
 
   const styles = styling(theme);
 
@@ -52,7 +63,11 @@ const Soundscape = () => {
             },
           };
         });
+
+        const topThreeItems = processedArticles.slice(0, 3);
+        setFavTracks(topThreeItems);
         setShowLibrary(true);
+        setShowForYou(true);
         setLibraryTracks(processedArticles);
       } else {
         // Handle the case where the data is not in the expected format
@@ -66,10 +81,6 @@ const Soundscape = () => {
   useEffect(() => {
     getSoundscapeListData();
   }, []);
-
-  const refreshData = () => {
-    getSoundscapeListData();
-  };
 
   useEffect(() => {
     navigation.setOptions({
@@ -86,7 +97,6 @@ const Soundscape = () => {
   }, [sound]);
 
   const handlePlayPause = async (track: any) => {
-    console.log(track, "track");
     try {
       if (currentTrack?.id === track.id) {
         if (isPlaying) {
@@ -129,75 +139,88 @@ const Soundscape = () => {
           />
         </TouchableOpacity>
 
-        <Text style={styles.header}>Soundscape</Text>
-        <Text style={styles.subHeader}>Immense Yourself in true nature.</Text>
-
-        {/* "For You" Section */}
-        {showForYou ? (
-          <View>
-            <FlatList
-              horizontal
-              data={forYouTracks}
-              keyExtractor={(item, index) => index.toString()}
-              renderItem={({ item }) => (
-                <SoundscapeFeaturedCard data={item} onPress={handlePlayPause} />
-              )}
-              showsHorizontalScrollIndicator={false}
-              snapToAlignment="start"
-              snapToInterval={CARD_WIDTH + 10} // card width + margin
-              decelerationRate="fast"
-              contentContainerStyle={{ paddingHorizontal: 0 }}
-            />
+        <SafeAreaView style={{ flex: 1 }}>
+          <View style={styles.header}>
+            <Text style={styles.title}>Soundscape</Text>
+            <Text style={styles.subtitle}>
+              Immense Yourself in true nature.
+            </Text>
           </View>
-        ) : null}
 
-        {/* "Library" Section */}
-        {showLibrary ? (
-          <View style={styles.sectionContainer}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Library</Text>
-            </View>
-            <FlatList
-              data={libraryTracks}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={styles.item}
-                  onPress={() => handlePlayPause(item)}
-                >
-                  <Image source={item.image} style={styles.image} />
-                  <View style={styles.textContainer}>
-                    <Text style={styles.title}>{item.title}</Text>
-                    <Text style={styles.duration}>{item.duration}</Text>
-                  </View>
-                </TouchableOpacity>
-              )}
-            />
-          </View>
-        ) : null}
+          {/* "For You" Section */}
 
-        {/* Bottom Player */}
-        {currentTrack && (
-          <View style={styles.bottomPlayer}>
-            <Image source={currentTrack.image} style={styles.playerImage} />
-            <View style={styles.playerText}>
-              <Text style={styles.playerTitle}>{currentTrack.title}</Text>
-              <Text style={styles.playerDuration}>
-                {currentTrack.duration} · Soundscape
-              </Text>
-            </View>
-            <TouchableOpacity onPress={() => handlePlayPause(currentTrack)}>
-              <Ionicons
-                name={isPlaying ? "pause" : "play"}
-                size={24}
-                color="white"
+          {showForYou ? (
+            <View>
+              <FlatList
+                horizontal
+                data={favTracks}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item, index }) => (
+                  <SoundscapeFeaturedCard
+                    data={item}
+                    onPress={handlePlayPause}
+                    cardColor={colorPalette[index % colorPalette.length]}
+                  />
+                )}
+                showsHorizontalScrollIndicator={false}
+                snapToAlignment="start"
+                snapToInterval={CARD_WIDTH + 10} // card width + margin
+                decelerationRate="fast"
+                contentContainerStyle={{ paddingHorizontal: 0 }}
               />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setCurrentTrack(null)}>
-              <Ionicons name="close" size={24} color="white" />
-            </TouchableOpacity>
-          </View>
-        )}
+            </View>
+          ) : null}
+
+          {/* "Library" Section */}
+          {showLibrary ? (
+            <View style={styles.sectionContainer}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>Library</Text>
+              </View>
+              <FlatList
+                data={libraryTracks}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={styles.item}
+                    onPress={() => handlePlayPause(item)}
+                  >
+                    <Image source={item.image} style={styles.image} />
+                    <View style={styles.textContainer}>
+                      <Text style={styles.itemTitle}>{item.title}</Text>
+                      <Text style={styles.duration}>
+                        {item.duration || "3"} min
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                )}
+              />
+            </View>
+          ) : null}
+
+          {/* Bottom Player */}
+          {currentTrack && (
+            <View style={styles.bottomPlayer}>
+              <Image source={currentTrack.image} style={styles.playerImage} />
+              <View style={styles.playerText}>
+                <Text style={styles.playerTitle}>{currentTrack.title}</Text>
+                <Text style={styles.playerDuration}>
+                  {currentTrack.duration} · Soundscape
+                </Text>
+              </View>
+              <TouchableOpacity onPress={() => handlePlayPause(currentTrack)}>
+                <Ionicons
+                  name={isPlaying ? "pause" : "play"}
+                  size={24}
+                  color="white"
+                />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setCurrentTrack(null)}>
+                <Ionicons name="close" size={24} color="white" />
+              </TouchableOpacity>
+            </View>
+          )}
+        </SafeAreaView>
       </View>
     </ScreenView>
   );
@@ -207,21 +230,28 @@ const styling = (theme: ThemeKey) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      paddingHorizontal: 10,
-    },
-    header: {
-      fontSize: 26,
-      fontWeight: "bold",
-      color: themeColors[theme].text,
     },
     backButton: {
       marginTop: 50,
       marginBottom: 10,
     },
-    subHeader: {
-      fontSize: 14,
-      color: themeColors.basic.subheader,
+    itemTitle: {
+      fontSize: 16,
+      color: themeColors[theme].text,
+      fontWeight: "bold",
+    },
+    header: {
+      paddingTop: 10,
       marginBottom: 20,
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: "bold",
+    },
+    subtitle: {
+      fontSize: 14,
+      color: "#999",
+      marginTop: 4,
     },
     headerTitle: {
       fontSize: 22,
@@ -241,7 +271,7 @@ const styling = (theme: ThemeKey) =>
       fontSize: 18,
       color: themeColors[theme].text,
       fontWeight: "bold",
-      marginLeft: 10,
+      // marginLeft: 10,
     },
     item: {
       flexDirection: "row",
@@ -258,11 +288,6 @@ const styling = (theme: ThemeKey) =>
     },
     textContainer: {
       flex: 1,
-    },
-    title: {
-      fontSize: 16,
-      color: themeColors[theme].text,
-      fontWeight: "bold",
     },
     duration: {
       fontSize: 14,

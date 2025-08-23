@@ -1,5 +1,6 @@
 import { ThemeKey } from "@/components/Themed";
 import ThemeContext from "@/context/ThemeContext";
+import { themeColors } from "@/constant/Colors";
 import React, { useContext } from "react";
 import {
   View,
@@ -28,16 +29,21 @@ interface itemDetails {
 interface MeditationFeauturedCardProps {
   data: itemDetails;
   onPress: (data: itemDetails) => void;
+  cardColor: {
+    bgColor: string;
+    color: string;
+  };
 }
 
-const GuidedMeditationCard: React.FC<MeditationFeauturedCardProps> = ({
+const MeditationFeautredCard: React.FC<MeditationFeauturedCardProps> = ({
   data,
   onPress,
+  cardColor,
 }) => {
   const { image, title, duration, description } = data;
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
 
-  const styles = styling(theme);
+  const styles = styling(theme, cardColor);
   return (
     <Pressable onPress={() => onPress(data)} style={styles.card}>
       <View>
@@ -59,11 +65,14 @@ const GuidedMeditationCard: React.FC<MeditationFeauturedCardProps> = ({
   );
 };
 
-const styling = (theme: ThemeKey) =>
+const styling = (
+  theme: ThemeKey,
+  cardColor: { bgColor: string; color: string }
+) =>
   StyleSheet.create({
     card: {
       marginVertical: 20,
-      backgroundColor: "#000",
+      backgroundColor: cardColor.bgColor,
       borderRadius: 15,
       marginRight: 16,
       width: CARD_WIDTH, // controlled card width
@@ -95,19 +104,19 @@ const styling = (theme: ThemeKey) =>
     },
     duration: {
       fontSize: 13,
-      color: "#888",
+      color: themeColors[theme].text,
       marginTop: 2,
     },
     footer: {
-      backgroundColor: "red",
+      backgroundColor: cardColor.color,
       padding: 15,
       borderRadius: 10,
       marginTop: 12,
     },
     description: {
-      color: "white",
+      color: themeColors[theme].text,
       fontSize: 13,
     },
   });
 
-export default GuidedMeditationCard;
+export default MeditationFeautredCard;

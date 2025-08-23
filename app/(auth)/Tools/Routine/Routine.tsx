@@ -37,51 +37,6 @@ type FilterCategory =
   | "Parenting"
   | "Hacks";
 
-// const data = [
-//   {
-//     id: "1",
-//     // title: "Restart your life in 50 days!",
-//     tag: "Fitness",
-//     height: 250,
-//     image: require("../../../../assets/images/routine/1.png"),
-//   },
-//   {
-//     id: "2",
-//     // title: "Less Awkward First Date Tricks",
-//     tag: "Skincare",
-//     height: 280,
-//     image: require("../../../../assets/images/routine/2.png"),
-//   },
-//   {
-//     id: "3",
-//     // title: "Relaxing During Workdays: ADHD",
-//     tag: "Mindfulness",
-//     height: 220,
-//     image: require("../../../../assets/images/routine/3.png"),
-//   },
-//   {
-//     id: "4",
-//     // title: "Pro Routine for Managing Anxiety",
-//     tag: "Mindfulness",
-//     height: 270,
-//     image: require("../../../../assets/images/routine/5.png"),
-//   },
-//   {
-//     id: "5",
-//     // title: "Tidy Desk, Clear Mind",
-//     tag: "Fitness",
-//     height: 230,
-//     image: require("../../../../assets/images/routine/6.png"),
-//   },
-//   {
-//     id: "6",
-//     // title: "Must-Have Back-to-School Essentials",
-//     tag: "Fitness",
-//     height: 240,
-//     image: require("../../../../assets/images/routine/7.png"),
-//   },
-// ];
-
 const RoutineScreen = () => {
   const [selected, setSelected] = useState("All");
   const [routineList, setRoutineList] = useState<any[] | undefined>();
@@ -257,7 +212,10 @@ const RoutineScreen = () => {
 
 const styling = (theme: ThemeKey) =>
   StyleSheet.create({
-    container: { flex: 1, paddingHorizontal: 16 },
+    container: {
+      flex: 1,
+      // paddingHorizontal: 16
+    },
     backButton: {
       marginTop: 50,
       marginBottom: 10,
@@ -269,7 +227,7 @@ const styling = (theme: ThemeKey) =>
       marginTop: 20,
     },
     header: {
-      paddingHorizontal: 20,
+      // paddingHorizontal: 20,
       paddingTop: 10,
     },
     title: {
@@ -284,7 +242,7 @@ const styling = (theme: ThemeKey) =>
     chipsContainer: {
       paddingTop: 20,
       paddingBottom: 50,
-      paddingLeft: 20,
+      // paddingLeft: 20,
     },
   });
 
