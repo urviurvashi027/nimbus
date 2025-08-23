@@ -47,7 +47,7 @@ const SuccessModal = ({
               <View style={styles.successView}>
                 {/* Success GIF */}
                 <Image
-                  source={require("../../assets/images/success.jpg")} // Replace with your GIF file
+                  source={require("../../assets/images/actionLogo/success.jpg")} // Replace with your GIF file
                   style={styles.gif}
                 />
                 <Text style={styles.successText}>

@@ -3,11 +3,8 @@ import {
   View,
   Text,
   TextInput,
-  Button,
   StyleSheet,
   Alert,
-  ScrollView,
-  Image,
   Platform,
   TouchableOpacity,
 } from "react-native";
@@ -17,6 +14,11 @@ import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/context/ThemeContext";
 import { useNavigation } from "expo-router";
 import { themeColors } from "@/constant/Colors";
+import {
+  bodyShapeCalculatorRequest,
+  bodyShapeCalculatorResponse,
+} from "@/types/toolsTypes";
+import { getBodyShapeInfo } from "@/services/toolService";
 
 type BodyShape =
   | "Hourglass"
@@ -43,6 +45,10 @@ const BodyShapeCalculator = () => {
   const [result, setResult] = useState("");
   const [icon, setIcon] = useState(null);
 
+  const [response, setResponse] = useState<bodyShapeCalculatorResponse | null>(
+    null
+  );
+
   const { theme } = useContext(ThemeContext);
   const styles = styling(theme);
 
@@ -53,18 +59,6 @@ const BodyShapeCalculator = () => {
       headerShown: false,
     });
   }, [navigation]);
-
-  useEffect(() => {
-    const loadResult = async () => {
-      const lastResult = await AsyncStorage.getItem("bodyShapeResult");
-      if (lastResult) {
-        const parsed = JSON.parse(lastResult);
-        setResult(parsed.result);
-        setIcon(parsed.icon);
-      }
-    };
-    loadResult();
-  }, []);
 
   const calculateBodyShape = async () => {
     const bustVal = parseFloat(bust);
@@ -83,6 +77,8 @@ const BodyShapeCalculator = () => {
     }
 
     let shape = "";
+
+    console.log(bustVal, waistVal, highHipVal, hipVal, "body shape");
 
     const bustHipDiff = Math.abs(bustVal - hipVal);
     const waistToBust = (waistVal / bustVal) * 100;
@@ -116,12 +112,25 @@ const BodyShapeCalculator = () => {
       JSON.stringify({ result: newResult, icon: shapeIcon })
     );
 
-    // (Optional) send to backend
-    // await fetch('https://your-backend.com/api/body-shape', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ bust: bustVal, waist: waistVal, highHip: highHipVal, hip: hipVal, shape }),
-    // });
+    const request = {
+      bust: bustVal.toString(),
+      waist: waistVal.toString(),
+      highHip: highHipVal.toString(),
+      lowHip: hipVal.toString(),
+    };
+
+    onSubmitClick(request);
+  };
+
+  const onSubmitClick = async (request: bodyShapeCalculatorRequest) => {
+    try {
+      const result = await getBodyShapeInfo(request);
+      if (result) {
+        setResponse(result);
+      }
+    } catch (error: any) {
+      console.log(error, "API Error Response");
+    }
   };
 
   return (
@@ -170,13 +179,11 @@ const BodyShapeCalculator = () => {
         <TextInput
           style={styles.input}
           placeholderTextColor={themeColors.basic.mediumGrey}
-          placeholder="Hip size (cm)"
+          placeholder="Low Hip size (cm)"
           keyboardType="numeric"
           value={hip}
           onChangeText={setHip}
         />
-
-        {/* <Button title="Calculate Body Shape" onPress={calculateBodyShape} /> */}
 
         <TouchableOpacity
           style={styles.saveButton}
@@ -187,10 +194,12 @@ const BodyShapeCalculator = () => {
           </View>
         </TouchableOpacity>
 
-        {result !== "" && (
+        {response && (
           <View style={styles.resultBox}>
-            <Text style={styles.result}>{result}</Text>
-            {icon && <Image source={icon} style={styles.icon} />}
+            <Text style={styles.result}>
+              Your Body Shape is: {response.shape}
+            </Text>
+            {/* {icon && <Image source={icon} style={styles.icon} />} */}
           </View>
         )}
       </View>

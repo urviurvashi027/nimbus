@@ -13,13 +13,16 @@ import {
 import { Ionicons } from "@expo/vector-icons"; // For back icon
 import { useNavigation } from "expo-router";
 
-import { ScreenView } from "@/components/Themed";
 import ThemeContext from "@/context/ThemeContext";
-import { ThemeKey } from "@/components/Themed";
+
 import { themeColors } from "@/constant/Colors";
+
+import { ScreenView } from "@/components/Themed";
+import { ThemeKey } from "@/components/Themed";
 import JournalModal from "@/components/selfCare/journaling/JorunalingModal";
 import JournalItem from "@/components/selfCare/journaling/JournalItem";
 import ReflectionFeaturedCard from "@/components/selfCare/reflection/ReflectionFeatureCard";
+
 import { getJournalList } from "@/services/selfCareService";
 
 const { width } = Dimensions.get("window"); // get screen width
@@ -37,38 +40,6 @@ interface Track {
   color: any;
 }
 
-const forYou: Track[] = [
-  {
-    id: "1",
-    title: "Self Affirmation",
-    duration: "61 min",
-    image: require("../../../../assets/images/mentalTest/adhdTest.png"), // Replace with actual image
-    description:
-      "Feeling unconditional love and acceptance towards yourself and the world",
-    category: "All",
-    isLocked: false,
-    color: {
-      cardColor: "#B5A8D5",
-      descriptionColor: "#7A73D1",
-    },
-  },
-  {
-    id: "16",
-    title: "Practice Gratitude",
-    duration: "3 min",
-    image: require("../../../../assets/images/mentalTest/adhdTest.png"), // Replace with actual image
-    // source: require("../../../../assets/audio/soundscape/seagulls.mp3"), // Replace with actual audio file
-    category: "All",
-    description:
-      "Feeling unconditional love and acceptance towards yourself and the world",
-    isLocked: false,
-    color: {
-      cardColor: "#C1D8C3",
-      descriptionColor: "#6A9C89",
-    },
-  },
-];
-
 const Reflection = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedQuestions, setSelectedQuestions] = useState<
@@ -77,7 +48,9 @@ const Reflection = () => {
   const [showForYou, setShowForYou] = useState(true);
   const [showLibrary, setShowLibrary] = useState(true);
 
+  const [favList, setFavList] = useState<any[] | undefined>();
   const [journalList, setJournalList] = useState<any[] | undefined>();
+
   const [templateId, setTemplateId] = useState<number>();
 
   const handlePress = (questions: any[], templateId: number) => {
@@ -88,6 +61,13 @@ const Reflection = () => {
   const navigation = useNavigation();
 
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const colorPalette = [
+    { bgColor: "#fadbd8", color: "#f19c94" },
+    { bgColor: "#d5f5e3", color: "#acebc8" },
+    { bgColor: "#f8e187", color: "#fbedb7" },
+    { bgColor: "#d6eaf8", color: "#95c9ed" },
+    { bgColor: "#E8DAEF", color: "#c7a5d8" },
+  ];
 
   const styles = styling(theme);
 
@@ -101,12 +81,13 @@ const Reflection = () => {
           // Return a new object with the original properties plus the new ones
           return {
             ...item, // Spread operator to keep original properties
-            icon: {
-              uri: "https://nimbus-fe-assets.s3.amazonaws.com/images/soundscape/peace.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIATTSKFUTAYTULL4XE%2F20250801%2Feu-north-1%2Fs3%2Faws4_request&X-Amz-Date=20250801T140236Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=f9eab29722216ed07fafc2f1a802c10f9ca4214e88fac8862eb5f69cf3d74033",
+            image: {
+              uri: item.icon,
             },
           };
         });
-
+        const topThreeItems = processedList.slice(0, 3);
+        setFavList(topThreeItems);
         setJournalList(processedList);
       } else {
         // Handle the case where the data is not in the expected format
@@ -120,10 +101,6 @@ const Reflection = () => {
   useEffect(() => {
     getJournalListData();
   }, []);
-
-  const refreshData = () => {
-    getJournalListData();
-  };
 
   useEffect(() => {
     navigation.setOptions({
@@ -168,12 +145,13 @@ const Reflection = () => {
               <View>
                 <FlatList
                   horizontal
-                  data={forYou}
+                  data={favList}
                   keyExtractor={(item, index) => index.toString()}
-                  renderItem={({ item }) => (
+                  renderItem={({ item, index }) => (
                     <ReflectionFeaturedCard
                       data={item}
                       onPress={handleFeaturedCardClick}
+                      cardColor={colorPalette[index % colorPalette.length]}
                     />
                   )}
                   showsHorizontalScrollIndicator={false}
@@ -215,7 +193,7 @@ const styling = (theme: ThemeKey) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      paddingHorizontal: 10,
+      // paddingHorizontal: 10,
     },
     backButton: {
       marginTop: 50,
@@ -285,8 +263,8 @@ const styling = (theme: ThemeKey) =>
       fontSize: 16,
       fontWeight: "bold",
     },
-    description: {
-      fontSize: 14,
-      color: "#666",
-    },
+    // description: {
+    //   fontSize: 14,
+    //   color: "#666",
+    // },
   });

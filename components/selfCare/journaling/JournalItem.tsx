@@ -24,7 +24,7 @@ const JournalItem = ({ item, onPress }: any) => {
       disabled={item.locked}
       onPress={() => onPress(item.prompts, item.id)} // Trigger the passed function
     >
-      <Image source={item.icon} style={styles.image} />
+      <Image source={item.image} style={styles.image} />
       <View style={styles.textContainer}>
         <Text style={styles.title}>{item.title}</Text>
         <View style={styles.itemDetails}>

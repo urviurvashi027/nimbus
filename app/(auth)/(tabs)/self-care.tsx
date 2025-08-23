@@ -19,7 +19,6 @@ import {
 import { banners } from "@/constant/data/banner";
 // Need to remove these data once api is integrated
 import { medTests } from "@/constant/data/medicalTest";
-import { RoutineData, RoutineType } from "@/constant/data/routineData";
 
 import { ScreenView } from "@/components/Themed";
 import { ThemeKey } from "@/components/Themed";
@@ -36,7 +35,7 @@ import {
   getMentalTestList,
   getWorkoutVideo,
 } from "@/services/selfCareService";
-import { getSoundscapeList } from "@/services/toolService";
+import { getRoutineList, getSoundscapeList } from "@/services/toolService";
 
 const SelfCare: React.FC = () => {
   const navigation = useNavigation();
@@ -50,6 +49,7 @@ const SelfCare: React.FC = () => {
   const [showPricingModal, setShowPricingModal] = useState(false);
   const [showSleepTagsModal, setShowSleepTagsModal] = useState(false);
   const [showThingsToDoTagsModal, setShowThingsToDoTagsModal] = useState(false);
+  const [routineList, setRoutineList] = useState<any[] | undefined>();
 
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
 
@@ -195,6 +195,31 @@ const SelfCare: React.FC = () => {
     }
   };
 
+  const getRoutineData = async (category?: string) => {
+    // need to add filters functionality and category param changes
+    try {
+      const result = await getRoutineList(category);
+      // Check if 'result' and 'result.data' exist and is an array
+      if (result && Array.isArray(result)) {
+        const processedArticles = result.map((article: any) => {
+          // Return a new object with the original properties plus the new ones
+          return {
+            ...article, // Spread operator to keep original properties
+            image: {
+              uri: article.image,
+            },
+          };
+        });
+        setRoutineList(processedArticles);
+      } else {
+        // Handle the case where the data is not in the expected format
+        console.error("API response data is not an array:", result);
+      }
+    } catch (error: any) {
+      console.log(error, "API Error Response");
+    }
+  };
+
   // TODO ADD MEDTEST API DATA
   const getMentalListData = async () => {
     // need to add filters functionality and category param changes
@@ -213,9 +238,10 @@ const SelfCare: React.FC = () => {
     }
   };
 
-  // useEffect(() => {
-  //   // getMentalListData();
-  // }, []);
+  useEffect(() => {
+    getRoutineData();
+    // getMentalListData();
+  }, []);
 
   return (
     <ScreenView
@@ -275,7 +301,7 @@ const SelfCare: React.FC = () => {
           <HorizontalListCardScroll
             title="Soundscape"
             description="The sound of nature gives you better sleep."
-            backgroundColor="#FFF085"
+            backgroundColor="#fff9d2"
             itemList={libraryTracks}
             onClickOfAll={() => onClickOfAll("soundscape")}
           />
@@ -284,7 +310,7 @@ const SelfCare: React.FC = () => {
           <TrendingCardCarousel
             type="rotuine"
             title="New and Trendings"
-            data={RoutineData}
+            data={routineList ?? []}
             onClickOfAll={() => onClickOfAll("routine")}
             onPress={handleCardPress}
           />
@@ -293,7 +319,7 @@ const SelfCare: React.FC = () => {
           <HorizontalListCardScroll
             title="Medical Test"
             description="Mental health is everything"
-            backgroundColor="#B7B1F2"
+            backgroundColor="#cbc7f6"
             noOfRows={2}
             itemList={medTests}
             onClickOfAll={() => onClickOfAll("medicalTest")}
@@ -305,7 +331,7 @@ const SelfCare: React.FC = () => {
           <HorizontalListCardScroll
             title="Meditation"
             description="Now is a great time to be present. Now is good, too. And now"
-            backgroundColor="#7A73D1"
+            backgroundColor="#fadfdd"
             itemList={meditationList}
             onClickOfAll={() => onClickOfAll("meditation")}
           />

@@ -43,7 +43,7 @@ const Tools: React.FC = () => {
   const [routineWellness, setRoutineWellnessList] = useState<
     any[] | undefined
   >();
-  const [routineFitness, setRutineFitnessList] = useState<any[] | undefined>();
+  const [routineFitness, setRoutineFitnessList] = useState<any[] | undefined>();
 
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
 
@@ -124,7 +124,7 @@ const Tools: React.FC = () => {
         } else if (category === "wellness") {
           setRoutineWellnessList(processedArticles);
         } else if (category === "fitness") {
-          setRutineFitnessList(processedArticles);
+          setRoutineFitnessList(processedArticles);
         }
       } else {
         // Handle the case where the data is not in the expected format
