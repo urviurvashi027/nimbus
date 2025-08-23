@@ -19,8 +19,8 @@ import { router, useNavigation } from "expo-router";
 import ThemeContext from "@/context/ThemeContext";
 import { themeColors } from "@/constant/Colors";
 import { ScreenView, ThemeKey } from "@/components/Themed";
-import ForYouCard from "@/components/selfCare/workout/WorkoutFeaturedCard";
 import { getWorkoutVideo } from "@/services/selfCareService";
+import WorkoutFeaturedCard from "@/components/selfCare/workout/WorkoutFeaturedCard";
 
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = width * 0.8;
@@ -262,7 +262,7 @@ const FitnessVideoList = () => {
             <FlatList
               data={forYouSectionData}
               renderItem={({ item }) => (
-                <ForYouCard item={item} onPress={onFeaturePostClick} />
+                <WorkoutFeaturedCard item={item} onPress={onFeaturePostClick} />
               )}
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{ paddingHorizontal: 0 }}
@@ -339,7 +339,10 @@ const FitnessVideoList = () => {
 
 const styling = (theme: ThemeKey) =>
   StyleSheet.create({
-    container: { flex: 1, paddingHorizontal: 10 },
+    container: {
+      flex: 1,
+      // paddingHorizontal: 10
+    },
     backButton: {
       marginTop: 50,
       marginBottom: 10,

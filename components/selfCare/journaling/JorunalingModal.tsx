@@ -106,7 +106,7 @@ const JournalModal = ({ visible, onClose, questions, templateId }: any) => {
               </Text>
               <Image
                 style={styles.image}
-                source={require("../../../assets/images/success.jpg")}
+                source={require("../../../assets/images/actionLogo/success.jpg")}
               ></Image>
               <View>
                 <TouchableOpacity

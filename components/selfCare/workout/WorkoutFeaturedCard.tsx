@@ -15,14 +15,17 @@ import {
 } from "react-native";
 
 const { width } = Dimensions.get("window");
-const CARD_WIDTH = width * 0.8;
+const CARD_WIDTH = width * 0.9;
 
-interface ForYouCardProps {
+interface WorkoutFeaturedCardProps {
   item: any;
   onPress: (videoId: string, islocked: boolean, source: string) => void;
 }
 
-const ForYouCard: React.FC<ForYouCardProps> = ({ item, onPress }) => {
+const WorkoutFeaturedCard: React.FC<WorkoutFeaturedCardProps> = ({
+  item,
+  onPress,
+}) => {
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
 
   const styles = styling(theme);
@@ -47,7 +50,7 @@ const ForYouCard: React.FC<ForYouCardProps> = ({ item, onPress }) => {
           </View>
           <View style={styles.overlayContent}>
             <Text style={styles.title}>{item.title}</Text>
-            <Text style={styles.duration}>{item.duration}</Text>
+            <Text style={styles.duration}> {item.duration || "3"} min</Text>
           </View>
         </ImageBackground>
       </Pressable>
@@ -69,8 +72,10 @@ const styling = (theme: ThemeKey) =>
     playButton: {
       justifyContent: "center",
       alignItems: "center",
-      backgroundColor: "rgba(0,0,0,0.5)",
-      borderRadius: 25,
+      // backgroundColor: "rgba(0,0,0,0.5)",
+      // width: 100,
+      // height: 100,
+      borderRadius: 65,
       padding: 5,
     },
     imageBackground: {
@@ -96,4 +101,4 @@ const styling = (theme: ThemeKey) =>
     },
   });
 
-export default ForYouCard;
+export default WorkoutFeaturedCard;

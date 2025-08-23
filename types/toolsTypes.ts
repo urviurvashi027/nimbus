@@ -107,9 +107,9 @@ export interface ShortVideoItem {
   id: number;
   title: string;
   image: string;
-  // category: string;
-  // duration: number;
-  // description: string;
+  category: string;
+  duration: number;
+  description: string;
   source: string;
 }
 
@@ -158,3 +158,74 @@ export interface RoutineItem {
 export interface RoutineListResponse {
   data: RoutineItem[];
 }
+
+export interface calorieCalculatorRequest {
+  weight: string;
+  height: string;
+  age: string;
+  gender: string;
+  activityLevel: string;
+}
+
+export interface calorieCalculatorResponse {
+  basalMetabolicRate: number;
+  maintenanceCalories: number;
+  goals: {
+    mildWeightLoss: {
+      calories: number;
+    };
+    weightLoss: {
+      calories: number;
+    };
+    mildWeightGain: {
+      calories: number;
+    };
+    weightGain: {
+      calories: number;
+    };
+  };
+}
+
+export interface proteinIntakeCalculatorRequest {
+  weight: string;
+  // gender: string;
+  activityLevel: string;
+}
+
+export interface proteinIntakeCalculatorResponse {
+  activityLevel: string;
+  recommendedIntake: {
+    grams: number;
+  };
+  generalRange: {
+    minimumGrams: number;
+    highActivityGrams: number;
+  };
+}
+
+export interface bodyShapeCalculatorRequest {
+  bust: string;
+  waist: string;
+  highHip: string;
+  lowHip: string;
+}
+
+export interface bodyShapeCalculatorResponse {
+  shape: string;
+  measurements: {
+    bust: number;
+    waist: number;
+    hips: number;
+  };
+}
+
+export type Meditations = {
+  id: string;
+  title: string;
+  duration: string;
+  description?: string;
+  image: any; // Replace with actual image
+  source: any; // Replace with actual audio
+  category: string;
+  isLocked: boolean;
+};

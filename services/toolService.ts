@@ -9,9 +9,13 @@ import {
   RoutineListResponse,
   ShortVideoListResponse,
   SoundscapeListResponse,
+  bodyShapeCalculatorRequest,
+  bodyShapeCalculatorResponse,
+  calorieCalculatorRequest,
+  calorieCalculatorResponse,
+  proteinIntakeCalculatorRequest,
+  proteinIntakeCalculatorResponse,
 } from "@/types/toolsTypes";
-
-// Type definitions for login, signup, and list responses
 
 // get article list
 // TODO: parsing data check image, source, filter functionality
@@ -35,15 +39,10 @@ export const getArticleList = async (
 export const getArticleDetails = async (
   id: number
 ): Promise<ArticleDataDetails> => {
-  console.log(
-    "i am serviced called",
-    `${API_ENDPOINTS.getArticleDetails}${id}/`
-  );
   try {
     const response: AxiosResponse<ArticleDataDetails> = await axios.get(
       `${API_ENDPOINTS.getArticleDetails}${id}/`
     );
-    // console.log(response, "response");
     return response.data; // Return the list data
   } catch (error: any) {
     throw error.response ? error.response.data : error.message;
@@ -112,6 +111,44 @@ export const getRoutineList = async (
     const response: AxiosResponse<RoutineListResponse> = await axios.get(
       endpoint
     );
+    return response.data; // Return the list data
+  } catch (error: any) {
+    throw error.response ? error.response.data : error.message;
+  }
+};
+
+export const getCalorieIntakeInfo = async (
+  data: calorieCalculatorRequest
+): Promise<calorieCalculatorResponse> => {
+  try {
+    const response: AxiosResponse<calorieCalculatorResponse> = await axios.post(
+      API_ENDPOINTS.calorieCalculator,
+      data
+    );
+    return response.data; // Return the list data
+  } catch (error: any) {
+    throw error.response ? error.response.data : error.message;
+  }
+};
+
+export const getProteinIntakeInfo = async (
+  data: proteinIntakeCalculatorRequest
+): Promise<proteinIntakeCalculatorResponse> => {
+  try {
+    const response: AxiosResponse<proteinIntakeCalculatorResponse> =
+      await axios.post(API_ENDPOINTS.proteinIntakeCalculator, data);
+    return response.data; // Return the list data
+  } catch (error: any) {
+    throw error.response ? error.response.data : error.message;
+  }
+};
+
+export const getBodyShapeInfo = async (
+  data: bodyShapeCalculatorRequest
+): Promise<bodyShapeCalculatorResponse> => {
+  try {
+    const response: AxiosResponse<bodyShapeCalculatorResponse> =
+      await axios.post(API_ENDPOINTS.bodyShapeCalculator, data);
     return response.data; // Return the list data
   } catch (error: any) {
     throw error.response ? error.response.data : error.message;

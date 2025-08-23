@@ -28,16 +28,23 @@ interface itemDetails {
 interface ReflectionFeauturedCardProps {
   data: itemDetails;
   onPress: (data: itemDetails) => void;
+  cardColor: {
+    bgColor: string;
+    color: string;
+  };
 }
 
 const ReflectionFeaturedCard: React.FC<ReflectionFeauturedCardProps> = ({
   data,
   onPress,
+  cardColor,
 }) => {
-  const { image, title, color, duration, description } = data;
+  const { image, title, duration, description } = data;
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
 
-  const styles = styling(theme, color);
+  console.log(image, "image featured card");
+
+  const styles = styling(theme, cardColor);
   return (
     <Pressable onPress={() => onPress(data)} style={styles.card}>
       <View>
@@ -59,11 +66,14 @@ const ReflectionFeaturedCard: React.FC<ReflectionFeauturedCardProps> = ({
   );
 };
 
-const styling = (theme: ThemeKey, color: any) =>
+const styling = (
+  theme: ThemeKey,
+  cardColor: { bgColor: string; color: string }
+) =>
   StyleSheet.create({
     card: {
       marginVertical: 20,
-      backgroundColor: color.cardColor,
+      backgroundColor: cardColor.bgColor,
       borderRadius: 15,
       marginRight: 16,
       width: CARD_WIDTH, // controlled card width
@@ -99,7 +109,7 @@ const styling = (theme: ThemeKey, color: any) =>
       marginTop: 2,
     },
     footer: {
-      backgroundColor: color.descriptionColor,
+      backgroundColor: cardColor.color,
       padding: 15,
       borderRadius: 10,
       marginTop: 12,

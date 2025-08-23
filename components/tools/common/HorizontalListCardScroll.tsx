@@ -141,7 +141,9 @@ const HorizontalListCardScroll: React.FC<PropType> = (props) => {
                   <View style={styles.itemInfo}>
                     <Text style={styles.itemTitle}>{entry.title}</Text>
                     {entry.duration && (
-                      <Text style={styles.itemDuration}>{entry.duration}</Text>
+                      <Text style={styles.itemDuration}>
+                        {entry.duration || "3"} min
+                      </Text>
                     )}
                   </View>
                 </View>

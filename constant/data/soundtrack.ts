@@ -7,10 +7,6 @@ export interface TrackType {
   source: any; // Replace with actual audio file
   category: string;
   isLocked: boolean;
-  // color: {
-  //   cardColor: string;
-  //   descriptionColor: string;
-  // };
 }
 
 export const forYouTracks: TrackType[] = [
@@ -24,10 +20,6 @@ export const forYouTracks: TrackType[] = [
       "Feeling unconditional love and acceptance towards yourself and the world",
     category: "All",
     isLocked: true,
-    // color: {
-    //   cardColor: "#B5A8D5",
-    //   descriptionColor: "#7A73D1",
-    // },
   },
   {
     id: "16",
@@ -39,9 +31,5 @@ export const forYouTracks: TrackType[] = [
     description:
       "Feeling unconditional love and acceptance towards yourself and the world",
     isLocked: true,
-    // color: {
-    //   cardColor: "#C1D8C3",
-    //   descriptionColor: "#6A9C89",
-    // },
   },
 ];
