@@ -301,7 +301,7 @@ const SelfCare: React.FC = () => {
           <HorizontalListCardScroll
             title="Soundscape"
             description="The sound of nature gives you better sleep."
-            backgroundColor="#FFF085"
+            backgroundColor="#fff9d2"
             itemList={libraryTracks}
             onClickOfAll={() => onClickOfAll("soundscape")}
           />
@@ -319,7 +319,7 @@ const SelfCare: React.FC = () => {
           <HorizontalListCardScroll
             title="Medical Test"
             description="Mental health is everything"
-            backgroundColor="#B7B1F2"
+            backgroundColor="#cbc7f6"
             noOfRows={2}
             itemList={medTests}
             onClickOfAll={() => onClickOfAll("medicalTest")}
@@ -331,7 +331,7 @@ const SelfCare: React.FC = () => {
           <HorizontalListCardScroll
             title="Meditation"
             description="Now is a great time to be present. Now is good, too. And now"
-            backgroundColor="#7A73D1"
+            backgroundColor="#fadfdd"
             itemList={meditationList}
             onClickOfAll={() => onClickOfAll("meditation")}
           />
