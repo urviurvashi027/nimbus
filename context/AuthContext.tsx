@@ -110,7 +110,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       const request = {
         username: userName,
         email,
-        phone_number: mobile,
+        phone_number: `+91${mobile}`,
         full_name: fullName,
         password,
       };
