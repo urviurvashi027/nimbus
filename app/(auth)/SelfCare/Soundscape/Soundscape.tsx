@@ -17,7 +17,7 @@ import { TrackType, forYouTracks } from "@/constant/data/soundtrack";
 import { useNavigation } from "expo-router";
 import ThemeContext from "@/context/ThemeContext";
 import { ScreenView, ThemeKey } from "@/components/Themed";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import SoundscapeFeaturedCard from "@/components/selfCare/soundscape/SoundscapeFeaturedCard";
 import { getSoundscapeList } from "@/services/toolService";
 

@@ -13,7 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/context/ThemeContext";
 import DatePanel from "@/components/homeScreen/DatePanel";
 import HabitList from "@/components/HabitList/HabitList";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import { getHabitList } from "@/services/habitService";
 import { HabitItem } from "@/types/habitTypes";
 import { ThemeKey } from "@/components/Themed";

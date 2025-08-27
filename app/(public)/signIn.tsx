@@ -5,7 +5,7 @@ import { router, useNavigation } from "expo-router";
 
 import { TextInput, ScreenView } from "@/components/Themed";
 import { useAuth } from "@/context/AuthContext";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import ThemeContext from "@/context/ThemeContext";
 import { Button } from "@/components/Themed";
 import { ThemeKey } from "@/components/Themed";

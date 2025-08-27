@@ -8,7 +8,7 @@ import {
   Dimensions,
 } from "react-native";
 
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import { ThemeKey } from "@/components/Themed";
 import ThemeContext from "@/context/ThemeContext";
 import { SoundscapeListItem } from "@/types/toolsTypes";

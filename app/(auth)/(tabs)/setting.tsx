@@ -8,7 +8,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Section } from "@/constant/data/settingsList";
 import * as SecureStore from "expo-secure-store";
 import { StoreKey } from "@/constant/Constant";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import { ScreenView } from "@/components/Themed";
 import ThemeContext from "@/context/ThemeContext";
 import NotificationTypeModal from "@/components/setting/NotificationTypeSetting";

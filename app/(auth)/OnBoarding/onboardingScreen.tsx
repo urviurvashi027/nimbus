@@ -11,7 +11,7 @@ import {
   Animated,
 } from "react-native";
 import { onboardingSteps } from "@/constant/data/onboardingData";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import ThemeContext from "@/context/ThemeContext";
 import { ThemeKey } from "@/components/Themed";
 

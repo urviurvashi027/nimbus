@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 
 import { Text } from "@/components/Themed";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import ThemeContext from "@/context/ThemeContext";
 import { MetricFormat } from "./Modal/HabitMetricModal";
 import HabitMetricModal from "./Modal/HabitMetricModal";

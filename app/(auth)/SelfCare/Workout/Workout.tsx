@@ -17,7 +17,7 @@ import { useVideoPlayer, VideoView } from "expo-video"; // ✅ Import correct ex
 
 import { router, useNavigation } from "expo-router";
 import ThemeContext from "@/context/ThemeContext";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import { ScreenView, ThemeKey } from "@/components/Themed";
 import { getWorkoutVideo } from "@/services/selfCareService";
 import WorkoutFeaturedCard from "@/components/selfCare/workout/WorkoutFeaturedCard";

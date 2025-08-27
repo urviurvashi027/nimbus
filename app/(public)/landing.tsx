@@ -4,7 +4,7 @@ import { View, ScreenView } from "@/components/Themed";
 import { SafeAreaView } from "react-native";
 import SegmentedButton from "@/components/segmentedButton";
 import { router } from "expo-router";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 
 export default function login() {
   const firstBtnSegmentBtnClick = () => {

@@ -13,7 +13,7 @@ import { ScreenView, ThemeKey } from "@/components/Themed";
 import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/context/ThemeContext";
 import { useNavigation } from "expo-router";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import {
   bodyShapeCalculatorRequest,
   bodyShapeCalculatorResponse,

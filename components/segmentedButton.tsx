@@ -8,7 +8,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { Text } from "./Themed";
 import { useThemeColor } from "./Themed";
 import ThemeContext from "@/context/ThemeContext";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 
 type segmentedButtonProps = {
   onBtnAction: () => void;

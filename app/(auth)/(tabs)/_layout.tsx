@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import Colors from "@/constant/Colors";
+import Colors from "@/constant/theme/Colors";
 import { useColorScheme } from "@/components/UseColorScheme";
 import ThemeContext from "@/context/ThemeContext";
 

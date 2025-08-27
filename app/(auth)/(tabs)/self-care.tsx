@@ -11,7 +11,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { router, useNavigation } from "expo-router";
 // application level import
 import ThemeContext from "@/context/ThemeContext";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import {
   buttons as NavigationButton,
   NavigationButtonType,

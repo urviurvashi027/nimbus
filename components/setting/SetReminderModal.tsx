@@ -14,7 +14,7 @@ import { format } from "date-fns";
 import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/context/ThemeContext";
 import { ThemeKey } from "../Themed";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import TimePicker from "../TimePicker";
 // import {
 //   checkNotifications,

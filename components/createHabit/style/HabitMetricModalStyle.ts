@@ -1,5 +1,5 @@
 import { View, TouchableOpacity, StyleSheet, Platform } from "react-native";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import { ThemeKey } from "@/components/Themed";
 
 const styling = (theme: ThemeKey) =>
@@ -49,6 +49,7 @@ const styling = (theme: ThemeKey) =>
       backgroundColor: themeColors[theme].background,
       borderColor: themeColors[theme].inpurBorderColor,
       color: themeColors[theme].text,
+      marginBottom: 15,
     },
     saveButton: {
       backgroundColor: themeColors[theme].primaryColor,

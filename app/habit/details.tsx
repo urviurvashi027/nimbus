@@ -5,7 +5,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { ScrollView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import { ScreenView, ThemeKey } from "@/components/Themed";
 import { getHabitDetailsById } from "@/services/habitService";
 import StreakCard from "@/components/habitDetails/StreakCard";

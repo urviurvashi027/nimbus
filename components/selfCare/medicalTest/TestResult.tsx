@@ -5,7 +5,7 @@ import { PieChart } from "react-native-chart-kit";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import testData from "@/constant/data/medicalTest";
 import { router } from "expo-router";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import { ThemeKey } from "@/components/Themed";
 import ThemeContext from "@/context/ThemeContext";
 import AnalyzingResult from "./AnalyzingResult";

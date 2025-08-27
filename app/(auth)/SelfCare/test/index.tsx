@@ -13,7 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router, useNavigation } from "expo-router";
 import { ScreenView, ThemeKey } from "@/components/Themed";
 import ThemeContext from "@/context/ThemeContext";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import { medTests } from "@/constant/data/medicalTest";
 import { getMentalTestList } from "@/services/selfCareService";
 

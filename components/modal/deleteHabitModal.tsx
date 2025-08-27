@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import React, { useContext } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import { ThemeKey } from "@/components/Themed";
 import ThemeContext from "@/context/ThemeContext";
 

@@ -11,7 +11,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import ThemeContext from "@/context/ThemeContext";
 import { ThemeKey } from "@/components/Themed";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 
 export default function NewUserScreen() {
   // const navigation = useNavigation();

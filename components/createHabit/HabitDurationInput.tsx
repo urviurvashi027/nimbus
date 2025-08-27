@@ -6,7 +6,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { Text } from "@/components/Themed";
 import HabitContext from "@/context/HabitContext";
 import { Button, ScreenView } from "@/components/Themed";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import ThemeContext from "@/context/ThemeContext";
 import HabitDurationModal from "./Modal/HabitDurationModal";
 import { Duration } from "./Modal/HabitDurationModal";

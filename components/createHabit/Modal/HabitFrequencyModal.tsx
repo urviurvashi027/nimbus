@@ -3,7 +3,7 @@ import { View, StyleSheet, Modal, TouchableOpacity } from "react-native";
 import { FormInput, Text } from "../../Themed";
 import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/context/ThemeContext";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import styling from "../style/HabitFrequencyModalStyle";
 
 interface FrequencyModalProps {

@@ -4,7 +4,7 @@ import { format } from "date-fns";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 import { Text } from "@/components/Themed";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import ThemeContext from "@/context/ThemeContext";
 import { FrequencyObj } from "./Modal/HabitFrequencyModal";
 import HabitFrequencyModal from "./Modal/HabitFrequencyModal";

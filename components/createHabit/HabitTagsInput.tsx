@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Modal } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import ThemeContext from "@/context/ThemeContext";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import { getHabitTag } from "@/services/habitService";
 import { HabitTag } from "@/types/habitTypes";
 import { ThemeKey } from "../Themed";

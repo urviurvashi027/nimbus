@@ -13,7 +13,7 @@ import { format } from "date-fns";
 import { Text } from "../../Themed";
 import ThemeContext from "@/context/ThemeContext";
 import HabitContext from "@/context/HabitContext";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import TimePicker from "../../TimePicker";
 import styling from "../style/HabitReminderModal";
 

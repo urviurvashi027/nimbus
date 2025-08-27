@@ -5,7 +5,7 @@ import { format } from "date-fns";
 
 import { FormInput, Text } from "../../Themed";
 import ThemeContext from "@/context/ThemeContext";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import DatePicker from "../../DatePicker";
 import styling from "../style/HabitDateModalStyle";
 
