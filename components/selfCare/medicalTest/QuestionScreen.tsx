@@ -12,7 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router, useNavigation } from "expo-router";
 import ThemeContext from "@/context/ThemeContext";
 import { ThemeKey } from "@/components/Themed";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 
 const QuestionScreen = ({
   questionData,

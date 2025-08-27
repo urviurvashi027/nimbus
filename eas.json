@@ -20,7 +20,8 @@
       "ios": {},
       "android": {
         "gradleCommand": ":app:bundleRelease",
-        "buildType": "app-bundle"
+        "buildType": "app-bundle",
+        "autoIncrement": true
       },
       "distribution": "store",
       "credentialsSource": "remote"

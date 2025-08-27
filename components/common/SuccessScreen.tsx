@@ -9,7 +9,7 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import { ThemeKey } from "../Themed";
 import { Ionicons } from "@expo/vector-icons";
 

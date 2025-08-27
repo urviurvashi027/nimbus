@@ -11,7 +11,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "expo-router";
 import ThemeContext from "@/context/ThemeContext";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import LottieView from "lottie-react-native"; // For animated background GIF
 import SettingsModal from "./WaterIntakeForm";
 import AddWaterModal from "./AddWaterModal";

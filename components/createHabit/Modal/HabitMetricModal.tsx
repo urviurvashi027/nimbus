@@ -10,7 +10,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { FormInput, Text } from "../../Themed";
 import DropDownPicker from "react-native-dropdown-picker";
 import ThemeContext from "@/context/ThemeContext";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import styling from "../style/HabitMetricModalStyle";
 import { addObjectAtEnd } from "@/utils/helper";
 import { HabitUnit } from "@/types/habitTypes";
@@ -40,27 +40,6 @@ interface HabitMetricModalProps {
   onSave: (value: MetricFormat) => void;
 }
 
-// const units = [
-//   { label: "Count", value: 1 },
-//   { label: "Steps", value: 2 },
-//   { label: "m", value: 3 },
-//   { label: "km", value: 4 },
-//   { label: "Miles", value: 5 },
-//   { label: "Ltr", value: 6 },
-//   { label: "Ml", value: 7 },
-//   { label: "Pound", value: 8 },
-//   { label: "Kg", value: 9 },
-//   { label: "Gm", value: 10 },
-//   { label: "Mg", value: 11 },
-//   { label: "Hr", value: 12 },
-//   { label: "Min", value: 13 },
-//   { label: "Sec", value: 14 },
-//   { label: "Oz", value: 15 },
-//   { label: "Cal", value: 16 },
-//   { label: "Drink", value: 17 },
-//   // { label: "Add New Unit", value: 18 },
-// ];
-
 const frequencies = ["Daily", "Weekly", "Monthly"];
 
 const HabitMetricModal: React.FC<HabitMetricModalProps> = ({
@@ -89,7 +68,6 @@ const HabitMetricModal: React.FC<HabitMetricModalProps> = ({
 
   useEffect(() => {
     setUnit(habitUnitList);
-    // console.log(habitUnitList, units);
   }, [habitUnitList]);
 
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
@@ -105,11 +83,6 @@ const HabitMetricModal: React.FC<HabitMetricModalProps> = ({
     } else {
     }
   }, [isEditMode]);
-
-  // useEffect(() => {
-  //   const modifiedArray = addObjectAtEnd(habitTagList);
-  //   setHabitTagData(modifiedArray);
-  // }, [habitTagList]);
 
   return (
     <Modal
@@ -131,19 +104,6 @@ const HabitMetricModal: React.FC<HabitMetricModalProps> = ({
             </TouchableOpacity>
           </View>
 
-          {/* Input for Target Value */}
-          <Text style={styles.label}>Target Value</Text>
-          <View style={styles.inputContainer}>
-            <FormInput
-              style={styles.input}
-              placeholderTextColor={themeColors.basic.mediumGrey}
-              placeholder="Enter target value"
-              value={target}
-              onChangeText={setTarget}
-              keyboardType="numeric"
-            />
-          </View>
-
           {/* Dropdown for Unit Selection */}
           <Text style={styles.label}>Select Unit</Text>
           <DropDownPicker
@@ -162,6 +122,19 @@ const HabitMetricModal: React.FC<HabitMetricModalProps> = ({
               borderColor: themeColors[theme].inpurBorderColor,
             }}
           />
+
+          {/* Input for Target Value */}
+          <Text style={styles.label}>Target Value</Text>
+          <View style={styles.inputContainer}>
+            <FormInput
+              style={styles.input}
+              placeholderTextColor={themeColors.basic.mediumGrey}
+              placeholder="Enter target value"
+              value={target}
+              onChangeText={setTarget}
+              keyboardType="numeric"
+            />
+          </View>
 
           {/* Save Button */}
           <TouchableOpacity style={styles.saveButton} onPress={handleSave}>

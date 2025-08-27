@@ -9,7 +9,7 @@ import {
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigation, useRouter } from "expo-router";
 
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import { ScreenView, TextInput } from "@/components/Themed";
 import ThemeContext from "@/context/ThemeContext";
 import { useAuth } from "@/context/AuthContext";

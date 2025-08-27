@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import SetReminderModal from "./SetReminderModal";
 import { Ionicons } from "@expo/vector-icons";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import ThemeContext from "@/context/ThemeContext";
 import { LargeButton, ThemeKey } from "../Themed";
 import { useNavigation } from "expo-router";

@@ -1,5 +1,5 @@
 import { ScreenView, ThemeKey } from "@/components/Themed";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import ThemeContext from "@/context/ThemeContext";
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigation } from "expo-router";

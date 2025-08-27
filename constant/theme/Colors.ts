@@ -1,15 +1,22 @@
+import {
+  ThemeColors,
+  ColorSet,
+  Spacing,
+  Typography,
+} from "../../types/themeTypes";
+
 const tintColorLight = "#f5bcdd";
 const tintColorDark = "#f5bcdd";
 export const primaryColor = "#f5bcdd";
 
-type ColorSet = {
+type ColorSetEx = {
   [colorName: string]: string;
 };
 
-interface ThemeColors {
-  basic: ColorSet;
-  light: ColorSet;
-  dark: ColorSet;
+interface ThemeColorsEx {
+  basic: ColorSetEx;
+  light: ColorSetEx;
+  dark: ColorSetEx;
 }
 
 export default {
@@ -43,7 +50,7 @@ const commonColor = {
   boxActiveColor: "#f5bcdd",
 };
 
-export const themeColors: ThemeColors = {
+export const themeColors: ThemeColorsEx = {
   basic: {
     primaryColor: "#fffdf7",
     secondaryColor: "#f5bcdd",
@@ -116,4 +123,73 @@ const colors = {
   btnBorder: "",
   text: "",
   itemDivider: "",
+};
+
+// latest theme color
+// Define a base set of colors that might be shared or used as a default
+const basicColors: ColorSet = {
+  primary: "#007AFF",
+  secondary: "#5856D6",
+  accent: "#FF9500",
+  success: "#34C759",
+  warning: "#FFC700",
+  error: "#FF3B30",
+  textPrimary: "#1C1C1E",
+  textSecondary: "#8E8E93",
+  textDisabled: "#C7C7CC",
+  background: "#F2F2F7",
+  surface: "#FFFFFF",
+  border: "#D1D1D6",
+  overlay: "rgba(0, 0, 0, 0.5)",
+};
+
+const typography: Typography = {
+  h1: { fontSize: 32, fontWeight: "bold", lineHeight: 40 },
+  h2: { fontSize: 24, fontWeight: "bold", lineHeight: 32 },
+  h3: { fontSize: 20, fontWeight: "600", lineHeight: 28 },
+  body: { fontSize: 16, fontWeight: "normal", lineHeight: 24 },
+  caption: { fontSize: 12, fontWeight: "normal", lineHeight: 16 },
+  button: { fontSize: 16, fontWeight: "bold" },
+};
+
+// 2. Define your standard spacing
+const spacing: Spacing = {
+  xs: 4,
+  sm: 8,
+  md: 16,
+  lg: 24,
+  xl: 32,
+  xxl: 48,
+};
+
+// Now, create the main theme object that adheres to the ThemeColors interface
+export const theme: ThemeColors = {
+  // The 'basic' theme can be the same as your default light theme
+  basic: basicColors,
+
+  // The 'light' theme can extend the basic one if they are similar
+  light: {
+    ...basicColors,
+    // You can override specific colors for light theme if needed
+    // For example: background: '#FAFAFA',
+  },
+
+  // The 'dark' theme will have its own distinct color set
+  dark: {
+    primary: "#0A84FF", // Often a brighter primary for dark backgrounds
+    secondary: "#5E5CE6",
+    accent: "#FF9F0A",
+    success: "#30D158",
+    warning: "#FFD60A",
+    error: "#FF453A",
+    textPrimary: "#FFFFFF",
+    textSecondary: "#8D8D93",
+    textDisabled: "#48484A",
+    background: "#000000",
+    surface: "#1C1C1E", // Dark cards, modals
+    border: "#38383A",
+    overlay: "rgba(0, 0, 0, 0.6)",
+  },
+  spacing: spacing,
+  typography: typography,
 };

@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { ProgressBar } from "react-native-paper"; // For progress bar
 import { Ionicons } from "@expo/vector-icons"; // For icons
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import {
   getJournalEntry,
   submitJournalEntry,

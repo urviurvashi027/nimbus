@@ -12,7 +12,7 @@ import Animated, {
 import { deleteHabit, markHabitDone } from "@/services/habitService";
 import { useNavigation } from "expo-router";
 import ThemeContext from "@/context/ThemeContext";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { HabitDoneRequest, HabitItem } from "@/types/habitTypes";
 import { ThemeKey } from "../Themed";

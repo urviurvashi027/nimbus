@@ -13,7 +13,7 @@ import { LineChart } from "react-native-chart-kit";
 import { Dimensions } from "react-native";
 import ThemeContext from "@/context/ThemeContext";
 import { ThemeKey } from "@/components/Themed";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 
 const waterHistory = {
   avgDailyIntake: "2000ml",

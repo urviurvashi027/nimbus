@@ -12,7 +12,7 @@ import {
   Platform,
 } from "react-native";
 
-import Colors, { themeColors } from "@/constant/Colors";
+import Colors, { themeColors } from "@/constant/theme/Colors";
 import { useColorScheme } from "./UseColorScheme";
 import { useContext } from "react";
 import ThemeContext from "@/context/ThemeContext";

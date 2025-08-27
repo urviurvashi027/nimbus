@@ -11,7 +11,7 @@ import { format, startOfWeek, addDays, isSameDay } from "date-fns";
 import { useNavigation } from "expo-router";
 
 import ThemeContext from "@/context/ThemeContext";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import { ThemeKey } from "../Themed";
 
 const daysOfWeek = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];

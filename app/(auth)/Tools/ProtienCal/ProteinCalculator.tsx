@@ -1,5 +1,5 @@
 import { ScreenView, ThemeKey } from "@/components/Themed";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import ThemeContext from "@/context/ThemeContext";
 import { getProteinIntakeInfo } from "@/services/toolService";
 import {

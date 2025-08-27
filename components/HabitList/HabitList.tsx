@@ -17,7 +17,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 import ThemeContext from "@/context/ThemeContext";
 import DatePanel from "@/components/homeScreen/DatePanel";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import { ThemeKey } from "../Themed";
 import Toast from "react-native-toast-message";
 // import { ThemeKey } from "../Themed";

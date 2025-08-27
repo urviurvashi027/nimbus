@@ -13,7 +13,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 
 import { Text } from "../../Themed";
 import ThemeContext from "@/context/ThemeContext";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import TimePicker from "@/components/TimePicker";
 import styling from "../style/HabitDurationModalStyle";
 

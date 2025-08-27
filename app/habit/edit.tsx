@@ -14,7 +14,7 @@ import { HabitDateType } from "@/components/createHabit/Modal/HabitDateModal";
 import { ReminderAt } from "@/components/createHabit/Modal/HabitReminderModal";
 import ThemeContext from "@/context/ThemeContext";
 import { ThemeKey } from "@/components/Themed";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 
 const HabitEdit = () => {
   const [metric, setMetric] = useState<MetricFormat | {}>({});

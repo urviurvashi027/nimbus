@@ -9,7 +9,7 @@ import {
 import React, { useContext, useEffect, useState } from "react";
 import ThemeContext from "@/context/ThemeContext";
 import { ThemeKey } from "@/components/Themed";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import { TrackType } from "@/constant/data/soundtrack";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";

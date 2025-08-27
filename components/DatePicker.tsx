@@ -4,7 +4,7 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { Ionicons } from "@expo/vector-icons";
 import { format } from "date-fns";
 import { Text } from "./Themed";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import ThemeContext from "@/context/ThemeContext";
 
 type ThemeKey = "basic" | "light" | "dark";

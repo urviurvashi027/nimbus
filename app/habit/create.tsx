@@ -17,7 +17,7 @@ import EmojiPicker, { type EmojiType } from "rn-emoji-keyboard";
 import HabitContext from "@/context/HabitContext";
 import { Button, FormInput, ScreenView } from "@/components/Themed";
 import ThemeContext from "@/context/ThemeContext";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import { Text } from "@/components/Themed";
 import HabitTypeInput from "@/components/createHabit/HabitTypeInput";
 import HabitTagsInput, {

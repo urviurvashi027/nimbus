@@ -1,5 +1,5 @@
 import { ThemeKey } from "@/components/Themed";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import ThemeContext from "@/context/ThemeContext";
 import React, { useContext } from "react";
 import {

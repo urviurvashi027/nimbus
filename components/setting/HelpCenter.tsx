@@ -8,7 +8,7 @@ import {
   ScrollView,
 } from "react-native";
 import { ThemeKey } from "../Themed";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 import ThemeContext from "@/context/ThemeContext";
 
 const faqs = [

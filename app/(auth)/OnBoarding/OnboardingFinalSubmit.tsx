@@ -5,7 +5,7 @@ import { router, useNavigation } from "expo-router";
 import { useOnboarding } from "@/context/OnBoardingContext";
 import { ThemeKey } from "@/components/Themed";
 import ThemeContext from "@/context/ThemeContext";
-import { themeColors } from "@/constant/Colors";
+import { themeColors } from "@/constant/theme/Colors";
 
 const OnboardingFinalSubmit: React.FC = ({}) => {
   const { onboardingData, resetOnboardingData } = useOnboarding();
