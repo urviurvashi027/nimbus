@@ -127,20 +127,34 @@ const colors = {
 
 // latest theme color
 // Define a base set of colors that might be shared or used as a default
-const basicColors: ColorSet = {
+const basicColors: any = {
   primary: "#007AFF",
   secondary: "#5856D6",
-  accent: "#FF9500",
-  success: "#34C759",
-  warning: "#FFC700",
-  error: "#FF3B30",
-  textPrimary: "#1C1C1E",
-  textSecondary: "#8E8E93",
+  // accent: "#FF9500",
+  // success: "#34C759",
+  // warning: "#FFC700",
+  // error: "#FF3B30",
+  // textPrimary: "#1C1C1E",
+  // textSecondary: "#8E8E93",
   textDisabled: "#C7C7CC",
-  background: "#F2F2F7",
-  surface: "#FFFFFF",
+  // background: "#F2F2F7",
+  // surface: "#FFFFFF",
   border: "#D1D1D6",
   overlay: "rgba(0, 0, 0, 0.5)",
+
+  // new property value
+  background: "#1C1E1A",
+  divider: "#242721",
+  surface: "#2A2D24",
+  textPrimary: "#ECEFF4",
+  textSecondary: "#A1A69B",
+  disabled: "#5C6157",
+  accent: "#A3BE8C",
+  accentPressed: "#8FAD78",
+  info: "#5E81AC",
+  success: "#90B47A",
+  warning: "#EBCB8B",
+  error: "#BF616A",
 };
 
 const typography: Typography = {
@@ -168,14 +182,14 @@ export const theme: ThemeColors = {
   basic: basicColors,
 
   // The 'light' theme can extend the basic one if they are similar
-  light: {
+  dark: {
     ...basicColors,
     // You can override specific colors for light theme if needed
     // For example: background: '#FAFAFA',
   },
 
   // The 'dark' theme will have its own distinct color set
-  dark: {
+  light: {
     primary: "#0A84FF", // Often a brighter primary for dark backgrounds
     secondary: "#5E5CE6",
     accent: "#FF9F0A",

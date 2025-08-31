@@ -45,7 +45,7 @@ export interface SignupRequest {
 }
 
 export interface GetOtpRequest {
-  phone_number: string;
+  recipient: string;
 }
 
 export interface GetOtpResponse {
@@ -55,8 +55,53 @@ export interface GetOtpResponse {
   error?: string;
 }
 
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ForgotPasswordResponse {
+  success: boolean;
+  message: string;
+  data: any;
+  error?: string;
+}
+
+export interface ResetPasswordRequest {
+  old_password: string;
+  new_password: string;
+}
+
+export interface ResetPasswordResponse {
+  success: boolean;
+  message:
+    | {
+        phone_number?: string;
+        email?: string;
+        full_name?: string;
+        password?: string;
+        username?: string;
+      }
+    | string;
+  data: any;
+  error_code?: string;
+}
+
+export interface SetPasswordRequest {
+  email: string;
+  otp: string;
+  password: string;
+  // password2: string;
+}
+
+export interface SetPasswordResponse {
+  success: boolean;
+  message: string;
+  data: any;
+  error_code?: string;
+}
+
 export interface VerifyOtpRequest {
-  phone_number: string;
+  recipient: string;
   otp: string;
 }
 
@@ -64,11 +109,20 @@ export interface VerifyOtpResponse {
   success: boolean;
   message: string;
   data: any;
-  error?: string;
+  error_code?: string;
 }
 
 export interface SignupResponse {
   success: boolean;
-  message: string;
-  data: SignupData;
+  message:
+    | {
+        phone_number?: string;
+        email?: string;
+        full_name?: string;
+        password?: string;
+        username?: string;
+      }
+    | string;
+  data: any;
+  error_code?: string;
 }

@@ -8,7 +8,9 @@ import React, {
   useCallback,
 } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { theme as themeKit } from "@/constant/theme/Colors";
 import { useColorScheme } from "react-native";
+import { ColorSet, Spacing, Typography } from "@/types/themeTypes";
 
 // export const saveString = async (key: any, value: any) => {
 //   try {
@@ -40,12 +42,18 @@ interface ThemeContextData {
   theme: "basic" | "light" | "dark";
   toggleTheme: (newTheme: "basic" | "light" | "dark") => void;
   useSystemTheme: () => void;
+  newTheme: ColorSet;
+  spacing: Spacing;
+  typography: Typography;
 }
 
 // 2. Create the context with a default value (or undefined)
 const ThemeContext = createContext<ThemeContextData>({
   toggleTheme: (newTheme: "basic" | "light" | "dark") => {},
   theme: "light",
+  newTheme: themeKit.dark,
+  spacing: themeKit.spacing,
+  typography: themeKit.typography,
   useSystemTheme: () => {},
 });
 
@@ -61,6 +69,8 @@ export const ThemeProvider: FC<ThemeProviderProps> = ({ children }) => {
   const [theme, setTheme] = useState<"basic" | "light" | "dark">(
     colorScheme || "light"
   );
+
+  const mainTheme = themeKit.dark;
 
   // const [initialValue, setInitialValue] = useState(0);
 
@@ -161,8 +171,18 @@ export const ThemeProvider: FC<ThemeProviderProps> = ({ children }) => {
   //     getAppTheme();
   //   }, [getAppTheme]);
 
+  // 2. Create the full context value that matches the interface
+  const contextValue: ThemeContextData = {
+    theme,
+    toggleTheme,
+    useSystemTheme,
+    newTheme: mainTheme, // Pass the colors from the current theme
+    spacing: themeKit.spacing, // Pass the spacing object
+    typography: themeKit.typography, // Pass the typography object
+  };
+
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, useSystemTheme }}>
+    <ThemeContext.Provider value={contextValue}>
       {children}
     </ThemeContext.Provider>
   );

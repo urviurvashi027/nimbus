@@ -11,6 +11,12 @@ import {
   GetOtpResponse,
   VerifyOtpRequest,
   VerifyOtpResponse,
+  ForgotPasswordResponse,
+  ForgotPasswordRequest,
+  ResetPasswordRequest,
+  ResetPasswordResponse,
+  SetPasswordResponse,
+  SetPasswordRequest,
 } from "@/types/loginTypes";
 import Toast from "react-native-toast-message";
 
@@ -50,7 +56,15 @@ export const signup = async (data: SignupRequest): Promise<SignupResponse> => {
     );
     return response.data; // Return the data containing the token
   } catch (error: any) {
-    throw error.response ? error.response.data : error.message;
+    // Normalize error to match SignupResponse
+    if (error.response?.data) {
+      return error.response.data as SignupResponse;
+    }
+    return {
+      success: false,
+      message: error.message ?? "Something went wrong",
+      data: {},
+    };
   }
 };
 
@@ -72,6 +86,49 @@ export const verifyOtp = async (
   try {
     const response: AxiosResponse<VerifyOtpResponse> = await axios.post(
       API_ENDPOINTS.verifyOtp,
+      data
+    );
+    return response.data; // Return the data containing the token
+  } catch (error: any) {
+    throw error.response ? error.response.data : error.message;
+  }
+};
+
+export const forgotPassword = async (
+  data: ForgotPasswordRequest
+): Promise<ForgotPasswordResponse> => {
+  try {
+    console.log("forgot password called,", data);
+    const response: AxiosResponse<ForgotPasswordResponse> = await axios.post(
+      API_ENDPOINTS.forgotPassword,
+      data
+    );
+    return response.data; // Return the data containing the token
+  } catch (error: any) {
+    throw error.response ? error.response.data : error.message;
+  }
+};
+
+export const resetPassword = async (
+  data: ResetPasswordRequest
+): Promise<ResetPasswordResponse> => {
+  try {
+    const response: AxiosResponse<ResetPasswordResponse> = await axios.post(
+      API_ENDPOINTS.changePassword,
+      data
+    );
+    return response.data; // Return the data containing the token
+  } catch (error: any) {
+    throw error.response ? error.response.data : error.message;
+  }
+};
+
+export const setPassword = async (
+  data: SetPasswordRequest
+): Promise<SetPasswordResponse> => {
+  try {
+    const response: AxiosResponse<SetPasswordResponse> = await axios.post(
+      API_ENDPOINTS.setPassword,
       data
     );
     return response.data; // Return the data containing the token
