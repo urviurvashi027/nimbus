@@ -1,24 +1,39 @@
 import React, { useContext, useEffect, useState } from "react";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View, Text, Pressable } from "react-native";
 import { Alert } from "react-native";
 import { router, useNavigation } from "expo-router";
 
-import { TextInput, ScreenView } from "@/components/Themed";
-import { useAuth } from "@/context/AuthContext";
-import { themeColors } from "@/constant/theme/Colors";
+//context
 import ThemeContext from "@/context/ThemeContext";
-import { Button } from "@/components/Themed";
+import { useAuth } from "@/context/AuthContext";
+
+//constant
+import { themeColors } from "@/constant/theme/Colors";
+
+// components
+import { ScreenView } from "@/components/Themed";
+import InputField from "@/components/common/ThemedComponent/StyledInput";
+import {
+  AppleIcon,
+  GoogleIcon,
+  StyledButton,
+} from "@/components/common/ThemedComponent/StyledButton";
 import { ThemeKey } from "@/components/Themed";
+import { StyledCheckbox } from "@/components/common/ThemedComponent/StyledCheckbox";
+
+import { ColorSet } from "@/types/themeTypes";
 
 export default function signIn() {
+  // input state
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, SetRememberMe] = useState(false);
 
   const { onLogin } = useAuth();
 
   const navigation = useNavigation();
 
-  const { theme } = useContext(ThemeContext);
+  const { theme, newTheme } = useContext(ThemeContext);
 
   useEffect(() => {
     navigation.setOptions({
@@ -27,15 +42,10 @@ export default function signIn() {
       headerBackButtonDisplayMode: "minimal",
       headerTintColor: styles.header.color,
       headerTitle: "",
-      headerTitleStyle: {
-        fontSize: 18,
-        color: styles.header,
-        paddingTop: 5,
-      },
     });
   }, [navigation]);
 
-  const styles = styling(theme);
+  const styles = styling(theme, newTheme);
 
   const onLoginClick = async () => {
     try {
@@ -48,6 +58,16 @@ export default function signIn() {
     }
   };
 
+  const handleSignUpClick = () => {
+    router.replace("/(public)/demo");
+    // router.replace("/(public)/signUp");
+  };
+
+  const handleForgotPasswordClick = () => {
+    // router.replace("/(public)/otpVerification");
+    router.replace("/(public)/forgotPassword");
+  };
+
   const _login = (username: string, password: string) => {
     if (username === "" || password === "")
       Alert.alert("Error", "Please enter a username and password");
@@ -55,108 +75,136 @@ export default function signIn() {
   };
 
   return (
-    <ScreenView style={styles.container}>
+    <ScreenView style={styles.mainContainer} bgColor={newTheme.background}>
       <View style={styles.titleContainer}>
-        <Text style={styles.title}>Sign In</Text>
+        <Text style={styles.title}>Join Nimbus Today</Text>
+        <Text style={styles.titleDescription}>
+          Start your habit journey with Nimbus, Its quick and easy
+        </Text>
       </View>
       <View
         style={{
           marginTop: 30,
-          backgroundColor: themeColors.basic.primaryColor,
         }}
       >
-        <TextInput
-          placeholder="Username"
-          placeholderTextColor="#cfcac9"
+        <InputField
+          label="Username"
           value={username}
           onChangeText={setUsername}
+          placeholder="John Cena"
         />
       </View>
       <View
         style={{
           marginTop: 30,
-          backgroundColor: themeColors.basic.primaryColor,
         }}
       >
-        <TextInput
-          placeholderTextColor="#cfcac9"
-          placeholder="Password"
+        <InputField
+          label="Password"
+          preset="password"
           value={password}
-          secureTextEntry={true}
           onChangeText={setPassword}
+          placeholder="••••••••"
+          secureTextEntry={true}
         />
       </View>
-      <Button
-        style={styles.btn}
-        textStyle={styles.signBtnText}
-        title="Log in"
+      <View style={{ height: 20 }} />
+
+      <View>
+        <StyledCheckbox
+          checked={rememberMe}
+          onToggle={() => SetRememberMe(!rememberMe)}
+          label={<Text style={styles.rememberMeText}>Remember Me To DO</Text>}
+        />
+      </View>
+      <View style={{ height: 20 }} />
+
+      <StyledButton
+        label="Sign in"
+        style={{ borderRadius: 12 }}
         onPress={() => _login(username, password)}
+      />
+
+      <View style={{ height: 20 }} />
+
+      <Pressable onPress={handleSignUpClick}>
+        <Text style={styles.signTextContainer}>
+          Do not have an account?{" "}
+          <Text style={{ color: newTheme.textPrimary }}>Sign up</Text>
+        </Text>
+      </Pressable>
+
+      <View style={{ height: 10 }} />
+      <Pressable onPress={handleForgotPasswordClick}>
+        <Text style={styles.signTextContainer}>
+          <Text style={{ color: newTheme.textPrimary }}>Forgot Password</Text>
+        </Text>
+      </Pressable>
+
+      {/* Divider */}
+      <View style={styles.dividerRow}>
+        <View style={styles.divider} />
+        <Text style={{ color: "#A1A69B" }}>or</Text>
+        <View style={styles.divider} />
+      </View>
+
+      {/* Social buttons */}
+      <StyledButton
+        label="Continue with Google"
+        variant="secondary"
+        onPress={() => {}}
+        leftIcon={<GoogleIcon />}
+        style={{ borderRadius: 12, marginBottom: 12 }}
+      />
+      <StyledButton
+        label="Continue with Apple"
+        variant="secondary"
+        onPress={() => {}}
+        leftIcon={<AppleIcon />}
+        style={{ borderRadius: 12 }}
       />
     </ScreenView>
   );
 }
 
-const styling = (theme: ThemeKey) =>
+const styling = (theme: ThemeKey, newTheme: any) =>
   StyleSheet.create({
-    btn: {
-      padding: 15,
-      borderRadius: 15,
-      backgroundColor: themeColors[theme].backgroundColor,
-      borderColor: themeColors[theme].primaryColor,
-      marginTop: 20,
-      borderWidth: 1,
-    },
-    btnText: {
-      color: themeColors[theme]?.text,
-      fontWeight: 800,
-      fontSize: 18,
-    },
-    container: {
+    mainContainer: {
       paddingTop: 95,
     },
     titleContainer: {
-      justifyContent: "center",
-      alignItems: "center",
+      paddingTop: 20,
     },
-    input: {
-      padding: 15,
-      borderWidth: 1,
-      borderRadius: 15,
+    title: {
+      paddingBottom: 5,
+      color: newTheme.textPrimary,
+      fontSize: 25,
+    },
+    titleDescription: {
+      fontSize: 14,
+      color: newTheme.textSecondary,
+    },
+    rememberMeText: {
+      color: newTheme.textPrimary,
     },
     header: {
-      color: themeColors[theme]?.text,
+      color: newTheme.textPrimary,
     },
-    createButton: {
-      padding: 15,
-      borderRadius: 15,
-      backgroundColor: themeColors[theme].primaryColor,
-      marginTop: 50,
-    },
-    signInButton: {
-      padding: 15,
-      borderRadius: 15,
-      backgroundColor: themeColors[theme].backgroundColor,
-      borderColor: themeColors[theme].primaryColor,
-      marginTop: 20,
-      borderWidth: 1,
-    },
-    createBtnText: {
-      color: themeColors[theme].text,
+    signTextContainer: {
+      color: newTheme.textSecondary,
+      fontSize: 14,
       textAlign: "center",
-      fontSize: 17,
     },
-    signBtnText: {
-      color: themeColors[theme].primaryColor,
-      textAlign: "center",
-      fontSize: 17,
+    dividerRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      marginVertical: 20,
     },
-    inputLabel: {
-      color: themeColors[theme].text,
-      marginBottom: 10,
-    },
-    placeholderColor: {},
-    title: {
-      color: themeColors[theme].text,
-      fontSize: 25,
+    divider: {
+      flex: 1,
+      height: 1,
+      backgroundColor: newTheme.divider,
+      marginHorizontal: 8,
     },
   });

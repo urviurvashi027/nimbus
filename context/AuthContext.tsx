@@ -53,14 +53,14 @@ function useProtectedRoute(authState: {
     const inAuthGroup = segments[0] === "(auth)";
 
     if (!authState.authenticated && inAuthGroup) {
-      console.log("cominge here 1");
-      router.replace("/landing");
+      // console.log("cominge here 1");
+      router.replace("/landingScreen");
     } else if (authState.authenticated && !inAuthGroup) {
-      console.log("cominge here 2");
+      // console.log("cominge here 2");
       router.replace("/(auth)/(tabs)");
     } else {
-      console.log("cominge here 3");
-      router.replace("/landing");
+      // console.log("cominge here 3");
+      router.replace("/landingScreen");
     }
   }, [authState.authenticated]);
 }
@@ -115,7 +115,6 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         password,
       };
       return await signup(request);
-      // return await axios.post(`${URL}/register/`, { email, password });
     } catch (e) {
       return { error: true, msg: (e as any).response.data.msg };
     }
@@ -129,13 +128,6 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       };
 
       const result = await login(request);
-
-      // const result = {
-      //   data: {
-      //     token: "kjshdkjgfkjdsgfjksgdkjfsgdjg",
-      //   },
-      // };
-
       const { success, message, data } = result;
 
       if (success && "email" in data) {
@@ -150,8 +142,6 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         });
 
         setUser(userInfo);
-
-        // Optionally, save tokens to AsyncStorage
 
         axios.defaults.headers.common[
           "Authorization"
@@ -171,15 +161,6 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       return { error: true, msg: (e as any).response.data.msg };
     }
   };
-
-  // const login = (username: string, password: string) => {
-  //   setUser({
-  //     id: "1",
-  //     username: username,
-  //   });
-
-  //   return true;
-  // };
 
   const _logout = async () => {
     const ref = await SecureStore.getItem(REFRESH_TOKEN);
@@ -215,10 +196,4 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   useProtectedRoute(authState);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-
-  // return (
-  //   <AuthContext.Provider value={{ user, login, logout }}>
-  //     {children}
-  //   </AuthContext.Provider>
-  // );
 }

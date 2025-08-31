@@ -1,20 +1,44 @@
-import React from "react";
-import { StyleSheet, Image } from "react-native";
-import { View, ScreenView } from "@/components/Themed";
+import React, { useContext, useEffect } from "react";
 import { SafeAreaView } from "react-native";
+import { StyleSheet, Image } from "react-native";
+import { router, useNavigation } from "expo-router";
+
+//component
+import { View, ScreenView, ThemeKey } from "@/components/Themed";
 import SegmentedButton from "@/components/segmentedButton";
-import { router } from "expo-router";
+
+// constant
 import { themeColors } from "@/constant/theme/Colors";
+// context
+import ThemeContext from "@/context/ThemeContext";
 
 export default function login() {
+  const navigation = useNavigation();
+
+  // const { theme, newTheme } = useContext(ThemeContext);
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerShown: false,
+      // headerTransparent: true,
+      // headerBackButtonDisplayMode: "minimal",
+      // headerTintColor: styles.header.color,
+      // headerTitle: "",
+    });
+  }, [navigation]);
+
   const firstBtnSegmentBtnClick = () => {
     // router.push("/(public)/onboardingScreen");
-    router.push("/(public)/signUp");
+    router.push("/(public)/demo");
   };
 
   const secondBtnSegmentBtnClick = () => {
     router.push("/(public)/signIn");
   };
+
+  const { theme, newTheme } = useContext(ThemeContext);
+
+  const styles = styling(theme, newTheme);
 
   return (
     <ScreenView style={{ padding: 10, marginTop: 0 }}>
@@ -43,15 +67,16 @@ export default function login() {
   );
 }
 
-const styles = StyleSheet.create({
-  imageContainer: {
-    height: "70%",
-    borderRadius: 40,
-    backgroundColor: themeColors.basic.primaryColor,
-  },
-  actionControl: {
-    backgroundColor: themeColors.basic.primaryColor,
-    justifyContent: "center",
-    alignContent: "center",
-  },
-});
+const styling = (theme: ThemeKey, newTheme: any) =>
+  StyleSheet.create({
+    imageContainer: {
+      height: "70%",
+      borderRadius: 40,
+      backgroundColor: newTheme.background,
+    },
+    actionControl: {
+      backgroundColor: newTheme.background,
+      justifyContent: "center",
+      alignContent: "center",
+    },
+  });

@@ -20,8 +20,11 @@ export const API_ENDPOINTS = {
   login: `${BASE_URL}/auth/login/`,
   register: `${BASE_URL}/auth/register/`,
   logout: `${BASE_URL}/auth/logout/`,
-  getOtp: `${BASE_URL}/auth/request-phone-otp/`,
-  verifyOtp: `${BASE_URL}/auth/verify-phone-otp/`,
+  getOtp: `${BASE_URL}/auth/request-otp/`,
+  verifyOtp: `${BASE_URL}/auth/verify-otp/`,
+  setPassword: `${BASE_URL}/auth/set-password/`,
+  forgotPassword: `${BASE_URL}/auth/forgot-password/`,
+  changePassword: `${BASE_URL}/auth/change-password/`,
 
   createHabit: `${BASE_URL}/api/habits/`,
 

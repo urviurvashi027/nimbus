@@ -10,12 +10,12 @@ import {
 } from "react-native";
 import { router, useLocalSearchParams, useNavigation } from "expo-router";
 
-import HeaderTipsGrid from "@/components/common/ArticleDetails/Header";
-import MetaInfo from "@/components/common/ArticleDetails/MetaInfo";
-import AuthorCard from "@/components/common/ArticleDetails/AuthorCard";
-import CatalogList from "@/components/common/ArticleDetails/CatalogList";
-import ArticleSection from "@/components/common/ArticleDetails/ArticleSection";
-import PrimaryButton from "@/components/common/ArticleDetails/PrimaryButton";
+import HeaderTipsGrid from "@/components/ArticleDetails/Header";
+import MetaInfo from "@/components/ArticleDetails/MetaInfo";
+import AuthorCard from "@/components/ArticleDetails/AuthorCard";
+import CatalogList from "@/components/ArticleDetails/CatalogList";
+import ArticleSection from "@/components/ArticleDetails/ArticleSection";
+import PrimaryButton from "@/components/ArticleDetails/PrimaryButton";
 import NutritionInfo from "./component/NutritionInfo";
 
 import { getArticleDetails } from "@/services/toolService";
