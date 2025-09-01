@@ -56,9 +56,9 @@ const successConfig: Record<
   },
   finishedResetPassword: {
     image: <ResetPasswordIcon width={120} height={120} />,
-    title: "You’re All Set! dd",
+    title: "You’re All Set!",
     subtitle: "Your password has been successfully updated.",
-    buttonLabel: "Go to Homepage",
+    buttonLabel: "Go to Sign In",
     route: "/(public)/signIn",
   },
 };
@@ -105,7 +105,7 @@ const SuccessScreen: React.FC<SuccessScreenProps> = ({
         <StyledButton
           label={buttonLabel}
           onPress={handlePress}
-          style={{ borderRadius: 24, marginTop: 40 }}
+          style={{ marginTop: 40 }}
         />
       </View>
     </ScreenView>
@@ -115,11 +115,7 @@ const SuccessScreen: React.FC<SuccessScreenProps> = ({
 const styling = (theme: ThemeKey, newTheme: any) =>
   StyleSheet.create({
     container: {
-      // flex: 1,
-      backgroundColor: "#1C1E1A",
-      justifyContent: "center",
-      alignItems: "center",
-      padding: 20,
+      paddingTop: 90,
     },
     imageWrapper: {
       marginBottom: 30,
