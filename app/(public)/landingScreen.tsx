@@ -34,6 +34,7 @@ const OnboardingScreen = () => {
   const firstBtnSegmentBtnClick = () => {
     // router.push("/(public)/onboardingScreen");
     router.push("/(public)/demo");
+    // router.push("/OnBoarding/QuestionScreen");
   };
 
   const secondBtnSegmentBtnClick = () => {
@@ -46,55 +47,9 @@ const OnboardingScreen = () => {
         {/* Top Illustrations */}
         <View style={styles.illustrationWrapper}>
           <View style={styles.imageContainer}>
-            <RelaxMenIcon
-              // <MeditationWomenIcon
-              width={width * 0.8}
-              height={width * 0.8}
-              //   width={styles.illustrationItem.width}
-              //   height={styles.illustrationItem.height}
-            />
-            {/* <MeditationWomenIcon/> */}
-            {/* <Image
-              source={require("@/assets/images/loginLatest.png")}
-              style={{
-                flex: 1,
-                width: "100%",
-                height: "100%",
-                resizeMode: "contain",
-              }}
-            ></Image> */}
+            <RelaxMenIcon width={width * 0.8} height={width * 0.8} />
           </View>
-          {/* <BlobIllustration /> */}
-
-          {/* Floating labels */}
-          {/* <View style={[styles.label, { top: 40, right: -30 }]}>
-            <Text style={styles.labelText}>MOOD & HORMONES</Text>
-          </View>
-          <View style={[styles.label, { top: 100, left: -30 }]}>
-            <Text style={styles.labelText}>SELF-DEVELOPMENT</Text>
-          </View> */}
         </View>
-
-        {/* Title */}
-        {/* <Text style={styles.title}>
-          <Text style={{ color: "#A3BE8C", fontSize: 14, fontWeight: "700" }}>
-            HABIT-TRACKER{" "}
-          </Text>
-          <Text style={{ color: "#ECEFF4", fontSize: 32, fontWeight: "700" }}>
-            Growth{" "}
-          </Text>
-          <Text style={{ color: "#B48EFC", fontSize: 32, fontWeight: "700" }}>
-            Up!
-          </Text>
-        </Text> */}
-
-        {/* Subtitle */}
-        {/* <Text style={styles.subtitle}>
-          Stronger mind. Healthier body. Happier you.
-        </Text>
-        <Text style={styles.helper}>
-          The neuroscience of happiness in your pocket!
-        </Text> */}
 
         {/* Hero / Tagline */}
         <Text style={styles.tagline}>
@@ -135,28 +90,21 @@ const OnboardingScreen = () => {
 const styling = (theme: ThemeKey, newTheme: any) =>
   StyleSheet.create({
     container: {
-      // flex: 1,
       backgroundColor: newTheme.background,
       justifyContent: "flex-start",
-      //   alignItems: "center",
-      //   padding: 20,
     },
     imageContainer: {
-      //   height: "60%",
       borderRadius: 40,
       padding: 20,
       backgroundColor: newTheme.background,
     },
     illustrationWrapper: {
       marginTop: 70,
-      //   padding: 90,
       alignItems: "center",
-      //   justifyContent: "center",
     },
     illustrationItem: {
       width: 100,
       height: 100,
-      //   borderRadius: 25, // Makes the button rounded
     },
     label: {
       position: "absolute",

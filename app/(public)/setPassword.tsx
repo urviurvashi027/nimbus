@@ -58,7 +58,7 @@ const SetPasswordScreen: React.FC<SetPasswordScreenProps> = ({
   }, [navigation]);
 
   const setPasswordHandler = () => {
-    console.log("setPasswordHandler called");
+    // console.log("setPasswordHandler called");
     onSetPassword();
   };
 
@@ -108,7 +108,7 @@ const SetPasswordScreen: React.FC<SetPasswordScreenProps> = ({
     if (mode === "forgotPassword") {
       setPasswordHandler();
     }
-    Alert.alert("Success", "Password reset successfully!");
+    // Alert.alert("Success", "Password reset successfully!");
   };
 
   const content = (
