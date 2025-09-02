@@ -11,12 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { themeColors } from "@/constant/theme/Colors";
 import { ScreenView, ThemeKey } from "@/components/Themed";
 import { getHabitDetailsById } from "@/services/habitService";
-// import StreakCard from "@/components/habitDetails/StreakCard";
-// import WeeklyView from "@/components/habitDetails/WeeklyPanel";
-import MonthlyOverview from "@/components/habitDetails/MonthlyOverview";
-import WeeklyHabitChart from "@/components/habitDetails/MonthlyChartView";
 import ThemeContext from "@/context/ThemeContext";
-import HabitDetailsCard from "@/components/habitDetails/HabitDetails";
 import WeeklyHabitRowPanel from "@/components/habitDetails/WeeklyRowPanel";
 import SummaryPanel from "@/components/habitDetails/SummaryPanel";
 import HabitDetailsPanel from "@/components/habitDetails/HabitDetailsPanel";
@@ -172,12 +167,8 @@ const HabitDetails = () => {
 
   return (
     <ScreenView
-      // padding={1}
-      // bgColor="red"
       style={{
-        // padding: 0,
         paddingTop: Platform.OS === "ios" ? 40 : 20,
-        // padding: 0,
       }}
     >
       <GestureHandlerRootView style={styles.gestureContainer}>
@@ -225,7 +216,6 @@ const HabitDetails = () => {
               {/* Habit Weekly Row Panel */}
               {habit && habit.weekly_row && (
                 <View style={{ padding: 5 }}>
-                  {/* {habit?.weekly_row.map((habit: any, i: number) => ( */}
                   <HeaderPanel
                     title="Weekly Overview"
                     type="weekly"
@@ -238,9 +228,7 @@ const HabitDetails = () => {
                     frequency={habit.frequency}
                     icon={habit.icon}
                     data={habit.weekly_row}
-                    // onToggle={(day) => toggleHabit(i, day)}
                   />
-                  {/* ))} */}
                 </View>
               )}
 
@@ -253,18 +241,10 @@ const HabitDetails = () => {
                     onSelect={(value) => console.log("Selected:", value)}
                   />
                   <MonthlyOverviewPanel
-                    // year={2025}
-                    // month={8} // October (0-based index)
                     completedDays={[21, 22, 23, 24, 20, 25]}
                   />
                 </>
               )}
-
-              {/* <MonthlyOverview
-                filledDates={filledDates}
-                startDate={startDate}
-                endDate={endDate}
-              /> */}
             </View>
           </ScrollView>
         </SafeAreaView>
