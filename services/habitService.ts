@@ -45,10 +45,15 @@ export const createHabit = async (
 };
 
 // get habit list
-export const getHabitList = async (): Promise<HabitListResponse> => {
+export const getHabitList = async (
+  data?: string
+): Promise<HabitListResponse> => {
+  const endpoint = data
+    ? `${API_ENDPOINTS.createHabit}?date=${data}`
+    : API_ENDPOINTS.createHabit;
   try {
     const response: AxiosResponse<HabitListResponse> = await axios.get(
-      API_ENDPOINTS.createHabit
+      endpoint
     );
     return response.data; // Return the list data
   } catch (error: any) {

@@ -50,9 +50,10 @@ const HorizontalListCardScroll: React.FC<PropType> = (props) => {
 
   // console.log(chunkedData, backgroundColor, "chunkedData");
 
-  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const { theme, newTheme, toggleTheme, useSystemTheme } =
+    useContext(ThemeContext);
 
-  const styles = styling(theme, backgroundColor);
+  const styles = styling(theme, newTheme, backgroundColor);
 
   const handleItemClick = (title: string, entry: any) => {
     console.log("I am clicked", title, entry);
@@ -180,7 +181,7 @@ const HorizontalListCardScroll: React.FC<PropType> = (props) => {
 
 export default HorizontalListCardScroll;
 
-const styling = (theme: ThemeKey, color: string) =>
+const styling = (theme: ThemeKey, newTheme: any, color: string) =>
   StyleSheet.create({
     card: {
       marginVertical: 20,

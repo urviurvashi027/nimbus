@@ -7,7 +7,6 @@ const EmojiInput = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleEmojiSelect = (emoji: EmojiType) => {
-    // console.log(emoji, "emoji detisl");
     setSelectedEmoji(emoji.emoji);
     setIsOpen(false); // Close modal after selection
   };

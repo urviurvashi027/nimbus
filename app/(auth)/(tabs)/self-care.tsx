@@ -51,9 +51,10 @@ const SelfCare: React.FC = () => {
   const [showThingsToDoTagsModal, setShowThingsToDoTagsModal] = useState(false);
   const [routineList, setRoutineList] = useState<any[] | undefined>();
 
-  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const { theme, newTheme, toggleTheme, useSystemTheme } =
+    useContext(ThemeContext);
 
-  const styles = styling(theme);
+  const styles = styling(theme, newTheme);
 
   // Funstion called on click of navigation button clicked
   const handleNavigationButtonPress = (button: NavigationButtonType) => {
@@ -125,6 +126,7 @@ const SelfCare: React.FC = () => {
         const processedArticles = result.map((tracks: any) => {
           return {
             ...tracks, // Spread operator to keep original properties
+            duration: tracks.duration || "3",
             image: {
               uri: tracks.image,
             },
@@ -366,7 +368,7 @@ const SelfCare: React.FC = () => {
   );
 };
 
-const styling = (theme: ThemeKey) =>
+const styling = (theme: ThemeKey, newTheme: any) =>
   StyleSheet.create({
     screenTitle: {
       marginBottom: 30,
@@ -374,6 +376,7 @@ const styling = (theme: ThemeKey) =>
     screenTitleText: {
       fontSize: 30,
       fontWeight: "bold",
+      color: newTheme.textPrimary,
     },
     navigationScrollView: {
       marginBottom: 20,
@@ -405,7 +408,7 @@ const styling = (theme: ThemeKey) =>
     },
     buttonLabel: {
       paddingTop: 10,
-      color: themeColors[theme].text,
+      color: newTheme.textPrimary,
       fontSize: 10,
     },
   });

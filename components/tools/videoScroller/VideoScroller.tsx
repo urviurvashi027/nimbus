@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import {
   View,
   Text,
@@ -10,6 +10,8 @@ import {
 import FullScreenVideoPlayer from "./component/fullScreenVideoPlayer/FullScreenVideoPlayer";
 import VideoThumbnail from "./component/videoThumbnail/videoThumbnail";
 import { getShortVideo } from "@/services/toolService";
+import ThemeContext from "@/context/ThemeContext";
+import { ThemeKey } from "@/components/Themed";
 
 // --- TYPES ---
 export interface VideoData {
@@ -59,6 +61,11 @@ const VideoScroller: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedVideo, setSelectedVideo] = useState<VideoData | null>(null);
   const [isPlayerVisible, setPlayerVisible] = useState(false);
+
+  const { theme, newTheme, toggleTheme, useSystemTheme } =
+    useContext(ThemeContext);
+
+  const videoScrollerStyles = styling(theme, newTheme);
 
   useEffect(() => {
     const loadVideos = async () => {
@@ -132,21 +139,22 @@ const VideoScroller: React.FC = () => {
 
 export default VideoScroller;
 
-const videoScrollerStyles = StyleSheet.create({
-  container: {
-    paddingVertical: 20,
-  },
-  header: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#1C1C1E",
-    marginBottom: 20,
-    fontFamily: Platform.OS === "ios" ? "Avenir-Heavy" : "Roboto-Bold",
-  },
-  listContentContainer: {},
-  loader: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-});
+const styling = (theme: ThemeKey, newTheme: any) =>
+  StyleSheet.create({
+    container: {
+      paddingVertical: 20,
+    },
+    header: {
+      fontSize: 28,
+      fontWeight: "bold",
+      color: newTheme.textPrimary,
+      marginBottom: 20,
+      fontFamily: Platform.OS === "ios" ? "Avenir-Heavy" : "Roboto-Bold",
+    },
+    listContentContainer: {},
+    loader: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+  });

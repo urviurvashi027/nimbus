@@ -64,9 +64,10 @@ export default function DatePanel(props: DatePanelProps) {
     });
   };
 
-  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const { theme, newTheme, toggleTheme, useSystemTheme } =
+    useContext(ThemeContext);
 
-  const styles = styling(theme);
+  const styles = styling(theme, newTheme);
 
   useEffect(() => {
     // After updating the currentWeek, set the selected date and reset FlatList to center position
@@ -155,20 +156,20 @@ export default function DatePanel(props: DatePanelProps) {
   );
 }
 
-const styling = (theme: ThemeKey) =>
+const styling = (theme: ThemeKey, newTheme: any) =>
   StyleSheet.create({
     gestureContainer: {
       flex: 1, // Ensures full screen coverage
     },
     container: {
-      paddingTop: 20,
+      paddingTop: 80,
       paddingBottom: 16, // Adjust as needed for Safe Area
       position: "relative", // Establishes positioning context for the floating button
     },
     headerText: {
       fontSize: 24,
       fontWeight: "bold",
-      color: themeColors[theme].text,
+      color: newTheme.textPrimary,
       marginBottom: 10, // Space between header and FlatList
     },
     flatList: {
@@ -188,29 +189,29 @@ const styling = (theme: ThemeKey) =>
       width: Dimensions.get("window").width / 7 - 16, // Ensure each day occupies equal width minus margins
     },
     selectedDay: {
-      backgroundColor: themeColors.basic.tertiaryColor,
+      backgroundColor: newTheme.accent,
       borderRadius: 20,
     },
     selectedText: {
-      color: themeColors.basic.mediumGrey,
+      color: newTheme.textPrimary,
     },
     dayText: {
       fontSize: 16,
       fontWeight: "500",
       marginBottom: 10,
-      color: themeColors[theme].text,
+      color: newTheme.textSecondary,
     },
     dateCircle: {
       width: 40,
       height: 40,
       borderRadius: 20,
-      backgroundColor: themeColors.basic.lightGrey,
+      backgroundColor: newTheme.accent,
       justifyContent: "center",
       alignItems: "center",
       marginTop: 0, // No margin needed
     },
     dateText: {
-      color: themeColors.basic.darkGrey,
+      color: newTheme.textPrimary,
       fontSize: 16,
     },
   });

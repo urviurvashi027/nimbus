@@ -1,0 +1,156 @@
+// DailyCheckInCard.tsx
+import ThemeContext from "@/context/ThemeContext";
+import React, { useContext } from "react";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import Svg, { Circle } from "react-native-svg";
+
+interface DailyCheckInCardProps {
+  name: string;
+  goalQuantity: number;
+  completedQuantity: number;
+  unit: string;
+  icon: string; // emoji for now
+  color: string;
+  onIncrement?: () => void;
+  onDecrement?: () => void;
+}
+
+const RADIUS = 40;
+const STROKE_WIDTH = 8;
+const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+
+const DailyCheckInCard: React.FC<DailyCheckInCardProps> = ({
+  name,
+  goalQuantity,
+  completedQuantity,
+  unit,
+  icon,
+  color,
+  onIncrement,
+  onDecrement,
+}) => {
+  const progress = Math.min(completedQuantity / goalQuantity, 1);
+  const strokeDashoffset = CIRCUMFERENCE - CIRCUMFERENCE * progress;
+
+  const { theme, newTheme } = useContext(ThemeContext);
+  const styles = styling(newTheme);
+
+  // console.log(name, "name");
+
+  return (
+    <View style={styles.card}>
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.icon}>{icon}</Text>
+        <Text style={styles.name}>{name}</Text>
+      </View>
+
+      {/* Circle progress */}
+      <View style={styles.circleWrapper}>
+        <Svg width={100} height={100}>
+          <Circle
+            stroke="#2A2A2A"
+            fill="none"
+            cx="50"
+            cy="50"
+            r={RADIUS}
+            strokeWidth={STROKE_WIDTH}
+          />
+          <Circle
+            stroke={color}
+            fill="none"
+            cx="50"
+            cy="50"
+            r={RADIUS}
+            strokeWidth={STROKE_WIDTH}
+            strokeDasharray={CIRCUMFERENCE}
+            strokeDashoffset={strokeDashoffset}
+            strokeLinecap="round"
+          />
+        </Svg>
+
+        <View style={styles.centerText}>
+          <Text style={styles.quantity}>
+            {completedQuantity}/{goalQuantity}
+          </Text>
+          <Text style={styles.unit}>{unit}</Text>
+        </View>
+      </View>
+
+      {/* Buttons */}
+      <View style={styles.controls}>
+        <TouchableOpacity style={styles.btn} onPress={onDecrement}>
+          <Text style={styles.btnText}>-</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.btn} onPress={onIncrement}>
+          <Text style={styles.btnText}>+</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
+
+const styling = (newTheme: any) =>
+  StyleSheet.create({
+    card: {
+      // backgroundColor: "red",
+      backgroundColor: newTheme.surface,
+      borderRadius: 16,
+      padding: 10,
+      alignItems: "center",
+      width: 160, // ✅ fixed width
+      height: 220, // ✅ fixed height
+      marginRight: 12,
+    },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginBottom: 12,
+    },
+    icon: {
+      fontSize: 18,
+      marginRight: 6,
+    },
+    name: {
+      color: "white",
+      fontSize: 16,
+      fontWeight: "600",
+    },
+    circleWrapper: {
+      position: "relative",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    centerText: {
+      position: "absolute",
+      alignItems: "center",
+    },
+    quantity: {
+      color: "white",
+      fontSize: 16,
+      fontWeight: "600",
+    },
+    unit: {
+      color: "#aaa",
+      fontSize: 12,
+      marginTop: 2,
+    },
+    controls: {
+      flexDirection: "row",
+      marginTop: 16,
+    },
+    btn: {
+      backgroundColor: "#2A2A2A",
+      paddingHorizontal: 20,
+      paddingVertical: 8,
+      borderRadius: 8,
+      marginHorizontal: 6,
+    },
+    btnText: {
+      fontSize: 18,
+      color: "#0f0",
+      fontWeight: "600",
+    },
+  });
+
+export default DailyCheckInCard;

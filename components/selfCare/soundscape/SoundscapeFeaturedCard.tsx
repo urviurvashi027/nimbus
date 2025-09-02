@@ -44,7 +44,8 @@ const SoundscapeFeaturedCard: React.FC<SoundscapeFeauturedCardProps> = ({
   cardColor,
 }) => {
   const { image, title, duration, description } = data;
-  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const { theme, toggleTheme, newTheme, useSystemTheme } =
+    useContext(ThemeContext);
 
   const styles = styling(theme, cardColor);
   return (

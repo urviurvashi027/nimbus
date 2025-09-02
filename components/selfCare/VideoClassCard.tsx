@@ -1,5 +1,7 @@
-import React from "react";
+import ThemeContext from "@/context/ThemeContext";
+import React, { useContext } from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { ThemeKey } from "../Themed";
 
 type VideoClassCardType = {
   title: string;
@@ -15,6 +17,10 @@ const MasterclassCard: React.FC<VideoClassCardType> = ({
   thumbnail,
   onPress,
 }) => {
+  const { theme, toggleTheme, newTheme, useSystemTheme } =
+    useContext(ThemeContext);
+
+  const styles = styling(theme, newTheme);
   return (
     <View style={styles.card}>
       <View style={styles.imageWrapper}>
@@ -41,72 +47,73 @@ const MasterclassCard: React.FC<VideoClassCardType> = ({
 
 export default MasterclassCard;
 
-const styles = StyleSheet.create({
-  card: {
-    padding: 0,
-    borderRadius: 16,
-    overflow: "hidden",
-    backgroundColor: "#E8F2FF",
-    marginRight: 16,
-    width: 250,
-  },
-  imageWrapper: {
-    position: "relative",
-    height: 180,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  image: {
-    width: "100%",
-    height: "100%",
-    resizeMode: "cover",
-  },
-  courses: {
-    position: "absolute",
-    bottom: 10,
-    left: 10,
-    color: "#fff",
-    fontSize: 14,
-  },
-  adhdText: {
-    position: "absolute",
-    fontSize: 48,
-    fontWeight: "bold",
-    color: "rgba(186, 154, 255, 0.8)",
-    textAlign: "center",
-  },
-  content: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    padding: 12,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#000",
-  },
-  coach: {
-    marginTop: 4,
-    fontSize: 14,
-    color: "#666",
-  },
-  coachName: {
-    fontWeight: "600",
-  },
-  playButton: {
-    // marginTop: 10,
-    // position: "absolute",
-    marginLeft: 10,
-    backgroundColor: "#000",
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderRadius: 20,
-    // alignSelf: "flex-start",
-  },
-  playText: {
-    color: "#fff",
-    fontSize: 13,
-    fontWeight: "bold",
-  },
-});
+const styling = (theme: ThemeKey, newTheme: any) =>
+  StyleSheet.create({
+    card: {
+      padding: 0,
+      borderRadius: 16,
+      overflow: "hidden",
+      backgroundColor: "#E8F2FF",
+      marginRight: 16,
+      width: 250,
+    },
+    imageWrapper: {
+      position: "relative",
+      height: 180,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    image: {
+      width: "100%",
+      height: "100%",
+      resizeMode: "cover",
+    },
+    courses: {
+      position: "absolute",
+      bottom: 10,
+      left: 10,
+      color: newTheme.textPriamry,
+      fontSize: 14,
+    },
+    adhdText: {
+      position: "absolute",
+      fontSize: 48,
+      fontWeight: "bold",
+      color: "rgba(186, 154, 255, 0.8)",
+      textAlign: "center",
+    },
+    content: {
+      display: "flex",
+      flexDirection: "row",
+      justifyContent: "space-between",
+      padding: 12,
+    },
+    title: {
+      fontSize: 16,
+      fontWeight: "bold",
+      color: "#000",
+    },
+    coach: {
+      marginTop: 4,
+      fontSize: 14,
+      color: "#666",
+    },
+    coachName: {
+      fontWeight: "600",
+    },
+    playButton: {
+      // marginTop: 10,
+      // position: "absolute",
+      marginLeft: 10,
+      backgroundColor: "#000",
+      paddingHorizontal: 10,
+      paddingVertical: 8,
+      borderRadius: 20,
+      // alignSelf: "flex-start",
+    },
+    playText: {
+      color: "#fff",
+      fontSize: 13,
+      fontWeight: "bold",
+    },
+  });
