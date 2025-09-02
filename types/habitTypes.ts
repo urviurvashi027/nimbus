@@ -182,6 +182,8 @@ export interface HabitDetail {
   // API: need to send proper format
   metric: number;
   goal: null;
+  metric_count: number;
+  metric_unit: string;
 }
 
 // Get Habit BY Id

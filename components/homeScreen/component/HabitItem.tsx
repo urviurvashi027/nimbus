@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/context/ThemeContext";
+import { router } from "expo-router";
 // import { ThemeKey } from "../Themed";
 
 interface HabitItemProps {
@@ -45,8 +46,16 @@ const HabitItemCard: React.FC<HabitItemProps> = ({
     onToggle(id, actual_count);
   };
 
+  const handleHabitClick = () => {
+    console.log(id, actual_count, "habitClikc");
+    router.push({ pathname: "/habit/details", params: { id: id } });
+  };
+
   return (
-    <TouchableOpacity style={styles(newTheme).container}>
+    <TouchableOpacity
+      style={styles(newTheme).container}
+      onPress={handleHabitClick}
+    >
       {/* Icon */}
 
       {/* Icon with round surface background */}
