@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import Colors from "@/constant/theme/Colors";
+import Colors, { theme as newThemeKit } from "@/constant/theme/Colors";
 import { useColorScheme } from "@/components/UseColorScheme";
 import ThemeContext from "@/context/ThemeContext";
 
@@ -15,17 +15,19 @@ import ThemeContext from "@/context/ThemeContext";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const { theme, toggleTheme, newTheme, useSystemTheme } =
+    useContext(ThemeContext);
 
   // const styles = styling(theme);
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+        tabBarActiveTintColor:
+          newThemeKit[colorScheme ?? "light"].accentPressed,
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: Colors[colorScheme ?? "light"].background, // White background
+          backgroundColor: newThemeKit[colorScheme ?? "light"].background, // White background
           borderTopWidth: 1,
           // borderTopColor: "#E5E5E5",
         },
@@ -36,7 +38,11 @@ export default function TabLayout() {
         options={{
           tabBarLabel: "Routine",
           tabBarIcon: ({ color }) => (
-            <Ionicons name="body-outline" size={24} color={color} />
+            <Ionicons
+              name="body-outline"
+              size={24}
+              color={newThemeKit[colorScheme ?? "light"].accentPressed}
+            />
           ),
         }}
       />
@@ -45,7 +51,11 @@ export default function TabLayout() {
         options={{
           tabBarLabel: "Self Care",
           tabBarIcon: ({ color }) => (
-            <Ionicons name="fitness-outline" size={24} color={color} />
+            <Ionicons
+              name="fitness-outline"
+              size={24}
+              color={newThemeKit[colorScheme ?? "light"].accentPressed}
+            />
           ),
         }}
       ></Tabs.Screen>
@@ -54,7 +64,11 @@ export default function TabLayout() {
         options={{
           tabBarLabel: "Tools",
           tabBarIcon: ({ color }) => (
-            <Ionicons name="construct-outline" size={24} color={color} />
+            <Ionicons
+              name="construct-outline"
+              size={24}
+              color={newThemeKit[colorScheme ?? "light"].accentPressed}
+            />
           ),
         }}
       />
@@ -64,7 +78,11 @@ export default function TabLayout() {
         options={{
           tabBarLabel: "Setting",
           tabBarIcon: ({ color }) => (
-            <Ionicons name="people-outline" size={24} color={color} />
+            <Ionicons
+              name="people-outline"
+              size={24}
+              color={newThemeKit[colorScheme ?? "light"].accentPressed}
+            />
           ),
         }}
       ></Tabs.Screen>

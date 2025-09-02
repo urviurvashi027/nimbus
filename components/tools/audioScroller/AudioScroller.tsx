@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import {
   View,
   Text,
@@ -11,6 +11,8 @@ import {
 import { getAudioBookList } from "@/services/toolService";
 import AudiobookThumbnail from "./components/AudiobookThumbnail";
 import FullScreenAudioPlayer from "./components/FullScreenAudioPlayer";
+import ThemeContext from "@/context/ThemeContext";
+import { ThemeKey } from "@/components/Themed";
 
 // --- TYPES ---
 export interface AudiobookData {
@@ -29,6 +31,11 @@ const AudiobookScroller: React.FC = () => {
   const [selectedAudiobook, setSelectedAudiobook] =
     useState<AudiobookData | null>(null);
   const [isPlayerVisible, setPlayerVisible] = useState(false);
+
+  const { theme, newTheme, toggleTheme, useSystemTheme } =
+    useContext(ThemeContext);
+
+  const scrollerStyles = styling(theme, newTheme);
 
   useEffect(() => {
     const loadAudiobooks = async () => {
@@ -108,21 +115,23 @@ const AudiobookScroller: React.FC = () => {
 
 export default AudiobookScroller;
 
-const scrollerStyles = StyleSheet.create({
-  container: {
-    paddingVertical: 20,
-  },
-  header: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#1C1C1E",
-    marginBottom: 20,
-    fontFamily: Platform.OS === "ios" ? "Avenir-Heavy" : "Roboto-Bold",
-  },
-  listContentContainer: {},
-  loader: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-});
+const styling = (theme: ThemeKey, newTheme: any) =>
+  StyleSheet.create({
+    container: {
+      paddingVertical: 20,
+    },
+    header: {
+      fontSize: 24,
+      fontWeight: "bold",
+      color: newTheme.textPrimary,
+      // color: "#1C1C1E",
+      marginBottom: 20,
+      fontFamily: Platform.OS === "ios" ? "Avenir-Heavy" : "Roboto-Bold",
+    },
+    listContentContainer: {},
+    loader: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+  });

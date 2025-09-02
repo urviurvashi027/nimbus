@@ -35,9 +35,10 @@ const TrendingCardCarousel: React.FC<TrendingCardCarouselProps> = ({
   onPress,
   onClickOfAll,
 }) => {
-  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const { theme, newTheme, toggleTheme, useSystemTheme } =
+    useContext(ThemeContext);
 
-  const styles = styling(theme);
+  const styles = styling(theme, newTheme);
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -73,7 +74,7 @@ const TrendingCardCarousel: React.FC<TrendingCardCarouselProps> = ({
   );
 };
 
-const styling = (theme: ThemeKey) =>
+const styling = (theme: ThemeKey, newTheme: any) =>
   StyleSheet.create({
     container: {
       marginVertical: 30,
@@ -86,16 +87,16 @@ const styling = (theme: ThemeKey) =>
     },
     headerText: {
       fontSize: 20,
-      color: themeColors[theme].text,
+      color: newTheme.textPrimary,
       fontWeight: "bold",
     },
     seeAll: {
       fontSize: 14,
-      color: "#666",
+      color: newTheme.textSecondary,
     },
     cardWrapper: {
       marginRight: 20,
-      backgroundColor: "#FBE4D6",
+      // backgroundColor: "red",
       borderRadius: 20,
       width: width * 0.55,
       height: width * 0.75,

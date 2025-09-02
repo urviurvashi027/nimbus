@@ -45,9 +45,10 @@ const Tools: React.FC = () => {
   >();
   const [routineFitness, setRoutineFitnessList] = useState<any[] | undefined>();
 
-  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const { theme, newTheme, toggleTheme, useSystemTheme } =
+    useContext(ThemeContext);
 
-  const styles = styling(theme);
+  const styles = styling(theme, newTheme);
 
   // ------------------------------- API CALLS ---------------------------------------
 
@@ -299,7 +300,7 @@ const Tools: React.FC = () => {
   );
 };
 
-const styling = (theme: ThemeKey) =>
+const styling = (theme: ThemeKey, newTheme: any) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -312,6 +313,7 @@ const styling = (theme: ThemeKey) =>
     screenTitleText: {
       fontSize: 30,
       fontWeight: "bold",
+      color: newTheme.textPrimary,
     },
     header: {
       fontSize: 22,
@@ -343,7 +345,7 @@ const styling = (theme: ThemeKey) =>
     },
     buttonLabel: {
       paddingTop: 10,
-      color: themeColors[theme].text,
+      color: newTheme.textPrimary,
       fontSize: 10,
     },
   });

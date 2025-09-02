@@ -190,18 +190,19 @@ export const theme: ThemeColors = {
 
   // The 'dark' theme will have its own distinct color set
   light: {
-    primary: "#0A84FF", // Often a brighter primary for dark backgrounds
-    secondary: "#5E5CE6",
-    accent: "#FF9F0A",
-    success: "#30D158",
-    warning: "#FFD60A",
-    error: "#FF453A",
-    textPrimary: "#FFFFFF",
-    textSecondary: "#8D8D93",
-    textDisabled: "#48484A",
-    background: "#000000",
-    surface: "#1C1C1E", // Dark cards, modals
-    border: "#38383A",
+    ...basicColors,
+    // primary: "#0A84FF", // Often a brighter primary for dark backgrounds
+    // secondary: "#5E5CE6",
+    // accent: "#FF9F0A",
+    // success: "#30D158",
+    // warning: "#FFD60A",
+    // error: "#FF453A",
+    // textPrimary: "#FFFFFF",
+    // textSecondary: "#8D8D93",
+    // textDisabled: "#48484A",
+    // background: "#000000",
+    // surface: "#1C1C1E", // Dark cards, modals
+    // border: "#38383A",
     overlay: "rgba(0, 0, 0, 0.6)",
   },
   spacing: spacing,

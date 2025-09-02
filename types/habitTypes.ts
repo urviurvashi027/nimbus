@@ -46,15 +46,29 @@ export type HabitTag = {
 export interface HabitItem {
   id: string;
   name: string;
+  icon: string;
+  tags: string[];
   habit_type: number;
+  description: string;
   color: string;
+  current_streak: 0;
+  longest_streak: 0;
   frequency: string;
   reminder_time: string;
+  start_time: string;
+  end_time: string;
+  all_day: boolean;
+
+  goal: string;
+  start_date: string;
+  end_date: string;
+
   duration: string;
   metric_count: number;
   metric_unit: string;
   last_completed: string;
   time?: string;
+  completed: boolean;
   // TODO Add other fields that are returned in your list items
 }
 

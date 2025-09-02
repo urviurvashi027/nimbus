@@ -24,6 +24,26 @@ export interface ColorSet {
   surface: string; // For cards, modals, etc.
   border: string;
   overlay: string;
+
+  // primary: "#007AFF";
+  // secondary: "#5856D6";
+  // accent: "#FF9500",
+  // success: "#34C759",
+  // warning: "#FFC700",
+  // error: "#FF3B30",
+  // textPrimary: "#1C1C1E",
+  // textSecondary: "#8E8E93",
+  // textDisabled: "#C7C7CC";
+  // background: "#F2F2F7",
+  // surface: "#FFFFFF",
+  // border: "#D1D1D6";
+  // overlay: "rgba(0, 0, 0, 0.5)";
+
+  // new property value
+  divider: string;
+  disabled: string;
+  accentPressed: string;
+  info: string;
 }
 
 export interface Typography {

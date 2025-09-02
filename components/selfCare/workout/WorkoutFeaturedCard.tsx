@@ -26,9 +26,10 @@ const WorkoutFeaturedCard: React.FC<WorkoutFeaturedCardProps> = ({
   item,
   onPress,
 }) => {
-  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const { theme, newTheme, toggleTheme, useSystemTheme } =
+    useContext(ThemeContext);
 
-  const styles = styling(theme);
+  const styles = styling(theme, newTheme);
 
   return (
     <>
@@ -58,7 +59,7 @@ const WorkoutFeaturedCard: React.FC<WorkoutFeaturedCardProps> = ({
   );
 };
 
-const styling = (theme: ThemeKey) =>
+const styling = (theme: ThemeKey, newTheme: any) =>
   StyleSheet.create({
     card: {
       width: CARD_WIDTH,
@@ -81,7 +82,7 @@ const styling = (theme: ThemeKey) =>
     imageBackground: {
       flex: 1,
       justifyContent: "flex-end",
-      backgroundColor: "#ccc",
+      backgroundColor: newTheme.textSecondary,
     },
     overlayContent: {
       backgroundColor: "rgba(255,255,255,0.6)",
@@ -92,11 +93,11 @@ const styling = (theme: ThemeKey) =>
     title: {
       fontSize: 16,
       fontWeight: "700",
-      color: "#000",
+      backgroundColor: newTheme.textPrimary,
     },
     duration: {
       fontSize: 11,
-      color: "#555",
+      backgroundColor: newTheme.textSecondary,
       marginTop: 4,
     },
   });
