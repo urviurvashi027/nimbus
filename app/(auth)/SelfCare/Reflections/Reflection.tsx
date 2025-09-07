@@ -60,7 +60,6 @@ const Reflection = () => {
   };
   const navigation = useNavigation();
 
-  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
   const colorPalette = [
     { bgColor: "#fadbd8", color: "#f19c94" },
     { bgColor: "#d5f5e3", color: "#acebc8" },
@@ -69,7 +68,9 @@ const Reflection = () => {
     { bgColor: "#E8DAEF", color: "#c7a5d8" },
   ];
 
-  const styles = styling(theme);
+  const { newTheme } = useContext(ThemeContext);
+
+  const styles = styling(newTheme);
 
   const getJournalListData = async () => {
     // need to add filters functionality and category param changes
@@ -131,7 +132,7 @@ const Reflection = () => {
               <Ionicons
                 name="arrow-back"
                 size={24}
-                color={themeColors[theme].text}
+                color={newTheme.textSecondary}
               />
             </TouchableOpacity>
 
@@ -189,7 +190,7 @@ const Reflection = () => {
 
 export default Reflection;
 
-const styling = (theme: ThemeKey) =>
+const styling = (theme: any) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -201,13 +202,13 @@ const styling = (theme: ThemeKey) =>
     },
     subHeader: {
       fontSize: 14,
-      color: themeColors.basic.subheader,
+      color: theme.textSecondary,
       marginBottom: 20,
     },
     header: {
       fontSize: 26,
       fontWeight: "bold",
-      color: themeColors[theme].text,
+      color: theme.textPrimary,
     },
     headerTitle: {
       fontSize: 22,
@@ -241,6 +242,7 @@ const styling = (theme: ThemeKey) =>
     sectionTitle: {
       fontSize: 18,
       fontWeight: "bold",
+      color: theme.textSecondary,
       marginVertical: 10,
     },
     itemContainer: {
@@ -263,8 +265,4 @@ const styling = (theme: ThemeKey) =>
       fontSize: 16,
       fontWeight: "bold",
     },
-    // description: {
-    //   fontSize: 14,
-    //   color: "#666",
-    // },
   });

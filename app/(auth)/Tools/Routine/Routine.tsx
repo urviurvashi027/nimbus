@@ -44,9 +44,9 @@ const RoutineScreen = () => {
   // const [filteredData, setFilteredData] = useState(data);
   const { filter } = useLocalSearchParams();
 
-  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const { newTheme } = useContext(ThemeContext);
 
-  const styles = styling(theme);
+  const styles = styling(newTheme);
 
   const navigation = useNavigation();
 
@@ -157,7 +157,7 @@ const RoutineScreen = () => {
           <Ionicons
             name="arrow-back"
             size={24}
-            color={themeColors[theme].text}
+            color={newTheme.textSecondary}
           />
         </TouchableOpacity>
         <SafeAreaView style={{ flex: 1 }}>
@@ -210,7 +210,7 @@ const RoutineScreen = () => {
   );
 };
 
-const styling = (theme: ThemeKey) =>
+const styling = (theme: any) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -231,12 +231,13 @@ const styling = (theme: ThemeKey) =>
       paddingTop: 10,
     },
     title: {
+      color: theme.textPrimary,
       fontSize: 24,
       fontWeight: "bold",
     },
     subtitle: {
+      color: theme.textSecondary,
       fontSize: 14,
-      color: "#999",
       marginTop: 4,
     },
     chipsContainer: {

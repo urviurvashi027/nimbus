@@ -36,9 +36,9 @@ const FitnessVideoList = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const { newTheme } = useContext(ThemeContext);
 
-  const styles = styling(theme);
+  const styles = styling(newTheme);
 
   const navigation = useNavigation();
 
@@ -188,10 +188,7 @@ const FitnessVideoList = () => {
           >
             {loading && (
               <View style={styles.loadingOverlay}>
-                <ActivityIndicator
-                  size="large"
-                  color={themeColors.basic.commonWhite}
-                />
+                <ActivityIndicator size="large" color={newTheme.textPrimary} />
               </View>
             )}
             <VideoView
@@ -211,7 +208,7 @@ const FitnessVideoList = () => {
               <Ionicons
                 name="play-circle"
                 size={30}
-                color={themeColors.basic.commonWhite}
+                color={newTheme.textPrimary}
               />
             </View>
           </ImageBackground>
@@ -224,7 +221,7 @@ const FitnessVideoList = () => {
               <Ionicons
                 name="lock-closed"
                 size={13}
-                color={themeColors.basic.mediumGrey}
+                color={newTheme.textPrimary}
                 style={styles.lockIcon}
               />
             )}
@@ -248,7 +245,7 @@ const FitnessVideoList = () => {
           <Ionicons
             name="arrow-back"
             size={24}
-            color={themeColors[theme].text}
+            color={newTheme.textSecondary}
           />
         </TouchableOpacity>
         {videoList.length ? (
@@ -337,7 +334,7 @@ const FitnessVideoList = () => {
   );
 };
 
-const styling = (theme: ThemeKey) =>
+const styling = (theme: any) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -350,18 +347,18 @@ const styling = (theme: ThemeKey) =>
     header: {
       fontSize: 26,
       fontWeight: "bold",
-      color: themeColors[theme].text,
+      color: theme.textPrimary,
     },
     subHeader: {
       fontSize: 14,
-      color: themeColors[theme].text,
+      color: theme.textSecondary,
       marginBottom: 20,
     },
     sectionTitle: {
       fontSize: 18,
       fontWeight: "bold",
       marginVertical: 10,
-      color: themeColors[theme].text,
+      color: theme.textSecondary,
     },
     lockIcon: {
       marginLeft: 5,
@@ -394,12 +391,12 @@ const styling = (theme: ThemeKey) =>
       padding: 20,
       paddingBottom: 10,
       borderBottomWidth: 1,
-      borderBottomColor: themeColors[theme].divider,
+      borderBottomColor: theme.divider,
     },
     videoTitle: {
       fontSize: 16,
       fontWeight: "bold",
-      color: themeColors[theme].text,
+      color: theme.textSecondary,
     },
     videoDuration: { fontSize: 14, color: themeColors.basic.mediumGrey },
     videoContainer: {

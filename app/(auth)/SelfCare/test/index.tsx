@@ -22,9 +22,9 @@ const categories = ["All"];
 const MentalHealthTestScreen = () => {
   const navigation = useNavigation();
 
-  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const { newTheme } = useContext(ThemeContext);
 
-  const styles = styling(theme);
+  const styles = styling(newTheme);
 
   useEffect(() => {
     navigation.setOptions({
@@ -58,9 +58,9 @@ const MentalHealthTestScreen = () => {
     }
   };
 
-  useEffect(() => {
-    getMentalListData();
-  }, []);
+  // useEffect(() => {
+  //   getMentalListData();
+  // }, []);
 
   return (
     <ScreenView
@@ -75,7 +75,7 @@ const MentalHealthTestScreen = () => {
           <Ionicons
             name="arrow-back"
             size={24}
-            color={themeColors[theme].text}
+            color={newTheme.textSecondary}
           />
         </TouchableOpacity>
 
@@ -115,11 +115,11 @@ const MentalHealthTestScreen = () => {
   );
 };
 
-const styling = (theme: ThemeKey) =>
+const styling = (theme: any) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      paddingHorizontal: 16,
+      paddingHorizontal: 10,
     },
     backButton: {
       marginTop: 40,
@@ -127,12 +127,12 @@ const styling = (theme: ThemeKey) =>
     },
     header: {
       fontSize: 26,
-      color: themeColors[theme].text,
+      color: theme.textPrimary,
       fontWeight: "bold",
     },
     subHeader: {
       fontSize: 14,
-      color: themeColors.basic.subheader,
+      color: theme.textSecondary,
       marginBottom: 20,
     },
     tabsContainer: {
@@ -140,19 +140,20 @@ const styling = (theme: ThemeKey) =>
     },
     activeTab: {
       borderBottomWidth: 2,
-      borderBottomColor: themeColors.basic.secondaryColor,
+      borderBottomColor: theme.textSecondary,
       paddingBottom: 6,
       marginRight: 15,
     },
     activeTabText: {
       fontSize: 18,
-      color: themeColors.basic.secondaryColor,
+      color: theme.textSecondary,
+      // color: themeColors.basic.secondaryColor,
     },
     listItem: {
       flexDirection: "row",
       alignItems: "center",
       borderBottomWidth: 1,
-      borderBottomColor: themeColors[theme].divider,
+      borderBottomColor: theme.divider,
     },
     listImage: {
       width: 100,
@@ -162,7 +163,7 @@ const styling = (theme: ThemeKey) =>
     },
     listTitle: {
       fontSize: 16,
-      color: themeColors[theme].text,
+      color: theme.textSecondary,
       fontWeight: "bold",
       flex: 1,
     },

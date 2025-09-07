@@ -91,8 +91,9 @@ export default function ProteinCalculator() {
 
   const [error, setError] = useState("");
 
-  const { theme } = useContext(ThemeContext);
-  const styles = styling(theme);
+  const { newTheme } = useContext(ThemeContext);
+
+  const styles = styling(newTheme);
 
   const navigation = useNavigation();
 
@@ -182,7 +183,7 @@ export default function ProteinCalculator() {
           <Ionicons
             name="arrow-back"
             size={24}
-            color={themeColors[theme].text}
+            color={newTheme.textSecondary}
           />
         </TouchableOpacity>
 
@@ -205,8 +206,8 @@ export default function ProteinCalculator() {
           setItems={setSelectedGender}
           textStyle={styles.item}
           dropDownContainerStyle={{
-            backgroundColor: themeColors[theme].background,
-            borderColor: themeColors[theme].inpurBorderColor,
+            backgroundColor: newTheme.background,
+            borderColor: newTheme.surface,
           }}
         />
 
@@ -252,8 +253,8 @@ export default function ProteinCalculator() {
           setItems={setSelectedUnit}
           textStyle={styles.item}
           dropDownContainerStyle={{
-            backgroundColor: themeColors[theme].background,
-            borderColor: themeColors[theme].inpurBorderColor,
+            backgroundColor: newTheme.background,
+            borderColor: newTheme.surface,
           }}
         />
 
@@ -281,20 +282,21 @@ export default function ProteinCalculator() {
   );
 }
 
-const styling = (theme: ThemeKey) =>
+const styling = (theme: any) =>
   StyleSheet.create({
     container: {
       flex: 1,
       paddingHorizontal: 16,
     },
     dropDown: {
-      backgroundColor: themeColors[theme].background,
-      borderColor: themeColors[theme].inpurBorderColor,
-      color: themeColors[theme].text,
+      backgroundColor: theme.background,
+      borderColor: theme.surface,
+
+      color: theme.textSecondary,
     },
     item: {
-      color: themeColors.basic.mediumGrey,
-      borderColor: themeColors[theme].inpurBorderColor,
+      color: theme.textPrimary,
+      borderColor: theme.divider,
     },
     backButton: {
       marginTop: 50,
@@ -303,14 +305,15 @@ const styling = (theme: ThemeKey) =>
     header: {
       fontSize: 26,
       fontWeight: "bold",
-      color: themeColors[theme].text,
+      color: theme.textPrimary,
     },
     subHeader: {
       fontSize: 14,
-      color: themeColors.basic.subheader,
+      color: theme.textSecondary,
       marginBottom: 20,
     },
     title: {
+      color: theme.textPrimary,
       fontSize: 24,
       marginBottom: 20,
       textAlign: "center",
@@ -318,8 +321,7 @@ const styling = (theme: ThemeKey) =>
     },
     input: {
       width: "100%",
-
-      borderBottomColor: themeColors[theme].inpurBorderColor,
+      borderBottomColor: theme.divider,
       borderBottomWidth: 1,
       borderRadius: 5,
       paddingVertical: 15,
@@ -333,22 +335,22 @@ const styling = (theme: ThemeKey) =>
       marginTop: 20,
       fontSize: 16,
       marginBottom: 10,
-      color: themeColors.basic.mediumGrey,
+      color: theme.textPrimary,
     },
     result: {
       fontSize: 15,
       marginTop: 20,
-      color: themeColors[theme].text,
+      color: theme.textPrimary,
     },
     saveButton: {
       marginVertical: 15,
-      backgroundColor: themeColors.basic.secondaryColor,
+      backgroundColor: theme.accent,
       paddingVertical: 15,
       borderRadius: 5,
       alignItems: "center",
     },
     saveButtonText: {
-      color: themeColors[theme].text,
+      color: theme.background,
       fontSize: 16,
       fontWeight: "bold",
     },

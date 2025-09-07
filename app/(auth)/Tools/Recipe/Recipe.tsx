@@ -13,7 +13,7 @@ import {
 import { router, useNavigation } from "expo-router";
 import RoutineCard from "../../../../components/tools/RoutineCard";
 import AnimatedChip from "@/components/tools/common/AnimatedChips";
-import { ScreenView, ThemeKey } from "@/components/Themed";
+import { ScreenView } from "@/components/Themed";
 import { Ionicons } from "@expo/vector-icons";
 import { themeColors } from "@/constant/theme/Colors";
 import ThemeContext from "@/context/ThemeContext";
@@ -41,116 +41,15 @@ type FilterCategory =
   | "Dessert"
   | "Sauce";
 
-// const data = [
-//   {
-//     id: "1",
-//     tag: "Breakfast",
-//     name: "Pea Poha",
-//     height: 250,
-//     image: require("../../../../assets/images/recipe/1.png"),
-//   },
-//   {
-//     id: "2",
-//     tag: "Breakfast",
-//     name: "Avacado Toast",
-//     height: 280,
-//     image: require("../../../../assets/images/recipe/2.png"),
-//   },
-//   {
-//     id: "3",
-//     tag: "Lunch",
-//     name: "Mexion Bowl",
-//     height: 220,
-//     image: require("../../../../assets/images/recipe/3.png"),
-//   },
-//   {
-//     id: "4",
-//     tag: "Lunch",
-//     name: "Thai Curry",
-//     height: 270,
-//     image: require("../../../../assets/images/recipe/5.png"),
-//   },
-//   {
-//     id: "5",
-//     tag: "Lunch",
-//     name: "Chicken Curry",
-//     height: 230,
-//     image: require("../../../../assets/images/recipe/6.png"),
-//   },
-//   {
-//     id: "6",
-//     tag: "Detox Water",
-//     name: "Chia Seed",
-//     height: 240,
-//     image: require("../../../../assets/images/recipe/7.png"),
-//   },
-//   {
-//     id: "7",
-//     tag: "Detox Water",
-//     name: "Chia Seed",
-//     height: 240,
-//     image: require("../../../../assets/images/recipe/7.png"),
-//   },
-//   {
-//     id: "8",
-//     tag: "Detox Water",
-//     name: "Alkaline Water",
-//     height: 240,
-//     image: require("../../../../assets/images/recipe/7.png"),
-//   },
-//   {
-//     id: "9",
-//     tag: "Detox Water",
-//     name: "Ginger Water",
-//     height: 240,
-//     image: require("../../../../assets/images/recipe/7.png"),
-//   },
-//   {
-//     id: "10",
-//     tag: "Protein",
-//     name: "Black Gram Salad",
-//     height: 240,
-//     image: require("../../../../assets/images/recipe/7.png"),
-//   },
-//   {
-//     id: "11",
-//     tag: "Protein",
-//     name: "Moong Dal Salad",
-//     height: 240,
-//     image: require("../../../../assets/images/recipe/7.png"),
-//   },
-//   {
-//     id: "12",
-//     tag: "Soup",
-//     name: "Moringa Soup",
-//     height: 240,
-//     image: require("../../../../assets/images/recipe/7.png"),
-//   },
-//   {
-//     id: "13",
-//     tag: "Soup",
-//     name: "TBC",
-//     height: 240,
-//     image: require("../../../../assets/images/recipe/7.png"),
-//   },
-//   {
-//     id: "14",
-//     tag: "dinner",
-//     height: 240,
-//     name: "Barley Khichdi",
-//     image: require("../../../../assets/images/recipe/7.png"),
-//   },
-// ];
-
 const RecipeScreen = () => {
   const [selected, setSelected] = useState("All");
   const [recipeList, setRecipeList] = useState<any[] | undefined>();
   // const [filteredData, setFilteredData] = useState(data);
   const [filteredData, setFilteredData] = useState<any[] | undefined>();
 
-  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const { newTheme } = useContext(ThemeContext);
 
-  const styles = styling(theme);
+  const styles = styling(newTheme);
 
   const navigation = useNavigation();
 
@@ -272,7 +171,7 @@ const RecipeScreen = () => {
           <Ionicons
             name="arrow-back"
             size={24}
-            color={themeColors[theme].text}
+            color={newTheme.textSecondary}
           />
         </TouchableOpacity>
         <SafeAreaView style={{ flex: 1 }}>
@@ -321,31 +220,32 @@ const RecipeScreen = () => {
   );
 };
 
-const styling = (theme: ThemeKey) =>
+const styling = (theme: any) =>
   StyleSheet.create({
     container: { flex: 1 },
     backButton: {
       marginTop: 50,
-      marginLeft: 10,
+      // marginLeft: 10,
       marginBottom: 10,
     },
     emptyText: {
       textAlign: "center",
       fontSize: 16,
-      color: themeColors.basic.mediumGrey,
+      color: theme.textSecondary,
       marginTop: 20,
     },
     header: {
-      paddingHorizontal: 20,
+      // paddingHorizontal: 20,
       paddingTop: 10,
     },
     title: {
+      color: theme.textPrimary,
       fontSize: 24,
       fontWeight: "bold",
     },
     subtitle: {
       fontSize: 14,
-      color: "#999",
+      color: theme.textSecondary,
       marginTop: 4,
     },
     chipsContainer: {

@@ -14,9 +14,9 @@ import {
 } from "react-native";
 
 const JournalItem = ({ item, onPress }: any) => {
-  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const { newTheme } = useContext(ThemeContext);
 
-  const styles = styling(theme);
+  const styles = styling(newTheme);
 
   return (
     <TouchableOpacity
@@ -43,14 +43,14 @@ const JournalItem = ({ item, onPress }: any) => {
   );
 };
 
-const styling = (theme: ThemeKey) =>
+const styling = (theme: any) =>
   StyleSheet.create({
     itemContainer: {
       flexDirection: "row",
       alignItems: "center",
       padding: 12,
       borderBottomWidth: 1,
-      borderBottomColor: themeColors[theme].divider,
+      borderBottomColor: theme.divider,
       // marginVertical: 6,
       // borderRadius: 12,
     },
@@ -71,13 +71,13 @@ const styling = (theme: ThemeKey) =>
     },
     title: {
       fontSize: 16,
-      color: themeColors[theme].text,
+      color: theme.textPrimary,
       fontWeight: "bold",
       marginBottom: 5,
     },
     description: {
       fontSize: 13,
-      color: themeColors[theme].text,
+      color: theme.textSecondary,
     },
   });
 

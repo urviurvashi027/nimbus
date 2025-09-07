@@ -27,9 +27,9 @@ const SleepModal = ({ visible, onClose }: any) => {
     onClose();
   };
 
-  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const { newTheme } = useContext(ThemeContext);
 
-  const styles = styling(theme);
+  const styles = styling(newTheme);
 
   const handleBannerPress = (id: string) => {
     console.log("Banner pressed:", id);
@@ -75,12 +75,15 @@ const SleepModal = ({ visible, onClose }: any) => {
       animationType="slide"
       presentationStyle="fullScreen"
       visible={visible}
-      // transparent={true}
     >
       <View style={styles.modalContainer}>
         {/* Back Button */}
         <TouchableOpacity style={styles.backButton} onPress={onModalClose}>
-          <Ionicons name="arrow-back" size={24} color="black" />
+          <Ionicons
+            name="arrow-back"
+            size={24}
+            color={newTheme.textSecondary}
+          />
         </TouchableOpacity>
 
         <View style={styles.modalContent}>
@@ -135,15 +138,16 @@ const SleepModal = ({ visible, onClose }: any) => {
   );
 };
 
-const styling = (theme: ThemeKey) =>
+const styling = (theme: any) =>
   StyleSheet.create({
     modalContainer: {
       flex: 1,
       paddingVertical: 46,
+      backgroundColor: theme.background,
     },
     subHeader: {
       fontSize: 14,
-      color: themeColors.basic.subheader,
+      color: theme.textSecondary,
       paddingHorizontal: 15,
       marginBottom: 20,
     },
@@ -151,7 +155,7 @@ const styling = (theme: ThemeKey) =>
       paddingHorizontal: 15,
       fontSize: 26,
       fontWeight: "bold",
-      color: themeColors[theme].text,
+      color: theme.textPrimary,
     },
     backButton: {
       position: "absolute",
@@ -172,29 +176,29 @@ const styling = (theme: ThemeKey) =>
       width: 200,
       height: 200,
       borderRadius: 100,
-      backgroundColor: "#7A4DF3",
+      backgroundColor: theme.accent,
       justifyContent: "center",
       alignItems: "center",
       elevation: 5,
     },
     startButtonText: {
-      color: "white",
+      color: theme.backgroundColor,
       fontSize: 24,
       fontWeight: "bold",
     },
     startButtonSubText: {
-      color: "white",
+      color: theme.surface,
       fontSize: 14,
       marginTop: 5,
     },
     reportPanel: {
-      backgroundColor: "#1C1C2E",
+      backgroundColor: theme.surface,
       borderRadius: 20,
       padding: 20,
       marginTop: 20,
     },
     reportTitle: {
-      color: "#A6A6A6",
+      color: theme.textSecondary,
       fontSize: 12,
       marginBottom: 10,
     },
@@ -206,13 +210,13 @@ const styling = (theme: ThemeKey) =>
       width: 45,
       height: 45,
       borderRadius: 25,
-      backgroundColor: "#2C2C44",
+      backgroundColor: theme.accentPressed,
       justifyContent: "center",
       alignItems: "center",
       marginRight: 10,
     },
     dayText: {
-      color: "white",
+      color: theme.background,
       fontSize: 16,
     },
     demoButton: {

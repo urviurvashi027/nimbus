@@ -37,9 +37,9 @@ const Meditation = () => {
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const { newTheme } = useContext(ThemeContext);
 
-  const styles = styling(theme);
+  const styles = styling(newTheme);
 
   const navigation = useNavigation();
 
@@ -72,6 +72,7 @@ const Meditation = () => {
             tag: randomTag,
             isLocked: false,
             coachName: "UU",
+            duration: `${item.duration} min`,
             image: {
               uri: item.image,
             },
@@ -146,7 +147,7 @@ const Meditation = () => {
           <Ionicons
             name="arrow-back"
             size={24}
-            color={themeColors[theme].text}
+            color={newTheme.textSecondary}
           />
         </TouchableOpacity>
         {/* Header */}
@@ -269,7 +270,7 @@ const Meditation = () => {
   );
 };
 
-const styling = (theme: ThemeKey) =>
+const styling = (theme: any) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -285,18 +286,18 @@ const styling = (theme: ThemeKey) =>
     header: {
       fontSize: 26,
       fontWeight: "bold",
-      color: themeColors[theme].text,
+      color: theme.textPrimary,
     },
     subHeader: {
       fontSize: 14,
-      color: themeColors.basic.subheader,
+      color: theme.textSecondary,
       marginBottom: 20,
     },
     tabsWrapper: { marginBottom: 5 },
     emptyText: {
       textAlign: "center",
       fontSize: 16,
-      color: themeColors.basic.mediumGrey,
+      color: theme.textSecondary,
       marginTop: 20,
     },
     flatListContainer: { flex: 1 },
@@ -318,16 +319,17 @@ const styling = (theme: ThemeKey) =>
     },
     tabText: {
       fontSize: 16,
-      color: themeColors.basic.mediumGrey,
+      color: theme.textSecondary,
     },
     activeTabText: {
-      color: themeColors.basic.activeText,
+      color: theme.textSecondary,
+
       fontWeight: "bold",
     },
     activeTabIndicator: {
       height: 2,
       width: "100%",
-      backgroundColor: themeColors.basic.secondaryColor,
+      backgroundColor: theme.background,
       marginTop: 3,
     },
 
@@ -336,27 +338,27 @@ const styling = (theme: ThemeKey) =>
       padding: 10,
       alignItems: "center",
       borderBottomWidth: 1,
-      borderBottomColor: themeColors[theme].divider,
+      borderBottomColor: theme.divider,
     },
     listImage: { width: 50, height: 50, borderRadius: 25, marginRight: 20 },
     listText: { flex: 1 },
     listTitle: {
       fontSize: 16,
       fontWeight: "bold",
-      color: themeColors[theme].text,
+      color: theme.textPrimary,
       marginBottom: 5,
     },
     lockIcon: {
       marginLeft: 5,
       marginTop: 1,
     },
-    listDuration: { fontSize: 14, color: themeColors.basic.mediumGrey },
+    listDuration: { fontSize: 14, color: theme.textSecondary },
     bottomPlayer: {
       position: "absolute",
       bottom: 100,
       left: 0,
       right: 0,
-      backgroundColor: themeColors.basic.darkGrey,
+      backgroundColor: theme.surface,
       padding: 12,
       flexDirection: "row",
       alignItems: "center",
@@ -372,7 +374,7 @@ const styling = (theme: ThemeKey) =>
 
     heading: {
       fontSize: 18,
-      color: themeColors[theme].text,
+      color: theme.textPrimary,
       fontWeight: "bold",
     },
   });
