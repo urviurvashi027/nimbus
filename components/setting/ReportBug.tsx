@@ -7,12 +7,11 @@ import {
   StyleSheet,
   FlatList,
 } from "react-native";
-import SetReminderModal from "./SetReminderModal";
 import { Ionicons } from "@expo/vector-icons";
-import { themeColors } from "@/constant/theme/Colors";
 import ThemeContext from "@/context/ThemeContext";
-import { TextInput, ThemeKey } from "../Themed";
 import { useNavigation } from "expo-router";
+import { StyledButton } from "../common/ThemedComponent/StyledButton";
+import InputField from "../common/ThemedComponent/StyledInput";
 
 export default function ReportBugModal({
   visible,
@@ -23,9 +22,9 @@ export default function ReportBugModal({
 }) {
   const [bug, setBug] = useState<string>("");
 
-  const { theme } = useContext(ThemeContext);
+  const { newTheme } = useContext(ThemeContext);
 
-  const styles = styling(theme);
+  const styles = styling(newTheme);
 
   const navigation = useNavigation();
 
@@ -34,62 +33,56 @@ export default function ReportBugModal({
   };
 
   return (
-    <Modal visible={visible} animationType="slide">
-      {/* Back Button */}
-      <TouchableOpacity style={styles.backButton} onPress={onClose}>
-        <Ionicons name="arrow-back" size={24} color={themeColors[theme].text} />
-      </TouchableOpacity>
-
-      <View style={styles.container}>
-        <View
-          style={{
-            marginTop: 30,
-          }}
-        >
-          <TextInput
-            style={styles.input}
-            placeholder="Bug Details"
-            placeholderTextColor="gray"
-            onChangeText={(value) => setBug(value)}
-          ></TextInput>
-        </View>
-        <TouchableOpacity style={styles.button} onPress={submitBug}>
-          <Text style={styles.btnText}>Report</Text>
+    <Modal visible={visible} animationType="slide" transparent>
+      <View style={styles.overlay}>
+        {/* Back Button */}
+        <TouchableOpacity style={styles.backButton} onPress={onClose}>
+          <Ionicons name="arrow-back" size={24} color={newTheme.textPrimary} />
         </TouchableOpacity>
+
+        <View style={styles.container}>
+          <View
+            style={{
+              marginTop: 30,
+            }}
+          >
+            <InputField
+              label="Bug Details"
+              value={bug}
+              onChangeText={setBug}
+              placeholder="Enter Your Bug Details"
+            />
+
+            <View style={{ height: 20 }} />
+
+            <StyledButton label="Report" onPress={submitBug} />
+          </View>
+        </View>
       </View>
     </Modal>
   );
 }
 
-const styling = (theme: ThemeKey) =>
+const styling = (theme: any) =>
   StyleSheet.create({
     container: {
-      // paddingTop: 60,
       paddingHorizontal: 20,
-      backgroundColor: themeColors.basic.primaryColor,
+      backgroundColor: theme.surface,
       flex: 1,
+    },
+    overlay: {
+      flex: 1,
+      backgroundColor: theme.surface,
     },
     backButton: {
       marginTop: 80,
       marginLeft: 20,
+      backgroundColor: theme.surface,
       marginBottom: 10,
     },
     input: {
       padding: 15,
       borderWidth: 1,
       borderRadius: 15,
-    },
-    button: {
-      padding: 15,
-      borderRadius: 15,
-      backgroundColor: themeColors[theme].backgroundColor,
-      borderColor: themeColors[theme].primaryColor,
-      marginTop: 20,
-      borderWidth: 1,
-    },
-    btnText: {
-      color: themeColors[theme].primaryColor,
-      textAlign: "center",
-      fontSize: 17,
     },
   });

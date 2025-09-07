@@ -36,7 +36,9 @@ const Soundscape = () => {
 
   const navigation = useNavigation();
 
-  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const { newTheme } = useContext(ThemeContext);
+
+  const styles = styling(newTheme);
 
   // Define your color palette. Add as many colors as you like.
   const colorPalette = [
@@ -46,8 +48,6 @@ const Soundscape = () => {
     { bgColor: "#d6eaf8", color: "#95c9ed" },
     { bgColor: "#E8DAEF", color: "#c7a5d8" },
   ];
-
-  const styles = styling(theme);
 
   // need to integrate audio functionality and image check
   const getSoundscapeListData = async () => {
@@ -135,7 +135,7 @@ const Soundscape = () => {
           <Ionicons
             name="arrow-back"
             size={24}
-            color={themeColors[theme].text}
+            color={newTheme.textSecondary}
           />
         </TouchableOpacity>
 
@@ -212,11 +212,11 @@ const Soundscape = () => {
                 <Ionicons
                   name={isPlaying ? "pause" : "play"}
                   size={24}
-                  color="white"
+                  color={newTheme.textPrimary}
                 />
               </TouchableOpacity>
               <TouchableOpacity onPress={() => setCurrentTrack(null)}>
-                <Ionicons name="close" size={24} color="white" />
+                <Ionicons name="close" size={24} color={newTheme.textPrimary} />
               </TouchableOpacity>
             </View>
           )}
@@ -226,7 +226,7 @@ const Soundscape = () => {
   );
 };
 
-const styling = (theme: ThemeKey) =>
+const styling = (theme: any) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -237,7 +237,7 @@ const styling = (theme: ThemeKey) =>
     },
     itemTitle: {
       fontSize: 16,
-      color: themeColors[theme].text,
+      color: theme.textPrimary,
       fontWeight: "bold",
     },
     header: {
@@ -246,18 +246,19 @@ const styling = (theme: ThemeKey) =>
     },
     title: {
       fontSize: 24,
+      color: theme.textPrimary,
       fontWeight: "bold",
     },
     subtitle: {
+      color: theme.textSecondary,
       fontSize: 14,
-      color: "#999",
       marginTop: 4,
     },
     headerTitle: {
       fontSize: 22,
       fontWeight: "bold",
       marginLeft: 10,
-      color: themeColors[theme].text,
+      color: theme.textSecondary,
     },
     sectionContainer: {
       marginBottom: 20,
@@ -269,7 +270,7 @@ const styling = (theme: ThemeKey) =>
     },
     sectionTitle: {
       fontSize: 18,
-      color: themeColors[theme].text,
+      color: theme.textSecondary,
       fontWeight: "bold",
       // marginLeft: 10,
     },
@@ -278,7 +279,7 @@ const styling = (theme: ThemeKey) =>
       alignItems: "center",
       padding: 12,
       borderBottomWidth: 1,
-      borderBottomColor: themeColors[theme].divider,
+      borderBottomColor: theme.divider,
     },
     image: {
       width: 60,
@@ -291,7 +292,7 @@ const styling = (theme: ThemeKey) =>
     },
     duration: {
       fontSize: 14,
-      color: themeColors[theme].text,
+      color: theme.textSecondary,
     },
     bottomPlayer: {
       position: "absolute",

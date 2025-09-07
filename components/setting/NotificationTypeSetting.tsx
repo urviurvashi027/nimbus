@@ -9,9 +9,7 @@ import {
 } from "react-native";
 import SetReminderModal from "./SetReminderModal";
 import { Ionicons } from "@expo/vector-icons";
-import { themeColors } from "@/constant/theme/Colors";
 import ThemeContext from "@/context/ThemeContext";
-import { ThemeKey } from "../Themed";
 import { useNavigation } from "expo-router";
 
 interface ReminderType {
@@ -39,62 +37,67 @@ export default function NotificationTypeModal({
   const [showSetReminderModal, setShowSetReminderModal] =
     useState<boolean>(false);
 
-  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const { newTheme } = useContext(ThemeContext);
 
-  const styles = styling(theme);
+  const styles = styling(newTheme);
 
   const navigation = useNavigation();
 
   return (
-    <Modal visible={visible} animationType="slide">
-      {/* Back Button */}
-      <TouchableOpacity style={styles.backButton} onPress={onClose}>
-        <Ionicons name="arrow-back" size={24} color={themeColors[theme].text} />
-      </TouchableOpacity>
+    <Modal visible={visible} animationType="slide" transparent>
+      <View style={styles.overlay}>
+        {/* Back Button */}
+        <TouchableOpacity style={styles.backButton} onPress={onClose}>
+          <Ionicons name="arrow-back" size={24} color={newTheme.textPrimary} />
+        </TouchableOpacity>
 
-      {/* reminder types */}
-      <View style={styles.container}>
-        {REMINDER_TYPES.map((item) => (
-          <TouchableOpacity
-            key={item.key}
-            style={styles.item}
-            onPress={() => {
-              setSelectedReminder(item);
-              setShowSetReminderModal(true);
-            }}
-          >
-            <Text style={styles.label}>{item.label}</Text>
-            <View style={styles.rightSection}>
-              <Text style={styles.status}>Off</Text>
-              <Ionicons
-                name="chevron-forward"
-                size={24}
-                color="black"
-                style={styles.iconRight}
-              />
-            </View>
-          </TouchableOpacity>
-        ))}
+        {/* reminder types */}
+        <View style={styles.container}>
+          {REMINDER_TYPES.map((item) => (
+            <TouchableOpacity
+              key={item.key}
+              style={styles.item}
+              onPress={() => {
+                setSelectedReminder(item);
+                setShowSetReminderModal(true);
+              }}
+            >
+              <Text style={styles.label}>{item.label}</Text>
+              <View style={styles.rightSection}>
+                <Text style={styles.status}>Off</Text>
+                <Ionicons
+                  name="chevron-forward"
+                  size={24}
+                  color="black"
+                  style={styles.iconRight}
+                />
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {selectedReminder && (
+          <SetReminderModal
+            visible={showSetReminderModal}
+            type={selectedReminder}
+            onClose={() => setSelectedReminder(null)}
+          />
+        )}
       </View>
-
-      {selectedReminder && (
-        <SetReminderModal
-          visible={showSetReminderModal}
-          type={selectedReminder}
-          onClose={() => setSelectedReminder(null)}
-        />
-      )}
     </Modal>
   );
 }
 
-const styling = (theme: ThemeKey) =>
+const styling = (theme: any) =>
   StyleSheet.create({
     container: {
-      // paddingTop: 60,
       paddingHorizontal: 20,
-      backgroundColor: themeColors.basic.primaryColor,
+      backgroundColor: theme.surface,
       flex: 1,
+    },
+    overlay: {
+      flex: 1,
+      backgroundColor: theme.surface,
     },
     backButton: {
       marginTop: 80,
@@ -104,17 +107,19 @@ const styling = (theme: ThemeKey) =>
     item: {
       paddingVertical: 20,
       borderBottomWidth: 1,
-      borderBottomColor: "#eee",
+      borderBottomColor: theme.divider,
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
     },
     label: {
       marginRight: 10,
+      color: theme.textPrimary,
       fontSize: 16,
     },
     iconRight: {
       marginRight: 12,
+      color: theme.textPrimary,
     },
     rightSection: {
       flexDirection: "row",

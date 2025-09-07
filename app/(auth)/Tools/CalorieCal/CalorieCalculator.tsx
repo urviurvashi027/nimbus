@@ -94,8 +94,9 @@ const CalorieCalculator = () => {
 
   const [error, setError] = useState("");
 
-  const { theme } = useContext(ThemeContext);
-  const styles = styling(theme);
+  const { newTheme } = useContext(ThemeContext);
+
+  const styles = styling(newTheme);
 
   const navigation = useNavigation();
 
@@ -181,7 +182,7 @@ const CalorieCalculator = () => {
           <Ionicons
             name="arrow-back"
             size={24}
-            color={themeColors[theme].text}
+            color={newTheme.textSecondary}
           />
         </TouchableOpacity>
 
@@ -204,8 +205,8 @@ const CalorieCalculator = () => {
           setItems={setSelectedGender}
           textStyle={styles.item}
           dropDownContainerStyle={{
-            backgroundColor: themeColors[theme].background,
-            borderColor: themeColors[theme].inpurBorderColor,
+            backgroundColor: newTheme.background,
+            borderColor: newTheme.surface,
           }}
         />
 
@@ -250,9 +251,13 @@ const CalorieCalculator = () => {
           setItems={setSelectedActivityLevel}
           textStyle={styles.item}
           dropDownContainerStyle={{
-            backgroundColor: themeColors[theme].background,
-            borderColor: themeColors[theme].inpurBorderColor,
+            backgroundColor: newTheme.background,
+            borderColor: newTheme.surface,
           }}
+          // dropDownContainerStyle={{
+          //   backgroundColor: themeColors[theme].background,
+          //   borderColor: themeColors[theme].inpurBorderColor,
+          // }}
         />
 
         <TouchableOpacity style={styles.saveButton} onPress={calculateCalories}>
@@ -290,7 +295,7 @@ const CalorieCalculator = () => {
   );
 };
 
-const styling = (theme: ThemeKey) =>
+const styling = (theme: any) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -303,23 +308,23 @@ const styling = (theme: ThemeKey) =>
     header: {
       fontSize: 26,
       fontWeight: "bold",
-      color: themeColors[theme].text,
+      color: theme.textPrimary,
     },
     subHeader: {
       fontSize: 14,
-      color: themeColors.basic.subheader,
+      color: theme.textSecondary,
       marginBottom: 20,
     },
     heading: {
       fontSize: 24,
+      color: theme.textPrimary,
       fontWeight: "bold",
       marginBottom: 20,
       textAlign: "center",
     },
     input: {
       width: "100%",
-
-      borderBottomColor: themeColors[theme].inpurBorderColor,
+      borderBottomColor: theme.divider,
       borderBottomWidth: 1,
       borderRadius: 5,
       paddingVertical: 15,
@@ -329,7 +334,7 @@ const styling = (theme: ThemeKey) =>
       marginTop: 20,
       fontSize: 16,
       marginBottom: 10,
-      color: themeColors.basic.mediumGrey,
+      color: theme.textSecondary,
     },
     picker: {
       marginVertical: 10,
@@ -340,7 +345,7 @@ const styling = (theme: ThemeKey) =>
     result: {
       fontSize: 15,
       fontWeight: "600",
-      color: themeColors[theme].text,
+      color: theme.textSecondary,
     },
     listContainer: {},
     typeButton: {
@@ -349,30 +354,31 @@ const styling = (theme: ThemeKey) =>
       alignItems: "center",
       paddingVertical: 15,
       borderBottomWidth: 1,
-      borderBottomColor: themeColors[theme].divider,
+      borderBottomColor: theme.divider,
     },
     typeText: {
       fontSize: 16,
-      color: themeColors[theme].text,
+      color: theme.textSecondary,
     },
     dropDown: {
-      backgroundColor: themeColors[theme].background,
-      borderColor: themeColors[theme].inpurBorderColor,
-      color: themeColors[theme].text,
+      backgroundColor: theme.background,
+      borderColor: theme.surface,
+
+      color: theme.textSecondary,
     },
     item: {
       color: themeColors.basic.mediumGrey,
-      borderColor: themeColors[theme].inpurBorderColor,
+      borderColor: theme.surface,
     },
     saveButton: {
       marginVertical: 15,
-      backgroundColor: themeColors.basic.secondaryColor,
+      backgroundColor: theme.accent,
       paddingVertical: 15,
       borderRadius: 5,
       alignItems: "center",
     },
     saveButtonText: {
-      color: themeColors[theme].text,
+      color: theme.surface,
       fontSize: 16,
       fontWeight: "bold",
     },

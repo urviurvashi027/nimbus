@@ -44,9 +44,9 @@ const ArticleScreen = () => {
 
   const [filteredData, setFilteredData] = useState<any[] | undefined>();
 
-  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const { newTheme } = useContext(ThemeContext);
 
-  const styles = styling(theme);
+  const styles = styling(newTheme);
 
   const navigation = useNavigation();
 
@@ -154,7 +154,7 @@ const ArticleScreen = () => {
           <Ionicons
             name="arrow-back"
             size={24}
-            color={themeColors[theme].text}
+            color={newTheme.textSecondary}
           />
         </TouchableOpacity>
         <SafeAreaView style={{ flex: 1 }}>
@@ -206,9 +206,9 @@ const ArticleScreen = () => {
   );
 };
 
-const styling = (theme: ThemeKey) =>
+const styling = (theme: any) =>
   StyleSheet.create({
-    container: { flex: 1, paddingHorizontal: 16 },
+    container: { flex: 1 },
     backButton: {
       marginTop: 50,
       marginBottom: 10,
@@ -220,16 +220,17 @@ const styling = (theme: ThemeKey) =>
       marginTop: 20,
     },
     header: {
-      paddingHorizontal: 20,
+      // paddingHorizontal: 20,
       paddingTop: 10,
     },
     title: {
+      color: theme.textPrimary,
       fontSize: 24,
       fontWeight: "bold",
     },
     subtitle: {
       fontSize: 14,
-      color: "#999",
+      color: theme.textSecondary,
       marginTop: 4,
     },
     chipsContainer: {

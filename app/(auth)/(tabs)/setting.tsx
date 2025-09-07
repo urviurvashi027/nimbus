@@ -20,8 +20,7 @@ import TermsModal from "@/components/setting/TermsAndService";
 import FAQModal from "@/components/setting/HelpCenter";
 import WarningBanner from "@/components/common/BannerWarning";
 import { router } from "expo-router";
-
-type ThemeKey = "basic" | "light" | "dark";
+import ChangePasswordModal from "@/components/setting/ChangePassword";
 
 type FormState = {
   darkMode: boolean;
@@ -35,6 +34,7 @@ export default function profile() {
   const [showRoutineSettingModal, setShowRoutineSettingModal] = useState(false);
   const [showReportBugModal, setShowReportBugModal] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
 
   const [showPrivatePolicyModal, setShowPrivatePrivacyModal] = useState(false);
   const [showTermsAndServiceModal, setShowTermsAndServiceModal] =
@@ -46,28 +46,18 @@ export default function profile() {
   isOnboardingComplete;
 
   // others
-  const [user, setUser] = useState<any>();
-  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  // const [user, setUser] = useState<any>();
+  const { newTheme, toggleTheme } = useContext(ThemeContext);
 
-  const styles = styling(theme);
+  const { onLogout, userProfile } = useAuth();
+
+  const styles = styling(newTheme);
 
   const [formState, setFormState] = useState<FormState>({
     darkMode: true,
     wifi: false,
     showCollaborators: false,
   });
-
-  useEffect(() => {
-    loadUserInfo();
-  }, []);
-
-  const loadUserInfo = async () => {
-    const userInfo = (await SecureStore.getItemAsync(StoreKey.USER_KEY)) ?? "";
-    const parsedValue = JSON.parse(userInfo);
-    setUser(parsedValue);
-  };
-
-  const { onLogout } = useAuth();
 
   const onLogoutClick = async () => {
     if (onLogout) {
@@ -82,7 +72,6 @@ export default function profile() {
   };
 
   const onSettingPanelClick = (type: string, label: string) => {
-    console.log("setting panel click data", type, label);
     if (type === "modal") {
       handleModalVisibilty(label);
     }
@@ -108,6 +97,9 @@ export default function profile() {
       case "Terms and Services":
         setShowTermsAndServiceModal(true);
         break;
+      case "Change Password":
+        setShowChangePasswordModal(true);
+        break;
 
       case "Help Center":
         setShowFAQModal(true);
@@ -118,11 +110,11 @@ export default function profile() {
 
   const handleGoToOnboarding = () => {
     console.log("banner warning clicked");
-    router.push("/(auth)/OnBoarding/onboardingScreen");
+    router.push("/OnBoarding/QuestionScreen");
+    // router.push("/(auth)/OnBoarding/onboardingScreen");
   };
 
   return (
-    // <ScreenView>
     <GestureHandlerRootView style={styles.gestureContainer}>
       <SafeAreaView style={styles.gestureContainer}>
         <ScrollView>
@@ -139,13 +131,18 @@ export default function profile() {
               </View>
             </View>
           </TouchableOpacity>
-          <View>
-            <Text style={styles.profileName}>{user?.userName}</Text>
 
-            <Text style={styles.profileAddress}>
-              Tower B, Assetz 63 degree East
-            </Text>
-          </View>
+          {userProfile && userProfile.first_name && (
+            <View>
+              <Text style={styles.profileName}>
+                {userProfile?.first_name} {userProfile?.last_name}
+              </Text>
+
+              <Text style={styles.profileAddress}>
+                Tower B, Assetz 63 degree East
+              </Text>
+            </View>
+          )}
 
           <View style={styles.bannerContainer}>
             {!isOnboardingComplete && (
@@ -183,10 +180,17 @@ export default function profile() {
                   >
                     <View style={styles.row}>
                       <View
-                        style={[styles.rowIcon, { backgroundColor: color }]}
+                        style={[
+                          styles.rowIcon,
+                          { backgroundColor: newTheme.accent },
+                        ]}
                       >
                         {/* icon */}
-                        <Ionicons name={icon} size={18} color="#333" />
+                        <Ionicons
+                          name={icon}
+                          size={18}
+                          color={newTheme.background}
+                        />
                       </View>
                       <Text style={styles.rowLabel}>{label}</Text>
 
@@ -195,22 +199,18 @@ export default function profile() {
                       {type === "toogle" && (
                         <Switch
                           value={formState[id]}
-                          thumbColor={themeColors.basic.primaryColor}
+                          thumbColor={newTheme.accent}
                           trackColor={{
-                            true: `${themeColors.basic.tertiaryColor}`,
+                            true: `${newTheme.background}`,
                           }}
-                          // onValueChange={(value) =>
-                          //   setFormState({ ...formState, [id]: value })
-                          // }
                           onValueChange={(value) => onToggle(id, value)}
-                          // onValueChange={onToggle}
                         />
                       )}
 
                       {type === "modal" && (
                         <Ionicons
                           name="chevron-forward"
-                          color="#0c0c0c"
+                          color={newTheme.textSecondary}
                           size={22}
                         />
                       )}
@@ -221,7 +221,7 @@ export default function profile() {
             </View>
           ))}
           <TouchableOpacity style={styles.logout} onPress={onLogoutClick}>
-            <Text>Logout</Text>
+            <Text style={{ color: newTheme.textSecondary }}>Logout</Text>
           </TouchableOpacity>
           {/* Notification Setting Modal */}
           <NotificationTypeModal
@@ -254,18 +254,23 @@ export default function profile() {
             visible={showFAQModal}
             onClose={() => setShowFAQModal(false)}
           />
+
+          <ChangePasswordModal
+            visible={showChangePasswordModal}
+            onClose={() => setShowChangePasswordModal(false)}
+          />
         </ScrollView>
       </SafeAreaView>
     </GestureHandlerRootView>
     // {/* </ScreenView> */}
   );
 }
-const styling = (theme: ThemeKey) =>
+const styling = (newTheme: any) =>
   StyleSheet.create({
     // const styles = StyleSheet.create({
     gestureContainer: {
       flex: 1,
-      backgroundColor: themeColors[theme].background,
+      backgroundColor: newTheme.background,
     },
     container: {
       paddingVertical: 24,
@@ -273,7 +278,7 @@ const styling = (theme: ThemeKey) =>
     bannerContainer: {
       flex: 1,
       padding: 20,
-      backgroundColor: "#fff",
+      backgroundColor: newTheme.background,
     },
     profile: {
       padding: 24,
@@ -284,11 +289,13 @@ const styling = (theme: ThemeKey) =>
       marginTop: 20,
       fontSize: 19,
       fontWeight: 600,
-      color: "#414d63",
+      color: newTheme.textPrimary,
+      // color: "#414d63",
       textAlign: "center",
     },
     profileAddress: {
-      color: "#989898",
+      color: newTheme.textSecondary,
+      // color: "#989898",
       fontSize: 15,
       marginTop: 5,
       textAlign: "center",
@@ -319,7 +326,8 @@ const styling = (theme: ThemeKey) =>
       paddingVertical: 12,
       fontSize: 12,
       fontWeight: 600,
-      color: "#9e9e9e",
+      color: newTheme.textPrimary,
+      // color: "red",
       textTransform: "uppercase",
       letterSpacing: 1.1,
     },
@@ -328,14 +336,14 @@ const styling = (theme: ThemeKey) =>
       alignItems: "center",
       justifyContent: "flex-start",
       height: 50,
-      backgroundColor: themeColors[theme].divider,
+      backgroundColor: newTheme.divider,
       borderRadius: 8,
       marginBottom: 12,
       paddingHorizontal: 12,
     },
     rowLabel: {
       fontSize: 12,
-      color: themeColors[theme].text,
+      color: newTheme.textPrimary,
     },
     rowIcon: {
       width: 32,
@@ -346,9 +354,8 @@ const styling = (theme: ThemeKey) =>
       justifyContent: "center",
     },
     logout: {
-      // paddingLeft: 24,
+      fontSize: 12,
+      color: newTheme.textPrimary,
       paddingHorizontal: 24,
-      // paddingHorizontal: 12,
-      // marginRight: 12,
     },
   });

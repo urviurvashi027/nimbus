@@ -49,8 +49,9 @@ const BodyShapeCalculator = () => {
     null
   );
 
-  const { theme } = useContext(ThemeContext);
-  const styles = styling(theme);
+  const { newTheme } = useContext(ThemeContext);
+
+  const styles = styling(newTheme);
 
   const navigation = useNavigation();
 
@@ -147,7 +148,7 @@ const BodyShapeCalculator = () => {
           <Ionicons
             name="arrow-back"
             size={24}
-            color={themeColors[theme].text}
+            color={newTheme.textSecondary}
           />
         </TouchableOpacity>
         <Text style={styles.heading}>Body Shape Calculator</Text>
@@ -207,7 +208,7 @@ const BodyShapeCalculator = () => {
   );
 };
 
-const styling = (theme: ThemeKey) =>
+const styling = (theme: any) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -219,12 +220,13 @@ const styling = (theme: ThemeKey) =>
     },
     heading: {
       fontSize: 22,
+      color: theme.textPrimary,
       fontWeight: "bold",
       marginBottom: 20,
     },
     input: {
       width: "100%",
-      borderBottomColor: themeColors[theme].inpurBorderColor,
+      borderBottomColor: theme.divider,
       borderBottomWidth: 1,
       borderRadius: 5,
       paddingVertical: 15,
@@ -232,13 +234,13 @@ const styling = (theme: ThemeKey) =>
     },
     saveButton: {
       marginVertical: 15,
-      backgroundColor: themeColors.basic.secondaryColor,
+      backgroundColor: theme.accent,
       paddingVertical: 15,
       borderRadius: 5,
       alignItems: "center",
     },
     saveButtonText: {
-      color: themeColors[theme].text,
+      color: theme.background,
       fontSize: 16,
       fontWeight: "bold",
     },
@@ -248,7 +250,7 @@ const styling = (theme: ThemeKey) =>
     },
     result: {
       fontSize: 18,
-      color: "#4caf50",
+      color: theme.accent,
       fontWeight: "bold",
       marginBottom: 10,
     },

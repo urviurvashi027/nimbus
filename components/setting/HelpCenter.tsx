@@ -7,9 +7,8 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native";
-import { ThemeKey } from "../Themed";
-import { themeColors } from "@/constant/theme/Colors";
 import ThemeContext from "@/context/ThemeContext";
+import { StyledButton } from "../common/ThemedComponent/StyledButton";
 
 const faqs = [
   {
@@ -52,9 +51,9 @@ const FAQModal = ({
     setOpenIndex(openIndex === index ? null : index);
   };
 
-  const { theme } = useContext(ThemeContext);
+  const { newTheme } = useContext(ThemeContext);
 
-  const styles = styling(theme);
+  const styles = styling(newTheme);
 
   return (
     <Modal visible={visible} animationType="slide" transparent>
@@ -77,9 +76,10 @@ const FAQModal = ({
                 )}
               </View>
             ))}
-            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <Text style={styles.closeButtonText}>Close</Text>
-            </TouchableOpacity>
+
+            <View style={{ height: 20 }} />
+
+            <StyledButton label="Close" onPress={onClose} />
           </ScrollView>
         </View>
       </View>
@@ -89,7 +89,7 @@ const FAQModal = ({
 
 export default FAQModal;
 
-const styling = (theme: ThemeKey) =>
+const styling = (theme: any) =>
   StyleSheet.create({
     overlay: {
       flex: 1,
@@ -98,7 +98,7 @@ const styling = (theme: ThemeKey) =>
       paddingHorizontal: 20,
     },
     modalContent: {
-      backgroundColor: themeColors.basic.commonWhite,
+      backgroundColor: theme.surface,
       borderRadius: 12,
       maxHeight: "80%",
       padding: 20,
@@ -109,12 +109,13 @@ const styling = (theme: ThemeKey) =>
     header: {
       fontSize: 18,
       fontWeight: "bold",
+      color: theme.textPrimary,
       marginBottom: 12,
       textAlign: "center",
     },
     accordionItem: {
       borderBottomWidth: 1,
-      borderBottomColor: "#eee",
+      borderBottomColor: theme.divider,
       marginBottom: 10,
     },
     questionBox: {
@@ -122,6 +123,7 @@ const styling = (theme: ThemeKey) =>
     },
     questionText: {
       fontSize: 16,
+      color: theme.textPrimary,
       fontWeight: "600",
     },
     answerBox: {
@@ -129,18 +131,6 @@ const styling = (theme: ThemeKey) =>
     },
     answerText: {
       fontSize: 14,
-      color: "#333",
-    },
-    closeButton: {
-      marginTop: 16,
-      backgroundColor: themeColors.basic.tertiaryColor,
-      paddingVertical: 12,
-      borderRadius: 6,
-    },
-    closeButtonText: {
-      textAlign: "center",
-      color: themeColors.basic.commonWhite,
-      fontWeight: "bold",
-      fontSize: 16,
+      color: theme.textSecondary,
     },
   });

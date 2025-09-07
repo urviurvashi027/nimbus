@@ -37,9 +37,7 @@ export function useThemeColor(
   colorName: keyof typeof Colors.light & keyof typeof Colors.dark
 ) {
   const theme = useColorScheme() ?? "light";
-  console.log(theme, "themetheme");
   const colorFromProps = props[theme];
-  // console.log(colorFromProps, colorName, theme);
   if (colorFromProps) {
     return colorFromProps;
   } else {
@@ -106,7 +104,7 @@ export function ScreenView(
   const { theme, newTheme, toggleTheme, useSystemTheme } =
     useContext(ThemeContext);
   const styles = screenViewStyling(theme, newTheme, bgColor, padding);
-  console.log("NewTheme[theme].background,");
+  // console.log("NewTheme[theme].background,");
   return <DefaultView style={[style, styles.container]} {...otherProps} />;
 }
 

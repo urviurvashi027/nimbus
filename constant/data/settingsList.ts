@@ -51,6 +51,26 @@ export const Section: any[] = [
     ],
   },
   {
+    header: "Account",
+    icon: "document",
+    items: [
+      {
+        id: "edit",
+        icon: "logo-discord",
+        color: "#dfd9f9",
+        type: "modal",
+        label: "Profile Info",
+      },
+      {
+        id: "chngPass",
+        icon: "logo-instagram",
+        color: "#dfd9f9",
+        type: "modal",
+        label: "Change Password",
+      },
+    ],
+  },
+  {
     header: "Help and feedback",
     icon: "help-circle",
     items: [

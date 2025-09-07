@@ -54,9 +54,9 @@ export default function RoutineSettingModal({
 
   const [startWeekOn, setStartWeekOn] = useState<string>("");
 
-  const { theme } = useContext(ThemeContext);
+  const { newTheme } = useContext(ThemeContext);
 
-  const styles = styling(theme);
+  const styles = styling(newTheme);
 
   const navigation = useNavigation();
 
@@ -118,62 +118,60 @@ export default function RoutineSettingModal({
   };
 
   return (
-    <Modal visible={visible} animationType="slide">
-      {/* Back Button */}
-      <TouchableOpacity style={styles.backButton} onPress={onClose}>
-        <Ionicons name="arrow-back" size={24} color={themeColors[theme].text} />
-      </TouchableOpacity>
-      {/* Routine Setting Types */}
-      <View style={styles.container}>
-        {SETTING_TYPES.map((item) => (
-          <TouchableOpacity
-            key={item.key}
-            style={styles.item}
-            onPress={() => {
-              setSelectedSetting(item);
-              onPanelClick(item);
-            }}
-          >
-            <Text style={styles.label}>{item.label}</Text>
-            <View style={styles.rightSection}>
-              {item.key === "sorting" && (
-                <Text style={styles.status}>
-                  {enableSorting ? `On` : `Off`}
-                </Text>
-              )}
+    <Modal visible={visible} animationType="slide" transparent>
+      <View style={styles.modalView}>
+        {/* Back Button */}
+        <TouchableOpacity style={styles.backButton} onPress={onClose}>
+          <Ionicons name="arrow-back" size={24} color={newTheme.textPrimary} />
+        </TouchableOpacity>
+        {/* Routine Setting Types */}
+        <View style={styles.container}>
+          {SETTING_TYPES.map((item) => (
+            <TouchableOpacity
+              key={item.key}
+              style={styles.item}
+              onPress={() => {
+                setSelectedSetting(item);
+                onPanelClick(item);
+              }}
+            >
+              <Text style={styles.label}>{item.label}</Text>
+              <View style={styles.rightSection}>
+                {item.key === "sorting" && (
+                  <Text style={styles.status}>
+                    {enableSorting ? `On` : `Off`}
+                  </Text>
+                )}
 
-              {item.key === "completed" && (
-                <Text style={styles.status}>{moveTaskDown ? `On` : `Off`}</Text>
-              )}
-              {/* {showOverlay && item.key === "startOn" && <WeekdaySelection />} */}
-              <Ionicons
-                name="chevron-forward"
-                size={24}
-                color="black"
-                style={styles.iconRight}
-              />
-            </View>
-          </TouchableOpacity>
-        ))}
+                {item.key === "completed" && (
+                  <Text style={styles.status}>
+                    {moveTaskDown ? `On` : `Off`}
+                  </Text>
+                )}
+                <Ionicons
+                  name="chevron-forward"
+                  size={24}
+                  color="black"
+                  style={styles.iconRight}
+                />
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
       </View>
-
-      {/* {selectedSetting && (
-        <SetReminderModal
-          visible={showRoutineSettingModal}
-          type={selectedSetting}
-          onClose={() => setSelectedSetting(null)}
-        />
-      )} */}
     </Modal>
   );
 }
 
-const styling = (theme: ThemeKey) =>
+const styling = (theme: any) =>
   StyleSheet.create({
+    modalView: {
+      flex: 1,
+      backgroundColor: theme.surface,
+    },
     container: {
-      // paddingTop: 60,
       paddingHorizontal: 20,
-      backgroundColor: themeColors.basic.primaryColor,
+      backgroundColor: theme.surface,
       flex: 1,
     },
     backButton: {
@@ -184,7 +182,7 @@ const styling = (theme: ThemeKey) =>
     item: {
       paddingVertical: 20,
       borderBottomWidth: 1,
-      borderBottomColor: "#eee",
+      borderBottomColor: theme.divider,
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
@@ -192,9 +190,11 @@ const styling = (theme: ThemeKey) =>
     label: {
       marginRight: 10,
       fontSize: 16,
+      color: theme.textPrimary,
     },
     iconRight: {
       marginRight: 12,
+      color: theme.textPrimary,
     },
     rightSection: {
       flexDirection: "row",
@@ -214,10 +214,6 @@ const styling = (theme: ThemeKey) =>
       padding: 16,
       borderRadius: 10,
       zIndex: 999,
-      // elevation: 5,
-      // shadowColor: "#000",
-      // shadowOpacity: 0.2,
-      // shadowRadius: 10,
     },
     dayItem: {
       padding: 12,
