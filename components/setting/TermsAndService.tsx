@@ -9,7 +9,7 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native";
-import { ThemeKey } from "../Themed";
+import { StyledButton } from "../common/ThemedComponent/StyledButton";
 
 const TermsModal = ({
   visible,
@@ -18,9 +18,9 @@ const TermsModal = ({
   visible: boolean;
   onClose: () => void;
 }) => {
-  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const { newTheme } = useContext(ThemeContext);
 
-  const styles = styling(theme);
+  const styles = styling(newTheme);
   return (
     <Modal visible={visible} animationType="slide" transparent>
       <View style={styles.overlay}>
@@ -82,12 +82,12 @@ const TermsModal = ({
             <Text style={styles.sectionTitle}>9. Contact</Text>
             <Text style={styles.text}>
               For any questions about these terms, please contact us at:
-              support@yourdomain.com
+              silentbonus@ygmail.com
             </Text>
 
-            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <Text style={styles.closeButtonText}>Close</Text>
-            </TouchableOpacity>
+            <View style={{ height: 20 }} />
+
+            <StyledButton label="Close" onPress={onClose} />
           </ScrollView>
         </View>
       </View>
@@ -97,7 +97,7 @@ const TermsModal = ({
 
 export default TermsModal;
 
-const styling = (theme: ThemeKey) =>
+const styling = (theme: any) =>
   StyleSheet.create({
     overlay: {
       flex: 1,
@@ -106,7 +106,7 @@ const styling = (theme: ThemeKey) =>
       paddingHorizontal: 20,
     },
     modalContent: {
-      backgroundColor: themeColors.basic.commonWhite,
+      backgroundColor: theme.surface,
       borderRadius: 12,
       maxHeight: "80%",
       padding: 20,
@@ -116,35 +116,25 @@ const styling = (theme: ThemeKey) =>
     },
     title: {
       fontSize: 20,
+      color: theme.textPrimary,
       fontWeight: "bold",
       marginBottom: 6,
     },
     lastUpdated: {
       fontSize: 12,
-      color: themeColors.basic.darkGrey,
+      color: theme.textSecondary,
       marginBottom: 16,
     },
     sectionTitle: {
       fontSize: 16,
+      color: theme.textPrimary,
       fontWeight: "600",
       marginTop: 12,
       marginBottom: 4,
     },
     text: {
       fontSize: 14,
-      color: themeColors.basic.mediumGrey,
+      color: theme.textSecondary,
       marginBottom: 8,
-    },
-    closeButton: {
-      marginTop: 20,
-      backgroundColor: themeColors.basic.tertiaryColor,
-      paddingVertical: 12,
-      borderRadius: 6,
-    },
-    closeButtonText: {
-      textAlign: "center",
-      color: themeColors.basic.commonWhite,
-      fontWeight: "bold",
-      fontSize: 16,
     },
   });

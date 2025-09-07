@@ -20,15 +20,17 @@ export const API_ENDPOINTS = {
   login: `${BASE_URL}/auth/login/`,
   register: `${BASE_URL}/auth/register/`,
   logout: `${BASE_URL}/auth/logout/`,
+
+  fetchUserDetails: `${BASE_URL}/profile/users/`,
+
   getOtp: `${BASE_URL}/auth/request-otp/`,
   verifyOtp: `${BASE_URL}/auth/verify-otp/`,
+
   setPassword: `${BASE_URL}/auth/set-password/`,
   forgotPassword: `${BASE_URL}/auth/forgot-password/`,
-  changePassword: `${BASE_URL}/auth/change-password/`,
+  changePassword: `${BASE_URL}/auth/reset-password/`,
 
   createHabit: `${BASE_URL}/api/habits/`,
-
-  // get habit type `equest
   habitTypeList: `${BASE_URL}/api/habit-types/`,
   habitTagList: `${BASE_URL}/api/tags/`,
   habitDetailsById: `${BASE_URL}/api/habits/`,

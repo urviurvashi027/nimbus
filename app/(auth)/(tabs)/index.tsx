@@ -32,47 +32,8 @@ import DateScroller from "@/components/homeScreen/DateScroller";
 import DailyCheckInPanel from "@/components/homeScreen/DailyCheckInPanel";
 import HabitItemCard from "@/components/homeScreen/component/HabitItem";
 import Toast from "react-native-toast-message";
+import { useAuth } from "@/context/AuthContext";
 // import DailyCheckInCard from "@/components/homeScreen/DailyCheckInCard";
-
-// const mockData = [
-//   {
-//     name: "Water",
-//     goalQuantity: 10,
-//     completedQuantity: 4,
-//     unit: "glass",
-//     icon: "💧",
-//     color: "#A259FF",
-//   },
-//   {
-//     name: "Sleep",
-//     goalQuantity: 8,
-//     completedQuantity: 5,
-//     unit: "hours",
-//     icon: "😴",
-//     color: "#4CAF50",
-//   },
-// ];
-
-// Mock User API
-const getUserData = async () => {
-  // simulate API delay
-  await new Promise((res) => setTimeout(res, 800));
-
-  return {
-    success: true,
-    data: {
-      name: "Urvashi Urvi",
-      id: "222",
-      onboardingDone: true,
-      firstTimeUser: false, // toggle for testing
-      units: {
-        weight: "kg",
-        height: "cm",
-        liquid: "ml",
-      },
-    },
-  };
-};
 
 export default function TabOneScreen() {
   const [habitList, setHabitList] = useState<HabitItem[]>([]);
@@ -132,41 +93,20 @@ export default function TabOneScreen() {
     }
   };
 
-  // ✅ Fetch user data + habits on mount
+  const { userProfile, getUserDetails } = useAuth();
+
   useEffect(() => {
     const init = async () => {
-      setLoading(true);
-
-      // await AsyncStorage.removeItem("userInfo");
-      // check cache
-      const cachedUser = await AsyncStorage.getItem("userInfo");
-      let user = cachedUser ? JSON.parse(cachedUser) : null;
-      console.log(user, "user");
-      if (!user) {
-        const res = await getUserData();
-        if (res.success) {
-          user = res.data;
-          await AsyncStorage.setItem("userInfo", JSON.stringify(user));
-        }
+      if (!userProfile) {
+        console.log("coming here index");
+        // const fetched = await getUserDetails?.();
+        // setUserInfo();
+      } else {
+        setUserInfo(userProfile);
       }
-
-      console.log(user, "name");
-      setUserInfo(user);
-
-      // Default fetch habits for today
-      // await onDateChange(new Date());
     };
-
     init();
-  }, []);
-
-  // useEffect(() => {
-  //   getHabitListData();
-  // }, []);
-
-  // useEffect(() => {
-  //   getHabitListData(date);
-  // }, [date]);
+  }, [userProfile]);
 
   const refreshData = () => {
     getHabitListData(date);
@@ -267,7 +207,9 @@ export default function TabOneScreen() {
                     backgroundColor: newTheme.background,
                   }}
                 >
-                  <Text style={styles.dateLabel}>{userInfo.name}</Text>
+                  <Text style={styles.dateLabel}>
+                    {userInfo.first_name} {userInfo.last_name}
+                  </Text>
                 </View>
               )}
 

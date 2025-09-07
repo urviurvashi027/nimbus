@@ -98,7 +98,6 @@ export const forgotPassword = async (
   data: ForgotPasswordRequest
 ): Promise<ForgotPasswordResponse> => {
   try {
-    console.log("forgot password called,", data);
     const response: AxiosResponse<ForgotPasswordResponse> = await axios.post(
       API_ENDPOINTS.forgotPassword,
       data
@@ -137,12 +136,37 @@ export const setPassword = async (
   }
 };
 
-// List API request
 export const logout = async (data: LogoutRequest): Promise<LogoutResponse> => {
   try {
     const response: AxiosResponse<LogoutResponse> = await axios.post(
       API_ENDPOINTS.logout,
       data
+    );
+    return response.data; // Return the list data
+  } catch (error: any) {
+    throw error.response ? error.response.data : error.message;
+  }
+};
+
+type UserProfile = {
+  full_name?: string | null;
+  phone_number?: string | null;
+  id: number | null;
+  username: string | null;
+  email: string | null;
+  first_name: string | null;
+  last_name: string | null;
+  userprofile: null;
+  usersettings: null;
+  // add whatever fields your API returns
+};
+
+type FetchUserResponse = UserProfile[];
+
+export const getUserDetails = async (): Promise<FetchUserResponse> => {
+  try {
+    const response: AxiosResponse<FetchUserResponse> = await axios.get(
+      API_ENDPOINTS.fetchUserDetails
     );
     return response.data; // Return the list data
   } catch (error: any) {

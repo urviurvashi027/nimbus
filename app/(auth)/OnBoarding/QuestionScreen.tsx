@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import { ONBOARDING_QUESTIONS } from "./onboardingQuestion";
+import { ONBOARDING_QUESTIONS } from "../../../constant/data/onboardingQuestion";
 import { StyledButton } from "@/components/common/ThemedComponent/StyledButton";
 import ChoiceItem from "./component/ChoiceItem";
 import { router, useNavigation } from "expo-router";

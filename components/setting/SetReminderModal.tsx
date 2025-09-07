@@ -9,18 +9,10 @@ import {
   Modal,
   TouchableOpacity,
 } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import { format } from "date-fns";
 import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/context/ThemeContext";
-import { ThemeKey } from "../Themed";
-import { themeColors } from "@/constant/theme/Colors";
 import TimePicker from "../TimePicker";
-// import {
-//   checkNotifications,
-//   requestNotifications,
-// } from "react-native-permissions";
-// import { openSettings } from "react-native-permissions";
 
 const ReminderModal = ({
   type,
@@ -37,25 +29,21 @@ const ReminderModal = ({
   const [time, setTime] = useState(new Date());
   const [hasPermission, setHasPermission] = useState(true);
 
-  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const { newTheme } = useContext(ThemeContext);
 
-  const styles = styling(theme);
+  const styles = styling(newTheme);
 
   useEffect(() => {
     checkPermissions();
   }, []);
 
   const checkPermissions = async () => {
-    // const { status } = await checkNotifications();
     const status = "granted";
     setHasPermission(status === "granted");
   };
 
   const toggleSwitch = async () => {
-    //  setIsEnabled((prev) => !prev);
-    // if (isEnabled) setShowTimePicker(true);
     if (!isEnabled) {
-      //   const { status } = await requestNotifications(["alert", "sound"]);
       const status = "granted";
       if (status !== "granted") {
         setHasPermission(false);
@@ -73,11 +61,6 @@ const ReminderModal = ({
   useEffect(() => {
     console.log(type, "notification type");
   }, [type]);
-
-  //   const onTimeChange = (_event: any, selectedDate?: Date) => {
-  //     if (selectedDate) setTime(selectedDate);
-  //     // setShowTimePicker(false);
-  //   };
 
   const onTimeChange = (selectedDate: any) => {
     if (selectedDate) {
@@ -108,11 +91,7 @@ const ReminderModal = ({
       <View style={styles.modalView}>
         {/* Back Button */}
         <TouchableOpacity style={styles.backButton} onPress={onClose}>
-          <Ionicons
-            name="arrow-back"
-            size={24}
-            color={themeColors[theme].text}
-          />
+          <Ionicons name="arrow-back" size={24} color={newTheme.textPrimary} />
         </TouchableOpacity>
         {/* <TouchableOpacity onPress={onClose} style={styles.backArrow}>
           <Text>{"←"}</Text>
@@ -152,26 +131,26 @@ const ReminderModal = ({
   );
 };
 
-const styling = (theme: ThemeKey) =>
+const styling = (theme: any) =>
   StyleSheet.create({
     modalView: {
       flex: 1,
-      backgroundColor: "white",
+      backgroundColor: theme.surface,
       padding: 20,
-      // justifyContent: "center",
     },
     backButton: {
       marginTop: 80,
-      //   marginLeft: 20,
       marginBottom: 10,
     },
     title: {
       fontWeight: "bold",
       fontSize: 20,
+      color: theme.textPrimary,
       marginBottom: 30,
     },
     label: {
       fontSize: 16,
+      color: theme.textSecondary,
     },
     row: {
       flexDirection: "row",
@@ -180,39 +159,39 @@ const styling = (theme: ThemeKey) =>
     },
     timeText: {
       marginTop: 20,
-      color: "#666",
+      color: theme.textSecondary,
     },
     permissionContainer: {
       flex: 1,
-      backgroundColor: "black",
+      backgroundColor: theme.surface,
       justifyContent: "center",
       alignItems: "center",
       padding: 30,
     },
     permissionText: {
-      color: "white",
+      color: theme.textSecondary,
       fontSize: 24,
       fontWeight: "bold",
       marginBottom: 10,
     },
     permissionSubtext: {
-      color: "#ccc",
+      color: theme.textSecondary,
       textAlign: "center",
       marginBottom: 20,
     },
     goToSettings: {
-      backgroundColor: "#9B59B6",
+      backgroundColor: theme.surface,
       paddingHorizontal: 20,
       paddingVertical: 10,
       borderRadius: 10,
     },
     goToSettingsText: {
-      color: "white",
+      color: theme.textSecondary,
       fontWeight: "bold",
     },
     cancelText: {
       marginTop: 20,
-      color: "#ccc",
+      color: theme.textSecondary,
     },
     backArrow: {
       position: "absolute",
