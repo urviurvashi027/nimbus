@@ -14,7 +14,6 @@ import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import ThemeContext from "@/context/ThemeContext";
-import HabitList from "@/components/HabitList/HabitList";
 import { getHabitList, markHabitDone } from "@/services/habitService";
 import { HabitItem } from "@/types/habitTypes";
 import { ThemeKey } from "@/components/Themed";
@@ -33,7 +32,6 @@ import DailyCheckInPanel from "@/components/homeScreen/DailyCheckInPanel";
 import HabitItemCard from "@/components/homeScreen/component/HabitItem";
 import Toast from "react-native-toast-message";
 import { useAuth } from "@/context/AuthContext";
-// import DailyCheckInCard from "@/components/homeScreen/DailyCheckInCard";
 
 export default function TabOneScreen() {
   const [habitList, setHabitList] = useState<HabitItem[]>([]);
@@ -224,7 +222,7 @@ export default function TabOneScreen() {
               ) : (
                 <>
                   {/* ✅ Daily check-in */}
-                  <View style={{ marginTop: 20 }}>
+                  <View style={{ marginVertical: 30 }}>
                     <DailyCheckInPanel />
                   </View>
 
@@ -281,7 +279,7 @@ const styling = (theme: ThemeKey, newTheme: any) =>
       backgroundColor: newTheme.background,
       // backgroundColor: themeColors[theme].background,
       flex: 12, // Takes up the remaining space
-      marginTop: 40, // 10px space between FlatList and TaskList
+      marginTop: 20, // 10px space between FlatList and TaskList
     },
     iconColor: {
       color: newTheme.textPrimary,
