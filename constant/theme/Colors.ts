@@ -130,15 +130,6 @@ const colors = {
 const basicColors: any = {
   primary: "#007AFF",
   secondary: "#5856D6",
-  // accent: "#FF9500",
-  // success: "#34C759",
-  // warning: "#FFC700",
-  // error: "#FF3B30",
-  // textPrimary: "#1C1C1E",
-  // textSecondary: "#8E8E93",
-  textDisabled: "#C7C7CC",
-  // background: "#F2F2F7",
-  // surface: "#FFFFFF",
   border: "#D1D1D6",
   overlay: "rgba(0, 0, 0, 0.5)",
 

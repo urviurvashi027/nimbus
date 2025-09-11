@@ -218,7 +218,7 @@ const HabitDetails = () => {
                 <View style={{ padding: 5 }}>
                   <HeaderPanel
                     title="Weekly Overview"
-                    type="weekly"
+                    // type="weekly"
                     accentColor={newTheme.surface} // your app’s accent
                     onSelect={(value) => console.log("Selected:", value)}
                   />
@@ -236,7 +236,7 @@ const HabitDetails = () => {
                 <>
                   <HeaderPanel
                     title="Monthly Overview"
-                    type="monthly"
+                    // type="monthly"
                     accentColor={newTheme.surface} // your app’s accent
                     onSelect={(value) => console.log("Selected:", value)}
                   />

@@ -4,23 +4,23 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { ScrollView, Switch } from "react-native-gesture-handler";
+
 import { useAuth } from "@/context/AuthContext";
 import { Section } from "@/constant/data/settingsList";
-import * as SecureStore from "expo-secure-store";
-import { StoreKey } from "@/constant/Constant";
-import { themeColors } from "@/constant/theme/Colors";
-import { ScreenView } from "@/components/Themed";
 import ThemeContext from "@/context/ThemeContext";
-import NotificationTypeModal from "@/components/setting/NotificationTypeSetting";
+
+import NotificationTypeModal from "@/components/setting/NotificationTypeModal";
 import RoutineSettingModal from "@/components/setting/RoutineSetting";
 import ReportBugModal from "@/components/setting/ReportBug";
 import FeedbackModal from "@/components/setting/Feeback";
 import PrivacyPolicyModal from "@/components/setting/PrivacyPoilcy";
 import TermsModal from "@/components/setting/TermsAndService";
 import FAQModal from "@/components/setting/HelpCenter";
-import WarningBanner from "@/components/common/BannerWarning";
-import { router } from "expo-router";
 import ChangePasswordModal from "@/components/setting/ChangePassword";
+import LogoutModal from "@/components/setting/LogoutModal";
+import SocialActionModal from "@/components/setting/SocialActionModal";
+import AdvancedSettingsModal from "@/components/setting/AdvanceSettingModal";
+import EditProfileModal from "@/components/setting/EditProfileModal";
 
 type FormState = {
   darkMode: boolean;
@@ -31,22 +31,25 @@ type FormState = {
 export default function profile() {
   // modal states
   const [showNotificationModal, setShowNotificationModal] = useState(false);
-  const [showRoutineSettingModal, setShowRoutineSettingModal] = useState(false);
+  const [showAdvanceSettingModal, setShowAdvanceSettingModal] = useState(false);
   const [showReportBugModal, setShowReportBugModal] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showSocialModal, setShowSocialModal] = useState(false);
 
   const [showPrivatePolicyModal, setShowPrivatePrivacyModal] = useState(false);
   const [showTermsAndServiceModal, setShowTermsAndServiceModal] =
     useState(false);
   const [showFAQModal, setShowFAQModal] = useState(false);
+  const [showEditProfile, setEditProfile] = useState(false);
 
-  const [isOnboardingComplete, setIsOnboardingComplete] = useState(false);
-
-  isOnboardingComplete;
+  // Instagram deep link: instagram://user?username=your_username
+  // webUrl: https://instagram.com/your_username
+  const instagramDeep = "instagram://user?username=nimbus_app";
+  const instagramWeb = "https://instagram.com/nimbus_app";
 
   // others
-  // const [user, setUser] = useState<any>();
   const { newTheme, toggleTheme } = useContext(ThemeContext);
 
   const { onLogout, userProfile } = useAuth();
@@ -82,8 +85,11 @@ export default function profile() {
       case "Notification":
         setShowNotificationModal(true);
         break;
-      case "Routine Setting":
-        setShowRoutineSettingModal(true);
+      case "Advance Setting":
+        setShowAdvanceSettingModal(true);
+        break;
+      case "Profile Info":
+        setEditProfile(true);
         break;
       case "Report Bug":
         setShowReportBugModal(true);
@@ -100,6 +106,15 @@ export default function profile() {
       case "Change Password":
         setShowChangePasswordModal(true);
         break;
+      case "Logout":
+        setShowLogoutModal(true);
+        break;
+      case "Facebook":
+      case "Instagram":
+      case "Discord":
+        console.log("coming here social");
+        setShowSocialModal(true);
+        break;
 
       case "Help Center":
         setShowFAQModal(true);
@@ -107,12 +122,6 @@ export default function profile() {
     }
   };
   const handleOnSaveNotification = () => {};
-
-  const handleGoToOnboarding = () => {
-    console.log("banner warning clicked");
-    router.push("/OnBoarding/QuestionScreen");
-    // router.push("/(auth)/OnBoarding/onboardingScreen");
-  };
 
   return (
     <GestureHandlerRootView style={styles.gestureContainer}>
@@ -143,19 +152,6 @@ export default function profile() {
               </Text>
             </View>
           )}
-
-          <View style={styles.bannerContainer}>
-            {!isOnboardingComplete && (
-              <WarningBanner
-                message="Your onboarding is incomplete. Some features may not work as expected."
-                ctaText="Complete Onboarding"
-                onPress={handleGoToOnboarding}
-              />
-            )}
-
-            {/* ... other settings items */}
-          </View>
-
           {Section.map(({ header, items }) => (
             <View style={styles.section} key={header}>
               <Text style={styles.sectionHeader}>{header}</Text>
@@ -220,20 +216,33 @@ export default function profile() {
               )}
             </View>
           ))}
-          <TouchableOpacity style={styles.logout} onPress={onLogoutClick}>
-            <Text style={{ color: newTheme.textSecondary }}>Logout</Text>
-          </TouchableOpacity>
+
           {/* Notification Setting Modal */}
+          {/* <NotificationTypeModal
+            visible={showNotificationModal}
+            onClose={() => setShowNotificationModal(false)}
+          /> */}
+
           <NotificationTypeModal
             visible={showNotificationModal}
             onClose={() => setShowNotificationModal(false)}
-            // onSaveData={handleOnSaveNotification}
           />
-          {/* Routine Setting Modal */}
-          <RoutineSettingModal
-            visible={showRoutineSettingModal}
-            onClose={() => setShowRoutineSettingModal(false)}
+
+          <AdvancedSettingsModal
+            visible={showAdvanceSettingModal}
+            onClose={() => setShowAdvanceSettingModal(false)}
           />
+
+          {/* The modal */}
+          <EditProfileModal
+            visible={showEditProfile}
+            onClose={() => setEditProfile(false)}
+            onSaved={(user) => {
+              console.log("Profile saved:", user);
+              setEditProfile(false);
+            }}
+          />
+
           <ReportBugModal
             visible={showReportBugModal}
             onClose={() => setShowReportBugModal(false)}
@@ -259,26 +268,33 @@ export default function profile() {
             visible={showChangePasswordModal}
             onClose={() => setShowChangePasswordModal(false)}
           />
+
+          <SocialActionModal
+            visible={showSocialModal}
+            onClose={() => setShowSocialModal(false)}
+            title="Nimbus on Instagram"
+            appDeepLink={instagramDeep}
+            webUrl={instagramWeb}
+          />
+
+          <LogoutModal
+            visible={showLogoutModal}
+            onLogout={onLogoutClick}
+            onClose={() => setShowLogoutModal(false)}
+          />
         </ScrollView>
       </SafeAreaView>
     </GestureHandlerRootView>
-    // {/* </ScreenView> */}
   );
 }
 const styling = (newTheme: any) =>
   StyleSheet.create({
-    // const styles = StyleSheet.create({
     gestureContainer: {
       flex: 1,
       backgroundColor: newTheme.background,
     },
     container: {
       paddingVertical: 24,
-    },
-    bannerContainer: {
-      flex: 1,
-      padding: 20,
-      backgroundColor: newTheme.background,
     },
     profile: {
       padding: 24,

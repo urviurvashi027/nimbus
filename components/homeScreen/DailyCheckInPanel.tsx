@@ -1,6 +1,17 @@
 // components/homeScreen/DailyCheckInPanel.tsx
-import React, { useContext, useState } from "react";
-import { View, StyleSheet, Text, ScrollView } from "react-native";
+import React, { useContext, useEffect, useState } from "react";
+import {
+  View,
+  StyleSheet,
+  Text,
+  ScrollView,
+  Animated,
+  Platform,
+  UIManager,
+  Easing,
+  LayoutAnimation,
+  TouchableOpacity,
+} from "react-native";
 import DailyCheckInCard from "@/components/homeScreen/component/DailyCheckInCard";
 import ThemeContext from "@/context/ThemeContext";
 
@@ -41,11 +52,34 @@ const mockData = [
 
 const DailyCheckInPanel = () => {
   const [data, setData] = useState(mockData);
+  const [expanded, setExpanded] = useState(true);
+  const rotateAnim = React.useRef(new Animated.Value(expanded ? 1 : 0)).current;
 
   const { theme, newTheme } = useContext(ThemeContext);
   const styles = styling(newTheme);
 
-  //   console.log(data, "data here");
+  // Enable LayoutAnimation on Android
+  useEffect(() => {
+    if (
+      Platform.OS === "android" &&
+      UIManager.setLayoutAnimationEnabledExperimental
+    ) {
+      UIManager.setLayoutAnimationEnabledExperimental(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    // rotate caret animation
+    Animated.timing(rotateAnim, {
+      toValue: expanded ? 1 : 0,
+      duration: 200,
+      easing: Easing.inOut(Easing.ease),
+      useNativeDriver: true,
+    }).start();
+
+    // Layout animation for show/hide
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+  }, [expanded, rotateAnim]);
 
   const updateQuantity = (index: number, delta: number) => {
     setData((prev) =>
@@ -63,9 +97,46 @@ const DailyCheckInPanel = () => {
     );
   };
 
+  // caret rotation interpolation: 0 -> 0deg, 1 -> 180deg
+  const rotate = rotateAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0deg", "180deg"],
+  });
+
+  const completedCount = data.filter(
+    (d) => d.completedQuantity >= d.goalQuantity
+  ).length;
+
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      {/* Header - tappable to toggle */}
+      <TouchableOpacity
+        activeOpacity={0.8}
+        onPress={() => setExpanded((v) => !v)}
+        style={styles.header}
+        accessibilityRole="button"
+        accessibilityState={{ expanded }}
+      >
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Text style={styles.title}>Daily check-in</Text>
+
+          {/* small space between title and caret */}
+          <Animated.View
+            style={[styles.caretContainer, { transform: [{ rotate }] }]}
+          >
+            <Text style={styles.caret}>⌄</Text>
+          </Animated.View>
+        </View>
+
+        {/* Count pill always visible */}
+        <View style={styles.pill}>
+          <Text style={styles.pillText}>
+            {completedCount}/{data.length}
+          </Text>
+        </View>
+      </TouchableOpacity>
+
+      {/* <View style={styles.header}>
         <Text style={styles.title}>Daily check-in</Text>
         <View style={styles.pill}>
           <Text style={styles.pillText}>
@@ -73,25 +144,28 @@ const DailyCheckInPanel = () => {
             {data.length}
           </Text>
         </View>
-      </View>
+      </View> */}
 
       {/* Horizontal scroll list */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
-        <View style={styles.grid}>
-          {data.map((item, index) => (
-            <DailyCheckInCard
-              key={item.name}
-              {...item}
-              onIncrement={() => updateQuantity(index, 1)}
-              onDecrement={() => updateQuantity(index, -1)}
-            />
-          ))}
-        </View>
-      </ScrollView>
+
+      {expanded && (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
+          <View style={styles.grid}>
+            {data.map((item, index) => (
+              <DailyCheckInCard
+                key={item.name}
+                {...item}
+                onIncrement={() => updateQuantity(index, 1)}
+                onDecrement={() => updateQuantity(index, -1)}
+              />
+            ))}
+          </View>
+        </ScrollView>
+      )}
     </View>
   );
 };
@@ -99,7 +173,7 @@ const DailyCheckInPanel = () => {
 const styling = (newTheme: any) =>
   StyleSheet.create({
     container: {
-      paddingVertical: 30,
+      paddingBottom: 10,
       backgroundColor: newTheme.background,
     },
     scrollContent: {
@@ -124,6 +198,21 @@ const styling = (newTheme: any) =>
       flexDirection: "row",
       flexWrap: "wrap",
       justifyContent: "space-between",
+      paddingBottom: 8,
+    },
+
+    // caret styles (simple text caret to avoid extra icon package)
+    caretContainer: {
+      marginLeft: 8,
+      width: 20,
+      height: 20,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    caret: {
+      fontSize: 16,
+      color: newTheme.textSecondary,
+      // rotate is handled by Animated.View
     },
   });
 
