@@ -1,6 +1,5 @@
 import { TouchableOpacity, StyleSheet, View } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
-import { format } from "date-fns";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 import { Text } from "@/components/Themed";

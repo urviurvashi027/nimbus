@@ -4,7 +4,7 @@ export type Choice = {
   icon?: string; // optional emoji / icon
 };
 
-export type QuestionType = "single" | "multiple" | "time";
+export type QuestionType = "single" | "multiple" | "time" | "signature";
 
 export type Question = {
   id: number;
@@ -96,5 +96,12 @@ export const ONBOARDING_QUESTIONS: Question[] = [
       { id: "stress", label: "Manage Stress & Anxiety", icon: "😌" },
       { id: "other", label: "Other (Specify)", icon: "✨" },
     ],
+  },
+  {
+    id: 8,
+    title: "Let's make a contract ✍️",
+    subtitle:
+      "Review & sign your personalized commitment to achieving your goals with Nimbus.",
+    type: "signature", // <- new type
   },
 ];

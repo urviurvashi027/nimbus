@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { View, Modal, Switch, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { format } from "date-fns";
 
 import { FormInput, Text } from "../../Themed";
 import ThemeContext from "@/context/ThemeContext";
