@@ -4,10 +4,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { ScrollView, Switch } from "react-native-gesture-handler";
+
 import { useAuth } from "@/context/AuthContext";
 import { Section } from "@/constant/data/settingsList";
 import ThemeContext from "@/context/ThemeContext";
-import NotificationTypeModal from "@/components/setting/NotificationTypeSetting";
+
+import NotificationTypeModal from "@/components/setting/NotificationTypeModal";
 import RoutineSettingModal from "@/components/setting/RoutineSetting";
 import ReportBugModal from "@/components/setting/ReportBug";
 import FeedbackModal from "@/components/setting/Feeback";
@@ -17,6 +19,8 @@ import FAQModal from "@/components/setting/HelpCenter";
 import ChangePasswordModal from "@/components/setting/ChangePassword";
 import LogoutModal from "@/components/setting/LogoutModal";
 import SocialActionModal from "@/components/setting/SocialActionModal";
+import AdvancedSettingsModal from "@/components/setting/AdvanceSettingModal";
+import EditProfileModal from "@/components/setting/EditProfileModal";
 
 type FormState = {
   darkMode: boolean;
@@ -27,7 +31,7 @@ type FormState = {
 export default function profile() {
   // modal states
   const [showNotificationModal, setShowNotificationModal] = useState(false);
-  const [showRoutineSettingModal, setShowRoutineSettingModal] = useState(false);
+  const [showAdvanceSettingModal, setShowAdvanceSettingModal] = useState(false);
   const [showReportBugModal, setShowReportBugModal] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
@@ -38,6 +42,7 @@ export default function profile() {
   const [showTermsAndServiceModal, setShowTermsAndServiceModal] =
     useState(false);
   const [showFAQModal, setShowFAQModal] = useState(false);
+  const [showEditProfile, setEditProfile] = useState(false);
 
   // Instagram deep link: instagram://user?username=your_username
   // webUrl: https://instagram.com/your_username
@@ -80,8 +85,11 @@ export default function profile() {
       case "Notification":
         setShowNotificationModal(true);
         break;
-      case "Routine Setting":
-        setShowRoutineSettingModal(true);
+      case "Advance Setting":
+        setShowAdvanceSettingModal(true);
+        break;
+      case "Profile Info":
+        setEditProfile(true);
         break;
       case "Report Bug":
         setShowReportBugModal(true);
@@ -208,20 +216,33 @@ export default function profile() {
               )}
             </View>
           ))}
-          {/* <TouchableOpacity style={styles.logout} onPress={onLogoutClick}>
-            <Text style={{ color: newTheme.textSecondary }}>Logout</Text>
-          </TouchableOpacity> */}
+
           {/* Notification Setting Modal */}
+          {/* <NotificationTypeModal
+            visible={showNotificationModal}
+            onClose={() => setShowNotificationModal(false)}
+          /> */}
+
           <NotificationTypeModal
             visible={showNotificationModal}
             onClose={() => setShowNotificationModal(false)}
-            // onSaveData={handleOnSaveNotification}
           />
-          {/* Routine Setting Modal */}
-          <RoutineSettingModal
-            visible={showRoutineSettingModal}
-            onClose={() => setShowRoutineSettingModal(false)}
+
+          <AdvancedSettingsModal
+            visible={showAdvanceSettingModal}
+            onClose={() => setShowAdvanceSettingModal(false)}
           />
+
+          {/* The modal */}
+          <EditProfileModal
+            visible={showEditProfile}
+            onClose={() => setEditProfile(false)}
+            onSaved={(user) => {
+              console.log("Profile saved:", user);
+              setEditProfile(false);
+            }}
+          />
+
           <ReportBugModal
             visible={showReportBugModal}
             onClose={() => setShowReportBugModal(false)}

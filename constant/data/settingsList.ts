@@ -28,11 +28,11 @@ export const Section: any[] = [
         label: "Notification",
       },
       {
-        id: "routineSetting",
-        icon: "people",
+        id: "advanceSetting",
+        icon: "construct-outline",
         color: "#dfd9f9",
         type: "modal",
-        label: "Routine Setting",
+        label: "Advance Setting",
       },
       {
         id: "soundEffect",
@@ -56,7 +56,8 @@ export const Section: any[] = [
     items: [
       {
         id: "edit",
-        icon: "construct-outline",
+        icon: "people",
+
         color: "#dfd9f9",
         type: "modal",
         label: "Profile Info",

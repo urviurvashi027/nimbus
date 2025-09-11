@@ -22,7 +22,7 @@ export default function signUp() {
   const [weight, setWeight] = useState<string>("");
   const [height, setHeight] = useState<string>("");
 
-  const { onboardingData, setDynamicAnswer, setProfileInfo } = useOnboarding();
+  // const { onboardingData, setDynamicAnswer, setProfileInfo } = useOnboarding();
 
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
   const styles = styling(theme);
@@ -36,7 +36,7 @@ export default function signUp() {
       return;
     }
 
-    setProfileInfo({ age, height, weight });
+    // setProfileInfo({ age, height, weight });
     await new Promise((resolve) => setTimeout(resolve, 300));
     router.push("/(auth)/OnBoarding/OnboardingFinalSubmit");
     // router.push("/(public)/OnboardingFinalSubmit");
