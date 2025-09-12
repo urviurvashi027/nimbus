@@ -101,7 +101,7 @@ export const ONBOARDING_QUESTIONS: Question[] = [
     id: 8,
     title: "Let's make a contract ✍️",
     subtitle:
-      "Review & sign your personalized commitment to achieving your goals with Nimbus.",
+      "Sign your personalized commitment to achieving your goals with Nimbus.",
     type: "signature", // <- new type
   },
 ];

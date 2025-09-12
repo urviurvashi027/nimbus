@@ -41,9 +41,6 @@ export default function TabOneScreen() {
 
   // create button click
   const onCreateClick = () => {
-    router.push("/(auth)/Tools/AskNimbus/AskNimbusScreen");
-    router.push("/(auth)/Tools/Therapy/AITherapyScreen");
-    router.push("/(auth)/Tools/Product/ProductListScreen");
     router.push("/habit/create");
   };
 

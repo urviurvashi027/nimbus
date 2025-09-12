@@ -6,9 +6,10 @@ import { format } from "date-fns";
 
 import { themeColors } from "@/constant/theme/Colors";
 import ThemeContext from "@/context/ThemeContext";
-import { ReminderAt } from "./Modal/HabitReminderModal";
-import HabitReminderModal from "./Modal/HabitReminderModal";
+import { ReminderAt } from "@/types/habitTypes";
+// import HabitReminderModal from "./Modal/HabitReminderModal";
 import styling from "./style/HabitInputStyle";
+import ReminderModal from "./Modal/ReminderModal";
 
 type EditData = {
   time?: Date | undefined | null;
@@ -32,15 +33,16 @@ const HabitReminderInput: React.FC<HabitReminderInputProps> = ({
   });
   const [userDisplay, setUserDisplay] = useState<string>("");
   const [showReminderAtModal, setShowReminderAtModal] = useState(false);
-  const { theme } = useContext(ThemeContext);
+  const { theme, newTheme } = useContext(ThemeContext);
 
-  const styles = styling(theme);
+  const styles = styling(theme, newTheme);
 
   // function to handle Habit Reminder
   const handleHabitReminder = (reminderAt: any) => {
+    console.log(reminderAt, "reminderAt");
     setReminderAt(reminderAt);
     if (reminderAt.time) {
-      console.log(reminderAt.time, "reminderAt.time");
+      console.log(reminderAt, "reminderAt.time");
       // const time12 = format(new Date(reminderAt.time), "hh:mm a");
       // setUserDisplay(time12);
       setUserDisplay(reminderAt.time);
@@ -82,11 +84,33 @@ const HabitReminderInput: React.FC<HabitReminderInputProps> = ({
   return (
     <>
       <TouchableOpacity
-        style={styles.selectorButton}
+        // style={styles.selectorButton}
+        style={styles.rowItem}
         onPress={() => {
           setShowReminderAtModal(true);
         }}
       >
+        <View style={styles.rowLeft}>
+          <Ionicons
+            style={styles.iconLeft}
+            name="stopwatch-outline"
+            size={20}
+            color={newTheme.textSecondary}
+          />
+          <Text style={styles.rowLabel}>Remind me at</Text>
+        </View>
+
+        <View style={styles.rowRight}>
+          <Text style={styles.rowValue}>
+            {reminderAt ? `${userDisplay}` : "Select Reminder Time"}
+          </Text>
+          <Ionicons
+            name="chevron-forward"
+            size={18}
+            color={newTheme.textSecondary}
+          />
+        </View>
+        {/* 
         <Ionicons
           style={styles.iconLeft}
           name="stopwatch-outline"
@@ -108,15 +132,29 @@ const HabitReminderInput: React.FC<HabitReminderInputProps> = ({
           name="chevron-forward"
           size={20}
           color={themeColors[theme].text}
-        />
+        /> */}
       </TouchableOpacity>
-      <HabitReminderModal
+      <ReminderModal
+        visible={showReminderAtModal}
+        onClose={() => setShowReminderAtModal(false)}
+        // visible={reminderModalVisible}
+        isAllDayEnabled={isAllDayEnabled} // 👈 pass true/false depending on HabitDuration modal
+        // onClose={() => setReminderModalVisible(false)}
+        onSave={handleHabitReminder}
+        // onSave={(data) => {
+        //   console.log("Reminder saved:", data);
+        //   setReminderData(data); // store it in state
+        //   setReminderModalVisible(false);
+        // }}
+        isEditMode={isEditMode} // 👈 pass saved state when editing
+      />
+      {/* <HabitReminderModal
         visible={showReminderAtModal}
         onClose={() => setShowReminderAtModal(false)}
         isAllDayEnabled={isAllDayEnabled}
         onSave={handleHabitReminder}
         isEditMode={isEditMode}
-      />
+      /> */}
     </>
   );
 };

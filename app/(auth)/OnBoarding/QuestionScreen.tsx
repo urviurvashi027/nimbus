@@ -83,10 +83,16 @@ const OnboardingFlow = () => {
     }
   };
 
+  const handleOnBack = () => {};
+
   return (
     <ScreenView style={{ padding: 10, marginTop: 0 }}>
       <View style={styles.container}>
-        <OnboardingHeader step={step + 1} totalSteps={TOTAL} />
+        <OnboardingHeader
+          step={step + 1}
+          totalSteps={TOTAL}
+          onBack={handleOnBack}
+        />
 
         <View style={styles.titleContainer}>
           <Text style={styles.title}>{question.title}</Text>
