@@ -62,7 +62,8 @@ const RecipeScreen = () => {
   const handleItemClick = (item: any) => {
     console.log("Item Clciked", item);
     router.push({
-      pathname: "/(auth)/Tools/Details/Details",
+      pathname: "/(auth)/Tools/Details/ContentDetailsScreen",
+      // pathname: "/(auth)/Tools/Details/Details",
       params: { id: item.id, type: "recipe" },
     });
   };

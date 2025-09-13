@@ -127,8 +127,10 @@ const ArticleScreen = () => {
   };
 
   const handleItemClick = (item: any) => {
+    // router.push("/(auth)/Tools/Details/ContentDetailsScreen")
     router.push({
-      pathname: "/(auth)/Tools/Details/Details",
+      // pathname: "/(auth)/Tools/Details/Details",
+      pathname: "/(auth)/Tools/Details/ContentDetailsScreen",
       params: { id: item.id, type: "article" },
     });
   };

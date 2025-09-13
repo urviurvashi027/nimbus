@@ -131,9 +131,13 @@ const RoutineScreen = () => {
 
   const handleItemClick = (item: any) => {
     router.push({
-      pathname: "/(auth)/Tools/Details/Details",
+      pathname: "/(auth)/Tools/Details/ContentDetailsScreen",
       params: { id: item.id, type: "routine" },
     });
+    // router.push({
+    //   pathname: "/(auth)/Tools/Details/Details",
+    //   params: { id: item.id, type: "routine" },
+    // });
   };
 
   useEffect(() => {
