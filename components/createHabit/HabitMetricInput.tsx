@@ -5,11 +5,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { Text } from "@/components/Themed";
 import { themeColors } from "@/constant/theme/Colors";
 import ThemeContext from "@/context/ThemeContext";
-import { MetricFormat } from "./Modal/HabitMetricModal";
-import HabitMetricModal from "./Modal/HabitMetricModal";
+import { MetricFormat } from "@/types/habitTypes";
+// import HabitMetricModal from "./Modal/HabitMetricModal";
 import styling from "./style/HabitInputStyle";
 import { getHabitUnitData } from "@/services/habitService";
 import { HabitUnit } from "@/types/habitTypes";
+import MetricModal from "./Modal/MetricModal";
 // import styling from "./style/HabitMetricInputStyle";
 
 type EditData = {
@@ -27,7 +28,7 @@ const HabitMetricInput: React.FC<HabitMetricInputProp> = ({
   onSelect,
   isEditMode,
 }) => {
-  const { theme } = useContext(ThemeContext);
+  const { theme, newTheme } = useContext(ThemeContext);
 
   const [habitMetric, setHabitMetric] = useState<MetricFormat | null>(null);
   const [tagList, setTaglist] = useState<HabitUnit[]>([]);
@@ -45,14 +46,16 @@ const HabitMetricInput: React.FC<HabitMetricInputProp> = ({
 
     // TODO need to change this according to the API
     const result = { count: value.count, unit: value.unit };
+    console.log(result, res, "result");
     onSelect(result);
   };
 
-  const styles = styling(theme);
+  const styles = styling(theme, newTheme);
 
   const getHabitUniLtist = async () => {
     try {
       const result = await getHabitUnitData();
+      // console.log(tagList, "tagList");
       if (result?.success) {
         setTaglist(result.data);
       }
@@ -80,42 +83,55 @@ const HabitMetricInput: React.FC<HabitMetricInputProp> = ({
     <>
       {/* Habit Metric Button */}
       <TouchableOpacity
-        style={styles.selectorButton}
+        style={styles.rowItem}
+        // style={styles.selectorButton}
         onPress={() => setShowHabitMetricModal(true)}
       >
-        <Ionicons
-          style={styles.iconLeft}
-          name="calculator-outline"
-          size={20}
-          color={themeColors[theme].text}
-        />
-        <View style={styles.inputField}>
-          <Text style={styles.label}>Metric</Text>
-          <Text
-            style={styles.selectorText}
-            numberOfLines={1}
-            ellipsizeMode="tail"
-          >
+        <View style={styles.rowLeft}>
+          <Ionicons
+            style={styles.iconLeft}
+            name="ticket-outline"
+            size={20}
+            color={newTheme.textSecondary}
+          />
+          <Text style={styles.rowLabel}>Metric</Text>
+        </View>
+
+        <View style={styles.rowRight}>
+          <Text style={styles.rowValue}>
             {habitMetric
               ? `${habitMetric.count} ${habitMetric.label}`
               : "Select Metric"}
           </Text>
+          <Ionicons
+            name="chevron-forward"
+            size={18}
+            color={newTheme.textSecondary}
+          />
         </View>
-        <Ionicons
-          style={styles.iconRight}
-          name="chevron-forward"
-          size={20}
-          color={themeColors[theme].text}
-        />
       </TouchableOpacity>
 
-      <HabitMetricModal
+      <MetricModal
+        visible={showHabitMetricModal}
+        onClose={() => setShowHabitMetricModal(false)}
+        // visible={metricModalVisible}
+        habitUnitList={tagList}
+        // onClose={() => setMetricModalVisible(false)}
+        onSave={handleHabitMetricSave}
+        // onSave={(val) => {
+        //   setHabitMetric(val);
+        //   setMetric(val); // if you already have metric state
+        // }}
+        isEditMode={habitMetric}
+      />
+
+      {/* <HabitMetricModal
         visible={showHabitMetricModal}
         onClose={() => setShowHabitMetricModal(false)}
         isEditMode={habitMetric}
         habitUnitList={tagList}
         onSave={handleHabitMetricSave}
-      />
+      /> */}
     </>
   );
 };

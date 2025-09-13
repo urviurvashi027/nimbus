@@ -15,7 +15,8 @@ import { FormInput } from "../../Themed";
 import { findIdBName, addObjectAtEnd } from "@/utils/helper";
 import { HabitTag } from "@/types/habitTypes";
 import { selectedTag } from "../HabitTagsInput";
-import styling from "../style/HabitTagModalStyle";
+import InputField from "@/components/common/ThemedComponent/StyledInput";
+// import styling from "../style/HabitTagModalStyle";
 
 type ThemeKey = "basic" | "light" | "dark";
 
@@ -73,8 +74,8 @@ const HabitTagsModal: React.FC<TaskTagsModalProps> = ({
     onClose();
   };
 
-  const { theme } = useContext(ThemeContext);
-  const styles = styling(theme);
+  const { newTheme } = useContext(ThemeContext);
+  const styles = styling(newTheme);
 
   useEffect(() => {
     const modifiedArray = addObjectAtEnd(habitTagList);
@@ -131,11 +132,7 @@ const HabitTagsModal: React.FC<TaskTagsModalProps> = ({
                 onClose();
               }}
             >
-              <Ionicons
-                name="close"
-                size={24}
-                color={themeColors[theme].text}
-              />
+              <Ionicons name="close" size={24} color={newTheme.textPrimary} />
             </TouchableOpacity>
           </View>
 
@@ -165,9 +162,22 @@ const HabitTagsModal: React.FC<TaskTagsModalProps> = ({
           {/* Add New Tag Section */}
           {isAdding && (
             <View style={styles.addNewContainer}>
-              <FormInput
+              <InputField
+                label="New Tag"
+                value={newTag}
+                // maxLength={20}
+                onChangeText={(text) => {
+                  setNewTag(text);
+                  if (text.length <= 20) {
+                    setError("");
+                  }
+                }}
+                placeholder="Add New Tag"
+              />
+
+              {/* <FormInput
                 style={styles.input}
-                placeholder="Enter new tag"
+                placeholder="Enter news tag"
                 value={newTag}
                 onChangeText={(text) => {
                   setNewTag(text);
@@ -176,7 +186,7 @@ const HabitTagsModal: React.FC<TaskTagsModalProps> = ({
                   }
                 }}
                 maxLength={20}
-              />
+              /> */}
               {error ? <Text style={styles.errorText}>{error}</Text> : null}
               <TouchableOpacity style={styles.addButton} onPress={handleAddNew}>
                 <Text style={styles.addButtonText}>Add</Text>
@@ -190,3 +200,74 @@ const HabitTagsModal: React.FC<TaskTagsModalProps> = ({
 };
 
 export default HabitTagsModal;
+
+const styling = (newTheme: any) =>
+  StyleSheet.create({
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(0,0,0,0.5)",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    modalContainer: {
+      width: "85%",
+      backgroundColor: newTheme.surface,
+      borderRadius: 10,
+      padding: 20,
+      maxHeight: "85%",
+    },
+    header: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 20,
+    },
+    title: {
+      fontSize: 18,
+      fontWeight: "bold",
+      color: newTheme.textPrimary,
+    },
+    listContainer: {
+      // Optional: Add any additional styling if needed
+    },
+    tagButton: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: newTheme.divider,
+    },
+    tagText: {
+      fontSize: 16,
+      color: newTheme.textPrimary,
+    },
+    addNewContainer: {
+      marginTop: 20,
+    },
+    input: {
+      borderWidth: 1,
+      backgroundColor: newTheme.surface,
+      borderColor: newTheme.divider,
+      borderRadius: 5,
+      padding: 10,
+      fontSize: 16,
+    },
+    addButton: {
+      marginTop: 10,
+      backgroundColor: newTheme.accent,
+      paddingVertical: 12,
+      borderRadius: 5,
+      alignItems: "center",
+    },
+    addButtonText: {
+      color: newTheme.background,
+      fontSize: 16,
+      fontWeight: "bold",
+    },
+    errorText: {
+      color: newTheme.error,
+      marginTop: 5,
+      fontSize: 14,
+    },
+  });

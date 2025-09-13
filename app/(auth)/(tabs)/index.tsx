@@ -17,14 +17,7 @@ import ThemeContext from "@/context/ThemeContext";
 import { getHabitList, markHabitDone } from "@/services/habitService";
 import { HabitItem } from "@/types/habitTypes";
 import { ThemeKey } from "@/components/Themed";
-import {
-  format,
-  addDays,
-  isSameDay,
-  isToday,
-  isTomorrow,
-  isYesterday,
-} from "date-fns";
+import { format, isToday, isTomorrow, isYesterday } from "date-fns";
 import NewUserScreen from "../FirstTimeUser/NewUserScreen";
 import DateScroller from "@/components/homeScreen/DateScroller";
 // import HabitListPanel from "@/components/homeScreen/HabitListPanel";
@@ -48,9 +41,6 @@ export default function TabOneScreen() {
 
   // create button click
   const onCreateClick = () => {
-    router.push("/(auth)/Tools/AskNimbus/AskNimbusScreen");
-    router.push("/(auth)/Tools/Therapy/AITherapyScreen");
-    router.push("/(auth)/Tools/Product/ProductListScreen");
     router.push("/habit/create");
   };
 

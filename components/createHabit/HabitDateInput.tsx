@@ -2,14 +2,15 @@ import { Text } from "react-native";
 import { View, TouchableOpacity } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { format, interval } from "date-fns";
+import { format } from "date-fns";
 
 import { themeColors } from "@/constant/theme/Colors";
 import ThemeContext from "@/context/ThemeContext";
-import { HabitDateType } from "./Modal/HabitDateModal";
-import HabitDateModal from "./Modal/HabitDateModal";
+import { HabitDateType } from "@/types/habitTypes";
+// import HabitDateModal from "./Modal/HabitDateModal";
 // import styling from "./style/HabitDateInputStyle";
 import styling from "./style/HabitInputStyle";
+import StartDateModal from "./Modal/StartDateModal";
 
 interface HabitDateInputProps {
   onSelect: (value: any) => void;
@@ -27,12 +28,13 @@ const HabitDateInput: React.FC<HabitDateInputProps> = ({
 
   const [showStartTaskModal, setShowStartTaskModal] = useState(false);
 
-  const { theme } = useContext(ThemeContext);
+  const { theme, newTheme } = useContext(ThemeContext);
 
-  const styles = styling(theme);
+  const styles = styling(theme, newTheme);
 
   // function which will be called on
   const handleStartSave = (habitDate: HabitDateType) => {
+    console.log(habitDate, "habitDate");
     setHabitDate(habitDate);
 
     setShowStartTaskModal(false);
@@ -58,6 +60,7 @@ const HabitDateInput: React.FC<HabitDateInputProps> = ({
         ...result,
         ...rest,
       };
+      console.log(result, "going to parent");
     }
     onSelect(result);
   };
@@ -106,39 +109,51 @@ const HabitDateInput: React.FC<HabitDateInputProps> = ({
   return (
     <>
       <TouchableOpacity
-        style={styles.selectorButton}
+        style={styles.rowItem}
         onPress={() => setShowStartTaskModal(true)}
       >
-        <Ionicons
-          style={styles.iconLeft}
-          name="calendar-outline"
-          size={20}
-          color={themeColors[theme].text}
-        />
-        <View style={styles.inputField}>
-          <Text style={styles.label}>Start Date</Text>
-          <Text
-            style={[styles.selectorText, { width: 130 }]}
-            numberOfLines={1}
-            ellipsizeMode="tail"
-          >
+        <View style={styles.rowLeft}>
+          <Ionicons
+            style={styles.iconLeft}
+            name="calendar-outline"
+            size={20}
+            color={newTheme.textSecondary}
+          />
+          <Text style={styles.rowLabel}>When</Text>
+        </View>
+
+        <View style={styles.rowRight}>
+          <Text style={styles.rowValue}>
             {habitDate ? userDisplay : "Select Date"}
           </Text>
+          <Ionicons
+            name="chevron-forward"
+            size={18}
+            color={newTheme.textSecondary}
+          />
         </View>
-        <Ionicons
-          style={styles.iconRight}
-          name="chevron-forward"
-          size={20}
-          color={themeColors[theme].text}
-        />
       </TouchableOpacity>
 
-      <HabitDateModal
+      {/* The modal itself */}
+      <StartDateModal
+        visible={showStartTaskModal}
+        onClose={() => setShowStartTaskModal(false)}
+        // visible={dateModalVisible}
+        // onClose={() => setDateModalVisible(false)}
+        isEditMode={habitDate || undefined} // pass existing data for editing
+        onSave={handleStartSave}
+        // onSave={(value) => {
+        //   setHabitDate(value); // save to state
+        //   setDateModalVisible(false);
+        // }}
+      />
+
+      {/* <HabitDateModal
         visible={showStartTaskModal}
         onClose={() => setShowStartTaskModal(false)}
         onSave={handleStartSave}
         isEditMode={isEditMode}
-      />
+      /> */}
     </>
   );
 };

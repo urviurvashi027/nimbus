@@ -16,9 +16,15 @@ type HabitFrequency = {
   end_date?: string;
 };
 
-type ReminderAt = {
+// export interface ReminderAt {
+//   time?: string | undefined;
+//   ten_min_before?: boolean;
+//   thirty_min_before?: boolean;
+// }
+
+export type ReminderAt = {
   // remind_at: string;
-  time?: string;
+  time?: string | undefined;
   ten_min_before?: boolean;
   thirty_min_before?: boolean;
 };
@@ -196,3 +202,36 @@ export interface HabitDetailResponse {
 export interface HabitDetailRequest {
   id: string;
 }
+
+// UI data types
+
+export type MetricFormat = {
+  count: string;
+  // unitId?: number; // TODO need to check
+  unit: number;
+  label?: string;
+};
+
+export type Duration = {
+  all_day?: boolean;
+  start_time?: Date;
+  end_time?: Date;
+};
+
+export type HabitDateType = {
+  start_date: Date;
+  end_date?: Date;
+  frequency_type?: string;
+  interval?: number;
+
+  days_of_week?: string[];
+  days_of_month?: number[];
+};
+
+export type FrequencyObj = {
+  frequency_type: string;
+  interval: number;
+
+  days_of_week?: string[];
+  days_of_month?: number[];
+};
