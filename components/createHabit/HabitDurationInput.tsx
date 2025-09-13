@@ -8,9 +8,10 @@ import HabitContext from "@/context/HabitContext";
 import { Button, ScreenView } from "@/components/Themed";
 import { themeColors } from "@/constant/theme/Colors";
 import ThemeContext from "@/context/ThemeContext";
-import HabitDurationModal from "./Modal/HabitDurationModal";
-import { Duration } from "./Modal/HabitDurationModal";
+// import HabitDurationModal from "./Modal/HabitDurationModal";
+import { Duration } from "@/types/habitTypes";
 import styling from "./style/HabitInputStyle";
+import DurationModal from "./Modal/DurationModal";
 // import styling from "./style/HabitDurationInputStyle";
 
 interface HabitDurationInputProps {
@@ -26,21 +27,37 @@ const HabitDurationInput: React.FC<HabitDurationInputProps> = ({
 
   const [showDurationModal, setShowDurationModal] = useState(false);
 
-  const { theme } = useContext(ThemeContext);
+  const { theme, newTheme } = useContext(ThemeContext);
 
-  const styles = styling(theme);
+  const styles = styling(theme, newTheme);
 
   const handleSave = (selectedDuration: any) => {
+    console.log(selectedDuration, "selectedDuration");
     if (selectedDuration.all_day) {
+      console.log(selectedDuration.all_day, "selectedDuration.all_day all day");
       onSelect({ all_day: true });
     } else {
       if (selectedDuration.start_time && selectedDuration.end_time) {
+        console.log(
+          selectedDuration.start_time,
+          format(selectedDuration.start_time, "hh:mm:ss"),
+          "selectedDuration.start_time both"
+        );
+        console.log(
+          selectedDuration.end_time,
+          format(selectedDuration.end_time, "hh:mm:ss"),
+          "selectedDuration.end_time both"
+        );
         onSelect({
           start_time: format(selectedDuration.start_time, "hh:mm:ss"),
           end_time: format(selectedDuration.end_time, "hh:mm:ss"),
           // start_time: pointTime,
         });
       } else {
+        console.log(
+          selectedDuration.start_time,
+          "selectedDuration.start_time else"
+        );
         onSelect({
           start_time: format(selectedDuration.start_time, "hh:mm:ss"),
         });
@@ -81,49 +98,62 @@ const HabitDurationInput: React.FC<HabitDurationInputProps> = ({
   return (
     <>
       <TouchableOpacity
-        style={styles.selectorButton}
+        style={styles.rowItem}
+        // style={styles.selectorButton}
         onPress={() => setShowDurationModal(true)}
       >
-        <Ionicons
-          style={styles.iconLeft}
-          name="alarm-outline"
-          size={20}
-          color={themeColors[theme].text}
-        />
-        <View style={styles.inputField}>
-          <Text style={styles.label}>Duration</Text>
-          <Text
-            style={styles.selectorText}
-            numberOfLines={1}
-            ellipsizeMode="tail"
-          >
+        <View style={styles.rowLeft}>
+          <Ionicons
+            style={styles.iconLeft}
+            name="ticket-outline"
+            size={20}
+            color={newTheme.textSecondary}
+          />
+          <Text style={styles.rowLabel}>Duration</Text>
+        </View>
+
+        <View style={styles.rowRight}>
+          <Text style={styles.rowValue} numberOfLines={1} ellipsizeMode="tail">
             {duration?.all_day === true
               ? "All Day"
               : duration.start_time && duration.end_time
-              ? `From ${format(duration.start_time, "hh:mm: a")} To ${format(
+              ? `${format(duration.start_time, "hh:mm a")} - ${format(
                   duration.end_time,
-                  "hh:mm: a"
+                  "hh:mm a"
                 )}`
               : `Point Time: ${format(
                   duration.start_time ?? new Date(),
-                  "hh:mm: a"
+                  "hh:mm a"
                 )}`}
           </Text>
+          <Ionicons
+            name="chevron-forward"
+            size={18}
+            color={newTheme.textSecondary}
+          />
         </View>
-        <Ionicons
-          style={styles.iconRight}
-          name="chevron-forward"
-          size={20}
-          color={themeColors[theme].text}
-        />
       </TouchableOpacity>
 
-      <HabitDurationModal
+      {/* The modal */}
+      <DurationModal
+        visible={showDurationModal}
+        onClose={() => setShowDurationModal(false)}
+        // visible={durationModalOpen}
+        isEditMode={duration}
+        // onClose={() => setDurationModalOpen(false)}
+        onSave={handleHabitDuration}
+        // onSave={(d) => {
+        //   setDuration(d);
+        //   setDurationModalOpen(false);
+        // }}
+      />
+
+      {/* <HabitDurationModal
         visible={showDurationModal}
         onClose={() => setShowDurationModal(false)}
         onSave={handleHabitDuration}
         isEditMode={isEditMode}
-      />
+      /> */}
     </>
   );
 };

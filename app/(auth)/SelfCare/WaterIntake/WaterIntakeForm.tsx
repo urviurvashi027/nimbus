@@ -14,9 +14,9 @@ import ThemeContext from "@/context/ThemeContext";
 import { ThemeKey } from "@/components/Themed";
 import WaterIntakeGoalModal from "./component/WaterIntakeGoal";
 import HabitReminderInput from "@/components/createHabit/HabitReminderInput";
-import HabitReminderModal, {
-  ReminderAt,
-} from "@/components/createHabit/Modal/HabitReminderModal";
+// import HabitReminderModal, {
+//   ReminderAt,
+// } from "@/components/createHabit/Modal/HabitReminderModal";
 import WeatherModal from "./component/WeatherModal";
 import UnitInputModal from "./component/LiquidUnit";
 
@@ -43,7 +43,7 @@ const SettingsModal: React.FC<WaterIntakeProps> = ({ visible, onClose }) => {
   const [unitModalVisible, setUnitModalVisible] = useState(false);
   const [selectedUnit, setSelectedUnit] = useState<UnitType>();
 
-  const [reminderAt, setReminderAt] = useState<ReminderAt>({});
+  // const [reminderAt, setReminderAt] = useState<ReminderAt>({});
   const [showReminderModal, setShowRemindersModal] = useState(false);
 
   const { theme } = useContext(ThemeContext);
@@ -81,7 +81,7 @@ const SettingsModal: React.FC<WaterIntakeProps> = ({ visible, onClose }) => {
 
   const handleHabitReminder = (reminderAt: any) => {
     console.log(reminderAt, "--------- reminerAt --------");
-    setReminderAt({ time: reminderAt });
+    // setReminderAt({ time: reminderAt });
   };
 
   // useEffect(() => {
@@ -155,13 +155,13 @@ const SettingsModal: React.FC<WaterIntakeProps> = ({ visible, onClose }) => {
         </View>
 
         {/* Habit reminder modal */}
-        <HabitReminderModal
+        {/* <HabitReminderModal
           visible={showReminderModal}
           onClose={() => setShowRemindersModal(false)}
           isAllDayEnabled={isAllDayEnabled()}
           onSave={handleHabitReminder}
           // isEditMode={isEditMode}
-        />
+        /> */}
 
         {/* water intake setting modal */}
         <WaterIntakeGoalModal

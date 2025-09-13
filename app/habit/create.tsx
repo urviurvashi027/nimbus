@@ -1,3 +1,4 @@
+import React, { useContext, useEffect, useState } from "react";
 import {
   View,
   TouchableOpacity,
@@ -5,42 +6,43 @@ import {
   Platform,
   TextInput,
   ActivityIndicator,
+  SafeAreaView,
+  ScrollView,
+  Pressable,
+  Text as RNText,
 } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
 import { router, useNavigation } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { ScrollView } from "react-native-gesture-handler";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import EmojiPicker, { type EmojiType } from "rn-emoji-keyboard";
+import Toast from "react-native-toast-message";
 
 import HabitContext from "@/context/HabitContext";
-import { Button, FormInput, ScreenView } from "@/components/Themed";
 import ThemeContext from "@/context/ThemeContext";
+
 import { themeColors } from "@/constant/theme/Colors";
-import { Text } from "@/components/Themed";
+
 import HabitTypeInput from "@/components/createHabit/HabitTypeInput";
 import HabitTagsInput, {
   selectedTag,
 } from "@/components/createHabit/HabitTagsInput";
-import { ThemeKey } from "@/components/Themed";
-import { HabitCreateRequest, HabitType } from "@/types/habitTypes";
+import { Button, FormInput, ScreenView, Text } from "@/components/Themed";
+
 import HabitMetricInput from "@/components/createHabit/HabitMetricInput";
-import HabitFrequencyInput from "@/components/createHabit/HabitFrequencyInput";
 import HabitDurationInput from "@/components/createHabit/HabitDurationInput";
 import HabitDateInput from "@/components/createHabit/HabitDateInput";
 import HabitReminderInput from "@/components/createHabit/HabitReminderInput";
-import { MetricFormat } from "@/components/createHabit/Modal/HabitMetricModal";
-import { FrequencyObj } from "@/components/createHabit/Modal/HabitFrequencyModal";
-import { Duration } from "@/components/createHabit/Modal/HabitDurationModal";
-import { HabitDateType } from "@/components/createHabit/Modal/HabitDateModal";
-import { ReminderAt } from "@/components/createHabit/Modal/HabitReminderModal";
+import EmojiSelector from "@/components/createHabit/EmojiSelectorModal";
+import { ThemeKey } from "@/components/Themed";
+// import EmojiInput from "@/components/createHabit/EmojiSelector";
+
 import { createHabit } from "@/services/habitService";
-import SubtaskInput from "@/components/createHabit/HabitSubTaskInput";
-import SuccessModal from "@/components/common/SuccessScreen";
-import Toast from "react-native-toast-message";
-import ActivityIndicatorModal from "@/components/common/ActivityIndicatorModal";
-import EmojiInput from "@/components/createHabit/EmojiSelector";
+
+import { ReminderAt } from "@/types/habitTypes";
+import { FrequencyObj } from "@/types/habitTypes";
+import { MetricFormat } from "@/types/habitTypes";
+import { Duration } from "@/types/habitTypes";
+import { HabitDateType } from "@/types/habitTypes";
 
 export default function HabitBasic() {
   // form state
@@ -55,83 +57,65 @@ export default function HabitBasic() {
   const [duration, setDuration] = useState<Duration>({ all_day: undefined });
   const [date, setDate] = useState<HabitDateType>();
   const [reminderAt, setReminderAt] = useState<ReminderAt>({});
-  // api state
+  const [emoji, setEmoji] = useState<string>("🙂");
+
+  // ui / api state
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [showResponseModal, setShowResponseModal] = useState(false);
 
   // context
   const { habitData, setHabitData } = useContext(HabitContext);
-  const { theme } = useContext(ThemeContext);
-  const styles = styling(theme);
+  const { theme, newTheme } = useContext(ThemeContext);
+  const styles = styling(theme, newTheme);
 
-  // navigation setting
+  // navigation & safe area
   const navigation = useNavigation();
-
-  const [isOpen, setIsOpen] = React.useState<boolean>(false);
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     navigation.setOptions({
       headerShown: true,
       headerTransparent: true,
-      headerTitle: "Habit Basic Details",
-      headerBackButtonDisplayMode: "minimal",
+      headerTitle: "Create New Habit",
       headerTitleAlign: "center",
-      // headerTintColor: styles.header.color,
       headerTitleStyle: {
         fontSize: 18,
+        fontWeight: "700",
         color: styles.header.color,
-        paddingTop: 5,
-        height: 40,
       },
+      headerStyle: {
+        elevation: 0,
+        shadowColor: "transparent",
+        backgroundColor: "transparent",
+        borderBottomWidth: 0,
+      },
+      headerLeft: () => (
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={{ marginLeft: 12, padding: 8 }}
+          accessibilityLabel="Close"
+        >
+          <Ionicons name="close" size={26} color={styles.header.color} />
+        </TouchableOpacity>
+      ),
+      headerRight: () => <View style={{ width: 44 }} />,
     });
-  }, [navigation]);
+  }, [navigation, styles.header.color]);
 
-  // function to handle color selection
+  // handlers passed to child input components
   const handleColorSelect = (
     color: "#FFEDFA" | "#B4EBE6" | "#F8ED8C" | "#C1CFA1" | "#B7B1F2"
   ) => {
     setColorSchema(color);
   };
-
-  // function to hanlde color selection
-  const handleHabitTypeSelect = (habitTypeId: number) => {
-    sethabitTypeId(habitTypeId);
-  };
-
-  // function to handle habit tags selection
-  const handleHabitTagSelection = (selectedTags: selectedTag) => {
-    setTags(selectedTags);
-  };
-
-  // function to handle metric selection
-  const handleMetricSelect = (value: any) => {
-    setMetric(value);
-  };
-
-  // function to handle frequency selection
-  const handleFrequencySelect = (value: any) => {
-    setFrequency(value);
-  };
-
-  // function to hanlde duration selection
-  const handleDurationSelect = (value: any) => {
-    setDuration(value);
-  };
-
-  // function to hanlde date selection
-  const handleHabitStartDate = (value: any) => {
-    setDate(value);
-  };
-
-  // function to handle reminder selection
-  const handleReminderSelect = (value: any) => {
-    setReminderAt(value);
-  };
-
-  const isAllDayEnabled = () => {
-    return duration.all_day ? true : false;
-  };
+  const handleHabitTypeSelect = (id: number) => sethabitTypeId(id);
+  const handleHabitTagSelection = (s: selectedTag) => setTags(s);
+  const handleMetricSelect = (v: any) => setMetric(v);
+  const handleFrequencySelect = (v: any) => setFrequency(v);
+  const handleDurationSelect = (v: any) => setDuration(v);
+  const handleHabitStartDate = (v: any) => setDate(v);
+  const handleReminderSelect = (v: any) => setReminderAt(v);
 
   const getFrequencyDetail = () => {
     if (frequency?.frequency_type || date?.start_date)
@@ -141,279 +125,337 @@ export default function HabitBasic() {
   const getFormattedTag = () => {
     let value;
     if (tags) {
-      let tagList = tags?.old?.map((item, index) => item.id);
-      if (tags.new) {
-        value = { old: tagList, new: [tags.new] };
-      } else {
-        value = { old: tagList };
-      }
-    } else {
-      value = {};
-    }
-
+      const oldIds = tags?.old?.map((it) => it.id) || [];
+      if (tags.new) value = { old: oldIds, new: [tags.new] };
+      else value = { old: oldIds };
+    } else value = {};
     return value;
   };
 
-  const getErrMessage = () => {
-    let msg;
-    if (!name) msg = "Please enter name";
-    if (!Object.keys(metric).length) msg = "Please enter metric";
-    if (!Object.keys(reminderAt).length) msg = "Please set reminder";
-    return msg;
+  const validateAndBuild = () => {
+    if (!name) return { ok: false, msg: "Please enter habit name" };
+    if (!Object.keys(metric).length)
+      return { ok: false, msg: "Please choose a metric" };
+    if (!Object.keys(reminderAt).length)
+      return { ok: false, msg: "Please set a reminder" };
+
+    const freq = getFrequencyDetail();
+    const payload: any = {
+      name,
+      habit_type_id: habitTypeId,
+      color: colorSchema,
+      habit_metric: metric,
+      habit_duration: duration,
+      habit_frequency: freq,
+      tags: getFormattedTag(),
+      icon: emoji,
+    };
+
+    if (reminderAt?.time || reminderAt?.ten_min_before)
+      payload.remind_at = reminderAt;
+    return { ok: true, payload };
   };
 
-  const createHabitData = async () => {
-    if (
-      name &&
-      Object.keys(metric).length > 0 &&
-      Object.keys(reminderAt).length > 0
-    ) {
-      const freq = getFrequencyDetail();
-
-      let result = {
-        name: name,
-        habit_type_id: habitTypeId,
-        color: colorSchema,
-        habit_metric: metric,
-        habit_duration: duration,
-        habit_frequency: freq,
-        // remind_at: reminderAt,
-        tags: getFormattedTag(),
-        ...(reminderAt?.time || reminderAt?.ten_min_before
-          ? { remind_at: reminderAt }
-          : {}),
-      };
-
-      // if (reminderAt.time || reminderAt.ten_min_before) {
-      //   result = { ...result, remind_at: reminderAt };
-      //   //  result.remind_at = reminderAt;
-      // }
-
-      // const res = tags.old?.length ? { ...result, tag: tags } : result;
-
-      creatHabitApi(result);
-    } else {
-      const errorMessage = name ? "Please enter metric" : "Please enter name";
-      const msg = getErrMessage();
-      // Show error toast
-      Toast.show({
-        type: "error",
-        text1: "Required Field Empty",
-        text2: msg,
-        position: "bottom",
-      });
-    }
-  };
-
-  const creatHabitApi = async (data: any) => {
-    setShowResponseModal(true);
+  const creatHabitApi = async (payload: any) => {
+    console.log(payload, "payload create habit");
     setIsLoading(true);
-
     try {
-      const result = await createHabit(data);
-
+      const result = await createHabit(payload);
       if (result?.success) {
         setIsSuccess(true);
-        setIsLoading(false);
-
-        resetData();
-        // router.replace("/(auth)/(tabs)"); // Navigate on success
+        // small UX: short toast
+        Toast.show({ type: "success", text1: "Habit created" });
+        // reset UI & navigate
+        setTimeout(() => {
+          router.replace("/(auth)/(tabs)");
+        }, 700);
+      } else {
+        Toast.show({ type: "error", text1: "Failed to create habit" });
       }
-    } catch (error: any) {
+    } catch (err: any) {
+      Toast.show({ type: "error", text1: "Network error" });
+    } finally {
       setIsLoading(false);
     }
   };
 
-  const resetData = () => {
-    setName("");
-    sethabitTypeId(0);
-    setTags({});
-    setMetric({});
-    setFrequency(null);
-    setDuration({ all_day: undefined });
-    setReminderAt({});
+  const onSubmitClick = () => {
+    const { ok, payload, msg } = validateAndBuild() as any;
+    if (!ok) {
+      Toast.show({ type: "error", text1: msg });
+      return;
+    }
+    creatHabitApi(payload);
   };
 
-  // function to handle continue click
-  const onSubmitClick = () => {
-    createHabitData();
+  // small helper UI components (kept inline for single-file copy)
+  const ColorSwatch = ({
+    color,
+    selected,
+    onPress,
+  }: {
+    color: string;
+    selected?: boolean;
+    onPress: () => void;
+  }) => {
+    return (
+      <Pressable
+        onPress={onPress}
+        style={[
+          styles.colorCircle,
+          { backgroundColor: color },
+          selected ? styles.colorSelectedOuter : undefined,
+        ]}
+        android_ripple={{ color: "rgba(0,0,0,0.1)" }}
+      >
+        {selected && (
+          <Ionicons name="checkmark" size={18} color={newTheme.background} />
+        )}
+      </Pressable>
+    );
+  };
+
+  const isAllDayEnabled = () => {
+    return duration.all_day ? true : false;
   };
 
   return (
-    <>
-      <GestureHandlerRootView
-        style={[
-          styles.gestureContainer,
-          { backgroundColor: colorSchema || themeColors[theme].background },
-        ]}
-      >
-        <SafeAreaView style={styles.gestureContainer}>
-          <ScrollView>
-            <ScreenView
-              bgColor={colorSchema}
-              style={{
-                paddingTop: Platform.OS === "ios" ? 20 : 10,
-              }}
-            >
-              <EmojiInput />
-              <View>
-                <TextInput
-                  style={styles.input}
-                  placeholderTextColor={themeColors.basic.mediumGrey}
-                  placeholder="Enter habit name"
-                  value={name}
-                  onChangeText={setName}
-                />
-
-                {/* Task Name */}
-                <View style={styles.colorOptionsContainer}>
-                  {["#FFEDFA", "#B4EBE6", "#F8ED8C", "#C1CFA1", "#B7B1F2"].map(
-                    (color) => (
-                      <TouchableOpacity
-                        key={color}
-                        style={[
-                          styles.colorCircle,
-                          { backgroundColor: color },
-                          colorSchema === color && {
-                            borderColor: themeColors.basic.mediumGrey,
-                          },
-                        ]}
-                        onPress={() =>
-                          handleColorSelect(
-                            color as
-                              | "#FFEDFA"
-                              | "#B4EBE6"
-                              | "#F8ED8C"
-                              | "#C1CFA1"
-                              | "#B7B1F2"
-                          )
-                        }
-                      />
-                    )
-                  )}
-                </View>
-
-                <HabitTypeInput onSelect={handleHabitTypeSelect} />
-
-                <HabitMetricInput onSelect={handleMetricSelect} />
-                <HabitDurationInput onSelect={handleDurationSelect} />
-                <HabitDateInput onSelect={handleHabitStartDate} />
-                <HabitReminderInput
-                  isAllDayEnabled={isAllDayEnabled()}
-                  onSelect={handleReminderSelect}
-                />
-                <HabitTagsInput onSelect={handleHabitTagSelection} />
-                {/* <SubtaskInput /> */}
-              </View>
-              <Button
-                style={styles.btn}
-                textStyle={styles.btnText}
-                title="Submit"
-                onPress={onSubmitClick}
+    <GestureHandlerRootView
+      style={[
+        styles.gestureContainer,
+        { backgroundColor: newTheme.background },
+      ]}
+    >
+      <SafeAreaView style={{ flex: 1 }}>
+        <ScrollView
+          contentContainerStyle={{
+            paddingBottom: Math.max(24, insets.bottom + 24),
+          }}
+        >
+          <ScreenView
+            bgColor={newTheme.background}
+            style={{
+              paddingTop: insets.top + 10,
+              paddingHorizontal: 18,
+              // paddingBottom: 12,
+            }}
+          >
+            <View style={styles.emojiRow}>
+              {/* <RNText style={styles.emoji}>{emoji}</RNText> */}
+              <EmojiSelector
+                value={emoji}
+                onSelect={(e) => {
+                  setEmoji(e);
+                  // any extra logic you want when emoji selected
+                }}
+                placeholder={emoji}
+                size={48}
               />
-            </ScreenView>
-          </ScrollView>
-        </SafeAreaView>
-      </GestureHandlerRootView>
+              <View style={styles.underline} />
+            </View>
 
-      <SuccessModal
-        visible={showResponseModal}
-        isLoading={isLoading}
-        isSuccess={isSuccess}
-        onClose={() => {
-          setShowResponseModal(false);
-          router.replace("/(auth)/(tabs)");
-        }}
-      />
-      {/* <ActivityIndicatorModal visible={isLoading} /> */}
-    </>
+            {/* NAME (pill input) */}
+            <View style={{ marginTop: 10, marginBottom: 18 }}>
+              <TextInput
+                style={[styles.pillInput, { color: newTheme.textPrimary }]}
+                placeholder="Habit name"
+                placeholderTextColor={newTheme.textSecondary}
+                value={name}
+                onChangeText={setName}
+                returnKeyType="done"
+              />
+            </View>
+
+            {/* Color swatches */}
+            <View style={styles.swatchesRow}>
+              {["#FFEDFA", "#B4EBE6", "#F8ED8C", "#C1CFA1", "#B7B1F2"].map(
+                (c) => (
+                  <ColorSwatch
+                    key={c}
+                    color={c}
+                    selected={c === colorSchema}
+                    onPress={() => handleColorSelect(c as any)}
+                  />
+                )
+              )}
+            </View>
+
+            {/* Form rows */}
+            <View style={styles.formList}>
+              <HabitTypeInput onSelect={handleHabitTypeSelect} />
+
+              <HabitMetricInput onSelect={handleMetricSelect} />
+              <HabitDurationInput onSelect={handleDurationSelect} />
+              <HabitDateInput onSelect={handleHabitStartDate} />
+              <HabitReminderInput
+                isAllDayEnabled={isAllDayEnabled()}
+                onSelect={handleReminderSelect}
+              />
+              <HabitTagsInput onSelect={handleHabitTagSelection} />
+
+              {/* <TouchableOpacity style={styles.rowItem}>
+                <View style={styles.rowLeft}>
+                  <Ionicons
+                    name="time-outline"
+                    size={20}
+                    color={newTheme.textSecondary}
+                  />
+                  <Text style={styles.rowLabel}>Reminder At</Text>
+                </View>
+                <View style={styles.rowRight}>
+                  <Text style={styles.rowValue}>Select the preset</Text>
+                  <Ionicons
+                    name="chevron-forward"
+                    size={18}
+                    color={newTheme.textSecondary}
+                  />
+                </View>
+              </TouchableOpacity> */}
+
+              {/* <TouchableOpacity style={styles.rowItem}>
+                <View style={styles.rowLeft}>
+                  <Ionicons
+                    name="pricetag-outline"
+                    size={20}
+                    color={newTheme.textSecondary}
+                  />
+                  <Text style={styles.rowLabel}>Tags</Text>
+                </View>
+                <View style={styles.rowRight}>
+                  <Text style={styles.rowValue}>Select Tags</Text>
+                  <Ionicons
+                    name="chevron-forward"
+                    size={18}
+                    color={newTheme.textSecondary}
+                  />
+                </View>
+              </TouchableOpacity> */}
+            </View>
+
+            {/* Spacer so content doesn't butt against the button */}
+            <View style={{ height: 32 }} />
+          </ScreenView>
+        </ScrollView>
+
+        {/* Submit button anchored above safe area */}
+        <View
+          style={[styles.submitWrap, { paddingBottom: insets.bottom || 16 }]}
+        >
+          <TouchableOpacity
+            onPress={onSubmitClick}
+            style={[styles.submitBtn, isLoading && { opacity: 0.8 }]}
+            activeOpacity={0.9}
+          >
+            {isLoading ? (
+              <ActivityIndicator color={newTheme.background} />
+            ) : (
+              <RNText style={styles.submitText}>Submit</RNText>
+            )}
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    </GestureHandlerRootView>
   );
 }
 
-const styling = (theme: ThemeKey) =>
+/* ----- Styles ----- */
+const styling = (theme: ThemeKey, newTheme: any) =>
   StyleSheet.create({
-    gestureContainer: {
-      flex: 1,
-    },
-    header: {
-      color: themeColors[theme]?.text,
-    },
-    container: {
-      marginTop: 60,
-    },
-    btn: {
-      marginTop: 30,
-      backgroundColor: themeColors[theme]?.primaryColor,
-      padding: 20,
+    gestureContainer: { flex: 1 },
+    header: { color: newTheme.textPrimary },
+
+    emojiRow: {
       alignItems: "center",
-      borderRadius: 10,
+      // marginTop: 6,
+      marginBottom: 12,
     },
-    btnText: {
-      color: themeColors[theme]?.text,
-      fontWeight: 800,
-      fontSize: 18,
+    emoji: { fontSize: 48 },
+    underline: {
+      width: 60,
+      height: 4,
+      backgroundColor: "rgba(255,255,255,0.12)",
+      marginTop: 8,
+      borderRadius: 2,
     },
-    input: {
+
+    pillInput: {
+      height: 54,
+      borderRadius: 28,
+      backgroundColor: newTheme.surface,
+      paddingHorizontal: 18,
+      fontSize: 16,
+      includeFontPadding: false,
+      alignSelf: "stretch",
       textAlign: "center",
-      width: "80%",
-      alignSelf: "center",
-      // borderWidth: 1,
-      borderBottomColor: themeColors[theme].inpurBorderColor,
-      borderBottomWidth: 1,
-      // borderColor: "#ccc",
-      borderRadius: 5,
-      padding: 10,
-      fontSize: 16,
-      // color: "#333",
+      borderWidth: 1,
+      borderColor: "rgba(255,255,255,0.03)",
     },
-    label: {
-      fontSize: 16,
-      marginBottom: 10,
-      marginTop: 10,
+
+    swatchesRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginVertical: 8,
+      paddingHorizontal: 4,
     },
     colorCircle: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
-      borderWidth: 1,
-      borderColor: "transparent",
+      width: 52,
+      height: 52,
+      borderRadius: 26,
       justifyContent: "center",
       alignItems: "center",
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.12,
+      shadowRadius: 6,
+      elevation: 2,
     },
-    selectedColor: {
-      borderColor: "blue",
+    colorSelectedOuter: {
+      borderWidth: 3,
+      borderColor: newTheme.textPrimary,
+      transform: [{ scale: 1.02 }],
+      shadowOpacity: 0.18,
     },
-    colorOptionsContainer: {
+
+    formList: {
+      marginTop: 10,
+      backgroundColor: "transparent",
+    },
+    rowItem: {
+      paddingVertical: 16,
+      paddingHorizontal: 4,
       flexDirection: "row",
+      alignItems: "center",
       justifyContent: "space-between",
-      marginBottom: 20,
-      paddingTop: 30,
+      borderBottomWidth: 1,
+      borderBottomColor: "rgba(255,255,255,0.03)",
     },
-    customContainer: {
-      width: "80%", // Adjust as needed
-      alignSelf: "center",
-      marginVertical: 10,
+    rowLeft: { flexDirection: "row", alignItems: "center", gap: 12 },
+    rowLabel: { marginLeft: 8, color: newTheme.textSecondary, fontSize: 15 },
+    rowRight: { flexDirection: "row", alignItems: "center", gap: 8 },
+    rowValue: { color: newTheme.textPrimary, fontSize: 15, fontWeight: "600" },
+
+    submitWrap: {
+      paddingHorizontal: 16,
+      backgroundColor: "transparent",
     },
-    customLabel: {
-      textAlign: "center", // Center the label
-      fontSize: 16,
-      fontWeight: "bold",
-      marginBottom: 5, // Space between label and input
-    },
-    customInput: {
-      borderBottomWidth: 1, // Only bottom border
-      borderBottomColor: "#555", // Border color
-      fontSize: 16,
-      textAlign: "center", // Center the input text
-      paddingVertical: 5, // Adjust vertical spacing
-    },
-    loaderContainer: {
-      flex: 1,
+    submitBtn: {
+      height: 64,
+      backgroundColor: newTheme.accent,
+      borderRadius: 32,
       justifyContent: "center",
       alignItems: "center",
-      position: "absolute",
-      width: "100%",
-      height: "100%",
-      backgroundColor: "rgba(0,0,0,0.2)", // Semi-transparent background
+      marginHorizontal: 2,
+      marginTop: 6,
+      shadowColor: newTheme.accent,
+      shadowOffset: { width: 0, height: 6 },
+      shadowOpacity: 0.18,
+      shadowRadius: 12,
+      elevation: 6,
+    },
+    submitText: {
+      color: newTheme.background,
+      fontSize: 18,
+      fontWeight: "700",
     },
   });

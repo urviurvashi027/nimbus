@@ -31,8 +31,8 @@ const HabitTagsInput: React.FC<HabitTagsInputProps> = ({ onSelect }) => {
 
   const [showHabitTagsModal, setShowHabitTagsModal] = useState(false);
 
-  const { theme } = useContext(ThemeContext);
-  const styles = styling(theme);
+  const { theme, newTheme } = useContext(ThemeContext);
+  const styles = styling(theme, newTheme);
 
   // const onLoginClick = async () => {
   //   try {
@@ -109,29 +109,31 @@ const HabitTagsInput: React.FC<HabitTagsInputProps> = ({ onSelect }) => {
     <>
       <View>
         <TouchableOpacity
-          style={styles.selectorButton}
+          style={styles.rowItem}
           onPress={() => setShowHabitTagsModal(true)}
         >
-          <Ionicons
-            style={styles.iconLeft}
-            name="pricetags-outline"
-            size={20}
-            color={themeColors[theme].text}
-          />
-          <View style={styles.inputField}>
-            <Text style={styles.label}>Tags</Text>
-            <Text style={styles.selectorText}>
+          <View style={styles.rowLeft}>
+            <Ionicons
+              style={styles.iconLeft}
+              name="pricetags-outline"
+              size={20}
+              color={newTheme.textSecondary}
+            />
+            <Text style={styles.rowLabel}>Types</Text>
+          </View>
+
+          <View style={styles.rowRight}>
+            <Text style={styles.rowValue}>
               {selectedTag?.length > 0
                 ? `${selectedTag?.length} Tag(s) Selected`
                 : "Select Tags"}
             </Text>
+            <Ionicons
+              name="chevron-forward"
+              size={18}
+              color={newTheme.textSecondary}
+            />
           </View>
-          <Ionicons
-            style={styles.iconRight}
-            name="chevron-forward"
-            size={20}
-            color={themeColors[theme].text}
-          />
         </TouchableOpacity>
       </View>
 
@@ -141,7 +143,7 @@ const HabitTagsInput: React.FC<HabitTagsInputProps> = ({ onSelect }) => {
           <View key={index} style={styles.tag}>
             <Text style={styles.tagText}>{tag.name}</Text>
             <TouchableOpacity onPress={() => handleRemoveTag(index)}>
-              <Ionicons name="close-circle" size={16} color="#ff0000" />
+              <Ionicons name="close-circle" size={16} color={newTheme.accent} />
             </TouchableOpacity>
           </View>
         ))}
