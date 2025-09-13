@@ -75,7 +75,8 @@
     "recharts": "^2.15.1",
     "rn-emoji-keyboard": "^1.7.0",
     "expo-image-picker": "~16.0.6",
-    "expo-clipboard": "~7.0.1"
+    "expo-clipboard": "~7.0.1",
+    "expo-linear-gradient": "~14.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

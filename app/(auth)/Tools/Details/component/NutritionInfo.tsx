@@ -1,4 +1,5 @@
-import React from "react";
+import ThemeContext from "@/context/ThemeContext";
+import React, { useContext, useMemo } from "react";
 import { View, Text, StyleSheet, SafeAreaView, StatusBar } from "react-native";
 
 // This type defines the structure of the nutrition data object
@@ -9,7 +10,7 @@ interface NutritionData {
 // This defines the props for our reusable component
 interface NutritionInfoProps {
   title: string;
-  data: NutritionData | null | undefined;
+  data: NutritionData | null | undefined | string;
 }
 
 const NutritionInfo: React.FC<NutritionInfoProps> = ({ title, data }) => {
@@ -20,6 +21,9 @@ const NutritionInfo: React.FC<NutritionInfoProps> = ({ title, data }) => {
 
   // Helper function to capitalize the first letter of a string
   const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+  const { newTheme } = useContext(ThemeContext);
+  const styles = useMemo(() => createStyles(newTheme), [newTheme]);
 
   return (
     <View style={styles.container}>
@@ -40,53 +44,54 @@ const NutritionInfo: React.FC<NutritionInfoProps> = ({ title, data }) => {
 
 export default NutritionInfo;
 
-const styles = StyleSheet.create({
-  appContainer: {
-    flex: 1,
-    backgroundColor: "#f5f5f5",
-    padding: 20,
-  },
-  container: {
-    backgroundColor: "#ffffff",
-    borderRadius: 12,
-    padding: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#333",
-    marginBottom: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-    paddingBottom: 10,
-  },
-  row: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    marginBottom: 8,
-  },
-  bullet: {
-    fontSize: 16,
-    color: "#555",
-    marginRight: 10,
-    lineHeight: 24, // Align bullet with text
-  },
-  keyText: {
-    fontSize: 16,
-    color: "#333",
-    fontWeight: "500",
-    marginRight: 5,
-    lineHeight: 24,
-  },
-  valueText: {
-    fontSize: 16,
-    color: "#555",
-    flex: 1, // Allow text to wrap
-    lineHeight: 24,
-  },
-});
+const createStyles = (theme: any) =>
+  StyleSheet.create({
+    appContainer: {
+      flex: 1,
+      backgroundColor: theme.surface,
+      padding: 20,
+    },
+    container: {
+      // backgroundColor: "#ffffff",
+      borderRadius: 12,
+      padding: 20,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    title: {
+      fontSize: 20,
+      fontWeight: "bold",
+      color: theme.textPrimary,
+      marginBottom: 15,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.divider,
+      paddingBottom: 10,
+    },
+    row: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      marginBottom: 8,
+    },
+    bullet: {
+      fontSize: 16,
+      color: theme.accent,
+      marginRight: 10,
+      lineHeight: 24, // Align bullet with text
+    },
+    keyText: {
+      fontSize: 16,
+      color: theme.textSecondary,
+      fontWeight: "500",
+      marginRight: 5,
+      lineHeight: 24,
+    },
+    valueText: {
+      fontSize: 16,
+      color: theme.textPrimary,
+      flex: 1, // Allow text to wrap
+      lineHeight: 24,
+    },
+  });
