@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import DailyCheckInCard from "@/components/homeScreen/component/DailyCheckInCard";
 import ThemeContext from "@/context/ThemeContext";
+import { useRouter } from "expo-router";
 
 const mockData = [
   {
@@ -23,6 +24,7 @@ const mockData = [
     unit: "glass",
     icon: "💧",
     color: "#A259FF",
+    route: "/(auth)/dailyCheckIn/WaterCheckIn",
   },
   {
     name: "Sleep",
@@ -31,6 +33,7 @@ const mockData = [
     unit: "hours",
     icon: "😴",
     color: "#4CAF50",
+    route: "/(auth)/dailyCheckIn/WaterCheckIn",
   },
   {
     name: "Meditation",
@@ -39,6 +42,7 @@ const mockData = [
     unit: "min",
     icon: "🧘",
     color: "#00BCD4",
+    route: "/(auth)/dailyCheckIn/WaterCheckIn",
   },
   {
     name: "Reading",
@@ -47,6 +51,7 @@ const mockData = [
     unit: "min",
     icon: "📚",
     color: "#9C27B0",
+    route: "/(auth)/dailyCheckIn/WaterCheckIn",
   },
 ];
 
@@ -57,6 +62,8 @@ const DailyCheckInPanel = () => {
 
   const { theme, newTheme } = useContext(ThemeContext);
   const styles = styling(newTheme);
+
+  const router = useRouter();
 
   // Enable LayoutAnimation on Android
   useEffect(() => {
@@ -112,7 +119,9 @@ const DailyCheckInPanel = () => {
       {/* Header - tappable to toggle */}
       <TouchableOpacity
         activeOpacity={0.8}
-        onPress={() => setExpanded((v) => !v)}
+        onPress={() => {
+          setExpanded((v) => !v);
+        }}
         style={styles.header}
         accessibilityRole="button"
         accessibilityState={{ expanded }}
@@ -159,6 +168,8 @@ const DailyCheckInPanel = () => {
               <DailyCheckInCard
                 key={item.name}
                 {...item}
+                onPress={() => router.push({ pathname: item.route as any })}
+                // onPress={() => router.push(item.route)}
                 onIncrement={() => updateQuantity(index, 1)}
                 onDecrement={() => updateQuantity(index, -1)}
               />

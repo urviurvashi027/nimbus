@@ -45,7 +45,7 @@ export const Section: any[] = [
         id: "navigation",
         icon: "navigate",
         color: "#dfd9f9",
-        type: "link",
+        type: "toogle",
         label: "Location",
       },
     ],

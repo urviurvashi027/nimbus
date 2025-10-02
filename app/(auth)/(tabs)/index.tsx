@@ -25,6 +25,7 @@ import DailyCheckInPanel from "@/components/homeScreen/DailyCheckInPanel";
 import HabitItemCard from "@/components/homeScreen/component/HabitItem";
 import Toast from "react-native-toast-message";
 import { useAuth } from "@/context/AuthContext";
+import TopBadge from "@/components/homeScreen/TopBadge";
 
 export default function TabOneScreen() {
   const [habitList, setHabitList] = useState<HabitItem[]>([]);
@@ -195,12 +196,23 @@ export default function TabOneScreen() {
                 <View
                   style={{
                     paddingVertical: 20,
+                    // paddingHorizontal: 20, // added horizontal padding
                     backgroundColor: newTheme.background,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between", // username left, badge right
                   }}
                 >
-                  <Text style={styles.dateLabel}>
-                    {userInfo.first_name} {userInfo.last_name}
-                  </Text>
+                  <Text style={styles.dateLabel}>{userInfo.username}</Text>
+
+                  {/* 🔥 Reusable TopBadge (points, score, level, etc.) */}
+                  <TopBadge
+                    count={userInfo.points || 123} // fallback if you don’t have points in API
+                    // label="pts"
+                    iconName="star"
+                    variant="pill"
+                    onPress={() => console.log("badge pressed")}
+                  />
                 </View>
               )}
 
@@ -300,7 +312,7 @@ const styling = (theme: ThemeKey, newTheme: any) =>
       backgroundColor: newTheme.background,
     },
     dateLabel: {
-      backgroundColor: newTheme.background,
+      // backgroundColor: newTheme.background,
       fontSize: 22,
       fontWeight: "600",
       color: newTheme.textPrimary,

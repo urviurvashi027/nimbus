@@ -4,6 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { ScrollView, Switch } from "react-native-gesture-handler";
+import * as Location from "expo-location";
 
 import { useAuth } from "@/context/AuthContext";
 import { Section } from "@/constant/data/settingsList";
@@ -21,6 +22,7 @@ import LogoutModal from "@/components/setting/LogoutModal";
 import SocialActionModal from "@/components/setting/SocialActionModal";
 import AdvancedSettingsModal from "@/components/setting/AdvanceSettingModal";
 import EditProfileModal from "@/components/setting/EditProfileModal";
+import UpgradeBanner from "@/components/common/UpgradeBanner";
 
 type FormState = {
   darkMode: boolean;
@@ -37,6 +39,7 @@ export default function profile() {
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showSocialModal, setShowSocialModal] = useState(false);
+  const [loc, setLoc] = useState<Location.LocationObject | null>(null);
 
   const [showPrivatePolicyModal, setShowPrivatePrivacyModal] = useState(false);
   const [showTermsAndServiceModal, setShowTermsAndServiceModal] =
@@ -69,16 +72,109 @@ export default function profile() {
     }
   };
 
-  const onToggle = (id: any, value: any) => {
+  const onToggle = async (id: string, value: boolean, label: string) => {
+    console.log(id, value, label, "on toggle");
+    // handle side-effects per id
+    if (value) {
+      await switchEnableHandler(id);
+    } else {
+      await switchDisableHandler(id);
+    }
+    // value ? switchEnableHandler(id) : switchdisableHandler(id);
     setFormState({ ...formState, [id]: value });
     value ? toggleTheme("dark") : toggleTheme("light");
   };
+
+  const switchEnableHandler = async (id: string) => {
+    try {
+      if (id === "navigation") {
+        await requestLocation();
+      } else if (id === "soundEffect") {
+        // enable sound effects: call your audio manager / update prefs
+        console.log("Enable sound effects");
+      } else {
+        // generic enable handler
+        console.log("Enable:", id);
+      }
+    } catch (err) {
+      console.warn("switchEnableHandler error", err);
+      // optional: revert UI if side-effect failed
+      setFormState({ ...formState, [id]: false });
+    }
+  };
+
+  // called when switch turned OFF
+  const switchDisableHandler = async (id: string) => {
+    try {
+      if (id === "navigation") {
+        // optionally clear or stop location usage
+        setLoc(null);
+        console.log("Navigation/location disabled");
+      } else if (id === "soundEffect") {
+        console.log("Disable sound effects");
+      } else {
+        console.log("Disable:", id);
+      }
+    } catch (err) {
+      console.warn("switchDisableHandler error", err);
+      // revert UI if necessary
+      setFormState({ ...formState, [id]: true });
+    }
+  };
+
+  useEffect(() => {
+    if (!loc) {
+      console.log("loc not found useEffect");
+      return;
+    }
+
+    console.log(
+      "loc detail useEffect",
+      loc.coords.latitude,
+      loc.coords.longitude
+    );
+
+    const fetchAddress = async () => {
+      try {
+        const reverseGeocode = await Location.reverseGeocodeAsync({
+          latitude: loc.coords.latitude,
+          longitude: loc.coords.longitude,
+        });
+
+        if (reverseGeocode.length > 0) {
+          const place = reverseGeocode[0];
+          console.log("Place details:", place);
+
+          console.log(
+            `${place.name}, ${place.city}, ${place.region}, ${place.country}`
+          );
+        }
+      } catch (error) {
+        console.warn("Reverse geocode failed", error);
+      }
+    };
+
+    fetchAddress();
+  }, [loc]);
 
   const onSettingPanelClick = (type: string, label: string) => {
     if (type === "modal") {
       handleModalVisibilty(label);
     }
   };
+
+  async function requestLocation() {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      alert("Permission denied :: Location permission is required.");
+      return;
+    }
+
+    const location = await Location.getCurrentPositionAsync({
+      accuracy: Location.Accuracy.Highest,
+    });
+    setLoc(location);
+  }
 
   const handleModalVisibilty = (label: string) => {
     switch (label) {
@@ -152,6 +248,11 @@ export default function profile() {
               </Text>
             </View>
           )}
+
+          <View style={{ paddingVertical: 20 }}>
+            <UpgradeBanner />
+          </View>
+
           {Section.map(({ header, items }) => (
             <View style={styles.section} key={header}>
               <Text style={styles.sectionHeader}>{header}</Text>
@@ -199,7 +300,7 @@ export default function profile() {
                           trackColor={{
                             true: `${newTheme.background}`,
                           }}
-                          onValueChange={(value) => onToggle(id, value)}
+                          onValueChange={(value) => onToggle(id, value, label)}
                         />
                       )}
 
