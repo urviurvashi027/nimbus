@@ -29,7 +29,7 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: newThemeKit[colorScheme ?? "light"].background, // White background
           borderTopWidth: 1,
-          // borderTopColor: "#E5E5E5",
+          borderTopColor: newTheme.surface,
         },
       }}
     >

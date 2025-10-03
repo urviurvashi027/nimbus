@@ -1,7 +1,16 @@
 // DailyCheckInCard.tsx
 import ThemeContext from "@/context/ThemeContext";
+import { useRouter } from "expo-router";
 import React, { useContext } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  GestureResponderEvent,
+  Pressable,
+  Platform,
+} from "react-native";
 import Svg, { Circle } from "react-native-svg";
 
 interface DailyCheckInCardProps {
@@ -13,6 +22,12 @@ interface DailyCheckInCardProps {
   color: string;
   onIncrement?: () => void;
   onDecrement?: () => void;
+  /** navigation: either pass onPress OR route (expo-router path) */
+  onPress?: () => void;
+  route?: string; // e.g. "/Tools/WaterLog"
+  params?: Record<string, any>;
+  style?: any;
+  accessibleLabel?: string;
 }
 
 const RADIUS = 40;
@@ -26,8 +41,13 @@ const DailyCheckInCard: React.FC<DailyCheckInCardProps> = ({
   unit,
   icon,
   color,
+  route,
+  params,
+  style,
+  accessibleLabel,
   onIncrement,
   onDecrement,
+  onPress,
 }) => {
   const progress = Math.min(completedQuantity / goalQuantity, 1);
   const strokeDashoffset = CIRCUMFERENCE - CIRCUMFERENCE * progress;
@@ -35,10 +55,45 @@ const DailyCheckInCard: React.FC<DailyCheckInCardProps> = ({
   const { theme, newTheme } = useContext(ThemeContext);
   const styles = styling(newTheme);
 
+  const router = useRouter();
+
+  const handleCardPress = () => {
+    if (onPress) {
+      onPress();
+      return;
+
+      // router.push("/(auth)/dailyCheckIn/WaterCheckIn")
+    }
+    if (route) {
+      // prefer route navigation if given
+      // router.push({ pathname: route, params: params ?? {} });
+      // prefer route navigation if given
+    }
+    // otherwise nothing
+  };
+
+  // prevent card press when tapping small controls:
+  const stopPropagation = (e?: GestureResponderEvent) => {
+    e?.stopPropagation?.();
+  };
+
   // console.log(name, "name");
 
   return (
-    <View style={styles.card}>
+    <Pressable
+      onPress={handleCardPress}
+      android_ripple={{ color: "rgba(255,255,255,0.04)" }}
+      style={({ pressed }) => [
+        styles.card,
+        style,
+        pressed && Platform.OS === "ios" ? { opacity: 0.88 } : undefined,
+      ]}
+      accessibilityRole="button"
+      accessibilityLabel={
+        accessibleLabel ??
+        `${name} card. ${completedQuantity} of ${goalQuantity} ${unit}`
+      }
+    >
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.icon}>{icon}</Text>
@@ -86,7 +141,7 @@ const DailyCheckInCard: React.FC<DailyCheckInCardProps> = ({
           <Text style={styles.btnText}>+</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </Pressable>
   );
 };
 
