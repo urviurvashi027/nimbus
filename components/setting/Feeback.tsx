@@ -16,6 +16,9 @@ import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/context/ThemeContext";
 import InputField from "../common/ThemedComponent/StyledInput";
 import { StyledButton } from "../common/ThemedComponent/StyledButton";
+import { logFeedback } from "@/services/settingService";
+import { FeedbackPayload } from "@/types/settingTypes";
+import Toast from "react-native-toast-message";
 
 type Props = {
   visible: boolean;
@@ -27,6 +30,7 @@ export default function ReportFeedbackModal({ visible, onClose }: Props) {
   const styles = styling(newTheme);
 
   const [text, setText] = useState("");
+  const [rating, setRating] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
@@ -43,8 +47,27 @@ export default function ReportFeedbackModal({ visible, onClose }: Props) {
     if (!text.trim()) return;
     setLoading(true);
     try {
+      const payload = {
+        message: text,
+        rating: rating,
+      };
+      // await handleFeedback(payload); // pass mobile and email if needed
       // simulate API call — replace with real call
-      await new Promise((res) => setTimeout(res, 900));
+      // await new Promise((res) => setTimeout(res, 900));
+
+      const result = await logFeedback(payload);
+      if (result && result.success) {
+        Toast.show({
+          type: "success",
+          text1: "OTP sent",
+          position: "bottom",
+        });
+      }
+
+      if (result && result.error_code) {
+        alert("some error occurred");
+      }
+
       setSubmitted(true);
     } catch (err) {
       console.warn("Feedback submit failed", err);
@@ -58,7 +81,7 @@ export default function ReportFeedbackModal({ visible, onClose }: Props) {
     <Modal
       visible={visible}
       animationType="slide"
-      transparent
+      transparent={false} // <- make modal full-screen (more predictable)
       statusBarTranslucent
       onRequestClose={resetAndClose}
     >
@@ -168,8 +191,9 @@ const styling = (theme: any) =>
   StyleSheet.create({
     backdrop: {
       flex: 1,
-      backgroundColor: "rgba(0,0,0,0.55)", // slightly darker than before so underlying settings are less visible
-      justifyContent: "flex-end", // bottom-sheet style (same as ReportBugModal)
+      backgroundColor: theme.background,
+      // backgroundColor: "rgba(0,0,0,0.55)", // slightly darker than before so underlying settings are less visible
+      // justifyContent: "flex-end", // bottom-sheet style (same as ReportBugModal)
     },
     keyboardWrapper: {
       width: "100%",
@@ -178,19 +202,21 @@ const styling = (theme: any) =>
       width: "100%",
     },
     card: {
+      // flex: 1,
+      // backgroundColor: theme.background,
+      // borderTopLeftRadius: 20,
+      // borderTopRightRadius: 20,
       backgroundColor: theme.background,
-      borderTopLeftRadius: 20,
-      borderTopRightRadius: 20,
       paddingTop: 12,
       paddingHorizontal: 18,
       paddingBottom: Platform.OS === "ios" ? 34 : 22,
-      minHeight: 380,
-      maxHeight: "90%",
-      shadowColor: "#000",
-      shadowOpacity: 0.25,
-      shadowRadius: 10,
-      shadowOffset: { width: 0, height: -6 },
-      elevation: 12,
+      // minHeight: 380,
+      // maxHeight: "90%",
+      // shadowColor: "#000",
+      // shadowOpacity: 0.25,
+      // shadowRadius: 10,
+      // shadowOffset: { width: 0, height: -6 },
+      // elevation: 12,
     },
     headerRow: {
       height: 36,

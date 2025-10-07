@@ -6,8 +6,9 @@ import {
   Modal,
   StyleSheet,
   FlatList,
+  Alert,
 } from "react-native";
-import SetReminderModal from "./SetReminderModal";
+// import SetReminderModal from "./SetReminderModal";
 import { Ionicons } from "@expo/vector-icons";
 import { themeColors } from "@/constant/theme/Colors";
 import ThemeContext from "@/context/ThemeContext";
@@ -45,6 +46,32 @@ export default function ChangePasswordModal({
       }
     } catch {
     } finally {
+    }
+  };
+
+  const isDirty = () => {
+    // if (!password && ) return false;
+    return !newPassword && !oldPassword;
+  };
+
+  const handleCancel = () => {
+    if (isDirty()) {
+      Alert.alert(
+        "Discard changes?",
+        "You have unsaved changes. Discard them?",
+        [
+          { text: "Keep editing", style: "cancel" },
+          {
+            text: "Discard",
+            style: "destructive",
+            onPress: () => {
+              onClose();
+            },
+          },
+        ]
+      );
+    } else {
+      onClose();
     }
   };
 
@@ -94,19 +121,27 @@ export default function ChangePasswordModal({
 const styling = (theme: any) =>
   StyleSheet.create({
     container: {
+      // paddingTop: 90,
       paddingHorizontal: 20,
-      backgroundColor: theme.surface,
+      backgroundColor: theme.background,
       flex: 1,
+    },
+    header: {
+      paddingTop: 50,
+      height: 72,
+      paddingHorizontal: 16,
+      alignItems: "center",
+      flexDirection: "row",
     },
     overlay: {
       flex: 1,
-      backgroundColor: theme.surface,
+      backgroundColor: theme.background,
     },
     backButton: {
       marginTop: 80,
       marginLeft: 20,
       marginBottom: 10,
-      backgroundColor: theme.surface,
+      // backgroundColor: theme.surface,
     },
     input: {
       padding: 15,
@@ -122,5 +157,18 @@ const styling = (theme: any) =>
     btnText: {
       textAlign: "center",
       fontSize: 17,
+    },
+    backBtn: { padding: 6, marginRight: 8 },
+    title: { fontSize: 20, fontWeight: "700", color: theme.textPrimary },
+    unsaved: {
+      marginTop: 4,
+      color: theme.background,
+      backgroundColor: theme.warning || "#EBCB8B",
+      alignSelf: "flex-start",
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: 8,
+      fontWeight: "700",
+      marginLeft: 0,
     },
   });

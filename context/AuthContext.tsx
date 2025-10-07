@@ -21,8 +21,8 @@ type UserProfile = {
   email: string | null;
   first_name: string | null;
   last_name: string | null;
-  userprofile: null;
-  usersettings: null;
+  profile: any;
+  settings: any;
   // add whatever fields your API returns
 };
 
@@ -239,15 +239,31 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   const _fetchUserProfile = async () => {
     try {
       const response = await getUserDetails(); // 👈 your backend endpoint
-      if (response && response.length) {
+      const { success, message, data } = response;
+      // console.log(response, "response auth context");
+      const { username, email, id, ...tokens } = data;
+      if (success && "email" in data) {
+        // console.log(response, "conimg response auth context 2222");
+        const {
+          username,
+          email,
+          first_name,
+          id,
+          last_name,
+          profile,
+          settings,
+          notifications,
+          ...tokens
+        } = data;
         const usr = {
-          id: response[0].id,
-          username: response[0].username,
-          email: response[0].email,
-          first_name: response[0].first_name,
-          last_name: response[0].last_name,
-          userprofile: response[0].userprofile,
-          usersettings: response[0].usersettings,
+          id: id,
+          username: username,
+          email: email,
+          first_name: first_name,
+          last_name: last_name,
+          profile: profile,
+          settings: settings,
+          notifications: notifications,
         };
 
         const profileInfo = await SecureStore.getItem(USER_PROFILE_KEY);

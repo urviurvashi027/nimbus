@@ -1,5 +1,7 @@
 // apiConfig.ts
 
+import { logFeedback } from "@/services/settingService";
+
 // Define base URLs for different environments
 const ENV = process.env.NODE_ENV as "development" | "staging" | "production";
 
@@ -21,7 +23,7 @@ export const API_ENDPOINTS = {
   register: `${BASE_URL}/auth/register/`,
   logout: `${BASE_URL}/auth/logout/`,
 
-  fetchUserDetails: `${BASE_URL}/profile/users/`,
+  fetchUserDetails: `${BASE_URL}/profile/users/me/`,
 
   getOtp: `${BASE_URL}/auth/request-otp/`,
   verifyOtp: `${BASE_URL}/auth/verify-otp/`,
@@ -56,4 +58,7 @@ export const API_ENDPOINTS = {
   calorieCalculator: `${BASE_URL}/calculators/calories/`,
   proteinIntakeCalculator: `${BASE_URL}/calculators/protein/`,
   bodyShapeCalculator: `${BASE_URL}/calculators/body_shape/`,
+
+  reportBug: `${BASE_URL}/api/bug-reports/`,
+  logFeedback: `${BASE_URL}/api/feedback/`,
 };

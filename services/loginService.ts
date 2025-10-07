@@ -150,18 +150,52 @@ export const logout = async (data: LogoutRequest): Promise<LogoutResponse> => {
 
 type UserProfile = {
   full_name?: string | null;
-  phone_number?: string | null;
+  // phone_number?: string | null;
   id: number | null;
   username: string | null;
   email: string | null;
   first_name: string | null;
   last_name: string | null;
-  userprofile: null;
-  usersettings: null;
+  profile: {
+    phone_number: string | null;
+    height: string | null;
+    weight: string | null;
+    age: number | null;
+    gender: string | null;
+  };
+  settings: {
+    weight_unit: string | null;
+    height_unit: string | null;
+    liquid_unit: string | null;
+    weather_unit: string | null;
+    start_of_day: string | null;
+    start_of_week: string | null;
+    sleep_time: string | null;
+    location: string | null;
+  };
+  address: {
+    street: string | null;
+    city: string | null;
+    state: string | null;
+    zip_code: string | null;
+    country: string | null;
+  };
+  notifications: [
+    {
+      notification_type: string;
+      enabled: true;
+      time: string;
+      days_of_week: string[];
+    }
+  ];
   // add whatever fields your API returns
 };
 
-type FetchUserResponse = UserProfile[];
+type FetchUserResponse = {
+  success: boolean;
+  data: UserProfile;
+  message: string;
+};
 
 export const getUserDetails = async (): Promise<FetchUserResponse> => {
   try {

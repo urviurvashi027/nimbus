@@ -12,29 +12,73 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/context/ThemeContext";
-import ReminderDetail from "./NotificationSettingModal";
+import ReminderDetail from "./NotificationSettingModal"; // your detail component
 import { useReminder } from "@/context/ReminderContext";
+import { parse, format, isValid } from "date-fns";
 
-type ReminderType = { key: string; label: string; desc?: string };
+type ReminderType = { id: string; key: string; label: string; desc?: string };
 
 const REMINDER_TYPES: ReminderType[] = [
   {
-    key: "morning",
+    key: "morning_review",
+    id: "morning",
     label: "Morning check-in",
     desc: "Start your day with a quick reflection.",
   },
   {
-    key: "nightly",
+    key: "night_review",
+    id: "nightly",
     label: "Nightly review",
     desc: "Wind down and review today.",
   },
-  { key: "mood", label: "Log your mood", desc: "Capture how you feel." },
   {
-    key: "streak",
+    key: "mood_logger",
+    id: "mood",
+    label: "Log your mood",
+    desc: "Capture how you feel.",
+  },
+  {
+    key: "streak_saver",
+    id: "streak",
     label: "Streak saver",
     desc: "Save your streak if you’re about to lose it.",
   },
 ];
+
+type BackendEntry = {
+  enabled?: boolean;
+  time?: string; // "HH:mm:ss"
+  days_of_week?: string[]; // ["mon","thu"]
+  // might include other backend keys in future
+};
+
+/* Helpers */
+
+/** Accept "HH:mm:ss" or "HH:mm" and return "7:30 AM" / "7:30 PM". Return fallback if invalid. */
+const TIME_HHMMSS_RE = /^\d{1,2}:\d{2}(:\d{2})?$/;
+const formatBackendTime = (time?: string | null, fallback = ""): string => {
+  if (!time || typeof time !== "string") return fallback;
+  const t = time.trim();
+  if (!TIME_HHMMSS_RE.test(t)) return fallback;
+  const normalized = t.split(":").length === 2 ? `${t}:00` : t;
+  const d = parse(normalized, "HH:mm:ss", new Date());
+  if (!isValid(d)) return fallback;
+  return format(d, "h:mm a");
+};
+
+/** Convert backend 'days_of_week' to a repeat label */
+const repeatLabelFromDays = (entry?: BackendEntry) => {
+  if (!entry) return "Off";
+  const days = entry.days_of_week ?? [];
+  if (days.length === 7) return "Every day";
+  const wk = ["mon", "tue", "wed", "thu", "fri"];
+  const wkends = ["sat", "sun"];
+  const isWeekdays = wk.every((d) => days.includes(d)) && days.length === 5;
+  const isWeekends = wkends.every((d) => days.includes(d)) && days.length === 2;
+  if (isWeekdays) return "Weekdays";
+  if (isWeekends) return "Weekends";
+  return days.length ? "Custom" : "Daily";
+};
 
 export default function NotificationTypeModal({
   visible,
@@ -52,29 +96,23 @@ export default function NotificationTypeModal({
   const [detailVisible, setDetailVisible] = useState(false);
 
   useEffect(() => {
-    if (visible) {
-      // refresh to ensure we read latest values
-      refreshAll();
-    }
-  }, [visible]);
+    if (visible) refreshAll();
+  }, [visible, refreshAll]);
 
   const statusLabel = (key: string) => {
-    const r = reminders[key];
-    if (!r || !r.enabled) return "Off";
-    const t = new Date(r.timeISO).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-    const repeat = r.repeat || "daily";
-    const repeatLabel =
-      repeat === "daily"
-        ? "Every day"
-        : repeat === "weekdays"
-        ? "Weekdays"
-        : repeat === "weekends"
-        ? "Weekends"
-        : "Custom";
-    return `${t} · ${repeatLabel}`;
+    // reminders is expected to be keyed object: { morning_review: {enabled, time, days_of_week}, ... }
+    const entry = (reminders as Record<string, BackendEntry> | undefined)?.[
+      key
+    ];
+    // Not configured
+    if (!entry) return "Off";
+
+    if (!entry.enabled) return "Off";
+
+    // Prefer time from backend time (HH:mm:ss). If backend doesn't supply, fallback label
+    const timeText = formatBackendTime(entry.time, "");
+    const repeatText = repeatLabelFromDays(entry);
+    return timeText ? `${timeText} · ${repeatText}` : repeatText;
   };
 
   return (
@@ -100,40 +138,42 @@ export default function NotificationTypeModal({
             <FlatList
               data={REMINDER_TYPES}
               keyExtractor={(i) => i.key}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={styles.item}
-                  onPress={() => {
-                    setSelected(item);
-                    setDetailVisible(true);
-                  }}
-                  activeOpacity={0.85}
-                >
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.label}>{item.label}</Text>
-                    {item.desc ? (
-                      <Text style={styles.desc}>{item.desc}</Text>
-                    ) : null}
-                  </View>
-                  <View style={styles.rowRight}>
-                    <Text style={styles.statusText}>
-                      {statusLabel(item.key)}
-                    </Text>
-                    <Ionicons
-                      name="chevron-forward"
-                      size={20}
-                      color={newTheme.textSecondary}
-                      style={{ marginLeft: 8 }}
-                    />
-                  </View>
-                </TouchableOpacity>
-              )}
+              renderItem={({ item }) => {
+                return (
+                  <TouchableOpacity
+                    style={styles.item}
+                    onPress={() => {
+                      setSelected(item);
+                      setDetailVisible(true);
+                    }}
+                    activeOpacity={0.85}
+                  >
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.label}>{item.label}</Text>
+                      {item.desc ? (
+                        <Text style={styles.desc}>{item.desc}</Text>
+                      ) : null}
+                    </View>
+
+                    <View style={styles.rowRight}>
+                      <Text style={styles.statusText}>
+                        {statusLabel(item.key)}
+                      </Text>
+                      <Ionicons
+                        name="chevron-forward"
+                        size={20}
+                        color={newTheme.textSecondary}
+                        style={{ marginLeft: 8 }}
+                      />
+                    </View>
+                  </TouchableOpacity>
+                );
+              }}
               ItemSeparatorComponent={() => <View style={styles.sep} />}
             />
           )}
         </View>
 
-        {/* nested detail */}
         {selected && (
           <ReminderDetail
             categoryKey={selected.key}
@@ -143,6 +183,7 @@ export default function NotificationTypeModal({
             onClose={() => {
               setDetailVisible(false);
               setSelected(null);
+              // refresh so list updates after edit
               refreshAll();
             }}
           />

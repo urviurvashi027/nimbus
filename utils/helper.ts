@@ -1,3 +1,7 @@
+import * as Device from "expo-device";
+import * as Application from "expo-application";
+import { Platform } from "react-native";
+
 // Function to find an object by name and return its id
 export function findIdBName(
   items: any,
@@ -30,3 +34,24 @@ export const addObjectAtEnd = (data: any) => {
 
   return modifiedArray;
 };
+
+export async function getDeviceDetails() {
+  // OS
+  const osName = Device.osName || (Platform.OS === "ios" ? "iOS" : "Android"); // friendly fallback
+  const osVersion = Device.osVersion ?? Platform.Version;
+  const os = `${osName} ${osVersion}`;
+
+  // Model / manufacturer
+  // On iOS this may return something like "iPhone" or full model depending on platform
+  const deviceModel = Device.modelName || Device.deviceName || "Unknown device";
+
+  // App version / build
+  const appVersion = Application.nativeApplicationVersion; // e.g. "1.2.0"
+  const buildNumber = Application.nativeBuildVersion; // e.g. "42"
+
+  return {
+    os,
+    device: deviceModel,
+    appVersion: appVersion ? `${appVersion} (${buildNumber})` : null,
+  };
+}
