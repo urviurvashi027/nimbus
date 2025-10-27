@@ -55,3 +55,15 @@ export async function getDeviceDetails() {
     appVersion: appVersion ? `${appVersion} (${buildNumber})` : null,
   };
 }
+
+export const arraysEqual = (a: any[] = [], b: any[] = []) =>
+  a.length === b.length && a.every((v, i) => v === b[i]);
+
+/** Build HH:mm:ss from notif.time or notif.timeISO */
+export const deriveHHmmss = (n: any): string => {
+  if (n?.time) return n.time;
+  const d = new Date(n?.timeISO ?? new Date().toISOString());
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mm = String(d.getMinutes()).padStart(2, "0");
+  return `${hh}:${mm}:00`;
+};

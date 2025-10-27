@@ -230,22 +230,12 @@ export default function profile() {
                 style={styles.profileAvatar}
                 source={require("../../../assets/images/loginLatest.png")}
               />
-
-              <View style={styles.profileActions}>
-                <Ionicons name="pencil" size={24} color="white" />
-              </View>
             </View>
           </TouchableOpacity>
 
-          {userProfile && userProfile.first_name && (
+          {userProfile && userProfile.username && (
             <View>
-              <Text style={styles.profileName}>
-                {userProfile?.first_name} {userProfile?.last_name}
-              </Text>
-
-              <Text style={styles.profileAddress}>
-                Tower B, Assetz 63 degree East
-              </Text>
+              <Text style={styles.profileName}>{userProfile?.username}</Text>
             </View>
           )}
 
@@ -403,39 +393,39 @@ const styling = (newTheme: any) =>
       justifyContent: "center",
     },
     profileName: {
-      marginTop: 20,
+      // marginTop: 20,
       fontSize: 19,
       fontWeight: 600,
       color: newTheme.textPrimary,
       // color: "#414d63",
       textAlign: "center",
     },
-    profileAddress: {
-      color: newTheme.textSecondary,
-      // color: "#989898",
-      fontSize: 15,
-      marginTop: 5,
-      textAlign: "center",
-    },
+    // profileAddress: {
+    //   color: newTheme.textSecondary,
+    //   // color: "#989898",
+    //   fontSize: 15,
+    //   marginTop: 5,
+    //   textAlign: "center",
+    // },
     profileAvatarWrapper: {
       position: "relative",
     },
     profileAvatar: {
-      width: 72,
-      height: 72,
+      width: 82,
+      height: 82,
       borderRadius: 9999,
     },
-    profileActions: {
-      width: 28,
-      height: 28,
-      borderRadius: 9999,
-      backgroundColor: "#007bff",
-      position: "absolute",
-      right: -4,
-      bottom: -10,
-      alignItems: "center",
-      justifyContent: "center",
-    },
+    // profileActions: {
+    //   width: 28,
+    //   height: 28,
+    //   borderRadius: 9999,
+    //   backgroundColor: "#007bff",
+    //   position: "absolute",
+    //   right: -4,
+    //   bottom: -10,
+    //   alignItems: "center",
+    //   justifyContent: "center",
+    // },
     section: {
       paddingHorizontal: 24,
     },

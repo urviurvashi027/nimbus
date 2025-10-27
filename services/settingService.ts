@@ -59,15 +59,3 @@ export const logFeedback = async (
     throw error.response ? error.response.data : error.message;
   }
 };
-
-export const saveNotificationChange = async (data: any): Promise<any> => {
-  try {
-    const response: AxiosResponse<any> = await axios.patch(
-      API_ENDPOINTS.fetchUserDetails,
-      data
-    );
-    return response.data; // Return the list data
-  } catch (error: any) {
-    throw error.response ? error.response.data : error.message;
-  }
-};

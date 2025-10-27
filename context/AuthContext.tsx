@@ -1,22 +1,35 @@
-import { ReactNode, createContext, useEffect, useRef } from "react";
+import {
+  ReactNode,
+  createContext,
+  useCallback,
+  useEffect,
+  useRef,
+} from "react";
 import { useContext, useState } from "react";
 import { router, useSegments } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import axios from "axios";
-import { login, signup, logout, getUserDetails } from "@/services/loginService";
+import {
+  login,
+  signup,
+  logout,
+  getUserDetails,
+  saveUpdateUser,
+} from "@/services/loginService";
+import { setStoredUser, User, getStoredUser } from "@/services/storageSerives";
 
-type User = {
-  userId: number | null;
-  username: string | null;
-  email?: string | null;
-  full_name?: string;
-  phone_number?: string;
-};
+// type UserL = {
+//   userId: number | null;
+//   username: string | null;
+//   email?: string | null;
+//   full_name?: string;
+//   phone_number?: string;
+// };
 
 type UserProfile = {
   full_name?: string | null;
   phone_number?: string | null;
-  id: number | null;
+  id: number;
   username: string | null;
   email: string | null;
   first_name: string | null;
@@ -52,6 +65,8 @@ interface AuthProps {
   onLogout?: () => Promise<any>;
   userProfile?: UserProfile | null;
   getUserDetails?: () => Promise<any>;
+  updateProfile?: (val: any) => Promise<any>;
+  loadUserFromStorage?: () => Promise<any>;
   user?: User;
 }
 
@@ -84,10 +99,11 @@ function useProtectedRoute(authState: {
 }
 
 export default function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<{
-    userId: number | null;
+  const [user, setUser] = useState<User>();
+  const [loggedInUser, setLoggedInUser] = useState<{
+    email: string | null;
     username: string | null;
-  }>({ userId: null, username: null });
+  } | null>();
 
   const [authState, setAuthState] = useState<{
     token: string | null;
@@ -120,6 +136,16 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     return await SecureStore.getItemAsync(REFRESH_TOKEN);
   };
 
+  const loadUserFromStorage = useCallback(async (): Promise<User | null> => {
+    const cached = await getStoredUser();
+    // console.log(cached, "cached");
+    if (cached) {
+      // setUser(cached);
+      // setUserProfile(cached as any);
+    }
+    return cached;
+  }, []);
+
   useEffect(() => {
     const loadToken = async () => {
       await SecureStore.deleteItemAsync(TOKEN_KEY);
@@ -129,7 +155,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       const userInfo = await SecureStore.getItem(USER_KEY);
       const profileInfo = await SecureStore.getItem(USER_PROFILE_KEY);
 
-      console.log("I am auth context");
+      // console.log("I am auth context");
 
       if (token) {
         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
@@ -181,16 +207,16 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       const { success, message, data } = result;
 
       if (success && "email" in data) {
-        const { username, email, id, ...tokens } = data; // Destructuring user details separately
+        const { username, email, ...tokens } = data; // Destructuring user details separately
         const userInfo = {
-          userId: id,
+          email: email,
           username: username,
         };
         setAuthState({
           token: tokens.access,
           authenticated: true,
         });
-        setUser(userInfo);
+        setLoggedInUser(userInfo);
 
         axios.defaults.headers.common[
           "Authorization"
@@ -227,7 +253,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         axios.defaults.headers.common["Authorization"] = "";
         await SecureStore.setItemAsync(USER_KEY, "");
         await SecureStore.setItemAsync(REFRESH_TOKEN, "");
-        setUser({ userId: null, username: null });
+        setLoggedInUser({ username: null, email: null });
         setAuthState({
           authenticated: false,
           token: null,
@@ -235,6 +261,18 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       }
     } catch (e) {}
   };
+
+  // single place to update state + storage from server
+  const applyServerUser = useCallback(async (serverUser: User) => {
+    setUser(serverUser);
+    await setStoredUser(serverUser);
+  }, []);
+
+  // public helpers
+  // const setLocalUser = useCallback(async (u: User | null) => {
+  //   setUser(u);
+  //   await setStoredUser(u);
+  // }, []);
 
   const _fetchUserProfile = async () => {
     try {
@@ -244,6 +282,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       const { username, email, id, ...tokens } = data;
       if (success && "email" in data) {
         // console.log(response, "conimg response auth context 2222");
+
         const {
           username,
           email,
@@ -265,8 +304,8 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
           settings: settings,
           notifications: notifications,
         };
-
-        const profileInfo = await SecureStore.getItem(USER_PROFILE_KEY);
+        await applyServerUser(usr);
+        // const profileInfo = await SecureStore.getItem(USER_PROFILE_KEY);
         await SecureStore.setItemAsync(USER_PROFILE_KEY, JSON.stringify(usr));
         setUserProfile(usr);
         return usr;
@@ -278,6 +317,49 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const updateProfile = useCallback(
+    async (payload: any): Promise<any> => {
+      try {
+        const res = await saveUpdateUser(payload); // your API
+        // if your API shape is { success, data: { user }, message }
+        if (res?.success && res?.data) {
+          const { success, message, data } = res;
+          const {
+            id,
+            username,
+            email,
+            first_name,
+            last_name,
+            profile,
+            settings,
+            address,
+            notifications,
+            notification_preferences,
+          } = data;
+          const usr = {
+            id: id,
+            username: username,
+            email: email,
+            first_name: first_name,
+            last_name: last_name,
+            profile: profile,
+            settings: settings,
+            notifications: notifications,
+          };
+          await applyServerUser(usr); // keep app + storage in sync
+        }
+        return res; // caller decides what to do
+      } catch (err: any) {
+        // keep errors visible to caller
+        return {
+          success: false,
+          message: err?.response?.data?.message ?? "Update failed",
+        };
+      }
+    },
+    [applyServerUser]
+  );
+
   const value = {
     onRegister: _register,
     onLogin: _login,
@@ -285,6 +367,8 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     userProfile,
     authState,
     getUserDetails: _fetchUserProfile,
+    updateProfile: updateProfile,
+    loadUserFromStorage: loadUserFromStorage,
   };
 
   useProtectedRoute(authState);

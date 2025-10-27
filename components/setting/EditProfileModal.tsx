@@ -6,7 +6,6 @@ import {
   Modal,
   TouchableOpacity,
   StyleSheet,
-  FlatList,
   Image,
   Alert,
   Platform,
@@ -14,33 +13,29 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   ScrollView,
-  Dimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import * as ImagePicker from "expo-image-picker"; // optional, catch if not installed
 import ThemeContext from "@/context/ThemeContext";
-import InputField from "@/components/common/ThemedComponent/StyledInput"; // use your existing styled input
-import { StyledButton } from "@/components/common/ThemedComponent/StyledButton";
-import { useAuth } from "@/context/AuthContext"; // YOUR auth context hook (adjust path if different)
+import InputField from "@/components/common/ThemedComponent/StyledInput";
+import { useAuth } from "@/context/AuthContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import AvatarPickerModal from "./AvatarPickerModal";
 
+/* import your BUILTIN_SVGS if you want preview of svg selection */
 import AvatarBusy from "@/assets/images/avatar/busyguy.svg";
 import AvatarCoolFemale from "@/assets/images/avatar/coolfemale.svg";
 import AvatarCoolGuy from "@/assets/images/avatar/coolguy.svg";
+import AvatarYoungGuy from "@/assets/images/avatar/youngguy.svg";
+import AvatarSeriousFemale from "@/assets/images/avatar/seriousfemale.svg";
+import AvatarFitnessFemale from "@/assets/images/avatar/fitnessfemale.svg";
+import AvatarFinanceGuy from "@/assets/images/avatar/financeguy.svg";
 import AvatarDeveloperGuy from "@/assets/images/avatar/developerguy.svg";
 import AvatarFemale from "@/assets/images/avatar/female.svg";
-import AvatarFinanceGuy from "@/assets/images/avatar/financeguy.svg";
-import AvatarFitnessFemale from "@/assets/images/avatar/fitnessfemale.svg";
-import AvatarSeriousFemale from "@/assets/images/avatar/seriousfemale.svg";
-import AvatarYoungGuy from "@/assets/images/avatar/youngguy.svg";
+import { se } from "rn-emoji-keyboard";
+// import { useReminder } from "@/context/ReminderContext";
+import Toast from "react-native-toast-message";
 
-type Props = {
-  visible: boolean;
-  onClose: () => void;
-  onSaved?: (updatedUser?: any) => void;
-};
-
-const SVG_AVATARS = [
+const BUILTIN_SVGS = [
   AvatarBusy,
   AvatarCoolFemale,
   AvatarCoolGuy,
@@ -52,11 +47,16 @@ const SVG_AVATARS = [
   AvatarFemale,
 ];
 
+type Props = {
+  visible: boolean;
+  onClose: () => void;
+  onSaved?: (updatedUser?: any) => void;
+};
+
 export default function EditProfileModal({ visible, onClose, onSaved }: Props) {
   const { newTheme } = useContext(ThemeContext);
   const styles = styling(newTheme);
 
-  // Attempt to get auth context - if your project uses a different hook name change this import.
   let auth: any = null;
   try {
     auth = useAuth();
@@ -64,177 +64,263 @@ export default function EditProfileModal({ visible, onClose, onSaved }: Props) {
     auth = null;
   }
 
-  // Local form state
-  const [loading, setLoading] = useState<boolean>(false);
-  const [initializing, setInitializing] = useState<boolean>(false);
-  const [username, setUsername] = useState<string>("");
-  const [firstName, setFirstName] = useState<string>("");
-  const [lastName, setLastName] = useState<string>("");
-  const [avatarUri, setAvatarUri] = useState<string | null>(null); // could be remote url or local uri
-  const [originalUser, setOriginalUser] = useState<any>(null);
+  const [initializing, setInitializing] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [profile, setProfile] = useState<any>(null);
 
-  // Compose full name helper
-  const fullName = useMemo(
-    () => `${firstName || ""} ${lastName || ""}`.trim(),
-    [firstName, lastName]
-  );
+  // editable fields
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [avatarKey, setAvatarKey] = useState<string | null>(null);
 
-  // Load user data when modal opens
+  // profile nested fields (editable)
+  const [age, setAge] = useState<number | null>(null);
+  const [height, setHeight] = useState<number | null>(null);
+  const [weight, setWeight] = useState<number | null>(null);
+
+  const [heightUnit, setHeightUnit] = useState<string>("");
+  const [weightUnit, setWeightUnit] = useState<string>("");
+
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const { loadUserFromStorage, updateProfile } = useAuth();
+
+  // const { get, save } = useReminder();
+
   useEffect(() => {
     if (!visible) return;
+    // console.log("coming here useefect", loadUserFromStorage);
+    setLoading(true);
     (async () => {
-      setInitializing(true);
-      try {
-        let user = null;
-        console.log(typeof auth.userProfile, "typeof auth.userProfile");
-        if (auth && typeof auth.userProfile === "object") {
-          user = auth.userProfile; // try explicit getter
-        } else if (auth && auth.userProfile) {
-          user = auth.user;
-        } else {
-          // dev fallback: read from AsyncStorage key "user"
-          const raw = await AsyncStorage.getItem("@nimbus_user");
-          user = raw ? JSON.parse(raw) : null;
-        }
-
-        // user can be null in dev; use default placeholders
-        const usernameVal = user?.username ?? user?.email ?? "";
-        const nameVal = user?.full_name ?? user?.name ?? "";
-        const avatarVal = user?.avatar ?? null;
-
-        // split name into first/last (simple split)
-        const parts = (nameVal || "").split(" ").filter(Boolean);
-        const first = parts.length ? parts[0] : "";
-        const last = parts.length > 1 ? parts.slice(1).join(" ") : "";
-
-        setUsername(usernameVal);
-        setFirstName(first);
-        setLastName(last);
-        setAvatarUri(avatarVal);
-
-        setOriginalUser({
-          username: usernameVal,
-          firstName: first,
-          lastName: last,
-          avatarUri: avatarVal,
-          raw: user,
-        });
-      } catch (err) {
-        console.warn("EditProfileModal load error", err);
-      } finally {
-        setInitializing(false);
-      }
+      const cached = await loadUserFromStorage?.(); // ← safe call
+      const profile = cached.profile;
+      const p = {
+        id: cached?.id,
+        username: cached?.username ?? "",
+        email: cached?.email ?? "",
+        first_name: cached?.first_name ?? "",
+        last_name: cached?.last_name ?? "",
+        profile: cached?.profile ?? {},
+        avatar: cached?.avatar ?? null,
+        setting: cached?.settings ?? {},
+      };
+      setProfile(p);
+      setFirstName(p.first_name);
+      setLastName(p.last_name);
+      setHeight(p.profile?.height);
+      setWeight(p.profile?.weight);
+      setAge(p.profile?.age);
+      setAvatarKey(p.avatar);
+      const backendSettings = p?.setting ?? {};
+      setHeightUnit(backendSettings.height_unit ?? "cm");
+      setWeightUnit(backendSettings.weight_unit ?? "kg");
+      const rawAge = p.profile?.age;
+      const rawHeight = p.profile?.height;
+      const rawWeight = p.profile?.weight;
+      setAge(
+        typeof rawAge === "number" ? rawAge : rawAge ? Number(rawAge) : null
+      );
+      setHeight(
+        typeof rawHeight === "number"
+          ? rawHeight
+          : rawHeight
+          ? Number(rawHeight)
+          : null
+      );
+      setWeight(
+        typeof rawWeight === "number"
+          ? rawWeight
+          : rawWeight
+          ? Number(rawWeight)
+          : null
+      );
+      setLoading(false);
     })();
-  }, [visible]);
+  }, [loadUserFromStorage]); // include in deps
 
+  // useEffect(() => {
+  //   if (!visible) return;
+  //   (async () => {
+  //     setInitializing(true);
+  //     try {
+  //       let user: any = null;
+  //       if (auth && auth.userProfile) user = auth.userProfile;
+  //       else {
+  //         const raw = await AsyncStorage.getItem("@nimbus_user");
+  //         user = raw ? JSON.parse(raw) : null;
+  //       }
+
+  //       const p = {
+  //         id: user?.id,
+  //         username: user?.username ?? user?.email ?? "",
+  //         email: user?.email ?? "",
+  //         first_name: user?.first_name ?? "",
+  //         last_name: user?.last_name ?? "",
+  //         profile: user?.profile ?? {},
+  //         avatar: user?.avatar ?? user?.avatarKey ?? null,
+  //         setting: user?.setting ?? user?.settings ?? {},
+  //       };
+
+  //       setProfile(p);
+  //       setFirstName(p.first_name ?? "");
+  //       setLastName(p.last_name ?? "");
+  //       setHeight(p.profile?.height ?? null);
+  //       setWeight(p.profile?.weight ?? null);
+  //       setAge(p.profile?.age ?? null);
+  //       setAvatarKey(p.avatar ?? null);
+
+  //       // initialize nested fields (ensure numeric or null)
+  //       const rawAge = p.profile?.age;
+  //       const rawHeight = p.profile?.height;
+  //       const rawWeight = p.profile?.weight;
+
+  //       const backendSettings = p?.setting ?? {};
+  //       setHeightUnit(backendSettings.height_unit ?? "cm");
+  //       setWeightUnit(backendSettings.weight_unit ?? "kg");
+
+  //       setAge(
+  //         typeof rawAge === "number" ? rawAge : rawAge ? Number(rawAge) : null
+  //       );
+  //       setHeight(
+  //         typeof rawHeight === "number"
+  //           ? rawHeight
+  //           : rawHeight
+  //           ? Number(rawHeight)
+  //           : null
+  //       );
+  //       setWeight(
+  //         typeof rawWeight === "number"
+  //           ? rawWeight
+  //           : rawWeight
+  //           ? Number(rawWeight)
+  //           : null
+  //       );
+  //     } catch (e) {
+  //       console.warn("EditProfile load error", e);
+  //     } finally {
+  //       setInitializing(false);
+  //     }
+  //   })();
+  // }, [visible, auth]);
+
+  // isDirty should consider all editable fields
   const isDirty = () => {
-    if (!originalUser) return false;
+    if (!profile) return false;
+    const firstChanged = (profile.first_name ?? "") !== (firstName ?? "");
+    const lastChanged = (profile.last_name ?? "") !== (lastName ?? "");
+    const avatarChanged = (profile.avatar ?? null) !== (avatarKey ?? null);
+
+    // profile nested changes
+    const origAge = profile.profile?.age ?? null;
+    const origHeight = profile.profile?.height ?? null;
+    const origWeight = profile.profile?.weight ?? null;
+
+    const ageChanged = (origAge ?? null) !== (age ?? null);
+    const heightChanged = (origHeight ?? null) !== (height ?? null);
+    const weightChanged = (origWeight ?? null) !== (weight ?? null);
+
     return (
-      username !== originalUser.username ||
-      firstName !== originalUser.firstName ||
-      lastName !== originalUser.lastName ||
-      avatarUri !== originalUser.avatarUri
+      firstChanged ||
+      lastChanged ||
+      avatarChanged ||
+      ageChanged ||
+      heightChanged ||
+      weightChanged
     );
   };
 
-  // Pick image from library (expo-image-picker)
-  const pickImage = async (): Promise<void> => {
-    try {
-      // Request permission (safe: the method may not exist in some test envs)
-      if (ImagePicker.requestMediaLibraryPermissionsAsync) {
-        const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (perm.status !== "granted") {
-          Alert.alert(
-            "Permission required",
-            "Please allow photo access to upload avatar."
-          );
-          return;
-        }
-      }
+  const buildPayload = () => {
+    if (!profile) return null;
 
-      // Launch picker
-      const res = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 0.8,
-      });
+    const payload: any = {};
 
-      // normalize result (supports both old & new shapes)
-      // New: { canceled: boolean, assets: [{ uri, ... }] }
-      // Old: { cancelled: boolean, uri: string }  (note spelling difference)
-      const cancelled =
-        (res as any).canceled ?? (res as any).cancelled ?? false;
-      if (cancelled) return;
-
-      // Try new shape first
-      const assets = (res as any).assets;
-      if (Array.isArray(assets) && assets.length > 0 && assets[0].uri) {
-        const uri: string = assets[0].uri;
-        setAvatarUri(uri);
-        return;
-      }
-
-      // Fallback to older SDK shape
-      const maybeUri = (res as any).uri ?? (res as any).uri;
-      if (maybeUri) {
-        setAvatarUri(maybeUri);
-        return;
-      }
-
-      // If we reach here, shape unexpected
-      console.warn("Unexpected image picker result", res);
-      Alert.alert("Upload failed", "Could not read selected image.");
-    } catch (e) {
-      console.warn("Image picker error", e);
-      Alert.alert(
-        "Upload not available",
-        "Image picker isn't available in this environment."
-      );
+    // --- Top-level fields ---
+    if ((profile.first_name ?? "") !== (firstName ?? "")) {
+      payload.first_name = firstName;
     }
+    if ((profile.last_name ?? "") !== (lastName ?? "")) {
+      payload.last_name = lastName;
+    }
+    if ((profile.avatar ?? null) !== (avatarKey ?? null)) {
+      payload.avatar = avatarKey ?? null;
+    }
+
+    // --- Profile nested fields ---
+    const nestedProfile: any = {};
+    const orig = profile.profile ?? {};
+
+    if ((orig.age ?? null) !== (age ?? null)) nestedProfile.age = age ?? null;
+    if ((orig.height ?? null) !== (height ?? null))
+      nestedProfile.height = height ?? null;
+    if ((orig.weight ?? null) !== (weight ?? null))
+      nestedProfile.weight = weight ?? null;
+
+    if (Object.keys(nestedProfile).length > 0) {
+      payload.profile = { ...(profile.profile ?? {}), ...nestedProfile };
+    }
+
+    // --- Settings fields ---
+    const nestedSettings: any = {};
+    const origSettings = profile.settings ?? {};
+
+    if ((origSettings.height_unit ?? "cm") !== heightUnit) {
+      nestedSettings.height_unit = heightUnit;
+    }
+    if ((origSettings.weight_unit ?? "kg") !== weightUnit) {
+      nestedSettings.weight_unit = weightUnit;
+    }
+
+    if (Object.keys(nestedSettings).length > 0) {
+      payload.settings = { ...(profile.settings ?? {}), ...nestedSettings };
+    }
+
+    // return only if something changed
+    return Object.keys(payload).length > 0 ? payload : null;
   };
 
-  // Save handler
   const handleSave = async () => {
+    if (!profile) return;
     setLoading(true);
     try {
-      const payload = {
-        username,
-        full_name: fullName,
-        avatar: avatarUri,
-        first_name: firstName,
-        last_name: lastName,
-      };
+      const payload = buildPayload();
+      if (!payload) {
+        Alert.alert("Nothing to save", "No changes detected.");
+        setLoading(false);
+        return;
+      }
+      const saved = await updateProfile?.(payload);
 
-      // Try auth.updateProfile or updateUser etc.
-      if (auth) {
-        if (typeof auth.updateProfile === "function") {
-          await auth.updateProfile(payload);
-        } else if (typeof auth.updateUser === "function") {
-          await auth.updateUser(payload);
-        } else if (typeof auth.saveUser === "function") {
-          await auth.saveUser(payload);
-        } else {
-          // dev fallback -> write to AsyncStorage
-          const existingRaw = await AsyncStorage.getItem("@nimbus_user");
-          const existing = existingRaw ? JSON.parse(existingRaw) : {};
-          const merged = { ...existing, ...payload };
-          await AsyncStorage.setItem("@nimbus_user", JSON.stringify(merged));
-        }
-      } else {
-        // fallback into storage
-        const existingRaw = await AsyncStorage.getItem("@nimbus_user");
-        const existing = existingRaw ? JSON.parse(existingRaw) : {};
-        const merged = { ...existing, ...payload };
-        await AsyncStorage.setItem("@nimbus_user", JSON.stringify(merged));
+      const { success, message, data } = saved;
+      if (success && "email" in data) {
+        console.log("coming here");
+        Toast.show({
+          type: "success",
+          text1: "Profile Updated",
+          position: "bottom",
+        });
+
+        // ✅ merge latest edits into local state
+        setProfile((prev: any) => ({
+          ...prev,
+          first_name: firstName,
+          last_name: lastName,
+          avatar: avatarKey,
+          profile: {
+            ...(prev.profile ?? {}),
+            age,
+            height,
+            weight,
+          },
+          settings: {
+            ...(prev.settings ?? {}),
+            height_unit: heightUnit,
+            weight_unit: weightUnit,
+          },
+        }));
       }
 
-      // success feedback
-      Alert.alert("Saved", "Profile updated");
-      onSaved?.(payload);
       onClose();
     } catch (e) {
-      console.warn("save profile error", e);
+      console.warn("save profile", e);
       Alert.alert("Error", "Unable to save profile. Try again.");
     } finally {
       setLoading(false);
@@ -248,142 +334,121 @@ export default function EditProfileModal({ visible, onClose, onSaved }: Props) {
         "You have unsaved changes. Discard them?",
         [
           { text: "Keep editing", style: "cancel" },
-          {
-            text: "Discard",
-            style: "destructive",
-            onPress: () => {
-              onClose();
-            },
-          },
+          { text: "Discard", style: "destructive", onPress: () => onClose() },
         ]
       );
-    } else {
-      onClose();
+    } else onClose();
+  };
+
+  if (!visible) return null;
+
+  const phone = profile?.profile?.phone_number ?? "";
+  const username = profile?.username ?? "";
+
+  // Avatar preview helper — renders svg or uri
+  const AvatarPreview = () => {
+    if (!avatarKey)
+      return (
+        <View style={styles.avatarPlaceholder}>
+          <Text style={{ color: newTheme.textSecondary }}>No avatar</Text>
+        </View>
+      );
+
+    if (typeof avatarKey === "string" && avatarKey.startsWith("svg:")) {
+      const idx = Number(avatarKey.split(":")[1]);
+      const SvgComp = BUILTIN_SVGS[idx];
+      if (SvgComp) {
+        // @ts-ignore
+        return (
+          <View style={[styles.avatarPlaceholder, { overflow: "hidden" }]}>
+            {/* @ts-ignore */}
+            <SvgComp width="100%" height="100%" />
+          </View>
+        );
+      }
     }
-  };
 
-  // Render one avatar tile: SVG component import rendered directly
-  const AvatarTile = ({
-    SvgComp,
-    index,
-  }: {
-    SvgComp: React.FC<any>;
-    index: number;
-  }) => {
-    const id = `svg:${index}`;
-    const selected = avatarUri === id;
+    const maybeUri =
+      typeof avatarKey === "string" && avatarKey.startsWith("uri:")
+        ? avatarKey.slice(4)
+        : avatarKey;
+
+    if (typeof maybeUri === "string") {
+      return <Image source={{ uri: maybeUri }} style={styles.avatarImage} />;
+    }
+
     return (
-      <TouchableOpacity
-        key={index}
-        onPress={() => setAvatarUri(id)}
-        style={[
-          styles.avatarItem,
-          selected && { borderColor: newTheme.accent, borderWidth: 2 },
-        ]}
-      >
-        {/* render the svg component full-size */}
-        {/* @ts-ignore - SvgComp is a React component typing from declaration file */}
-        <SvgComp width="100%" height="100%" />
-      </TouchableOpacity>
+      <View style={styles.avatarPlaceholder}>
+        <Text style={{ color: newTheme.textSecondary }}>Avatar</Text>
+      </View>
     );
   };
 
-  // avatar item renderer
-  const renderAvatarItem = ({ item, index }: { item: any; index: number }) => {
-    const selected =
-      avatarUri &&
-      typeof avatarUri === "string" &&
-      avatarUri === Image.resolveAssetSource?.(item)?.uri;
-    // resolveAssetSource only for packaged assets; fallback compare by index by storing "asset:index" format if desired
-    const isSelected =
-      selected ||
-      avatarUri?.includes(`avatar_${index}`) ||
-      (!avatarUri && index === 0 && !originalUser?.avatarUri);
-
-    return (
-      <TouchableOpacity
-        onPress={() => {
-          // store identifier as "asset:index" so we can persist
-          // but for simplicity we can store remote uri or "asset:index"
-          setAvatarUri(
-            Image.resolveAssetSource?.(item)?.uri ?? `asset:${index}`
-          );
-        }}
-        style={[
-          styles.avatarItem,
-          isSelected && { borderColor: newTheme.accent, borderWidth: 2 },
-        ]}
-      >
-        <Image source={item} style={styles.avatarImage} />
-      </TouchableOpacity>
-    );
+  // handlers for numeric fields: keep them nullable numbers
+  const onChangeAge = (txt: string) => {
+    const n = txt === "" ? null : Number(txt);
+    setAge(Number.isNaN(n) ? null : n);
+  };
+  const onChangeHeight = (txt: string) => {
+    const n = txt === "" ? null : Number(txt);
+    setHeight(Number.isNaN(n) ? null : n);
+  };
+  const onChangeWeight = (txt: string) => {
+    const n = txt === "" ? null : Number(txt);
+    setWeight(Number.isNaN(n) ? null : n);
   };
 
   return (
-    <Modal visible={visible} animationType="slide">
-      <SafeAreaView style={[styles.screen /* background */]}>
-        <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-        >
-          {/* Header */}
-          <View style={styles.header}>
-            <TouchableOpacity onPress={handleCancel} style={styles.backBtn}>
-              <Ionicons
-                name="arrow-back"
-                size={22}
-                color={newTheme.textPrimary}
-              />
-            </TouchableOpacity>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.title}>Edit profile</Text>
-              {isDirty() ? <Text style={styles.unsaved}>UNSAVED</Text> : null}
-            </View>
-            <View style={{ width: 64 }} />
-          </View>
-
-          {/* Scrollable body */}
-          <ScrollView
-            style={styles.body}
-            contentContainerStyle={{ paddingBottom: 140 }} // big enough for fixed footer
-            keyboardShouldPersistTaps="handled"
+    <>
+      <Modal visible={visible} animationType="slide">
+        <SafeAreaView style={styles.screen}>
+          <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === "ios" ? "padding" : undefined}
           >
-            {/* Avatar grid */}
-            <Text style={styles.label}>Avatar</Text>
-
-            <View style={styles.grid}>
-              {SVG_AVATARS.map((SvgComp, i) => (
-                <AvatarTile SvgComp={SvgComp} index={i} key={i} />
-              ))}
+            <View style={styles.header}>
+              <TouchableOpacity onPress={handleCancel} style={styles.backBtn}>
+                <Ionicons
+                  name="arrow-back"
+                  size={22}
+                  color={newTheme.textPrimary}
+                />
+              </TouchableOpacity>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.title}>Edit profile</Text>
+                {isDirty() ? <Text style={styles.unsaved}>UNSAVED</Text> : null}
+              </View>
+              <View style={{ width: 64 }} />
             </View>
 
-            {/* Upload + Reset buttons (always visible inside scroll area right below grid) */}
-            <View style={{ flexDirection: "row", marginTop: 12, gap: 12 }}>
-              <TouchableOpacity style={styles.uploadBtn} onPress={pickImage}>
-                <Text style={{ color: newTheme.background, fontWeight: "700" }}>
-                  Upload photo
-                </Text>
-              </TouchableOpacity>
+            <ScrollView
+              style={styles.body}
+              contentContainerStyle={{ paddingBottom: 140 }}
+              keyboardShouldPersistTaps="handled"
+            >
+              <View style={styles.avatarHeader}>
+                <TouchableOpacity
+                  onPress={() => setPickerOpen(true)}
+                  style={styles.avatarPreview}
+                >
+                  <AvatarPreview />
+                </TouchableOpacity>
+                <Text style={styles.avatarNote}>Tap to change avatar</Text>
+              </View>
 
-              <TouchableOpacity
-                style={[styles.smallBtn, { backgroundColor: newTheme.surface }]}
-                onPress={() => {
-                  setAvatarUri(null);
-                }}
-              >
-                <Text style={{ color: newTheme.textSecondary }}>Reset</Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* Form fields */}
-            <View style={{ marginTop: 18 }}>
-              <InputField
-                label="Username"
-                value={username}
-                onChangeText={setUsername}
-                placeholder="username"
-              />
+              <Text style={styles.sectionLabel}>Account</Text>
+              <View style={styles.readRow}>
+                <Text style={styles.readLabel}>Username</Text>
+                <Text style={styles.readValue}>{username}</Text>
+              </View>
               <View style={{ height: 12 }} />
+              <View style={styles.readRow}>
+                <Text style={styles.readLabel}>Phone</Text>
+                <Text style={styles.readValue}>{phone || "Not provided"}</Text>
+              </View>
+
+              <View style={{ height: 12 }} />
+              <Text style={styles.sectionLabel}>Personal</Text>
               <InputField
                 label="First name"
                 value={firstName}
@@ -397,47 +462,83 @@ export default function EditProfileModal({ visible, onClose, onSaved }: Props) {
                 onChangeText={setLastName}
                 placeholder="Last name"
               />
-            </View>
 
-            {/* spacer to allow scroll-to-bottom above footer */}
-            <View style={{ height: 40 }} />
-          </ScrollView>
+              <View style={{ height: 8 }} />
+              <View style={styles.rowInputs}>
+                <View style={{ flex: 1, marginRight: 8 }}>
+                  <InputField
+                    label="Age"
+                    value={age !== null ? String(age) : ""}
+                    onChangeText={onChangeAge}
+                    placeholder="Age"
+                    keyboardType="numeric"
+                  />
+                </View>
+                <View style={{ flex: 1, marginLeft: 8 }}>
+                  <InputField
+                    label={`Height (${heightUnit})`}
+                    value={height !== null ? String(height) : ""}
+                    onChangeText={onChangeHeight}
+                    placeholder="Height"
+                    keyboardType="numeric"
+                  />
+                </View>
+              </View>
 
-          {/* Fixed footer: Save / Cancel */}
-          <View style={styles.fixedFooterContainer}>
-            <View style={styles.footerInner}>
-              <TouchableOpacity
-                style={styles.cancelBtn}
-                onPress={handleCancel}
-                disabled={loading}
-              >
-                <Text
-                  style={{ color: newTheme.textPrimary, fontWeight: "700" }}
+              <View style={{ height: 12 }} />
+              <InputField
+                label={`Weight (${weightUnit})`}
+                value={weight !== null ? String(weight) : ""}
+                onChangeText={onChangeWeight}
+                placeholder="Weight"
+                keyboardType="numeric"
+              />
+
+              <View style={{ height: 32 }} />
+            </ScrollView>
+
+            <View style={styles.fixedFooterContainer}>
+              <View style={styles.footerInner}>
+                <TouchableOpacity
+                  style={styles.cancelBtn}
+                  onPress={handleCancel}
+                  disabled={loading}
                 >
-                  Cancel
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[styles.saveBtn, !isDirty() && { opacity: 0.5 }]}
-                onPress={handleSave}
-                disabled={!isDirty() || loading}
-              >
-                {loading ? (
-                  <ActivityIndicator color={newTheme.background} />
-                ) : (
                   <Text
-                    style={{ color: newTheme.background, fontWeight: "800" }}
+                    style={{ color: newTheme.textPrimary, fontWeight: "700" }}
                   >
-                    Save
+                    Cancel
                   </Text>
-                )}
-              </TouchableOpacity>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[styles.saveBtn, !isDirty() && { opacity: 0.5 }]}
+                  onPress={handleSave}
+                  disabled={!isDirty() || loading}
+                >
+                  {loading ? (
+                    <ActivityIndicator color={newTheme.background} />
+                  ) : (
+                    <Text
+                      style={{ color: newTheme.background, fontWeight: "800" }}
+                    >
+                      Save
+                    </Text>
+                  )}
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-        </KeyboardAvoidingView>
-      </SafeAreaView>
-    </Modal>
+          </KeyboardAvoidingView>
+        </SafeAreaView>
+      </Modal>
+
+      <AvatarPickerModal
+        visible={pickerOpen}
+        initial={avatarKey}
+        onClose={() => setPickerOpen(false)}
+        onSelect={(k: any) => setAvatarKey(k)}
+      />
+    </>
   );
 }
 
@@ -455,49 +556,63 @@ const styling = (theme: any) =>
     unsaved: {
       marginTop: 4,
       color: theme.background,
-      backgroundColor: theme.warning || "#EBCB8B",
+      backgroundColor: theme.warning ?? "#EBCB8B",
       alignSelf: "flex-start",
       paddingHorizontal: 8,
       paddingVertical: 4,
       borderRadius: 8,
       fontWeight: "700",
-      marginLeft: 0,
     },
-    body: { flex: 1, padding: 16 },
-    label: { color: theme.textPrimary, fontWeight: "700", marginBottom: 8 },
-    avatarRow: {
-      // grid handled by FlatList numColumns
+    body: { flex: 1, paddingHorizontal: 16 },
+    avatarHeader: { alignItems: "center", marginTop: 6, marginBottom: 12 },
+    avatarPreview: {
+      width: 112,
+      height: 112,
+      borderRadius: 12,
+      backgroundColor: theme.surface,
+      alignItems: "center",
+      justifyContent: "center",
+      overflow: "hidden",
+      borderWidth: 1,
+      borderColor: "transparent",
+    },
+    avatarImage: { width: 112, height: 112, borderRadius: 12 },
+    avatarNote: {
+      marginTop: 8,
+      color: theme.textSecondary,
+      textAlign: "center",
+      paddingHorizontal: 20,
+    },
+    sectionLabel: {
+      color: theme.textSecondary,
+      fontWeight: "700",
+      marginBottom: 8,
+      marginTop: 6,
+    },
+    readRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      paddingVertical: 12,
+      borderRadius: 12,
+      backgroundColor: theme.surface,
+      paddingHorizontal: 12,
       marginBottom: 6,
     },
-    grid: {
-      flexDirection: "row",
-      flexWrap: "wrap",
-      justifyContent: "space-between",
-      gap: 8,
-    },
-    // avatarItem: {
-    //   width: 96,
-    //   height: 96,
-    //   borderRadius: 12,
-    //   overflow: "hidden",
-    //   alignItems: "center",
-    //   justifyContent: "center",
-    //   backgroundColor: theme.surface,
-    // },
-    // avatarImage: {
-    //   width: "100%",
-    //   height: "100%",
-    //   resizeMode: "cover",
-    // },
-    // smallBtn: {
-    //   paddingVertical: 10,
-    //   paddingHorizontal: 14,
-    //   borderRadius: 10,
-    //   backgroundColor: theme.accent,
-    //   alignItems: "center",
-    //   justifyContent: "center",
-    // },
-    footer: { flexDirection: "row", gap: 12, marginTop: 18 },
+    readLabel: { color: theme.textSecondary },
+    readValue: { color: theme.textPrimary, fontWeight: "700" },
+
+    // helper row for age/height
+    rowInputs: { flexDirection: "row", alignItems: "flex-start" },
+
+    fixedFooterContainer: {
+      position: "absolute",
+      left: 0,
+      right: 0,
+      bottom: 0,
+      paddingBottom: Platform.OS === "ios" ? 24 : 12,
+      // backgroundColor: "transparent",
+    } as any,
+    footerInner: { flexDirection: "row", paddingHorizontal: 16, gap: 12 },
     cancelBtn: {
       flex: 1,
       paddingVertical: 14,
@@ -516,56 +631,12 @@ const styling = (theme: any) =>
       justifyContent: "center",
       backgroundColor: theme.accent,
     },
-    // add to styling(...) result
-    fixedFooterContainer: {
-      // pinned at bottom, full width
-      position: "absolute",
-      left: 0,
-      right: 0,
-      bottom: 0,
-      paddingBottom: Platform.OS === "ios" ? 24 : 12, // safe area bottom
-      backgroundColor: "transparent",
-    },
-    footerInner: {
-      flexDirection: "row",
-      paddingHorizontal: 16,
-      gap: 12,
-    },
-    uploadBtn: {
-      paddingVertical: 10,
-      paddingHorizontal: 14,
-      borderRadius: 10,
-      backgroundColor: theme.accent,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    smallBtn: {
-      paddingVertical: 10,
-      paddingHorizontal: 14,
-      borderRadius: 10,
-      backgroundColor: theme.surface,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    avatarItem: {
-      width: (Dimensions.get("window").width - 64) / 3, // three columns with margin
-      height: (Dimensions.get("window").width - 64) / 3,
+    avatarPlaceholder: {
+      width: 112,
+      height: 112,
       borderRadius: 12,
-      overflow: "hidden",
+      alignItems: "center",
+      justifyContent: "center",
       backgroundColor: theme.surface,
-      marginBottom: 12,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    avatarImage: {
-      width: "100%",
-      height: "100%",
-      resizeMode: "cover",
-    },
-    placeholder: {
-      width: "100%",
-      height: "100%",
-      alignItems: "center",
-      justifyContent: "center",
     },
   });

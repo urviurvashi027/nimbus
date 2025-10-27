@@ -1,4 +1,3 @@
-// components/AdvancedSettingsModal.tsx
 import React, { useContext, useEffect, useState } from "react";
 import {
   Modal,
@@ -11,22 +10,68 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/context/ThemeContext";
 import SettingDetail from "./PreferenceDetailModal";
-import { getAllPreferences, PreferenceKey } from "@/services/PreferenceStorage";
+import { useAuth } from "@/context/AuthContext";
+import Toast from "react-native-toast-message";
+// import { useReminder } from "@/context/ReminderContext";
+
+type PreferenceKey =
+  | "liquid_unit"
+  | "weight_unit"
+  | "weather_unit"
+  | "start_of_day"
+  | "start_of_week"
+  | "height_unit"
+  | "length_unit"
+  | "sleep_time";
 
 type SettingType = {
   key: PreferenceKey;
   label: string;
   options: string[];
+  selectedUnit?: string | null;
+};
+type BackendSettings = Record<string, string | null | undefined>;
+
+type UserPrefs = {
+  // other fields...
+  settings?: BackendSettings | null;
 };
 
 const SETTINGS: SettingType[] = [
-  { key: "liquid", label: "Liquid unit", options: ["ml", "oz"] },
-  { key: "weight", label: "Weight unit", options: ["kg", "lbs"] },
-  { key: "weather", label: "Weather unit", options: ["°C", "°F"] },
+  { key: "liquid_unit", label: "Liquid unit", options: ["ml", "oz"] },
+  { key: "weight_unit", label: "Weight unit", options: ["kg", "lbs"] },
   {
-    key: "gender",
-    label: "Gender",
-    options: ["Not set", "Male", "Female", "Other"],
+    key: "weather_unit",
+    label: "Weather unit",
+    options: ["Celsius", "Fahrenheit"],
+  },
+  {
+    key: "start_of_day",
+    label: "Start of the day",
+    options: Array.from({ length: 24 }, (_, i) => `${i}:00`),
+  },
+  {
+    key: "start_of_week",
+    label: "Start of the week",
+    options: [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ],
+  },
+  {
+    key: "length_unit",
+    label: "Length Unit",
+    options: ["feet", "km", "miles"],
+  },
+  {
+    key: "sleep_time",
+    label: "Sleep time",
+    options: Array.from({ length: 24 }, (_, i) => `${i}:00`),
   },
 ];
 
@@ -39,25 +84,66 @@ export default function AdvancedSettingsModal({
 }) {
   const { newTheme } = useContext(ThemeContext);
   const styles = styling(newTheme);
-
-  const [prefs, setPrefs] = useState<Record<PreferenceKey, string>>({
-    liquid: "",
-    weight: "",
-    weather: "",
-    gender: "",
-  });
-
-  const [selected, setSelected] = useState<SettingType | null>(null);
+  const [userPrefs, setUserPrefs] = useState<UserPrefs>();
+  const [selectedPanel, setSelectedPanel] = useState<SettingType | null>(null);
   const [detailVisible, setDetailVisible] = useState(false);
+  const [merged, setMerged] = useState<SettingType[]>(SETTINGS);
+  const [loading, setLoading] = useState(false);
+
+  // const { userProfile } = useAuth();
+  const { loadUserFromStorage, updateProfile } = useAuth();
+  // const { getUserProfile, save } = useReminder();
 
   useEffect(() => {
-    if (visible) {
-      (async () => {
-        const vals = await getAllPreferences();
-        setPrefs(vals);
-      })();
+    // console.log("coming here useefect", loadUserFromStorage);
+    setLoading(true);
+    (async () => {
+      const cached = await loadUserFromStorage?.(); // ← safe call
+      const updated = SETTINGS.map((item) => ({
+        ...item,
+        selectedUnit: cached.settings[item.key] ?? null,
+      }));
+
+      setMerged(updated);
+      setLoading(false);
+      // console.log("Loaded from storage: Advanced", updated);
+    })();
+  }, [loadUserFromStorage]); // include in deps
+
+  const onSaveSetting = async (val: any) => {
+    try {
+      const saved = await updateProfile?.(val);
+      const { success, message, data } = saved;
+      if (success && "email" in data) {
+        setUserPrefs(data);
+
+        const rawProfile = data?.settings;
+        if (!rawProfile) return;
+        const backendSettings = rawProfile;
+
+        const updated = SETTINGS.map((item) => ({
+          ...item,
+          selectedUnit: backendSettings[item.key] ?? null,
+        }));
+
+        setMerged(updated);
+        Toast.show({
+          type: "success",
+          text1: "Advanced Setting Updated",
+          position: "bottom",
+        });
+      }
+    } catch (e) {
+      console.warn("save error", e);
+      Toast.show({
+        type: "error",
+        text1: "Could not save setting. Please try again.",
+        position: "bottom",
+      });
+    } finally {
+      // onClose?.();
     }
-  }, [visible]);
+  };
 
   return (
     <Modal visible={visible} animationType="slide" transparent>
@@ -75,19 +161,21 @@ export default function AdvancedSettingsModal({
 
         <View style={styles.container}>
           <FlatList
-            data={SETTINGS}
+            data={merged}
             keyExtractor={(i) => i.key}
             renderItem={({ item }) => (
               <TouchableOpacity
                 style={styles.item}
                 onPress={() => {
-                  setSelected(item);
+                  setSelectedPanel(item);
                   setDetailVisible(true);
                 }}
               >
                 <Text style={styles.label}>{item.label}</Text>
                 <View style={styles.right}>
-                  <Text style={styles.value}>{prefs[item.key]}</Text>
+                  <Text style={[styles.value, { textTransform: "capitalize" }]}>
+                    {item.selectedUnit ? item.selectedUnit : "Not selected"}
+                  </Text>
                   <Ionicons
                     name="chevron-forward"
                     size={20}
@@ -100,16 +188,17 @@ export default function AdvancedSettingsModal({
           />
         </View>
 
-        {selected && (
+        {selectedPanel && (
           <SettingDetail
             visible={detailVisible}
-            categoryKey={selected.key}
-            label={selected.label}
-            options={selected.options}
+            categoryKey={selectedPanel.key}
+            label={selectedPanel.label}
+            options={selectedPanel.options}
+            selectedUnit={selectedPanel.selectedUnit || undefined}
+            onSave={onSaveSetting}
             onClose={() => {
               setDetailVisible(false);
-              setSelected(null);
-              (async () => setPrefs(await getAllPreferences()))();
+              setSelectedPanel(null);
             }}
           />
         )}

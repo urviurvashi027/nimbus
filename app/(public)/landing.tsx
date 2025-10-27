@@ -33,6 +33,7 @@ export default function login() {
   };
 
   const secondBtnSegmentBtnClick = () => {
+    console.log("I am clicked");
     router.push("/(public)/signIn");
   };
 

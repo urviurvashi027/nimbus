@@ -127,11 +127,23 @@ export const getReminder = async (): Promise<NotificationsByType> => {
   }
 };
 
+export const getUserProfileInfo = async () => {
+  try {
+    const r = await SecureStore.getItem("user-profile");
+    if (!r) return null;
+    // const parsed = JSON.parse(r);
+    return r;
+  } catch (e) {
+    console.warn("getUserProfile error", e);
+    return null;
+  }
+};
+
 /**
  * saveReminder / removeReminder maintained for local persistence/back-compat.
  * Consider implementing server API calls if saving must update backend user's profile.
  */
-export const saveReminder = async (type: string, payload: any) => {
+export const saveReminder = async (payload: any) => {
   try {
     // const now = new Date().toISOString();
     // const toSave = { ...payload, lastUpdated: now };

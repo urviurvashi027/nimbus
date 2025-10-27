@@ -11,7 +11,7 @@ import { useColorScheme } from "@/components/UseColorScheme";
 import AuthProvider from "@/context/AuthContext";
 import { HabitCreateRequest } from "@/types/habitTypes";
 import { OnboardingProvider } from "@/context/OnBoardingContext";
-import { ReminderProvider } from "@/context/ReminderContext";
+// import { ReminderProvider } from "@/context/ReminderContext";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -56,21 +56,21 @@ function RootLayoutNav() {
     <AuthProvider>
       <ThemeProvider>
         <HabitContext.Provider value={{ habitData, setHabitData }}>
-          <ReminderProvider>
-            {/* <OnboardingProvider> */}
-            <Stack>
-              <Stack.Screen
-                name="(auth)/(tabs)"
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="(public)/landing"
-                options={{ headerShown: false }}
-              />
-            </Stack>
-            <Toast />
-            {/* </OnboardingProvider> */}
-          </ReminderProvider>
+          {/* <ReminderProvider> */}
+          {/* <OnboardingProvider> */}
+          <Stack>
+            <Stack.Screen
+              name="(auth)/(tabs)"
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="(public)/landing"
+              options={{ headerShown: false }}
+            />
+          </Stack>
+          <Toast />
+          {/* </OnboardingProvider> */}
+          {/* </ReminderProvider> */}
         </HabitContext.Provider>
       </ThemeProvider>
     </AuthProvider>

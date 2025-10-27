@@ -13,10 +13,30 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/context/ThemeContext";
 import ReminderDetail from "./NotificationSettingModal"; // your detail component
-import { useReminder } from "@/context/ReminderContext";
-import { parse, format, isValid } from "date-fns";
+import { useAuth } from "@/context/AuthContext";
+import {
+  formatBackendTime,
+  mergeReminders,
+  repeatLabelFromDays,
+} from "@/utils/notoficationHelper";
 
-type ReminderType = { id: string; key: string; label: string; desc?: string };
+export type ReminderType = {
+  id: string;
+  key: string;
+  label: string;
+  desc?: string;
+};
+
+export type DayShort = "sun" | "mon" | "tue" | "wed" | "thu" | "fri" | "sat";
+
+export type ReminderSettings = {
+  repeat?: "once" | "daily" | "weekdays" | "weekends" | "custom";
+  weekdays?: number[];
+  notification_type: string; // e.g. "morning_review"
+  enabled: boolean;
+  time: string; // "07:30:00"
+  days_of_week?: DayShort[];
+};
 
 const REMINDER_TYPES: ReminderType[] = [
   {
@@ -45,41 +65,11 @@ const REMINDER_TYPES: ReminderType[] = [
   },
 ];
 
-type BackendEntry = {
+export type BackendEntry = {
   enabled?: boolean;
   time?: string; // "HH:mm:ss"
   days_of_week?: string[]; // ["mon","thu"]
-  // might include other backend keys in future
 };
-
-/* Helpers */
-
-/** Accept "HH:mm:ss" or "HH:mm" and return "7:30 AM" / "7:30 PM". Return fallback if invalid. */
-const TIME_HHMMSS_RE = /^\d{1,2}:\d{2}(:\d{2})?$/;
-const formatBackendTime = (time?: string | null, fallback = ""): string => {
-  if (!time || typeof time !== "string") return fallback;
-  const t = time.trim();
-  if (!TIME_HHMMSS_RE.test(t)) return fallback;
-  const normalized = t.split(":").length === 2 ? `${t}:00` : t;
-  const d = parse(normalized, "HH:mm:ss", new Date());
-  if (!isValid(d)) return fallback;
-  return format(d, "h:mm a");
-};
-
-/** Convert backend 'days_of_week' to a repeat label */
-const repeatLabelFromDays = (entry?: BackendEntry) => {
-  if (!entry) return "Off";
-  const days = entry.days_of_week ?? [];
-  if (days.length === 7) return "Every day";
-  const wk = ["mon", "tue", "wed", "thu", "fri"];
-  const wkends = ["sat", "sun"];
-  const isWeekdays = wk.every((d) => days.includes(d)) && days.length === 5;
-  const isWeekends = wkends.every((d) => days.includes(d)) && days.length === 2;
-  if (isWeekdays) return "Weekdays";
-  if (isWeekends) return "Weekends";
-  return days.length ? "Custom" : "Daily";
-};
-
 export default function NotificationTypeModal({
   visible,
   onClose,
@@ -90,28 +80,46 @@ export default function NotificationTypeModal({
   const { newTheme } = useContext(ThemeContext);
   const styles = styling(newTheme);
 
-  const { loading, reminders, refreshAll } = useReminder();
-
   const [selected, setSelected] = useState<ReminderType | null>(null);
   const [detailVisible, setDetailVisible] = useState(false);
+  const [notification, setNotification] = useState<any>();
+  const [loading, setLoading] = useState(false);
+
+  const { loadUserFromStorage } = useAuth();
+
+  const refreshAll = React.useCallback(async () => {
+    setLoading(true);
+    const cached = await loadUserFromStorage?.();
+    const r = mergeReminders(REMINDER_TYPES, cached?.notifications ?? []);
+    setNotification(r);
+    setLoading(false);
+  }, [loadUserFromStorage]);
 
   useEffect(() => {
-    if (visible) refreshAll();
-  }, [visible, refreshAll]);
+    refreshAll();
+  }, [refreshAll]); // initial load
 
-  const statusLabel = (key: string) => {
-    // reminders is expected to be keyed object: { morning_review: {enabled, time, days_of_week}, ... }
-    const entry = (reminders as Record<string, BackendEntry> | undefined)?.[
-      key
-    ];
+  useEffect(() => {
+    // console.log("coming here useefect", loadUserFromStorage);
+    setLoading(true);
+    (async () => {
+      const cached = await loadUserFromStorage?.(); // ← safe call
+      const r = mergeReminders(REMINDER_TYPES, cached?.notifications);
+      console.log(r, "rrr");
+      setNotification(r);
+      setLoading(false);
+      // console.log("Loaded from storage:", cached?.notifications);
+    })();
+  }, [loadUserFromStorage]); // include in deps
+
+  const statusLabel = (item: any) => {
     // Not configured
-    if (!entry) return "Off";
+    if (!item) return "Off";
 
-    if (!entry.enabled) return "Off";
+    if (!item.enabled) return "Off";
 
-    // Prefer time from backend time (HH:mm:ss). If backend doesn't supply, fallback label
-    const timeText = formatBackendTime(entry.time, "");
-    const repeatText = repeatLabelFromDays(entry);
+    const timeText = formatBackendTime(item.time, "");
+    const repeatText = repeatLabelFromDays(item);
     return timeText ? `${timeText} · ${repeatText}` : repeatText;
   };
 
@@ -136,7 +144,7 @@ export default function NotificationTypeModal({
             <ActivityIndicator size="large" color={newTheme.accent} />
           ) : (
             <FlatList
-              data={REMINDER_TYPES}
+              data={notification}
               keyExtractor={(i) => i.key}
               renderItem={({ item }) => {
                 return (
@@ -157,7 +165,8 @@ export default function NotificationTypeModal({
 
                     <View style={styles.rowRight}>
                       <Text style={styles.statusText}>
-                        {statusLabel(item.key)}
+                        {/* {item.} */}
+                        {statusLabel(item)}
                       </Text>
                       <Ionicons
                         name="chevron-forward"
@@ -176,15 +185,20 @@ export default function NotificationTypeModal({
 
         {selected && (
           <ReminderDetail
+            detail={selected}
             categoryKey={selected.key}
             title={selected.label}
             description={selected.desc}
             visible={detailVisible}
+            onSaved={async () => {
+              // only refetch after a successful save
+              await refreshAll();
+            }}
             onClose={() => {
               setDetailVisible(false);
               setSelected(null);
               // refresh so list updates after edit
-              refreshAll();
+              // refreshAll();
             }}
           />
         )}
