@@ -12,30 +12,64 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/context/ThemeContext";
-import ReminderDetail from "./NotificationSettingModal";
-import { useReminder } from "@/context/ReminderContext";
+import ReminderDetail from "./NotificationSettingModal"; // your detail component
+import { useAuth } from "@/context/AuthContext";
+import {
+  formatBackendTime,
+  mergeReminders,
+  repeatLabelFromDays,
+} from "@/utils/notoficationHelper";
 
-type ReminderType = { key: string; label: string; desc?: string };
+export type ReminderType = {
+  id: string;
+  key: string;
+  label: string;
+  desc?: string;
+};
+
+export type DayShort = "sun" | "mon" | "tue" | "wed" | "thu" | "fri" | "sat";
+
+export type ReminderSettings = {
+  repeat?: "once" | "daily" | "weekdays" | "weekends" | "custom";
+  weekdays?: number[];
+  notification_type: string; // e.g. "morning_review"
+  enabled: boolean;
+  time: string; // "07:30:00"
+  days_of_week?: DayShort[];
+};
 
 const REMINDER_TYPES: ReminderType[] = [
   {
-    key: "morning",
+    key: "morning_review",
+    id: "morning",
     label: "Morning check-in",
     desc: "Start your day with a quick reflection.",
   },
   {
-    key: "nightly",
+    key: "night_review",
+    id: "nightly",
     label: "Nightly review",
     desc: "Wind down and review today.",
   },
-  { key: "mood", label: "Log your mood", desc: "Capture how you feel." },
   {
-    key: "streak",
+    key: "mood_logger",
+    id: "mood",
+    label: "Log your mood",
+    desc: "Capture how you feel.",
+  },
+  {
+    key: "streak_saver",
+    id: "streak",
     label: "Streak saver",
     desc: "Save your streak if you’re about to lose it.",
   },
 ];
 
+export type BackendEntry = {
+  enabled?: boolean;
+  time?: string; // "HH:mm:ss"
+  days_of_week?: string[]; // ["mon","thu"]
+};
 export default function NotificationTypeModal({
   visible,
   onClose,
@@ -46,35 +80,47 @@ export default function NotificationTypeModal({
   const { newTheme } = useContext(ThemeContext);
   const styles = styling(newTheme);
 
-  const { loading, reminders, refreshAll } = useReminder();
-
   const [selected, setSelected] = useState<ReminderType | null>(null);
   const [detailVisible, setDetailVisible] = useState(false);
+  const [notification, setNotification] = useState<any>();
+  const [loading, setLoading] = useState(false);
+
+  const { loadUserFromStorage } = useAuth();
+
+  const refreshAll = React.useCallback(async () => {
+    setLoading(true);
+    const cached = await loadUserFromStorage?.();
+    const r = mergeReminders(REMINDER_TYPES, cached?.notifications ?? []);
+    setNotification(r);
+    setLoading(false);
+  }, [loadUserFromStorage]);
 
   useEffect(() => {
-    if (visible) {
-      // refresh to ensure we read latest values
-      refreshAll();
-    }
-  }, [visible]);
+    refreshAll();
+  }, [refreshAll]); // initial load
 
-  const statusLabel = (key: string) => {
-    const r = reminders[key];
-    if (!r || !r.enabled) return "Off";
-    const t = new Date(r.timeISO).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-    const repeat = r.repeat || "daily";
-    const repeatLabel =
-      repeat === "daily"
-        ? "Every day"
-        : repeat === "weekdays"
-        ? "Weekdays"
-        : repeat === "weekends"
-        ? "Weekends"
-        : "Custom";
-    return `${t} · ${repeatLabel}`;
+  useEffect(() => {
+    // console.log("coming here useefect", loadUserFromStorage);
+    setLoading(true);
+    (async () => {
+      const cached = await loadUserFromStorage?.(); // ← safe call
+      const r = mergeReminders(REMINDER_TYPES, cached?.notifications);
+      console.log(r, "rrr");
+      setNotification(r);
+      setLoading(false);
+      // console.log("Loaded from storage:", cached?.notifications);
+    })();
+  }, [loadUserFromStorage]); // include in deps
+
+  const statusLabel = (item: any) => {
+    // Not configured
+    if (!item) return "Off";
+
+    if (!item.enabled) return "Off";
+
+    const timeText = formatBackendTime(item.time, "");
+    const repeatText = repeatLabelFromDays(item);
+    return timeText ? `${timeText} · ${repeatText}` : repeatText;
   };
 
   return (
@@ -98,52 +144,61 @@ export default function NotificationTypeModal({
             <ActivityIndicator size="large" color={newTheme.accent} />
           ) : (
             <FlatList
-              data={REMINDER_TYPES}
+              data={notification}
               keyExtractor={(i) => i.key}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={styles.item}
-                  onPress={() => {
-                    setSelected(item);
-                    setDetailVisible(true);
-                  }}
-                  activeOpacity={0.85}
-                >
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.label}>{item.label}</Text>
-                    {item.desc ? (
-                      <Text style={styles.desc}>{item.desc}</Text>
-                    ) : null}
-                  </View>
-                  <View style={styles.rowRight}>
-                    <Text style={styles.statusText}>
-                      {statusLabel(item.key)}
-                    </Text>
-                    <Ionicons
-                      name="chevron-forward"
-                      size={20}
-                      color={newTheme.textSecondary}
-                      style={{ marginLeft: 8 }}
-                    />
-                  </View>
-                </TouchableOpacity>
-              )}
+              renderItem={({ item }) => {
+                return (
+                  <TouchableOpacity
+                    style={styles.item}
+                    onPress={() => {
+                      setSelected(item);
+                      setDetailVisible(true);
+                    }}
+                    activeOpacity={0.85}
+                  >
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.label}>{item.label}</Text>
+                      {item.desc ? (
+                        <Text style={styles.desc}>{item.desc}</Text>
+                      ) : null}
+                    </View>
+
+                    <View style={styles.rowRight}>
+                      <Text style={styles.statusText}>
+                        {/* {item.} */}
+                        {statusLabel(item)}
+                      </Text>
+                      <Ionicons
+                        name="chevron-forward"
+                        size={20}
+                        color={newTheme.textSecondary}
+                        style={{ marginLeft: 8 }}
+                      />
+                    </View>
+                  </TouchableOpacity>
+                );
+              }}
               ItemSeparatorComponent={() => <View style={styles.sep} />}
             />
           )}
         </View>
 
-        {/* nested detail */}
         {selected && (
           <ReminderDetail
+            detail={selected}
             categoryKey={selected.key}
             title={selected.label}
             description={selected.desc}
             visible={detailVisible}
+            onSaved={async () => {
+              // only refetch after a successful save
+              await refreshAll();
+            }}
             onClose={() => {
               setDetailVisible(false);
               setSelected(null);
-              refreshAll();
+              // refresh so list updates after edit
+              // refreshAll();
             }}
           />
         )}
