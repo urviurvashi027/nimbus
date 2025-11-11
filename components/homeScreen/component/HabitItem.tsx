@@ -31,17 +31,6 @@ const HabitItemCard: React.FC<HabitItemProps> = ({
 }: HabitItemProps) => {
   const { theme, newTheme } = React.useContext(ThemeContext);
 
-  //   console.log(
-  //     name,
-  //     icon,
-  //     id,
-  //     time,
-  //     done,
-  //     description,
-  //     frequency,
-  //     "done done done done"
-  //   );
-
   const handlePress = () => {
     onToggle(id, actual_count);
   };
@@ -70,16 +59,6 @@ const HabitItemCard: React.FC<HabitItemProps> = ({
           />
         )}
       </View>
-      {/* 
-      {icon ? (
-        <Image source={icon} style={styles(newTheme).icon} />
-      ) : (
-        <Ionicons
-          name="checkmark-circle-outline"
-          size={24}
-          color={newTheme.textSecondary}
-        />
-      )} */}
 
       {/* Text info */}
       <View style={styles(newTheme).textContainer}>
@@ -120,8 +99,6 @@ const styles = (newTheme: any) =>
       backgroundColor: newTheme.surface,
       borderRadius: 12,
       marginVertical: 12,
-      //   marginTop: 12,
-      //   marginBottom: 12,
     },
     // New rounded background for icon
     iconContainer: {
