@@ -96,7 +96,7 @@ const DailyCheckInCard: React.FC<DailyCheckInCardProps> = ({
     >
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.icon}>{icon}</Text>
+        {/* <Text style={styles.icon}>{icon}</Text> */}
         <Text style={styles.name}>{name}</Text>
       </View>
 
@@ -104,7 +104,7 @@ const DailyCheckInCard: React.FC<DailyCheckInCardProps> = ({
       <View style={styles.circleWrapper}>
         <Svg width={100} height={100}>
           <Circle
-            stroke="#2A2A2A"
+            stroke={newTheme.borderMuted}
             fill="none"
             cx="50"
             cy="50"
@@ -149,7 +149,7 @@ const styling = (newTheme: any) =>
   StyleSheet.create({
     card: {
       // backgroundColor: "red",
-      backgroundColor: newTheme.surface,
+      backgroundColor: newTheme.card,
       borderRadius: 16,
       padding: 10,
       alignItems: "center",
@@ -167,7 +167,7 @@ const styling = (newTheme: any) =>
       marginRight: 6,
     },
     name: {
-      color: "white",
+      color: newTheme.textPrimary,
       fontSize: 16,
       fontWeight: "600",
     },
@@ -181,12 +181,12 @@ const styling = (newTheme: any) =>
       alignItems: "center",
     },
     quantity: {
-      color: "white",
+      color: newTheme.textPrimary,
       fontSize: 16,
       fontWeight: "600",
     },
     unit: {
-      color: "#aaa",
+      color: newTheme.textSecondary,
       fontSize: 12,
       marginTop: 2,
     },
@@ -195,7 +195,7 @@ const styling = (newTheme: any) =>
       marginTop: 16,
     },
     btn: {
-      backgroundColor: "#2A2A2A",
+      backgroundColor: newTheme.cardRaised,
       paddingHorizontal: 20,
       paddingVertical: 8,
       borderRadius: 8,
@@ -203,7 +203,7 @@ const styling = (newTheme: any) =>
     },
     btnText: {
       fontSize: 18,
-      color: "#0f0",
+      color: newTheme.buttonPrimary,
       fontWeight: "600",
     },
   });

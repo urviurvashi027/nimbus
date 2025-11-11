@@ -34,19 +34,7 @@ const StatsScreen = () => {
 
   useEffect(() => {
     navigation.setOptions({
-      headerShown: true,
-      headerTransparent: true,
-      headerTitle: "Stats",
-      headerBackButtonDisplayMode: "minimal",
-      headerTitleAlign: "center",
-      headerTintColor: styles.header.color,
-      // headerRight: () => <Button title="Edit" onPress={onEditClick} />,
-      headerTitleStyle: {
-        fontSize: 18,
-        color: styles.header,
-        paddingTop: 5,
-        height: 40,
-      },
+      headerShown: false,
     });
   }, [navigation]);
 

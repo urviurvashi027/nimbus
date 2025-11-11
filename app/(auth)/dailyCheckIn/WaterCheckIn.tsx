@@ -1,30 +1,31 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useMemo, useRef } from "react";
 import {
   View,
   Text,
-  FlatList,
-  Image,
   TouchableOpacity,
   StyleSheet,
   Platform,
-  Dimensions,
-  SafeAreaView,
+  ScrollView,
+  Animated,
+  ActivityIndicator,
 } from "react-native";
-import { Audio } from "expo-av";
+
 import { Ionicons } from "@expo/vector-icons";
+import { useLocalSearchParams, useNavigation } from "expo-router";
 
-import { TrackType, forYouTracks } from "@/constant/data/soundtrack";
-import { useNavigation } from "expo-router";
 import ThemeContext from "@/context/ThemeContext";
-import { ScreenView, ThemeKey } from "@/components/Themed";
-import WaterTracker from "@/components/DailyCheckIn/WaterIntakeLog";
-import NotificationSettingRow from "@/components/DailyCheckIn/NotificationSettingRow";
-import WeeklySummaryChart from "@/components/DailyCheckIn/WaterWeekySummary";
+import { ScreenView } from "@/components/Themed";
+import WaterTracker from "@/components/DailyCheckIn/waterIntake/WaterIntakeLog";
+import NotificationSettingRow from "@/components/DailyCheckIn/common/NotificationSettingRow";
+import WeeklySummaryChartSvg from "@/components/DailyCheckIn/waterIntake/WeekySummary";
 
-const { width } = Dimensions.get("window"); // get screen width
-const CARD_WIDTH = width * 0.8; // 80% of screen width
+import { getHabitDetailsByDate } from "@/services/dailyCheckinService";
+import { DailyCheckInDetailResponse } from "@/types/dailyCheckin";
+import { ErrorCard } from "@/components/DailyCheckIn/waterIntake/ErrorCard";
+import { SkeletonCard } from "@/components/DailyCheckIn/waterIntake/SkeletonCard";
+import { SkeletonRow } from "@/components/DailyCheckIn/waterIntake/SkeletonRow";
 
-const options = [
+const remindOptions = [
   { key: "15m", label: "Every 15 minutes" },
   { key: "30m", label: "Every 30 minutes" },
   { key: "45m", label: "Every 45 minutes" },
@@ -32,33 +33,82 @@ const options = [
 ];
 
 const WaterCheckIn = () => {
-  const [enabled, setEnabled] = useState(true);
-  const [value, setValue] = useState<string | null>("45m");
-
   const navigation = useNavigation();
-
   const { newTheme } = useContext(ThemeContext);
-
   const styles = styling(newTheme);
+  // route params: id + date (both strings)
+  const { id, date } = useLocalSearchParams<{ id?: string; date?: string }>();
 
-  const mockData = [
-    { day: "Mon", percent: 40 },
-    { day: "Tue", percent: 50 },
-    { day: "Wed", percent: 80 },
-    { day: "Thu", percent: 65 },
-    { day: "Fri", percent: 90 },
-    { day: "Sat", percent: 70 },
-    { day: "Sun", percent: 30 },
-  ];
+  // UI states
+  const [enabled, setEnabled] = useState(true);
+  const [valueKey, setValueKey] = useState<string | null>("45m");
+  // const [water, setWater] = useState(waterIntakeData.completedUnit);
 
-  // Define your color palette. Add as many colors as you like.
-  const colorPalette = [
-    { bgColor: "#fadbd8", color: "#f19c94" },
-    { bgColor: "#d5f5e3", color: "#acebc8" },
-    { bgColor: "#f8e187", color: "#fbedb7" },
-    { bgColor: "#d6eaf8", color: "#95c9ed" },
-    { bgColor: "#E8DAEF", color: "#c7a5d8" },
-  ];
+  // API states
+  const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState<string | null>(null);
+  const [total, setTotal] = useState<number>(0); // target_unit (glasses)
+  const [completed, setCompleted] = useState<number>(0); // completed_unit
+  const [weekly, setWeekly] = useState<{ day: string; percent: number }[]>([]);
+
+  // skeleton pulse
+  const pulse = useRef(new Animated.Value(0.3)).current;
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulse, {
+          toValue: 1,
+          duration: 700,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulse, {
+          toValue: 0.3,
+          duration: 700,
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [pulse]);
+
+  useEffect(() => {
+    navigation.setOptions({ headerShown: false });
+  }, [navigation]);
+
+  // fetch habit detail
+  useEffect(() => {
+    const run = async () => {
+      if (!id || !date) {
+        setErr("Missing habit id or date.");
+        setLoading(false);
+        return;
+      }
+      try {
+        setLoading(true);
+        setErr(null);
+        const habitId = Number(id);
+        const res: DailyCheckInDetailResponse = await getHabitDetailsByDate(
+          habitId,
+          date
+        );
+
+        const h = res?.data;
+        setTotal(Number(h?.target_unit ?? 0));
+        setCompleted(Number(h?.completed_unit ?? 0));
+        setWeekly(
+          Array.isArray(h?.last_7_days_completion)
+            ? h!.last_7_days_completion
+            : []
+        );
+      } catch (e: any) {
+        setErr(typeof e === "string" ? e : e?.message ?? "Failed to load");
+      } finally {
+        setLoading(false);
+      }
+    };
+    run();
+  }, [id, date]);
 
   useEffect(() => {
     navigation.setOptions({
@@ -66,8 +116,18 @@ const WaterCheckIn = () => {
     });
   }, [navigation]);
 
+  const weeklyForChart = useMemo(
+    () =>
+      weekly.map((d) => ({
+        day: d.day,
+        percent: Math.max(0, Math.min(100, Number(d.percent) || 0)),
+      })),
+    [weekly]
+  );
+
   const handleChange = (newValue: number) => {
-    console.log(newValue, "newValue");
+    // local update only; you’ll call PATCH API in onChange if needed
+    setCompleted(newValue);
   };
 
   return (
@@ -84,7 +144,11 @@ const WaterCheckIn = () => {
           />
         </TouchableOpacity>
 
-        <SafeAreaView style={{ flex: 1 }}>
+        <ScrollView
+          bounces
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 28 }}
+        >
           <View style={styles.header}>
             <Text style={styles.title}>WaterCheckIn</Text>
             <Text style={styles.subtitle}>
@@ -92,34 +156,89 @@ const WaterCheckIn = () => {
             </Text>
           </View>
 
-          <View style={styles.section}>
-            <WaterTracker
-              value={4}
-              total={10}
-              onChange={handleChange}
-              contentPadding={0}
+          {/* Content */}
+          {loading ? (
+            <View>
+              <SkeletonCard pulse={pulse} theme={newTheme} height={130} />
+              <View style={{ height: 16 }} />
+              <SkeletonRow pulse={pulse} theme={newTheme} />
+              <View style={{ height: 16 }} />
+              <SkeletonCard pulse={pulse} theme={newTheme} height={180} />
+            </View>
+          ) : err ? (
+            <ErrorCard
+              theme={newTheme}
+              message={err}
+              onRetry={async () => {
+                setLoading(true);
+                setErr(null);
+                try {
+                  const res = await getHabitDetailsByDate(
+                    Number(id),
+                    String(date)
+                  );
+                  const h = res?.data;
+                  setTotal(Number(h?.target_unit ?? 0));
+                  setCompleted(Number(h?.completed_unit ?? 0));
+                  setWeekly(
+                    Array.isArray(h?.last_7_days_completion)
+                      ? h!.last_7_days_completion
+                      : []
+                  );
+                } catch (e: any) {
+                  setErr(
+                    typeof e === "string" ? e : e?.message ?? "Failed to load"
+                  );
+                } finally {
+                  setLoading(false);
+                }
+              }}
             />
-          </View>
+          ) : (
+            <>
+              {/* Tracker */}
+              <View style={{ height: 15 }} />
+              <View style={styles.section}>
+                <WaterTracker
+                  value={completed}
+                  total={total}
+                  plusColor={newTheme.buttonGhostBg}
+                  filledColor={newTheme.surfaceMuted}
+                  emptySlotColor={newTheme.borderMuted}
+                  onChange={handleChange}
+                  contentPadding={0}
+                />
+              </View>
 
-          <View style={{ paddingHorizontal: 20 }}>
-            <NotificationSettingRow
-              label="Notification"
-              subtitle="Remind me to drink water"
-              helpText=""
-              enabled={enabled}
-              onToggle={(v) => setEnabled(v)}
-              options={options}
-              valueKey={value}
-              onOptionSelect={(item) => setValue(item.key)}
-            />
-          </View>
+              {/* Notifications */}
+              <View style={{ height: 20 }} />
+              <View style={{ paddingHorizontal: 0 }}>
+                <NotificationSettingRow
+                  label="Notification"
+                  subtitle="Remind me to drink water"
+                  helpText=""
+                  enabled={enabled}
+                  onToggle={setEnabled}
+                  options={remindOptions}
+                  valueKey={valueKey}
+                  onOptionSelect={(item) => setValueKey(item.key)}
+                />
+              </View>
 
-          <View>
-            <WeeklySummaryChart data={mockData} />
-          </View>
+              {/* Weekly summary */}
+              <View style={{ height: 12 }} />
+              <WeeklySummaryChartSvg
+                data={weeklyForChart.map((d) => ({
+                  day: d.day,
+                  percent: d.percent,
+                }))}
+                barColor={newTheme.chart3}
+              />
+            </>
+          )}
 
           {/* "For You" Section */}
-        </SafeAreaView>
+        </ScrollView>
       </View>
     </ScreenView>
   );
@@ -152,42 +271,6 @@ const styling = (theme: any) =>
       color: theme.textSecondary,
       fontSize: 14,
       marginTop: 4,
-    },
-    headerTitle: {
-      fontSize: 22,
-      fontWeight: "bold",
-      marginLeft: 10,
-      color: theme.textSecondary,
-    },
-    sectionContainer: {
-      marginBottom: 20,
-    },
-    sectionHeader: {
-      flexDirection: "row",
-      alignItems: "center",
-      marginBottom: 10,
-    },
-    sectionTitle: {
-      fontSize: 18,
-      color: theme.textSecondary,
-      fontWeight: "bold",
-      // marginLeft: 10,
-    },
-    item: {
-      flexDirection: "row",
-      alignItems: "center",
-      padding: 12,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.divider,
-    },
-    image: {
-      width: 60,
-      height: 60,
-      borderRadius: 30,
-      marginRight: 12,
-    },
-    textContainer: {
-      flex: 1,
     },
     section: {
       paddingHorizontal: 0,

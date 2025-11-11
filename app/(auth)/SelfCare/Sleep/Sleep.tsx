@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-import { themeColors } from "@/constant/theme/Colors";
+// import { themeColors } from "@/constant/theme/Colors";
 import ThemeContext from "@/context/ThemeContext";
 import { ThemeKey } from "@/components/Themed";
 import HorizontalListCardScroll from "@/components/tools/common/HorizontalListCardScroll";

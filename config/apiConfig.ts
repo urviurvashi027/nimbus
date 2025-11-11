@@ -61,4 +61,12 @@ export const API_ENDPOINTS = {
 
   reportBug: `${BASE_URL}/api/bug-reports/`,
   logFeedback: `${BASE_URL}/api/feedback/`,
+
+  // ✅ NEW: Function for fetching habits with date & filter
+  getDailyCheckInByDate: (date: string, isDailyCheckIn = true) =>
+    `${BASE_URL}/api/habits/?date=${date}&is_daily_checkin=${isDailyCheckIn}`,
+  // ✅ NEW: Function for fetching habits with date & filter
+  // ✅ Dynamic: fetch single habit details by id + date
+  getHabitDetailsByDate: (habitId: number, date: string) =>
+    `${BASE_URL}/api/habits/${habitId}/?date=${date}`,
 };

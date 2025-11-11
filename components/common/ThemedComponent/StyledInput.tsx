@@ -1,4 +1,5 @@
-import React, { useMemo, useState, useCallback } from "react";
+import ThemeContext from "@/context/ThemeContext";
+import React, { useMemo, useState, useCallback, useContext } from "react";
 import {
   View,
   Text,
@@ -9,7 +10,6 @@ import {
   GestureResponderEvent,
   Pressable,
   TextInputProps,
-  LayoutChangeEvent,
   Platform,
 } from "react-native";
 import Svg, { Path } from "react-native-svg";
@@ -177,6 +177,9 @@ export const InputField: React.FC<InputFieldProps> = ({
 
   const showPasswordToggle = enablePasswordToggle || preset === "password";
 
+  const { newTheme } = useContext(ThemeContext);
+  const styles = styling(newTheme);
+
   const effectiveLeftIcon = useMemo(() => {
     if (leftIcon) return leftIcon;
     if (preset === "email") return <MailIcon />;
@@ -321,72 +324,73 @@ export const InputField: React.FC<InputFieldProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
-  wrapper: {
-    width: "100%",
-  },
-  label: {
-    color: colors.text,
-    fontSize: 14,
-    fontWeight: "600",
-    marginBottom: 8,
-  },
-  labelDisabled: {
-    color: colors.textDisabled,
-  },
-  field: {
-    flexDirection: "row",
-    alignItems: "center", // single-line default
-    borderWidth: 1,
-    backgroundColor: colors.fieldBg,
-    borderRadius: 12,
-    shadowColor: "#000",
-    shadowOpacity: 0.12,
-    shadowOffset: { width: 0, height: 6 },
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  fieldMultiline: {
-    alignItems: "flex-start", // multiline: grow from top
-    paddingTop: 10,
-    paddingBottom: 10,
-  },
-  fieldDisabled: {
-    opacity: 0.7,
-  },
-  left: {
-    width: 28,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingTop: 6,
-  },
-  right: {
-    marginLeft: 8,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingTop: 6,
-  },
-  input: {
-    flex: 1,
-    fontSize: 16,
-    includeFontPadding: false,
-    paddingVertical: 6,
-  },
-  inputMultiline: {
-    // top aligning on Android is important
-    textAlignVertical: "top",
-    paddingVertical: 4,
-  },
-  helper: {
-    marginTop: 8,
-    color: colors.helper,
-    fontSize: 13,
-  },
-  error: {
-    marginTop: 8,
-    color: colors.error,
-    fontSize: 13,
-  },
-});
+const styling = (newTheme: any) =>
+  StyleSheet.create({
+    wrapper: {
+      width: "100%",
+    },
+    label: {
+      color: colors.text,
+      fontSize: 14,
+      fontWeight: "600",
+      marginBottom: 8,
+    },
+    labelDisabled: {
+      color: colors.textDisabled,
+    },
+    field: {
+      flexDirection: "row",
+      alignItems: "center", // single-line default
+      borderWidth: 1,
+      backgroundColor: colors.fieldBg,
+      borderRadius: 12,
+      shadowColor: newTheme.shadow,
+      shadowOpacity: 0.12,
+      shadowOffset: { width: 0, height: 6 },
+      shadowRadius: 8,
+      elevation: 2,
+    },
+    fieldMultiline: {
+      alignItems: "flex-start", // multiline: grow from top
+      paddingTop: 10,
+      paddingBottom: 10,
+    },
+    fieldDisabled: {
+      opacity: 0.7,
+    },
+    left: {
+      width: 28,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingTop: 6,
+    },
+    right: {
+      marginLeft: 8,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingTop: 6,
+    },
+    input: {
+      flex: 1,
+      fontSize: 16,
+      includeFontPadding: false,
+      paddingVertical: 6,
+    },
+    inputMultiline: {
+      // top aligning on Android is important
+      textAlignVertical: "top",
+      paddingVertical: 4,
+    },
+    helper: {
+      marginTop: 8,
+      color: colors.helper,
+      fontSize: 13,
+    },
+    error: {
+      marginTop: 8,
+      color: colors.error,
+      fontSize: 13,
+    },
+  });
 
 export default InputField;

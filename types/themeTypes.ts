@@ -25,25 +25,56 @@ export interface ColorSet {
   border: string;
   overlay: string;
 
-  // primary: "#007AFF";
-  // secondary: "#5856D6";
-  // accent: "#FF9500",
-  // success: "#34C759",
-  // warning: "#FFC700",
-  // error: "#FF3B30",
-  // textPrimary: "#1C1C1E",
-  // textSecondary: "#8E8E93",
-  // textDisabled: "#C7C7CC";
-  // background: "#F2F2F7",
-  // surface: "#FFFFFF",
-  // border: "#D1D1D6";
-  // overlay: "rgba(0, 0, 0, 0.5)";
-
   // new property value
   divider: string;
   disabled: string;
   accentPressed: string;
   info: string;
+
+  // NEW — neutrals for elevation/borders
+  card: string; // slightly lighter than background
+  cardRaised: string; // for prominent cards
+  surfaceMuted: string; // list rows / chips
+  // border: "#3A3E33"; // hairline borders
+  borderMuted: string;
+
+  // NEW — overlays / scrims
+  // overlay: "rgba(12,14,11,0.6)"; // modal backdrop
+  overlayStrong: string;
+  shadow: string;
+
+  // NEW — focus / outline
+  focus: string; // soft light-green outline
+  focusRing: string;
+
+  // NEW — buttons
+  buttonPrimary: string; // = accent
+  buttonPrimaryText: string;
+  buttonGhostBg: string;
+  buttonGhostBorder: string;
+  buttonGhostText: string;
+
+  // NEW — chart accents (brighter but cohesive)
+  // Use these for lines, bars, and categorical series.
+  chart1: string; // fresh lime (pairs with accent)
+  chart2: string; // softened blue (fits info family)
+  chart3: string; // warm amber (fits warning family)
+  chart4: string; // muted rose (ties to error family)
+  chart5: string; // seafoam (secondary success)
+  chart6: string; // lavender (for variety)
+  chartGrid: string; // subtle grid/rules
+  chartAreaFade: string;
+
+  // NEW — gradients (for charts/headers)
+  gradAccent: string; // light -> base accent
+  gradLime: string; // for progress arcs
+  gradBlue: string;
+  gradAmber: string;
+
+  // NEW — states
+  pressed: string;
+  hovered: string;
+  selected: string;
 }
 
 export interface Typography {

@@ -97,7 +97,7 @@ export default function MentalHealthCharts() {
           </View>
         </View>
       </View>
-      <MoodEmotionsChart data={sampleData} totalPoints={5795} />;
+      <MoodEmotionsChart data={sampleData} totalPoints={5795} />
       {/* Multi-series Bar Chart Section */}
       <View style={styles.card}>
         <Text style={styles.sectionTitle}>Mood & Emotions</Text>
