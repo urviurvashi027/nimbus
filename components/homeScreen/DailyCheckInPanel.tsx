@@ -59,8 +59,6 @@ const DailyCheckInPanel = ({ date }: Props) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [err, setErr] = useState<string | null>(null);
 
-  // const [queryDate] = useState(() => formatLocalISODate());
-
   const [expanded, setExpanded] = useState(true);
   const rotateAnim = React.useRef(new Animated.Value(1)).current;
 
@@ -93,7 +91,6 @@ const DailyCheckInPanel = ({ date }: Props) => {
       setErr(null);
       try {
         const res = await getCheckinList(date, true); // <— single source of truth
-        // const res = await getCheckinList(queryDate, true);
 
         // Some backends return { success, data }, some return array directly
         const habits = Array.isArray((res as any)?.data)

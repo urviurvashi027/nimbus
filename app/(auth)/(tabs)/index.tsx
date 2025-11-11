@@ -1,3 +1,4 @@
+// app/(auth)/index/TabOneScreen.tsx
 import {
   ActivityIndicator,
   FlatList,
@@ -8,18 +9,15 @@ import {
 import { View, Text, ScreenView } from "@/components/Themed";
 import { router } from "expo-router";
 import Toast from "react-native-toast-message";
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
-import { format, isToday, isTomorrow, isYesterday } from "date-fns";
+import { format, isToday, isTomorrow, isYesterday, startOfDay } from "date-fns";
 
 import ThemeContext from "@/context/ThemeContext";
 import { useAuth } from "@/context/AuthContext";
-
 import { getHabitList, markHabitDone } from "@/services/habitService";
 import { HabitItem } from "@/types/habitTypes";
-
-import { ThemeKey } from "@/components/Themed";
 
 import DateScroller from "@/components/homeScreen/DateScroller";
 import DailyCheckInPanel from "@/components/homeScreen/DailyCheckInPanel";
@@ -28,82 +26,34 @@ import TopBadge from "@/components/homeScreen/TopBadge";
 import NewUserScreen from "../FirstTimeUser/NewUserScreen";
 
 export default function TabOneScreen() {
-  const [habitList, setHabitList] = useState<HabitItem[]>([]);
-
-  // Single source of truth
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-
-  const [date, setDate] = useState<string>("");
-  const [dateLabel, setDateLabel] = useState<string>("");
-  const [loading, setLoading] = useState(true);
-  const [userInfo, setUserInfo] = useState<any>(null);
-  const [completedHabit, setCompletedHabit] = useState<number>();
-
   const { newTheme } = useContext(ThemeContext);
-
   const styles = styling(newTheme);
 
-  const toLocalISO = (d: Date) => {
-    const off = d.getTimezoneOffset();
-    const local = new Date(d.getTime() - off * 60000);
-    return local.toISOString().slice(0, 10); // YYYY-MM-DD
-  };
+  // Controlled date (single source of truth)
+  const [selectedDate, setSelectedDate] = useState(startOfDay(new Date()));
+  const isoDate = useMemo(
+    () => format(selectedDate, "yyyy-MM-dd"),
+    [selectedDate]
+  );
+  const [userInfo, setUserInfo] = useState<any>(null);
+  // API + UI state
+  const [habitList, setHabitList] = useState<HabitItem[]>([]);
+  const [completedHabit, setCompletedHabit] = useState<number>(0);
+  const [loading, setLoading] = useState(true);
 
-  const queryDate = useMemo(() => toLocalISO(selectedDate), [selectedDate]);
+  const { userProfile } = useAuth();
+  // const userInfo = userProfile || null;
 
-  // fetch habits WHEN selectedDate changes
-  useEffect(() => {
-    (async () => {
-      await getHabitListData(queryDate);
-    })();
-  }, [queryDate]);
+  const dateLabel = useMemo(() => {
+    if (isToday(selectedDate)) return "Today";
+    if (isTomorrow(selectedDate)) return "Tomorrow";
+    if (isYesterday(selectedDate)) return "Yesterday";
+    return format(selectedDate, "EEE, MMM dd");
+  }, [selectedDate]);
 
-  // create button click
-  const onCreateClick = () => {
-    router.push("/habit/create");
-  };
-
-  // function to be called whenever date changes
-  // const onDateChange = async (val: any) => {
-  //   const formatted = format(new Date(val), "yyyy-MM-dd");
-  //   const label = getDateLabel(val);
-  //   setDate(formatted);
-  //   setDateLabel(label);
-
-  //   await getHabitListData(formatted);
-  // };
-
-  const getHabitListData = async (date?: string) => {
-    const habitIcons = ["🍰", "🌱", "🏃‍♂️", "🧘", "📚", "💧"];
-    const habitColors = ["#FF6B6B", "#4ECDC4", "#FFD93D", "#1A535C", "#6A4C93"];
-    try {
-      setLoading(true);
-      const result = await getHabitList(date);
-      if (result?.success) {
-        setCompletedHabit(result.data.filter((h: any) => h.completed).length);
-        const formattedData = result.data.map((item: any, index: number) => {
-          const color = habitColors[index % habitColors.length]; // cycle through colors
-          const icon = habitIcons[index % habitIcons.length];
-          return {
-            ...item,
-            done: item.completed,
-            color: color,
-            icon: icon,
-          };
-        });
-        setHabitList(formattedData || []);
-      } else {
-        setHabitList([]);
-      }
-    } catch (error: any) {
-      console.log(error, "API Error Response");
-      setHabitList([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const { userProfile, getUserDetails } = useAuth();
+  // map helpers
+  const habitIcons = ["🍰", "🌱", "🏃‍♂️", "🧘", "📚", "💧"];
+  const habitColors = ["#FF6B6B", "#4ECDC4", "#FFD93D", "#1A535C", "#6A4C93"];
 
   useEffect(() => {
     const init = async () => {
@@ -118,47 +68,92 @@ export default function TabOneScreen() {
     init();
   }, [userProfile]);
 
-  const refreshData = () => {
-    getHabitListData(date);
-  };
+  // Single fetch path tied to isoDate
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        setLoading(true);
+        const res = await getHabitList(isoDate); // one call here
+        if (!mounted) return;
+        if (res?.success) {
+          setCompletedHabit(res.data.filter((h: any) => h.completed).length);
+          const formatted = res.data.map((item: any, idx: number) => ({
+            ...item,
+            done: item.completed,
+            color: habitColors[idx % habitColors.length],
+            icon: habitIcons[idx % habitIcons.length],
+          }));
+          setHabitList(formatted);
+        } else {
+          setHabitList([]);
+          setCompletedHabit(0);
+        }
+      } catch (e) {
+        if (mounted) {
+          setHabitList([]);
+          setCompletedHabit(0);
+        }
+      } finally {
+        mounted && setLoading(false);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [isoDate]); // <-- ONLY when date string changes
 
-  const getDateLabel = (date: Date) => {
-    if (isToday(date)) return "Today";
-    if (isTomorrow(date)) return "Tomorrow";
-    if (isYesterday(date)) return "Yesterday";
-    return format(date, "EEE, MMM dd"); // Fallback format
+  const onCreateClick = () => router.push("/habit/create");
+
+  const refreshData = () => {
+    // force re-run by changing state to same date (or refetch inline)
+    (async () => {
+      setLoading(true);
+      try {
+        const res = await getHabitList(isoDate);
+        if (res?.success) {
+          setCompletedHabit(res.data.filter((h: any) => h.completed).length);
+          const formatted = res.data.map((item: any, idx: number) => ({
+            ...item,
+            done: item.completed,
+            color: habitColors[idx % habitColors.length],
+            icon: habitIcons[idx % habitIcons.length],
+          }));
+          setHabitList(formatted);
+        }
+      } finally {
+        setLoading(false);
+      }
+    })();
   };
 
   const handleHabitDoneClick = async (id: any, count: any) => {
-    const request = {
-      completed: true,
-      actual_count: {
-        count: count.metric_count,
-        unit: count.metric_unit,
-      },
-    };
     try {
-      const result = await markHabitDone(request, id);
+      const result = await markHabitDone(
+        {
+          completed: true,
+          actual_count: { count: count.metric_count, unit: count.metric_unit },
+        },
+        id
+      );
       if (result?.success) {
-        // refreshData();
         Toast.show({
           type: "success",
           text1: "Habit marked done successfuly",
           position: "bottom",
         });
+        refreshData();
       }
-    } catch (error: any) {
+    } catch {
       Toast.show({
         type: "error",
         text1: "Something went wrong",
         position: "bottom",
       });
-    } finally {
-      refreshData();
     }
   };
 
-  // ✅ Improved professional loading state
+  // Initial “whole screen” loading
   if (loading && !userInfo) {
     return (
       <ScreenView style={{ flex: 1, justifyContent: "center" }}>
@@ -179,13 +174,12 @@ export default function TabOneScreen() {
   return (
     <ScreenView style={{ paddingTop: Platform.OS === "ios" ? 80 : 20 }}>
       <GestureHandlerRootView style={styles.gestureContainer}>
-        {/* 🚀 One FlatList for everything */}
         <FlatList
           data={userInfo?.firstTimeUser ? [] : habitList} // if first-time user → no habit data
+          // data={userInfo?.firstTimeUser ? [] : habitList}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
             <HabitItemCard
-              // {...item}
               id={item.id.toString()}
               name={item.name}
               icon={item.icon}
@@ -198,61 +192,52 @@ export default function TabOneScreen() {
               }}
               description={item.description}
               done={item.completed}
-              onToggle={(id: string, actual_count: any) => {
-                console.log(id, "onToggle");
-                handleHabitDoneClick(id, actual_count);
-                // setHabitList((prev) =>
-                //   prev.map((h) => (h.id === id ? { ...h, done: newStatus } : h))
-                // );
-              }}
+              onToggle={(id: string, actual_count: any) =>
+                handleHabitDoneClick(id, actual_count)
+              }
             />
           )}
           ListHeaderComponent={
             <>
-              {/* ✅ User info */}
               {userInfo && (
                 <View
                   style={{
                     paddingVertical: 20,
-                    // paddingHorizontal: 20, // added horizontal padding
                     backgroundColor: newTheme.background,
                     flexDirection: "row",
                     alignItems: "center",
-                    justifyContent: "space-between", // username left, badge right
+                    justifyContent: "space-between",
                   }}
                 >
                   <Text style={styles.dateLabel}>{userInfo.username}</Text>
-
-                  {/* 🔥 Reusable TopBadge (points, score, level, etc.) */}
                   <TopBadge
-                    // count={userInfo.points || 123} // fallback if you don’t have points in API
-                    // label="pts"
                     iconName="star"
                     variant="pill"
-                    onPress={() => {
-                      console.log("badge pressed");
-                      router.push("/(auth)/CoachScreen/CoachScreen");
-                    }}
+                    onPress={() =>
+                      router.push("/(auth)/CoachScreen/CoachScreen")
+                    }
                   />
                 </View>
               )}
 
-              {/* ✅ Date scroller */}
-              <DateScroller onDateChange={setSelectedDate} />
+              <DateScroller
+                value={selectedDate}
+                onChange={(d) => setSelectedDate(startOfDay(d))}
+                isLoading={loading}
+                centerSelected
+              />
 
-              {/* ✅ First time user journey */}
               {userInfo?.firstTimeUser ? (
                 <View style={styles.taskListContainer}>
                   <NewUserScreen />
                 </View>
               ) : (
                 <>
-                  {/* ✅ Daily check-in */}
                   <View style={{ marginVertical: 30 }}>
-                    <DailyCheckInPanel date={queryDate} />
+                    {/* This component will do ONE more call using `date={isoDate}` */}
+                    <DailyCheckInPanel date={isoDate} />
                   </View>
 
-                  {/* ✅ Habits header (only if we have habits) */}
                   {habitList.length > 0 && (
                     <View style={styles.header}>
                       <Text style={styles.title}>{dateLabel}</Text>
@@ -285,7 +270,6 @@ export default function TabOneScreen() {
         />
       </GestureHandlerRootView>
 
-      {/* Floating add button */}
       <TouchableOpacity style={styles.floatingButton} onPress={onCreateClick}>
         <Ionicons name="add" size={24} color={styles.iconColor.color} />
       </TouchableOpacity>
@@ -295,21 +279,13 @@ export default function TabOneScreen() {
 
 const styling = (newTheme: any) =>
   StyleSheet.create({
-    gestureContainer: {
-      // backgroundColor: themeColors[theme].background,
-      backgroundColor: newTheme.background,
-      flex: 1, // Ensures full screen coverage
-    },
-    datePanel: {},
+    gestureContainer: { backgroundColor: newTheme.background, flex: 1 },
     taskListContainer: {
       backgroundColor: newTheme.background,
-      // backgroundColor: themeColors[theme].background,
-      flex: 12, // Takes up the remaining space
-      marginTop: 20, // 10px space between FlatList and TaskList
+      flex: 12,
+      marginTop: 20,
     },
-    iconColor: {
-      color: newTheme.textPrimary,
-    },
+    iconColor: { color: newTheme.textPrimary },
     floatingButton: {
       position: "absolute",
       right: 20,
@@ -326,20 +302,7 @@ const styling = (newTheme: any) =>
       shadowRadius: 2,
       elevation: 5,
     },
-    itemSeparator: {
-      flex: 1,
-      height: 1,
-      paddingBottom: 12,
-      backgroundColor: newTheme.background,
-    },
-    dateLabel: {
-      // backgroundColor: newTheme.background,
-      fontSize: 22,
-      fontWeight: "600",
-      color: newTheme.textPrimary,
-      // textAlign: "center",
-      // marginBottom: 5,
-    },
+    dateLabel: { fontSize: 22, fontWeight: "600", color: newTheme.textPrimary },
     header: {
       flexDirection: "row",
       justifyContent: "space-between",
@@ -352,7 +315,7 @@ const styling = (newTheme: any) =>
       backgroundColor: newTheme.surface,
       paddingHorizontal: 10,
       paddingVertical: 4,
-      borderRadius: 6, // square-pill feel
+      borderRadius: 6,
     },
     pillText: { color: newTheme.textSecondary, fontWeight: "500" },
   });

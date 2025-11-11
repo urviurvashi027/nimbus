@@ -1,4 +1,5 @@
-import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
+// components/homeScreen/DateScroller.tsx
+import React, { useContext, useEffect, useMemo, useRef } from "react";
 import {
   View,
   Text,
@@ -9,151 +10,143 @@ import {
   ActivityIndicator,
   NativeSyntheticEvent,
   NativeScrollEvent,
+  LayoutChangeEvent,
 } from "react-native";
-import {
-  format,
-  addDays,
-  isSameDay,
-  isToday,
-  isTomorrow,
-  isYesterday,
-} from "date-fns";
+import { addDays, isSameDay, startOfDay } from "date-fns";
 import ThemeContext from "@/context/ThemeContext";
 import { ThemeKey } from "../Themed";
 
-const MAX_DAYS = 365;
+type Props = {
+  value: Date;
+  onChange: (d: Date) => void;
+  isLoading?: boolean;
+  daysAroundToday?: number;
+  centerSelected?: boolean;
+};
 
-interface DateScrollerProps {
-  // value: Date;
-  onDateChange: (date: Date) => void;
-}
+const DEFAULT_DAYS_AROUND = 365;
+const atMidnight = (d: Date) => startOfDay(d);
 
-export default function DateScroller({ onDateChange }: DateScrollerProps) {
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [loading, setLoading] = useState(false);
-
-  const flatListRef = useRef<FlatList<Date>>(null);
+export default function DateScroller({
+  value,
+  onChange,
+  isLoading = false,
+  daysAroundToday = DEFAULT_DAYS_AROUND,
+  centerSelected = true,
+}: Props) {
+  const listRef = useRef<FlatList<Date>>(null);
+  const userDraggingRef = useRef(false);
+  const didCenterOnceRef = useRef(false); // <-- NEW: avoid repeated “first center”
   const screenWidth = Dimensions.get("window").width;
-  const itemWidth = screenWidth / 5; // show 5 at a time
+  const itemWidth = screenWidth / 5;
+  const sidePad = centerSelected ? (screenWidth - itemWidth) / 2 : 0;
 
-  // Theme
   const { theme, newTheme } = useContext(ThemeContext);
   const styles = styling(theme, newTheme, itemWidth);
 
-  const today = useMemo(() => {
-    const d = new Date();
-    d.setHours(0, 0, 0, 0);
-    return d;
-  }, []);
+  const today = useMemo(() => atMidnight(new Date()), []);
+  const selected = useMemo(() => atMidnight(value), [value]);
 
-  const days = useMemo(
-    () =>
-      Array.from({ length: 365 * 2 }, (_, i) => {
-        const d = new Date(today);
-        d.setDate(d.getDate() + i - 365);
-        return d;
-      }),
-    [today]
+  const days = useMemo(() => {
+    const total = 2 * daysAroundToday + 1;
+    return Array.from({ length: total }, (_, i) =>
+      atMidnight(addDays(today, i - daysAroundToday))
+    );
+  }, [today, daysAroundToday]);
+
+  const selectedIdx = useMemo(
+    () => days.findIndex((d) => d.getTime() === selected.getTime()),
+    [days, selected]
   );
 
-  // console.log(days, "days");
-
-  // Select a date (no scroll on tap)
-  const handleDateSelect = async (date: Date) => {
-    setSelectedDate(date);
-    setLoading(true);
-    try {
-      await onDateChange(date);
-    } finally {
-      setLoading(false);
-    }
+  const centerSelectedSilently = (animated = false) => {
+    if (selectedIdx < 0) return;
+    // Guard so momentum handler won’t emit onChange
+    userDraggingRef.current = false;
+    listRef.current?.scrollToIndex({
+      index: selectedIdx,
+      animated,
+      viewPosition: centerSelected ? 0.5 : 0,
+    });
   };
 
-  // Auto-scroll to today on mount
+  // Center after list is laid out the first time
+  const handleLayout = (_e: LayoutChangeEvent) => {
+    if (didCenterOnceRef.current) return;
+    // Defer to ensure items are measured
+    requestAnimationFrame(() => {
+      centerSelectedSilently(false);
+      didCenterOnceRef.current = true;
+    });
+  };
+
+  // Also re-center whenever the *selected index* changes (e.g., parent sets a new date)
   useEffect(() => {
-    // onDateChange(new Date());
-    // setSelectedDate(today);
-    // onDateChange(today);
+    if (!didCenterOnceRef.current) return; // first time is handled in onLayout
+    requestAnimationFrame(() => centerSelectedSilently(false));
+  }, [selectedIdx]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    setTimeout(() => {
-      // use the same today reference everywhere
-      const todayIndex = days.findIndex((d) => isSameDay(d, today));
-      if (todayIndex !== -1) {
-        flatListRef.current?.scrollToIndex({
-          index: todayIndex,
-          animated: false,
-          viewPosition: 0.5,
-        });
-        handleDateSelect(today); // ✅ single API call here
-        // setSelectedDate(new Date());
-      }
-    }, 200);
-  }, []);
-
-  // When user swipes → first visible item becomes selected
-  const handleMomentumScrollEnd = (
-    event: NativeSyntheticEvent<NativeScrollEvent>
-  ) => {
-    const offsetX = event.nativeEvent.contentOffset.x;
-    const firstVisibleIndex = Math.round(offsetX / itemWidth);
-    if (days[firstVisibleIndex]) {
-      handleDateSelect(days[firstVisibleIndex]);
-    }
+  const onScrollBeginDrag = () => {
+    userDraggingRef.current = true;
   };
 
-  const getDateLabel = (date: Date) => {
-    if (isToday(date)) return "Today";
-    if (isTomorrow(date)) return "Tomorrow";
-    if (isYesterday(date)) return "Yesterday";
-    return format(date, "EEE, MMM dd"); // Fallback format
-  };
+  const onMomentumScrollEnd = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    if (!userDraggingRef.current) return; // ignore programmatic scrolls
+    userDraggingRef.current = false;
 
-  const renderItem = ({ item }: { item: Date }) => {
-    const isSelected = isSameDay(item, selectedDate);
-
-    return (
-      <TouchableOpacity
-        onPress={() => handleDateSelect(item)}
-        style={[styles.dateBox, isSelected && styles.selectedBox]}
-        disabled={loading && isSelected}
-      >
-        <Text style={[styles.dayText, isSelected && styles.selectedText]}>
-          {format(item, "EEE")}
-        </Text>
-        {loading && isSelected ? (
-          <ActivityIndicator size="small" color={newTheme.textPrimary} />
-        ) : (
-          <Text style={[styles.dateText, isSelected && styles.selectedText]}>
-            {format(item, "dd")}
-          </Text>
-        )}
-      </TouchableOpacity>
-    );
+    const raw = e.nativeEvent.contentOffset.x - sidePad;
+    const idx = Math.round(raw / itemWidth);
+    const clamped = Math.max(0, Math.min(days.length - 1, idx));
+    const next = days[clamped];
+    if (next && next.getTime() !== selected.getTime()) onChange(next);
   };
 
   return (
-    <View>
+    <View onLayout={handleLayout}>
       <FlatList
-        ref={flatListRef}
+        ref={listRef}
         data={days}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.toISOString()}
+        keyExtractor={(d) => d.toISOString()}
         horizontal
         showsHorizontalScrollIndicator={false}
         snapToInterval={itemWidth}
         decelerationRate="fast"
+        onScrollBeginDrag={onScrollBeginDrag}
+        onMomentumScrollEnd={onMomentumScrollEnd}
         getItemLayout={(_, index) => ({
           length: itemWidth,
           offset: itemWidth * index,
           index,
         })}
-        contentContainerStyle={{
-          paddingHorizontal: (screenWidth - itemWidth) / 2,
+        contentContainerStyle={
+          centerSelected ? { paddingHorizontal: sidePad } : undefined
+        }
+        initialNumToRender={20}
+        renderItem={({ item }) => {
+          const isSelected = isSameDay(item, selected);
+          return (
+            <TouchableOpacity
+              onPress={() => !isSelected && onChange(item)}
+              disabled={isLoading && isSelected}
+              activeOpacity={0.85}
+              style={[styles.dateBox, isSelected && styles.selectedBox]}
+            >
+              <Text style={[styles.dayText, isSelected && styles.selectedText]}>
+                {item.toLocaleDateString(undefined, { weekday: "short" })}
+              </Text>
+              {isLoading && isSelected ? (
+                <ActivityIndicator size="small" color={newTheme.textPrimary} />
+              ) : (
+                <Text
+                  style={[styles.dateText, isSelected && styles.selectedText]}
+                >
+                  {String(item.getDate()).padStart(2, "0")}
+                </Text>
+              )}
+            </TouchableOpacity>
+          );
         }}
-        onMomentumScrollEnd={handleMomentumScrollEnd}
       />
-
-      {/* <Text style={styles.dateLabel}>d:{getDateLabel(selectedDate)}</Text> */}
     </View>
   );
 }
@@ -169,29 +162,13 @@ const styling = (theme: ThemeKey, newTheme: any, itemWidth: number) =>
       justifyContent: "center",
       marginHorizontal: 6,
     },
-    selectedBox: {
-      backgroundColor: newTheme.accent,
-    },
-    dayText: {
-      fontSize: 14,
-      fontWeight: "500",
-      color: newTheme.textSecondary,
-    },
+    selectedBox: { backgroundColor: newTheme.accent },
+    dayText: { fontSize: 14, fontWeight: "500", color: newTheme.textSecondary },
     dateText: {
       fontSize: 16,
       fontWeight: "600",
       color: newTheme.textPrimary,
       marginTop: 4,
     },
-    selectedText: {
-      color: newTheme.background,
-      fontWeight: "700",
-    },
-    dateLabel: {
-      fontSize: 18,
-      fontWeight: "600",
-      color: newTheme.textPrimary,
-      textAlign: "center",
-      marginBottom: 12,
-    },
+    selectedText: { color: newTheme.background, fontWeight: "700" },
   });
