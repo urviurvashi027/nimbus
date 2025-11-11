@@ -1,5 +1,6 @@
 // components/FilterPill.tsx
-import React from "react";
+import ThemeContext from "@/context/ThemeContext";
+import React, { useContext } from "react";
 import { Pressable, Text, StyleSheet } from "react-native";
 
 interface Props {
@@ -16,6 +17,8 @@ export default function FilterPill({
   type = "date",
 }: Props) {
   const isDate = type === "date";
+  const { newTheme } = useContext(ThemeContext);
+  const styles = styling(newTheme);
   return (
     <Pressable
       onPress={onPress}
@@ -38,34 +41,35 @@ export default function FilterPill({
   );
 }
 
-const styles = StyleSheet.create({
-  pill: {
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-    borderRadius: 20,
-    marginRight: 8,
-  },
-  label: {
-    fontSize: 14,
-    color: "#aaa",
-    fontWeight: "600",
-  },
-  datePill: {
-    // backgroundColor: "#1a1a1a",
-  },
-  dateSelected: {
-    backgroundColor: "#9DFF56",
-  },
-  dateLabelSelected: {
-    color: "#000",
-  },
-  tagPill: {
-    backgroundColor: "#222",
-  },
-  tagSelected: {
-    backgroundColor: "#A78BFA", // purple
-  },
-  tagLabelSelected: {
-    color: "#fff",
-  },
-});
+const styling = (newTheme: any) =>
+  StyleSheet.create({
+    pill: {
+      paddingHorizontal: 20,
+      paddingVertical: 14,
+      borderRadius: 20,
+      marginRight: 8,
+    },
+    label: {
+      fontSize: 14,
+      color: newTheme.textSecondary,
+      fontWeight: "600",
+    },
+    datePill: {
+      // backgroundColor: "#1a1a1a",
+    },
+    dateSelected: {
+      backgroundColor: newTheme.accentPressed,
+    },
+    dateLabelSelected: {
+      color: newTheme.background,
+    },
+    tagPill: {
+      backgroundColor: newTheme.surface,
+    },
+    tagSelected: {
+      backgroundColor: newTheme.info, // purple
+    },
+    tagLabelSelected: {
+      color: "#fff",
+    },
+  });

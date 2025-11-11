@@ -2,43 +2,61 @@ import {
   ActivityIndicator,
   FlatList,
   Platform,
-  ScrollView,
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
 import { View, Text, ScreenView } from "@/components/Themed";
 import { router } from "expo-router";
-import React, { useContext, useEffect, useState } from "react";
+import Toast from "react-native-toast-message";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { format, isToday, isTomorrow, isYesterday } from "date-fns";
 
 import ThemeContext from "@/context/ThemeContext";
+import { useAuth } from "@/context/AuthContext";
+
 import { getHabitList, markHabitDone } from "@/services/habitService";
 import { HabitItem } from "@/types/habitTypes";
+
 import { ThemeKey } from "@/components/Themed";
-import { format, isToday, isTomorrow, isYesterday } from "date-fns";
-import NewUserScreen from "../FirstTimeUser/NewUserScreen";
+
 import DateScroller from "@/components/homeScreen/DateScroller";
-// import HabitListPanel from "@/components/homeScreen/HabitListPanel";
 import DailyCheckInPanel from "@/components/homeScreen/DailyCheckInPanel";
 import HabitItemCard from "@/components/homeScreen/component/HabitItem";
-import Toast from "react-native-toast-message";
-import { useAuth } from "@/context/AuthContext";
 import TopBadge from "@/components/homeScreen/TopBadge";
+import NewUserScreen from "../FirstTimeUser/NewUserScreen";
 
 export default function TabOneScreen() {
   const [habitList, setHabitList] = useState<HabitItem[]>([]);
+
+  // Single source of truth
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+
   const [date, setDate] = useState<string>("");
   const [dateLabel, setDateLabel] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [userInfo, setUserInfo] = useState<any>(null);
   const [completedHabit, setCompletedHabit] = useState<number>();
 
-  const { theme, newTheme, toggleTheme, useSystemTheme } =
-    useContext(ThemeContext);
+  const { newTheme } = useContext(ThemeContext);
 
-  const styles = styling(theme, newTheme);
+  const styles = styling(newTheme);
+
+  const toLocalISO = (d: Date) => {
+    const off = d.getTimezoneOffset();
+    const local = new Date(d.getTime() - off * 60000);
+    return local.toISOString().slice(0, 10); // YYYY-MM-DD
+  };
+
+  const queryDate = useMemo(() => toLocalISO(selectedDate), [selectedDate]);
+
+  // fetch habits WHEN selectedDate changes
+  useEffect(() => {
+    (async () => {
+      await getHabitListData(queryDate);
+    })();
+  }, [queryDate]);
 
   // create button click
   const onCreateClick = () => {
@@ -46,14 +64,14 @@ export default function TabOneScreen() {
   };
 
   // function to be called whenever date changes
-  const onDateChange = async (val: any) => {
-    const formatted = format(new Date(val), "yyyy-MM-dd");
-    const label = getDateLabel(val);
-    setDate(formatted);
-    setDateLabel(label);
+  // const onDateChange = async (val: any) => {
+  //   const formatted = format(new Date(val), "yyyy-MM-dd");
+  //   const label = getDateLabel(val);
+  //   setDate(formatted);
+  //   setDateLabel(label);
 
-    await getHabitListData(formatted);
-  };
+  //   await getHabitListData(formatted);
+  // };
 
   const getHabitListData = async (date?: string) => {
     const habitIcons = ["🍰", "🌱", "🏃‍♂️", "🧘", "📚", "💧"];
@@ -207,17 +225,20 @@ export default function TabOneScreen() {
 
                   {/* 🔥 Reusable TopBadge (points, score, level, etc.) */}
                   <TopBadge
-                    count={userInfo.points || 123} // fallback if you don’t have points in API
+                    // count={userInfo.points || 123} // fallback if you don’t have points in API
                     // label="pts"
                     iconName="star"
                     variant="pill"
-                    onPress={() => console.log("badge pressed")}
+                    onPress={() => {
+                      console.log("badge pressed");
+                      router.push("/(auth)/CoachScreen/CoachScreen");
+                    }}
                   />
                 </View>
               )}
 
               {/* ✅ Date scroller */}
-              <DateScroller onDateChange={onDateChange} />
+              <DateScroller onDateChange={setSelectedDate} />
 
               {/* ✅ First time user journey */}
               {userInfo?.firstTimeUser ? (
@@ -228,7 +249,7 @@ export default function TabOneScreen() {
                 <>
                   {/* ✅ Daily check-in */}
                   <View style={{ marginVertical: 30 }}>
-                    <DailyCheckInPanel />
+                    <DailyCheckInPanel date={queryDate} />
                   </View>
 
                   {/* ✅ Habits header (only if we have habits) */}
@@ -272,7 +293,7 @@ export default function TabOneScreen() {
   );
 }
 
-const styling = (theme: ThemeKey, newTheme: any) =>
+const styling = (newTheme: any) =>
   StyleSheet.create({
     gestureContainer: {
       // backgroundColor: themeColors[theme].background,

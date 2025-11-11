@@ -53,8 +53,10 @@ export default function WaterTracker({
     Math.floor((screenW - contentPadding * 2) / Math.min(perRow, total)) - 12
   );
 
-  const filled = filledColor ?? "#7C5CFA";
-  const empty = emptySlotColor ?? newTheme.surface;
+  const styles = styling(newTheme);
+
+  const filled = filledColor ?? "#2D3028";
+  const empty = emptySlotColor ?? "#2D3028";
   const plus = plusColor ?? newTheme.accent;
 
   const anims = useMemo(
@@ -130,10 +132,6 @@ export default function WaterTracker({
         <Text style={[styles.title, { color: newTheme.textPrimary }]}>
           {headerTitle}
         </Text>
-        <TouchableOpacity
-          accessibilityLabel="Edit water target"
-          style={styles.editBtn}
-        />
       </View>
 
       <Text style={[styles.subtitle, { color: newTheme.textSecondary }]}>
@@ -213,57 +211,66 @@ export default function WaterTracker({
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
-const styles = StyleSheet.create({
-  container: {
-    width: "100%",
-    // NO backgroundColor here — parent should control the section background.
-  },
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  title: { fontSize: 20, fontWeight: "800" },
-  editBtn: { padding: 6 },
-  subtitle: { fontSize: 13, marginTop: 6 },
-  // grid uses wrap so it will break into next line instead of overflowing
-  grid: {
-    marginTop: 8,
-    flexDirection: "row",
-    flexWrap: "wrap",
-    alignItems: "center",
-  },
-  droplet: {
-    justifyContent: "center",
-    alignItems: "center",
-    ...Platform.select({
-      ios: {
-        shadowColor: "#000",
-        shadowOpacity: 0.18,
-        shadowOffset: { width: 0, height: 6 },
-        shadowRadius: 8,
-      },
-      android: { elevation: 3 },
-    }),
-  },
-  emptySlot: {
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 0.6,
-    borderColor: "rgba(255,255,255,0.04)",
-  },
-  plusCircle: {
-    justifyContent: "center",
-    alignItems: "center",
-    ...Platform.select({
-      ios: {
-        shadowColor: "#000",
-        shadowOpacity: 0.06,
-        shadowOffset: { width: 0, height: 4 },
-        shadowRadius: 6,
-      },
-      android: { elevation: 2 },
-    }),
-  },
-  plusText: { fontSize: 20, fontWeight: "700", color: "#111" },
-});
+const styling = (newTheme: any) =>
+  StyleSheet.create({
+    container: {
+      width: "100%",
+      padding: 15,
+      backgroundColor: newTheme.surface,
+      borderRadius: 12,
+      // NO backgroundColor here — parent should control the section background.
+    },
+    headerRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: 18,
+    },
+    title: { fontSize: 20, fontWeight: "800" },
+    // editBtn: { padding: 6 },
+    subtitle: { fontSize: 13, marginTop: 6, paddingHorizontal: 18 },
+    // grid uses wrap so it will break into next line instead of overflowing
+    grid: {
+      marginTop: 8,
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+      flexDirection: "row",
+      flexWrap: "wrap",
+      alignItems: "center",
+      // backgroundColor: "green",
+    },
+    droplet: {
+      justifyContent: "center",
+      alignItems: "center",
+      ...Platform.select({
+        ios: {
+          shadowColor: "#000",
+          shadowOpacity: 0.18,
+          shadowOffset: { width: 0, height: 6 },
+          shadowRadius: 8,
+        },
+        android: { elevation: 3 },
+      }),
+    },
+    emptySlot: {
+      justifyContent: "center",
+      alignItems: "center",
+      borderWidth: 0.1,
+      borderColor: newTheme.focus,
+    },
+    plusCircle: {
+      justifyContent: "center",
+      alignItems: "center",
+      // backgroundColor: "red",
+      ...Platform.select({
+        ios: {
+          // shadowColor: "red",
+          shadowOpacity: 0.06,
+          shadowOffset: { width: 0, height: 4 },
+          shadowRadius: 6,
+        },
+        android: { elevation: 2 },
+      }),
+    },
+    plusText: { fontSize: 20, fontWeight: "700", color: newTheme.chart1 },
+  });

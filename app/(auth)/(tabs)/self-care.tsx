@@ -11,7 +11,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { router, useNavigation } from "expo-router";
 // application level import
 import ThemeContext from "@/context/ThemeContext";
-import { themeColors } from "@/constant/theme/Colors";
+// import { themeColors } from "@/constant/theme/Colors";
 import {
   buttons as NavigationButton,
   NavigationButtonType,
@@ -399,7 +399,7 @@ const styling = (theme: ThemeKey, newTheme: any) =>
       width: 60,
       height: 60,
       borderRadius: 25, // Makes the button rounded
-      marginRight: 8, // Space between buttons
+      marginRight: 12, // Space between buttons
     },
     buttonIcon: {
       width: 60,
@@ -408,6 +408,9 @@ const styling = (theme: ThemeKey, newTheme: any) =>
     },
     buttonLabel: {
       paddingTop: 10,
+      // alignContent: "center",
+      // justifyContent: "center",
+      alignItems: "center",
       color: newTheme.textPrimary,
       fontSize: 10,
     },

@@ -120,6 +120,26 @@ export const Section: any[] = [
     ],
   },
   {
+    header: "Achievements & Statistics",
+    icon: "trophy",
+    items: [
+      {
+        id: "overview",
+        icon: "stats-chart-outline",
+        color: "#dfd9f9",
+        type: "screen",
+        label: "Overview",
+      },
+      {
+        id: "Badges",
+        icon: "trophy-outline",
+        color: "#dfd9f9",
+        type: "screen",
+        label: "Badges",
+      },
+    ],
+  },
+  {
     header: "Social Media",
     icon: "document",
     items: [

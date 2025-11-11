@@ -15,7 +15,7 @@ import {
   buttons as NavigationButton,
   NavigationButtonType,
 } from "@/constant/data/toolsButton";
-import { themeColors } from "@/constant/theme/Colors";
+// import { themeColors } from "@/constant/theme/Colors";
 
 import { ScreenView } from "@/components/Themed";
 import { ThemeKey } from "@/components/Themed";

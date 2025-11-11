@@ -8,7 +8,6 @@ import ThemeContext from "@/context/ThemeContext";
 import { useAuth } from "@/context/AuthContext";
 
 //constant
-import { themeColors } from "@/constant/theme/Colors";
 
 // components
 import { ScreenView } from "@/components/Themed";
@@ -21,8 +20,6 @@ import {
 import { ThemeKey } from "@/components/Themed";
 import { StyledCheckbox } from "@/components/common/ThemedComponent/StyledCheckbox";
 
-import { ColorSet } from "@/types/themeTypes";
-
 export default function signIn() {
   // input state
   const [username, setUsername] = useState("");
@@ -33,7 +30,8 @@ export default function signIn() {
 
   const navigation = useNavigation();
 
-  const { theme, newTheme } = useContext(ThemeContext);
+  const { newTheme } = useContext(ThemeContext);
+  const styles = styling(newTheme);
 
   useEffect(() => {
     navigation.setOptions({
@@ -44,8 +42,6 @@ export default function signIn() {
       headerTitle: "",
     });
   }, [navigation]);
-
-  const styles = styling(theme, newTheme);
 
   const onLoginClick = async () => {
     try {
@@ -167,7 +163,7 @@ export default function signIn() {
   );
 }
 
-const styling = (theme: ThemeKey, newTheme: any) =>
+const styling = (newTheme: any) =>
   StyleSheet.create({
     mainContainer: {
       paddingTop: 95,

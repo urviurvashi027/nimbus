@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -24,14 +24,15 @@ import { ThemeKey } from "../Themed";
 const MAX_DAYS = 365;
 
 interface DateScrollerProps {
-  onDateChange: (date: Date) => Promise<any>;
+  // value: Date;
+  onDateChange: (date: Date) => void;
 }
 
 export default function DateScroller({ onDateChange }: DateScrollerProps) {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [loading, setLoading] = useState(false);
 
-  const flatListRef = useRef<FlatList>(null);
+  const flatListRef = useRef<FlatList<Date>>(null);
   const screenWidth = Dimensions.get("window").width;
   const itemWidth = screenWidth / 5; // show 5 at a time
 
@@ -39,11 +40,20 @@ export default function DateScroller({ onDateChange }: DateScrollerProps) {
   const { theme, newTheme } = useContext(ThemeContext);
   const styles = styling(theme, newTheme, itemWidth);
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  // Generate days
-  const days = Array.from({ length: MAX_DAYS * 2 }, (_, i) =>
-    addDays(today, i - MAX_DAYS)
+  const today = useMemo(() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }, []);
+
+  const days = useMemo(
+    () =>
+      Array.from({ length: 365 * 2 }, (_, i) => {
+        const d = new Date(today);
+        d.setDate(d.getDate() + i - 365);
+        return d;
+      }),
+    [today]
   );
 
   // console.log(days, "days");

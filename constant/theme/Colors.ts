@@ -97,19 +97,6 @@ export const themeColors: ThemeColorsEx = {
     inputLabel: "#f6f8fc",
     divider: "#e6e7eb",
     ...commonColor,
-
-    // dark theme color combination
-    // primaryColor: "#f5bcdd",
-    // text: "#fffdf7",
-    // inputLabel: "#f6f8fc",
-    // background: "#2f2f2f",
-    // tint: "#f5bcdd",
-    // divider: "#727275",
-    // inpurBorderColor: "#5f5f5f",
-    // tabIconDefault: "#5f5f5f",
-    // boxShadowColor: "#f5f5f5",
-    // tabIconSelected: "#f5bcdd",
-    // ...commonColor,
   },
 };
 
@@ -130,8 +117,8 @@ const colors = {
 const basicColors: any = {
   primary: "#007AFF",
   secondary: "#5856D6",
-  border: "#D1D1D6",
-  overlay: "rgba(0, 0, 0, 0.5)",
+  // border: "#D1D1D6",
+  // overlay: "rgba(0, 0, 0, 0.5)",
 
   // new property value
   background: "#1C1E1A",
@@ -146,6 +133,50 @@ const basicColors: any = {
   success: "#90B47A",
   warning: "#EBCB8B",
   error: "#BF616A",
+  // NEW — neutrals for elevation/borders
+  card: "#22251E", // slightly lighter than background
+  cardRaised: "#262A22", // for prominent cards
+  surfaceMuted: "#23261F", // list rows / chips
+  border: "#3A3E33", // hairline borders
+  borderMuted: "#2D3028",
+
+  // NEW — overlays / scrims
+  overlay: "rgba(12,14,11,0.6)", // modal backdrop
+  overlayStrong: "rgba(12,14,11,0.75)",
+  shadow: "rgba(0,0,0,0.35)", // card shadow
+
+  // NEW — focus / outline
+  focus: "#D7E3C8", // soft light-green outline
+  focusRing: "rgba(163,190,140,0.35)",
+
+  // NEW — buttons
+  buttonPrimary: "#A3BE8C", // = accent
+  buttonPrimaryText: "#10120E",
+  buttonGhostBg: "#262A22",
+  buttonGhostBorder: "#3A3E33",
+  buttonGhostText: "#ECEFF4",
+
+  // NEW — chart accents (brighter but cohesive)
+  // Use these for lines, bars, and categorical series.
+  chart1: "#CFE86C", // fresh lime (pairs with accent)
+  chart2: "#79A9F2", // softened blue (fits info family)
+  chart3: "#F2B36E", // warm amber (fits warning family)
+  chart4: "#E48FA3", // muted rose (ties to error family)
+  chart5: "#9DD2C5", // seafoam (secondary success)
+  chart6: "#C8B8F4", // lavender (for variety)
+  chartGrid: "#35382E", // subtle grid/rules
+  chartAreaFade: "rgba(163,190,140,0.10)",
+
+  // NEW — gradients (for charts/headers)
+  gradAccent: ["#B8D39B", "#8FAD78"], // light -> base accent
+  gradLime: ["#D6F083", "#A3C94D"], // for progress arcs
+  gradBlue: ["#A9C7F7", "#6F97D3"],
+  gradAmber: ["#F6C889", "#DFA154"],
+
+  // NEW — states
+  pressed: "rgba(255,255,255,0.04)",
+  hovered: "rgba(255,255,255,0.03)",
+  selected: "rgba(163,190,140,0.12)",
 };
 
 const typography: Typography = {
@@ -172,28 +203,16 @@ export const theme: ThemeColors = {
   // The 'basic' theme can be the same as your default light theme
   basic: basicColors,
 
-  // The 'light' theme can extend the basic one if they are similar
+  // The 'dark' theme can extend the basic one if they are similar
   dark: {
     ...basicColors,
     // You can override specific colors for light theme if needed
     // For example: background: '#FAFAFA',
   },
 
-  // The 'dark' theme will have its own distinct color set
+  // The 'light' theme will have its own distinct color set
   light: {
     ...basicColors,
-    // primary: "#0A84FF", // Often a brighter primary for dark backgrounds
-    // secondary: "#5E5CE6",
-    // accent: "#FF9F0A",
-    // success: "#30D158",
-    // warning: "#FFD60A",
-    // error: "#FF453A",
-    // textPrimary: "#FFFFFF",
-    // textSecondary: "#8D8D93",
-    // textDisabled: "#48484A",
-    // background: "#000000",
-    // surface: "#1C1C1E", // Dark cards, modals
-    // border: "#38383A",
     overlay: "rgba(0, 0, 0, 0.6)",
   },
   spacing: spacing,

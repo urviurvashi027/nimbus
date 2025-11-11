@@ -11,7 +11,7 @@ import { Section } from "@/constant/data/settingsList";
 import ThemeContext from "@/context/ThemeContext";
 
 import NotificationTypeModal from "@/components/setting/NotificationTypeModal";
-import RoutineSettingModal from "@/components/setting/RoutineSetting";
+// import RoutineSettingModal from "@/components/setting/RoutineSetting";
 import ReportBugModal from "@/components/setting/ReportBug";
 import FeedbackModal from "@/components/setting/Feeback";
 import PrivacyPolicyModal from "@/components/setting/PrivacyPoilcy";
@@ -23,6 +23,8 @@ import SocialActionModal from "@/components/setting/SocialActionModal";
 import AdvancedSettingsModal from "@/components/setting/AdvanceSettingModal";
 import EditProfileModal from "@/components/setting/EditProfileModal";
 import UpgradeBanner from "@/components/common/UpgradeBanner";
+import { router } from "expo-router";
+import DailyCheckInCard from "@/components/homeScreen/component/DailyCheckInCard";
 
 type FormState = {
   darkMode: boolean;
@@ -160,6 +162,11 @@ export default function profile() {
   const onSettingPanelClick = (type: string, label: string) => {
     if (type === "modal") {
       handleModalVisibilty(label);
+    }
+    if (type === "screen") {
+      if (label === "Overview") router.push("/(auth)/Overview/details");
+      if (label === "Badges")
+        router.push("/(auth)/AchievementScreen/Achievement");
     }
   };
 

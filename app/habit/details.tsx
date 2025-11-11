@@ -8,7 +8,7 @@ import {
 import { ScrollView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { themeColors } from "@/constant/theme/Colors";
+// import { themeColors } from "@/constant/theme/Colors";
 import { ScreenView, ThemeKey } from "@/components/Themed";
 import { getHabitDetailsById } from "@/services/habitService";
 import ThemeContext from "@/context/ThemeContext";
@@ -162,7 +162,7 @@ const HabitDetails = () => {
   };
 
   const handleStatsPress = () => {
-    router.push("/(auth)/Stats/details");
+    router.push("/(auth)/Overview/details");
   };
 
   return (

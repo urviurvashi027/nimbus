@@ -8,7 +8,7 @@ import { View, ScreenView, ThemeKey } from "@/components/Themed";
 import SegmentedButton from "@/components/segmentedButton";
 
 // constant
-import { themeColors } from "@/constant/theme/Colors";
+// import { themeColors } from "@/constant/theme/Colors";
 // context
 import ThemeContext from "@/context/ThemeContext";
 

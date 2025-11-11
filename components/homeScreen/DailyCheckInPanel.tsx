@@ -1,5 +1,5 @@
 // components/homeScreen/DailyCheckInPanel.tsx
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -11,59 +11,58 @@ import {
   Easing,
   LayoutAnimation,
   TouchableOpacity,
+  ActivityIndicator,
+  Pressable,
 } from "react-native";
 import DailyCheckInCard from "@/components/homeScreen/component/DailyCheckInCard";
 import ThemeContext from "@/context/ThemeContext";
 import { useRouter } from "expo-router";
+import { getCheckinList } from "@/services/dailyCheckinService";
+import {
+  clamp,
+  pickColor,
+  pickIcon,
+  resolveUnit,
+  roundForUnit,
+  routeFor,
+  stepFor,
+} from "@/utils/dailyCheckin";
+import { DailyCheckinSkeletonCard } from "./component/DailyCheckinSkeletonCard";
+import axios from "axios";
+import { Unit } from "@/types/dailyCheckin";
 
-const mockData = [
-  {
-    name: "Water",
-    goalQuantity: 10,
-    completedQuantity: 4,
-    unit: "glass",
-    icon: "💧",
-    color: "#A259FF",
-    route: "/(auth)/dailyCheckIn/WaterCheckIn",
-  },
-  {
-    name: "Sleep",
-    goalQuantity: 8,
-    completedQuantity: 5,
-    unit: "hours",
-    icon: "😴",
-    color: "#4CAF50",
-    route: "/(auth)/dailyCheckIn/WaterCheckIn",
-  },
-  {
-    name: "Meditation",
-    goalQuantity: 20,
-    completedQuantity: 15,
-    unit: "min",
-    icon: "🧘",
-    color: "#00BCD4",
-    route: "/(auth)/dailyCheckIn/WaterCheckIn",
-  },
-  {
-    name: "Reading",
-    goalQuantity: 30,
-    completedQuantity: 10,
-    unit: "min",
-    icon: "📚",
-    color: "#9C27B0",
-    route: "/(auth)/dailyCheckIn/WaterCheckIn",
-  },
-];
+type CardItem = {
+  name: string;
+  goalQuantity: number;
+  completedQuantity: number;
+  unit: string;
+  icon: string;
+  color: string;
+  route: string;
+  id?: number;
+};
 
-const DailyCheckInPanel = () => {
-  const [data, setData] = useState(mockData);
-  const [expanded, setExpanded] = useState(true);
-  const rotateAnim = React.useRef(new Animated.Value(expanded ? 1 : 0)).current;
+const formatLocalISODate = (d = new Date()) => {
+  const tz = d.getTimezoneOffset();
+  const local = new Date(d.getTime() - tz * 60000);
+  return local.toISOString().slice(0, 10);
+};
 
-  const { theme, newTheme } = useContext(ThemeContext);
+type Props = { date: string }; // YYYY-MM-DD
+
+const DailyCheckInPanel = ({ date }: Props) => {
+  const router = useRouter();
+  const { newTheme } = useContext(ThemeContext);
   const styles = styling(newTheme);
 
-  const router = useRouter();
+  const [items, setItems] = useState<CardItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [err, setErr] = useState<string | null>(null);
+
+  // const [queryDate] = useState(() => formatLocalISODate());
+
+  const [expanded, setExpanded] = useState(true);
+  const rotateAnim = React.useRef(new Animated.Value(1)).current;
 
   // Enable LayoutAnimation on Android
   useEffect(() => {
@@ -88,31 +87,83 @@ const DailyCheckInPanel = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   }, [expanded, rotateAnim]);
 
-  const updateQuantity = (index: number, delta: number) => {
-    setData((prev) =>
-      prev.map((item, i) =>
-        i === index
-          ? {
-              ...item,
-              completedQuantity: Math.max(
-                0,
-                Math.min(item.goalQuantity, item.completedQuantity + delta)
-              ),
-            }
-          : item
-      )
-    );
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setErr(null);
+      try {
+        const res = await getCheckinList(date, true); // <— single source of truth
+        // const res = await getCheckinList(queryDate, true);
 
-  // caret rotation interpolation: 0 -> 0deg, 1 -> 180deg
+        // Some backends return { success, data }, some return array directly
+        const habits = Array.isArray((res as any)?.data)
+          ? (res as any).data
+          : Array.isArray(res)
+          ? res
+          : [];
+
+        const mapped: CardItem[] = habits.map((h: any) => ({
+          id: h.id,
+          name: h.name ?? "Habit",
+          goalQuantity: Number(h.target_unit ?? 0),
+          completedQuantity: Number(h.completed_unit ?? 0),
+          unit: resolveUnit(h),
+          icon: pickIcon(h.name),
+          color: h.color || pickColor(h.name, newTheme),
+          route: routeFor(h.name),
+        }));
+
+        setItems(mapped);
+      } catch (e: any) {
+        // robust string extraction for axios or generic errors
+        const msg = axios.isAxiosError(e)
+          ? e.response?.data?.message ??
+            e.response?.data?.detail ??
+            e.message ??
+            "Failed to load"
+          : (typeof e === "string" ? e : e?.message) || "Failed to load";
+        setErr(msg);
+        setItems([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [date]);
+
+  // caret rotation interpolation
   const rotate = rotateAnim.interpolate({
     inputRange: [0, 1],
     outputRange: ["0deg", "180deg"],
   });
 
-  const completedCount = data.filter(
-    (d) => d.completedQuantity >= d.goalQuantity
-  ).length;
+  const completedCount = useMemo(
+    () =>
+      items.filter(
+        (d) => d.completedQuantity >= d.goalQuantity && d.goalQuantity > 0
+      ).length,
+    [items]
+  );
+
+  const incrementByName = (name: string) =>
+    setItems((prev) =>
+      prev.map((p) => {
+        if (p.name !== name) return p;
+        const step = stepFor(p);
+        const next = clamp(p.completedQuantity + step, 0, p.goalQuantity);
+        return { ...p, completedQuantity: roundForUnit(next, p.unit as Unit) };
+      })
+    );
+
+  const decrementByName = (name: string) =>
+    setItems((prev) =>
+      prev.map((p) => {
+        if (p.name !== name) return p;
+        const step = stepFor(p);
+        const next = clamp(p.completedQuantity - step, 0, p.goalQuantity);
+        return { ...p, completedQuantity: roundForUnit(next, p.unit as Unit) };
+      })
+    );
 
   return (
     <View style={styles.container}>
@@ -140,20 +191,10 @@ const DailyCheckInPanel = () => {
         {/* Count pill always visible */}
         <View style={styles.pill}>
           <Text style={styles.pillText}>
-            {completedCount}/{data.length}
+            {completedCount}/{items.length || 0}
           </Text>
         </View>
       </TouchableOpacity>
-
-      {/* <View style={styles.header}>
-        <Text style={styles.title}>Daily check-in</Text>
-        <View style={styles.pill}>
-          <Text style={styles.pillText}>
-            {data.filter((d) => d.completedQuantity >= d.goalQuantity).length}/
-            {data.length}
-          </Text>
-        </View>
-      </View> */}
 
       {/* Horizontal scroll list */}
 
@@ -164,16 +205,86 @@ const DailyCheckInPanel = () => {
           contentContainerStyle={styles.scrollContent}
         >
           <View style={styles.grid}>
-            {data.map((item, index) => (
-              <DailyCheckInCard
-                key={item.name}
-                {...item}
-                onPress={() => router.push({ pathname: item.route as any })}
-                // onPress={() => router.push(item.route)}
-                onIncrement={() => updateQuantity(index, 1)}
-                onDecrement={() => updateQuantity(index, -1)}
-              />
-            ))}
+            {loading ? (
+              // skeletons
+              [0, 1, 2, 3].map((i) => (
+                <DailyCheckinSkeletonCard key={`sk-${i}`} theme={newTheme} />
+              ))
+            ) : err ? (
+              // error card only
+              <View style={styles.errorCard}>
+                <Text style={styles.errorText}>{err}</Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    // trigger refetch
+                    setErr(null);
+                    setLoading(true);
+                    // simple: flip expanded twice to trigger useEffect? better to call same fetch function.
+                    // For brevity, rely on the effect by updating theme dep or just re-run code inline.
+                    (async () => {
+                      try {
+                        const date = formatLocalISODate();
+                        const res = await getCheckinList(date, true);
+                        const habits = Array.isArray((res as any)?.data)
+                          ? (res as any).data
+                          : Array.isArray(res)
+                          ? res
+                          : [];
+                        const mapped: CardItem[] = habits.map((h: any) => ({
+                          id: h.id,
+                          name: h.name ?? "Habit",
+                          goalQuantity: Number(h.target_unit ?? 0),
+                          completedQuantity: Number(h.completed_unit ?? 0),
+                          unit: resolveUnit(h),
+                          icon: pickIcon(h.name),
+                          color: h.color || pickColor(h.name, newTheme),
+                          route: routeFor(h.name),
+                        }));
+                        setItems(mapped);
+                      } catch (e: any) {
+                        const msg = axios.isAxiosError(e)
+                          ? e.response?.data?.message ??
+                            e.response?.data?.detail ??
+                            e.message ??
+                            "Failed to load"
+                          : (typeof e === "string" ? e : e?.message) ||
+                            "Failed to load";
+                        setErr(msg);
+                      } finally {
+                        setLoading(false);
+                      }
+                    })();
+                  }}
+                  style={styles.retryBtn}
+                >
+                  <Text style={styles.retryText}>Retry</Text>
+                </TouchableOpacity>
+              </View>
+            ) : items.length > 0 ? (
+              // data cards
+              items.map((item) => (
+                <DailyCheckInCard
+                  key={item.id ?? item.name}
+                  {...item}
+                  onPress={() =>
+                    router.push({
+                      pathname: item.route as any,
+                      params: {
+                        id: item.id?.toString(),
+                        date: date, // <— same date
+                      },
+                    })
+                  }
+                  onIncrement={() => incrementByName(item.name)}
+                  onDecrement={() => decrementByName(item.name)}
+                />
+              ))
+            ) : (
+              // empty state only
+              <View style={styles.emptyCard}>
+                <Text style={styles.emptyText}>No check-ins for today</Text>
+              </View>
+            )}
           </View>
         </ScrollView>
       )}
@@ -225,6 +336,39 @@ const styling = (newTheme: any) =>
       color: newTheme.textSecondary,
       // rotate is handled by Animated.View
     },
+    errorCard: {
+      width: 220,
+      minHeight: 140,
+      borderRadius: 16,
+      marginRight: 12,
+      padding: 12,
+      backgroundColor: "#2a1f21",
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: newTheme.error,
+      justifyContent: "space-between",
+    },
+    errorText: { color: newTheme.textPrimary, marginBottom: 8 },
+    retryBtn: {
+      alignSelf: "flex-start",
+      backgroundColor: newTheme.accent,
+      borderRadius: 10,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+    },
+    retryText: { color: "#10120E", fontWeight: "800" },
+
+    emptyCard: {
+      width: 220,
+      height: 140,
+      borderRadius: 16,
+      marginRight: 12,
+      backgroundColor: newTheme.surface,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: newTheme.divider,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    emptyText: { color: newTheme.textSecondary },
   });
 
 export default DailyCheckInPanel;
