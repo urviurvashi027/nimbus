@@ -135,8 +135,9 @@ export const markHabitDone = async (
   id: any
 ): Promise<HabitDoneResponse> => {
   try {
-    const response: AxiosResponse<HabitDoneResponse> = await axios.patch(
-      `${API_ENDPOINTS.habitPatch}${id}/`,
+    const endpoint = `${API_ENDPOINTS.markHabitDone(id)}`;
+    const response: AxiosResponse<HabitDoneResponse> = await axios.post(
+      endpoint,
       data
     );
     if (response.status === 204) {
