@@ -1,161 +1,128 @@
-// components/UpgradeBanner.tsx
 import React from "react";
-import {
-  View,
-  Pressable,
-  Text as RNText,
-  StyleSheet,
-  GestureResponderEvent,
-  ViewStyle,
-} from "react-native";
+import { View, Pressable, Text, StyleSheet, ViewStyle } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import ThemeContext from "@/context/ThemeContext";
 
-/**
- * UpgradeBanner
- *
- * Props:
- * - title: main heading (default: "Upgrade Plan Now!")
- * - subtitle: small description
- * - cta: short CTA label (default: "Upgrade")
- * - onPress: called when CTA or banner pressed
- * - style: optional container style override
- */
 type Props = {
   title?: string;
   subtitle?: string;
   cta?: string;
-  onPress?: (e?: GestureResponderEvent) => void;
+  onPress?: () => void;
   style?: ViewStyle;
 };
 
 export default function UpgradeBanner({
-  title = "Upgrade Plan Now!",
-  subtitle = "Enjoy all the benefits and explore more possibilities",
+  title = "Unlock Nimbus Plus",
+  subtitle = "Go premium to create unlimited routines and unlock all features.",
   cta = "Upgrade",
   onPress,
   style,
 }: Props) {
-  const { theme, newTheme } = React.useContext(ThemeContext);
+  const { newTheme } = React.useContext(ThemeContext);
 
-  // precompute colors from theme (fallbacks if your theme doesn't provide)
-  const bg = "#9b84f7"; // purple-ish
-  const bgTint = newTheme?.surface || "rgba(255,255,255,0.04)";
-  const textPrimary = newTheme?.textPrimary || "#fff";
-  const textSecondary = newTheme?.textSecondary || "rgba(255,255,255,0.9)";
-  const ctaBg = newTheme?.background || "#fff";
-  const ctaText = newTheme?.surface || "#111";
+  const primary = newTheme?.accent ?? "#A7C57A";
+  const surface = newTheme?.surface ?? "#1E1E1E";
+  const textPrimary = newTheme?.textPrimary ?? "#fff";
+  const textSecondary = newTheme?.textSecondary ?? "rgba(255,255,255,0.7)";
+  const ctaBg = newTheme?.accent ?? "#A7C57A";
+  const ctaText = newTheme?.background ?? "#0D0D0D";
 
   return (
     <Pressable
       onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={`${title}. ${subtitle}. ${cta}`}
-      style={({ pressed }) => [
-        styles.wrapper,
-        { backgroundColor: bg, shadowColor: "#000" },
-        pressed && styles.pressed,
-        style,
-      ]}
+      style={({ pressed }) => [{ opacity: pressed ? 0.9 : 1 }]}
     >
-      <View style={styles.inner}>
-        {/* left: icon */}
-        <View style={[styles.iconWrap, { backgroundColor: bgTint }]}>
-          <MaterialCommunityIcons name="crown-outline" size={22} color="#fff" />
-        </View>
-
-        {/* center: texts */}
-        <View style={styles.textWrap}>
-          <RNText
-            numberOfLines={1}
-            ellipsizeMode="tail"
-            style={[styles.title, { color: textPrimary }]}
+      {/* OUTER GRADIENT BORDER */}
+      <LinearGradient
+        colors={[primary, "rgba(167,197,122,0.2)"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={[styles.borderContainer, style]}
+      >
+        {/* INNER CONTENT CARD */}
+        <View style={[styles.innerCard, { backgroundColor: surface }]}>
+          {/* ICON */}
+          <View
+            style={[
+              styles.iconContainer,
+              { backgroundColor: newTheme.surface },
+            ]}
           >
-            {title}
-          </RNText>
-          <RNText
-            numberOfLines={2}
-            ellipsizeMode="tail"
-            style={[styles.subtitle, { color: textSecondary }]}
-          >
-            {subtitle}
-          </RNText>
-        </View>
+            <MaterialCommunityIcons
+              name="crown-outline"
+              size={26}
+              color={primary}
+            />
+          </View>
 
-        {/* right: CTA pill */}
-        <View style={styles.ctaWrap}>
-          <RNText style={[styles.ctaText, { color: ctaText }]}>{cta}</RNText>
+          {/* TEXT */}
+          <View style={styles.textBlock}>
+            <Text style={[styles.title, { color: textPrimary }]}>{title}</Text>
+            <Text
+              style={[styles.subtitle, { color: textSecondary }]}
+              numberOfLines={1}
+            >
+              {subtitle}
+            </Text>
+          </View>
+
+          {/* CTA PILL */}
+          <View style={[styles.cta, { backgroundColor: ctaBg }]}>
+            <Text style={[styles.ctaText, { color: ctaText }]}>{cta}</Text>
+          </View>
         </View>
-      </View>
+      </LinearGradient>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  wrapper: {
-    borderRadius: 12,
+  borderContainer: {
+    borderRadius: 18,
+    padding: 1.5, // border thickness
     marginHorizontal: 16,
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-    borderWidth: 1,
-    // subtle elevation/shadow
-    ...PlatformIOSShadow(),
+    marginTop: 12,
   },
-  inner: {
+  innerCard: {
+    borderRadius: 16,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
     flexDirection: "row",
     alignItems: "center",
+    gap: 14,
   },
-  iconWrap: {
-    width: 44,
-    height: 44,
-    borderRadius: 10,
+  iconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 12,
-    // subtle inner shadow feel
-    opacity: 0.95,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.05)",
   },
-  textWrap: {
+  textBlock: {
     flex: 1,
-    justifyContent: "center",
   },
   title: {
     fontSize: 16,
     fontWeight: "700",
-    marginBottom: 2,
   },
   subtitle: {
+    marginTop: 2,
     fontSize: 12,
     fontWeight: "500",
-    opacity: 0.95,
   },
-  ctaWrap: {
-    backgroundColor: "",
-    paddingVertical: 8,
+  cta: {
     paddingHorizontal: 14,
-    borderRadius: 10,
-    marginLeft: 12,
+    paddingVertical: 8,
+    borderRadius: 50,
     justifyContent: "center",
     alignItems: "center",
+    minWidth: 80,
   },
   ctaText: {
     fontSize: 14,
     fontWeight: "700",
   },
-  pressed: {
-    opacity: 0.88,
-  },
 });
-
-/** small helper to provide iOS + Android shadow consistently */
-function PlatformIOSShadow() {
-  return {
-    // iOS shadow
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.12,
-    shadowRadius: 14,
-    // Android elevation
-    elevation: 6,
-  } as ViewStyle;
-}

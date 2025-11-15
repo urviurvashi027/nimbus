@@ -247,7 +247,10 @@ export default function profile() {
           )}
 
           <View style={{ paddingVertical: 20 }}>
-            <UpgradeBanner />
+            <UpgradeBanner
+              onPress={() => router.push("/(auth)/upgradePlan")}
+              // onPress={() => router.push("/(auth)/settings/UpgradePlan")}
+            />
           </View>
 
           {Section.map(({ header, items }) => (
