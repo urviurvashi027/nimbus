@@ -9,16 +9,19 @@ import {
   Image,
   Alert,
   Platform,
-  ActivityIndicator,
   SafeAreaView,
   KeyboardAvoidingView,
   ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import Toast from "react-native-toast-message";
+
 import ThemeContext from "@/context/ThemeContext";
-import InputField from "@/components/common/ThemedComponent/StyledInput";
 import { useAuth } from "@/context/AuthContext";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import InputField from "@/components/common/ThemedComponent/StyledInput";
+import StyledButton from "@/components/common/themeComponents/StyledButton";
+
 import AvatarPickerModal from "./AvatarPickerModal";
 
 /* import your BUILTIN_SVGS if you want preview of svg selection */
@@ -31,9 +34,6 @@ import AvatarFitnessFemale from "@/assets/images/avatar/fitnessfemale.svg";
 import AvatarFinanceGuy from "@/assets/images/avatar/financeguy.svg";
 import AvatarDeveloperGuy from "@/assets/images/avatar/developerguy.svg";
 import AvatarFemale from "@/assets/images/avatar/female.svg";
-import { se } from "rn-emoji-keyboard";
-// import { useReminder } from "@/context/ReminderContext";
-import Toast from "react-native-toast-message";
 
 const BUILTIN_SVGS = [
   AvatarBusy,
@@ -103,6 +103,7 @@ export default function EditProfileModal({ visible, onClose, onSaved }: Props) {
         avatar: cached?.avatar ?? null,
         setting: cached?.settings ?? {},
       };
+      console.log("Loaded from storage: EditProfile", p);
       setProfile(p);
       setFirstName(p.first_name);
       setLastName(p.last_name);
@@ -136,71 +137,6 @@ export default function EditProfileModal({ visible, onClose, onSaved }: Props) {
       setLoading(false);
     })();
   }, [loadUserFromStorage]); // include in deps
-
-  // useEffect(() => {
-  //   if (!visible) return;
-  //   (async () => {
-  //     setInitializing(true);
-  //     try {
-  //       let user: any = null;
-  //       if (auth && auth.userProfile) user = auth.userProfile;
-  //       else {
-  //         const raw = await AsyncStorage.getItem("@nimbus_user");
-  //         user = raw ? JSON.parse(raw) : null;
-  //       }
-
-  //       const p = {
-  //         id: user?.id,
-  //         username: user?.username ?? user?.email ?? "",
-  //         email: user?.email ?? "",
-  //         first_name: user?.first_name ?? "",
-  //         last_name: user?.last_name ?? "",
-  //         profile: user?.profile ?? {},
-  //         avatar: user?.avatar ?? user?.avatarKey ?? null,
-  //         setting: user?.setting ?? user?.settings ?? {},
-  //       };
-
-  //       setProfile(p);
-  //       setFirstName(p.first_name ?? "");
-  //       setLastName(p.last_name ?? "");
-  //       setHeight(p.profile?.height ?? null);
-  //       setWeight(p.profile?.weight ?? null);
-  //       setAge(p.profile?.age ?? null);
-  //       setAvatarKey(p.avatar ?? null);
-
-  //       // initialize nested fields (ensure numeric or null)
-  //       const rawAge = p.profile?.age;
-  //       const rawHeight = p.profile?.height;
-  //       const rawWeight = p.profile?.weight;
-
-  //       const backendSettings = p?.setting ?? {};
-  //       setHeightUnit(backendSettings.height_unit ?? "cm");
-  //       setWeightUnit(backendSettings.weight_unit ?? "kg");
-
-  //       setAge(
-  //         typeof rawAge === "number" ? rawAge : rawAge ? Number(rawAge) : null
-  //       );
-  //       setHeight(
-  //         typeof rawHeight === "number"
-  //           ? rawHeight
-  //           : rawHeight
-  //           ? Number(rawHeight)
-  //           : null
-  //       );
-  //       setWeight(
-  //         typeof rawWeight === "number"
-  //           ? rawWeight
-  //           : rawWeight
-  //           ? Number(rawWeight)
-  //           : null
-  //       );
-  //     } catch (e) {
-  //       console.warn("EditProfile load error", e);
-  //     } finally {
-  //       setInitializing(false);
-  //     }
-  //   })();
-  // }, [visible, auth]);
 
   // isDirty should consider all editable fields
   const isDirty = () => {
@@ -499,6 +435,28 @@ export default function EditProfileModal({ visible, onClose, onSaved }: Props) {
 
             <View style={styles.fixedFooterContainer}>
               <View style={styles.footerInner}>
+                <StyledButton
+                  label="Cancel"
+                  variant="secondary"
+                  fullWidth
+                  onPress={handleCancel}
+                  disabled={loading}
+                  style={styles.footerButton}
+                />
+
+                <StyledButton
+                  label={loading ? "Saving..." : "Save"}
+                  variant="primary"
+                  fullWidth
+                  onPress={handleSave}
+                  disabled={!isDirty() || loading}
+                  loading={loading}
+                />
+              </View>
+            </View>
+
+            {/* <View style={styles.fixedFooterContainer}>
+              <View style={styles.footerInner}>
                 <TouchableOpacity
                   style={styles.cancelBtn}
                   onPress={handleCancel}
@@ -527,17 +485,16 @@ export default function EditProfileModal({ visible, onClose, onSaved }: Props) {
                   )}
                 </TouchableOpacity>
               </View>
-            </View>
+            </View> */}
           </KeyboardAvoidingView>
         </SafeAreaView>
+        <AvatarPickerModal
+          visible={pickerOpen}
+          initial={avatarKey}
+          onClose={() => setPickerOpen(false)}
+          onSelect={(k: any) => setAvatarKey(k)}
+        />
       </Modal>
-
-      <AvatarPickerModal
-        visible={pickerOpen}
-        initial={avatarKey}
-        onClose={() => setPickerOpen(false)}
-        onSelect={(k: any) => setAvatarKey(k)}
-      />
     </>
   );
 }
@@ -604,32 +561,30 @@ const styling = (theme: any) =>
     // helper row for age/height
     rowInputs: { flexDirection: "row", alignItems: "flex-start" },
 
+    // fixedFooterContainer: {
+    //   position: "absolute",
+    //   left: 0,
+    //   right: 0,
+    //   bottom: 0,
+    //   paddingBottom: Platform.OS === "ios" ? 24 : 12,
+    //   // backgroundColor: "transparent",
+    // } as any,
     fixedFooterContainer: {
       position: "absolute",
       left: 0,
       right: 0,
       bottom: 0,
       paddingBottom: Platform.OS === "ios" ? 24 : 12,
-      // backgroundColor: "transparent",
+      backgroundColor: theme.background,
+      borderTopWidth: 1,
+      borderTopColor: theme.divider,
     } as any,
-    footerInner: { flexDirection: "row", paddingHorizontal: 16, gap: 12 },
-    cancelBtn: {
-      flex: 1,
-      paddingVertical: 14,
-      borderRadius: 12,
-      alignItems: "center",
-      justifyContent: "center",
-      borderWidth: 1,
-      borderColor: theme.divider,
-      backgroundColor: theme.surface,
+    footerInner: {
+      paddingHorizontal: 16,
+      paddingTop: 12,
     },
-    saveBtn: {
-      flex: 1,
-      paddingVertical: 14,
-      borderRadius: 12,
-      alignItems: "center",
-      justifyContent: "center",
-      backgroundColor: theme.accent,
+    footerButton: {
+      marginBottom: 12,
     },
     avatarPlaceholder: {
       width: 112,

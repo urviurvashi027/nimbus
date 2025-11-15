@@ -17,6 +17,26 @@
 
 export const Section: any[] = [
   {
+    header: "Achievements & Statistics",
+    icon: "trophy",
+    items: [
+      {
+        id: "overview",
+        icon: "stats-chart-outline",
+        color: "#dfd9f9",
+        type: "screen",
+        label: "Overview",
+      },
+      {
+        id: "Badges",
+        icon: "trophy-outline",
+        color: "#dfd9f9",
+        type: "screen",
+        label: "Badges",
+      },
+    ],
+  },
+  {
     header: "Perference",
     icon: "settings",
     items: [
@@ -79,6 +99,33 @@ export const Section: any[] = [
     ],
   },
   {
+    header: "Social Media",
+    icon: "document",
+    items: [
+      {
+        id: "discord",
+        icon: "logo-discord",
+        color: "#dfd9f9",
+        type: "modal",
+        label: "Discord",
+      },
+      {
+        id: "instagram",
+        icon: "logo-instagram",
+        color: "#dfd9f9",
+        type: "modal",
+        label: "Instagram",
+      },
+      {
+        id: "facebook",
+        icon: "logo-facebook",
+        color: "#dfd9f9",
+        type: "modal",
+        label: "Facebook",
+      },
+    ],
+  },
+  {
     header: "Help and feedback",
     icon: "help-circle",
     items: [
@@ -116,53 +163,6 @@ export const Section: any[] = [
         color: "#dfd9f9",
         type: "modal",
         label: "Terms and Services",
-      },
-    ],
-  },
-  {
-    header: "Achievements & Statistics",
-    icon: "trophy",
-    items: [
-      {
-        id: "overview",
-        icon: "stats-chart-outline",
-        color: "#dfd9f9",
-        type: "screen",
-        label: "Overview",
-      },
-      {
-        id: "Badges",
-        icon: "trophy-outline",
-        color: "#dfd9f9",
-        type: "screen",
-        label: "Badges",
-      },
-    ],
-  },
-  {
-    header: "Social Media",
-    icon: "document",
-    items: [
-      {
-        id: "discord",
-        icon: "logo-discord",
-        color: "#dfd9f9",
-        type: "modal",
-        label: "Discord",
-      },
-      {
-        id: "instagram",
-        icon: "logo-instagram",
-        color: "#dfd9f9",
-        type: "modal",
-        label: "Instagram",
-      },
-      {
-        id: "facebook",
-        icon: "logo-facebook",
-        color: "#dfd9f9",
-        type: "modal",
-        label: "Facebook",
       },
     ],
   },

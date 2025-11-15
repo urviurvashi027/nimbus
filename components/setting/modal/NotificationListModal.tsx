@@ -19,58 +19,15 @@ import {
   mergeReminders,
   repeatLabelFromDays,
 } from "@/utils/notoficationHelper";
-
-export type ReminderType = {
-  id: string;
-  key: string;
-  label: string;
-  desc?: string;
-};
-
-export type DayShort = "sun" | "mon" | "tue" | "wed" | "thu" | "fri" | "sat";
-
-export type ReminderSettings = {
-  repeat?: "once" | "daily" | "weekdays" | "weekends" | "custom";
-  weekdays?: number[];
-  notification_type: string; // e.g. "morning_review"
-  enabled: boolean;
-  time: string; // "07:30:00"
-  days_of_week?: DayShort[];
-};
-
-const REMINDER_TYPES: ReminderType[] = [
-  {
-    key: "morning_review",
-    id: "morning",
-    label: "Morning check-in",
-    desc: "Start your day with a quick reflection.",
-  },
-  {
-    key: "night_review",
-    id: "nightly",
-    label: "Nightly review",
-    desc: "Wind down and review today.",
-  },
-  {
-    key: "mood_logger",
-    id: "mood",
-    label: "Log your mood",
-    desc: "Capture how you feel.",
-  },
-  {
-    key: "streak_saver",
-    id: "streak",
-    label: "Streak saver",
-    desc: "Save your streak if you’re about to lose it.",
-  },
-];
+import { NotificationType } from "@/types/notificationType";
+import { NOTIFICATION_TYPES } from "@/constant/data/notificationType";
 
 export type BackendEntry = {
   enabled?: boolean;
   time?: string; // "HH:mm:ss"
   days_of_week?: string[]; // ["mon","thu"]
 };
-export default function NotificationTypeModal({
+export default function NotificationListModal({
   visible,
   onClose,
 }: {
@@ -80,7 +37,7 @@ export default function NotificationTypeModal({
   const { newTheme } = useContext(ThemeContext);
   const styles = styling(newTheme);
 
-  const [selected, setSelected] = useState<ReminderType | null>(null);
+  const [selected, setSelected] = useState<NotificationType | null>(null);
   const [detailVisible, setDetailVisible] = useState(false);
   const [notification, setNotification] = useState<any>();
   const [loading, setLoading] = useState(false);
@@ -90,7 +47,7 @@ export default function NotificationTypeModal({
   const refreshAll = React.useCallback(async () => {
     setLoading(true);
     const cached = await loadUserFromStorage?.();
-    const r = mergeReminders(REMINDER_TYPES, cached?.notifications ?? []);
+    const r = mergeReminders(NOTIFICATION_TYPES, cached?.notifications ?? []);
     setNotification(r);
     setLoading(false);
   }, [loadUserFromStorage]);
@@ -104,7 +61,7 @@ export default function NotificationTypeModal({
     setLoading(true);
     (async () => {
       const cached = await loadUserFromStorage?.(); // ← safe call
-      const r = mergeReminders(REMINDER_TYPES, cached?.notifications);
+      const r = mergeReminders(NOTIFICATION_TYPES, cached?.notifications);
       console.log(r, "rrr");
       setNotification(r);
       setLoading(false);

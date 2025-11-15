@@ -1,14 +1,7 @@
 import ThemeContext from "@/context/ThemeContext";
 import React, { useContext } from "react";
-import {
-  Modal,
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-} from "react-native";
-import { StyledButton } from "../common/ThemedComponent/StyledButton";
+import { Modal, View, Text, StyleSheet, ScrollView } from "react-native";
+import StyledButton from "@/components/common/themeComponents/StyledButton";
 
 const PrivacyPolicyModal = ({
   visible,
@@ -18,7 +11,6 @@ const PrivacyPolicyModal = ({
   onClose: () => void;
 }) => {
   const { newTheme } = useContext(ThemeContext);
-
   const styles = styling(newTheme);
 
   return (
@@ -83,13 +75,19 @@ const PrivacyPolicyModal = ({
 
             <Text style={styles.sectionTitle}>8. Contact Us</Text>
             <Text style={styles.text}>
-              Email: support@yourdomain.com {"\n"}Phone: (if applicable) {"\n"}
+              Email: support@yourdomain.com {"\n"}
+              Phone: (if applicable) {"\n"}
               Settings → Support → Contact Us
             </Text>
 
-            <View style={{ height: 20 }} />
+            <View style={{ height: 24 }} />
 
-            <StyledButton label="Close" onPress={onClose} />
+            <StyledButton
+              label="Close"
+              variant="secondary"
+              fullWidth
+              onPress={onClose}
+            />
           </ScrollView>
         </View>
       </View>
@@ -103,23 +101,23 @@ const styling = (theme: any) =>
   StyleSheet.create({
     overlay: {
       flex: 1,
-      backgroundColor: "rgba(0,0,0,0.5)",
+      backgroundColor: "rgba(0,0,0,0.55)",
       justifyContent: "center",
-      paddingHorizontal: 20,
+      paddingHorizontal: 22,
     },
     modalContent: {
       backgroundColor: theme.surface,
-      borderRadius: 12,
-      maxHeight: "80%",
+      borderRadius: 16,
+      maxHeight: "82%",
       padding: 20,
     },
     scrollContent: {
-      paddingBottom: 20,
+      paddingBottom: 24,
     },
     title: {
       fontSize: 20,
       color: theme.textPrimary,
-      fontWeight: "bold",
+      fontWeight: "700",
       marginBottom: 6,
     },
     lastUpdated: {
@@ -138,8 +136,9 @@ const styling = (theme: any) =>
       fontSize: 14,
       color: theme.textSecondary,
       marginBottom: 8,
+      lineHeight: 20,
     },
     bold: {
-      fontWeight: "bold",
+      fontWeight: "700",
     },
   });

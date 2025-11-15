@@ -57,21 +57,21 @@ const HabitDetails = () => {
     });
   }, [navigation]);
 
-  const startDate = "2025-08-13";
-  const endDate = "2025-09-13";
+  // const startDate = "2025-08-13";
+  // const endDate = "2025-09-13";
 
-  // Example of filled dates (in "month-day" format)
-  const filledDates = [
-    "8-13",
-    "8-14",
-    "8-20",
-    "8-25",
-    "8-28",
-    "9-2",
-    "9-5",
-    "9-10",
-    "9-13",
-  ];
+  // // Example of filled dates (in "month-day" format)
+  // const filledDates = [
+  //   "8-13",
+  //   "8-14",
+  //   "8-20",
+  //   "8-25",
+  //   "8-28",
+  //   "9-2",
+  //   "9-5",
+  //   "9-10",
+  //   "9-13",
+  // ];
 
   const getHabitDetails = async (id: string) => {
     setLoading(true);
@@ -109,6 +109,7 @@ const HabitDetails = () => {
               value: `134 days`,
             },
           ],
+          completedDays: [21, 22, 23, 24, 20, 25],
           weekly_row: [
             { day: "Mon", done: true },
             { day: "Tue", done: true },
@@ -241,7 +242,7 @@ const HabitDetails = () => {
                     onSelect={(value) => console.log("Selected:", value)}
                   />
                   <MonthlyOverviewPanel
-                    completedDays={[21, 22, 23, 24, 20, 25]}
+                    completedDays={habit.completedDays || []}
                   />
                 </>
               )}

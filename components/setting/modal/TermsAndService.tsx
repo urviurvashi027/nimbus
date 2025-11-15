@@ -1,15 +1,7 @@
-import { themeColors } from "@/constant/theme/Colors";
 import ThemeContext from "@/context/ThemeContext";
 import React, { useContext } from "react";
-import {
-  Modal,
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-} from "react-native";
-import { StyledButton } from "../common/ThemedComponent/StyledButton";
+import { Modal, View, Text, StyleSheet, ScrollView } from "react-native";
+import StyledButton from "@/components/common/themeComponents/StyledButton";
 
 const TermsModal = ({
   visible,
@@ -87,7 +79,12 @@ const TermsModal = ({
 
             <View style={{ height: 20 }} />
 
-            <StyledButton label="Close" onPress={onClose} />
+            <StyledButton
+              label="Close"
+              variant="secondary"
+              fullWidth
+              onPress={onClose}
+            />
           </ScrollView>
         </View>
       </View>
