@@ -8,7 +8,7 @@ import {
   ScrollView,
 } from "react-native";
 import ThemeContext from "@/context/ThemeContext";
-import { StyledButton } from "../common/ThemedComponent/StyledButton";
+import StyledButton from "@/components/common/themeComponents/StyledButton";
 
 const faqs = [
   {
@@ -46,13 +46,9 @@ const FAQModal = ({
   onClose: () => void;
 }) => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-
-  const toggle = (index: number) => {
-    setOpenIndex(openIndex === index ? null : index);
-  };
+  const toggle = (i: number) => setOpenIndex(openIndex === i ? null : i);
 
   const { newTheme } = useContext(ThemeContext);
-
   const styles = styling(newTheme);
 
   return (
@@ -60,26 +56,48 @@ const FAQModal = ({
       <View style={styles.overlay}>
         <View style={styles.modalContent}>
           <Text style={styles.header}>Frequently Asked Questions</Text>
+
           <ScrollView contentContainerStyle={styles.scrollContent}>
-            {faqs.map((faq, index) => (
-              <View key={index} style={styles.accordionItem}>
-                <TouchableOpacity
-                  onPress={() => toggle(index)}
-                  style={styles.questionBox}
-                >
-                  <Text style={styles.questionText}>{faq.question}</Text>
-                </TouchableOpacity>
-                {openIndex === index && (
-                  <View style={styles.answerBox}>
-                    <Text style={styles.answerText}>{faq.answer}</Text>
-                  </View>
-                )}
-              </View>
-            ))}
+            {faqs.map((faq, index) => {
+              const active = openIndex === index;
+              return (
+                <View key={index} style={styles.accordionItem}>
+                  <TouchableOpacity
+                    onPress={() => toggle(index)}
+                    style={[
+                      styles.questionBox,
+                      active && styles.questionActive,
+                    ]}
+                    activeOpacity={0.85}
+                  >
+                    <Text
+                      style={[
+                        styles.questionText,
+                        active && styles.questionTextActive,
+                      ]}
+                    >
+                      {faq.question}
+                    </Text>
+                  </TouchableOpacity>
 
-            <View style={{ height: 20 }} />
+                  {active && (
+                    <View style={styles.answerBox}>
+                      <Text style={styles.answerText}>{faq.answer}</Text>
+                    </View>
+                  )}
+                </View>
+              );
+            })}
 
-            <StyledButton label="Close" onPress={onClose} />
+            <View style={{ height: 24 }} />
+
+            {/* Nimbus Premium Button */}
+            <StyledButton
+              label="Close"
+              variant="secondary"
+              fullWidth
+              onPress={onClose}
+            />
           </ScrollView>
         </View>
       </View>
@@ -93,22 +111,22 @@ const styling = (theme: any) =>
   StyleSheet.create({
     overlay: {
       flex: 1,
-      backgroundColor: "rgba(0,0,0,0.5)",
+      backgroundColor: "rgba(0,0,0,0.55)",
       justifyContent: "center",
-      paddingHorizontal: 20,
+      paddingHorizontal: 22,
     },
     modalContent: {
       backgroundColor: theme.surface,
-      borderRadius: 12,
-      maxHeight: "80%",
+      borderRadius: 16,
+      maxHeight: "82%",
       padding: 20,
     },
     scrollContent: {
-      paddingBottom: 20,
+      paddingBottom: 24,
     },
     header: {
       fontSize: 18,
-      fontWeight: "bold",
+      fontWeight: "700",
       color: theme.textPrimary,
       marginBottom: 12,
       textAlign: "center",
@@ -116,21 +134,31 @@ const styling = (theme: any) =>
     accordionItem: {
       borderBottomWidth: 1,
       borderBottomColor: theme.divider,
-      marginBottom: 10,
+      marginBottom: 12,
+      paddingBottom: 4,
     },
     questionBox: {
-      paddingVertical: 12,
+      paddingVertical: 14,
+    },
+    questionActive: {
+      backgroundColor: theme.surface2 ?? theme.surface,
+      borderRadius: 8,
     },
     questionText: {
       fontSize: 16,
       color: theme.textPrimary,
       fontWeight: "600",
     },
+    questionTextActive: {
+      color: theme.accent,
+    },
     answerBox: {
       paddingVertical: 8,
+      paddingRight: 4,
     },
     answerText: {
       fontSize: 14,
       color: theme.textSecondary,
+      lineHeight: 20,
     },
   });

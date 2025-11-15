@@ -19,6 +19,8 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
 
+import StyledButton from "@/components/common/themeComponents/StyledButton";
+
 type Props = {
   visible: boolean;
 
@@ -62,8 +64,6 @@ export default function SettingDetail({
   const [selected, setSelected] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
-
-  const { userProfile } = useAuth();
 
   // load current preference when opening
   useEffect(() => {
@@ -162,26 +162,21 @@ export default function SettingDetail({
   /* ---------- Footer buttons component used in both modes ---------- */
   const FooterButtons = () => (
     <View style={styles.footerWrapper}>
-      <View style={styles.ctaRow}>
-        <TouchableOpacity
-          style={styles.btnAlt}
-          onPress={cancel}
-          activeOpacity={0.85}
-        >
-          <Text style={styles.btnAltText}>Cancel</Text>
-        </TouchableOpacity>
+      <StyledButton
+        label="Cancel"
+        variant="secondary"
+        fullWidth
+        onPress={cancel}
+        style={styles.footerButton}
+      />
 
-        <TouchableOpacity
-          style={styles.btnPrimary}
-          onPress={doSave}
-          disabled={loading}
-          activeOpacity={0.9}
-        >
-          <Text style={styles.btnPrimaryText}>
-            {loading ? "Saving..." : "Save"}
-          </Text>
-        </TouchableOpacity>
-      </View>
+      <StyledButton
+        label={loading ? "Saving..." : "Save"}
+        variant="primary"
+        fullWidth
+        disabled={loading}
+        onPress={doSave}
+      />
     </View>
   );
 
@@ -189,8 +184,13 @@ export default function SettingDetail({
     <Modal visible={visible} animationType="slide">
       <View style={styles.container}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={onClose}>
-            <Text style={styles.back}>←</Text>
+          <TouchableOpacity onPress={onClose} style={styles.backBtn}>
+            <Ionicons
+              name="arrow-back"
+              size={22}
+              color={newTheme.textPrimary}
+            />
+            {/* <Text style={styles.back}>←</Text> */}
           </TouchableOpacity>
           <Text style={styles.title}>{label}</Text>
         </View>
@@ -331,16 +331,13 @@ const styling = (newTheme: any) =>
       paddingTop: 90,
     },
     header: {
+      marginTop: 12,
       flexDirection: "row",
       alignItems: "center",
       paddingHorizontal: 16,
       paddingBottom: 12,
     },
-    back: {
-      fontSize: 22,
-      color: newTheme.textPrimary,
-      marginRight: 12,
-    },
+    backBtn: { padding: 6, marginRight: 8 },
     title: { fontSize: 20, fontWeight: "700", color: newTheme.textPrimary },
 
     /* common list content spacing */
@@ -436,34 +433,17 @@ const styling = (newTheme: any) =>
 
     smallMuted: { color: newTheme.textSecondary },
 
-    /* footer */
     footerWrapper: {
-      paddingTop: 8,
+      paddingTop: 16,
       paddingBottom: Platform.OS === "ios" ? 26 : 16,
+      paddingHorizontal: 16,
+    },
+    footerButton: {
+      marginBottom: 12,
     },
     ctaRow: {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
     },
-    btnAlt: {
-      borderRadius: 12,
-      paddingVertical: 12,
-      paddingHorizontal: 16,
-      alignItems: "center",
-      borderWidth: 1,
-      borderColor: newTheme.divider,
-      flex: 1,
-      marginRight: 12,
-    },
-    btnAltText: { color: newTheme.textPrimary, fontWeight: "700" },
-    btnPrimary: {
-      backgroundColor: newTheme.accent,
-      paddingVertical: 12,
-      paddingHorizontal: 16,
-      borderRadius: 12,
-      flex: 1,
-      alignItems: "center",
-    },
-    btnPrimaryText: { color: newTheme.background, fontWeight: "700" },
   });

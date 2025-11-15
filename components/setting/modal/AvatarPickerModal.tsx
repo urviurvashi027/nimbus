@@ -27,6 +27,7 @@ import AvatarFinanceGuy from "@/assets/images/avatar/financeguy.svg";
 import AvatarFitnessFemale from "@/assets/images/avatar/fitnessfemale.svg";
 import AvatarSeriousFemale from "@/assets/images/avatar/seriousfemale.svg";
 import AvatarYoungGuy from "@/assets/images/avatar/youngguy.svg";
+import StyledButton from "@/components/common/themeComponents/StyledButton";
 
 const BUILTIN_SVGS = [
   AvatarBusy,
@@ -217,26 +218,20 @@ export default function AvatarPickerModal({
         />
 
         <View style={styles.actions}>
-          {/* <TouchableOpacity
-            style={[styles.btn, styles.btnPrimary]}
-            onPress={pickImage}
-          >
-            <Text style={styles.btnPrimaryText}>Upload photo</Text>
-          </TouchableOpacity> */}
-
-          <TouchableOpacity
-            style={[styles.btn, styles.btnAlt]}
+          <StyledButton
+            label="Reset"
+            variant="secondary"
+            fullWidth={false}
             onPress={handleReset}
-          >
-            <Text style={styles.btnAltText}>Reset</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.btn, styles.btnSave]}
+            style={{ flex: 1 }}
+          />
+          <StyledButton
+            label="Save"
+            variant="primary"
+            fullWidth={false}
             onPress={handleSave}
-          >
-            <Text style={styles.btnSaveText}>Save</Text>
-          </TouchableOpacity>
+            style={{ flex: 1 }}
+          />
         </View>
       </SafeAreaView>
     </Modal>

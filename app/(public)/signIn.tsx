@@ -55,12 +55,10 @@ export default function signIn() {
   };
 
   const handleSignUpClick = () => {
-    router.replace("/(public)/demo");
-    // router.replace("/(public)/signUp");
+    router.replace("/(public)/register");
   };
 
   const handleForgotPasswordClick = () => {
-    // router.replace("/(public)/otpVerification");
     router.replace("/(public)/forgotPassword");
   };
 

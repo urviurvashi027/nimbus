@@ -10,21 +10,23 @@ import { useAuth } from "@/context/AuthContext";
 import { Section } from "@/constant/data/settingsList";
 import ThemeContext from "@/context/ThemeContext";
 
-import NotificationTypeModal from "@/components/setting/NotificationTypeModal";
+import NotificationListModal from "@/components/setting/modal/NotificationListModal";
 // import RoutineSettingModal from "@/components/setting/RoutineSetting";
 import ReportBugModal from "@/components/setting/ReportBug";
 import FeedbackModal from "@/components/setting/Feeback";
-import PrivacyPolicyModal from "@/components/setting/PrivacyPoilcy";
-import TermsModal from "@/components/setting/TermsAndService";
-import FAQModal from "@/components/setting/HelpCenter";
-import ChangePasswordModal from "@/components/setting/ChangePassword";
-import LogoutModal from "@/components/setting/LogoutModal";
+import PrivacyPolicyModal from "@/components/setting/modal/PrivacyPoilcy";
+import TermsModal from "@/components/setting/modal/TermsAndService";
+import FAQModal from "@/components/setting/modal/HelpCenter";
+import ChangePasswordModal from "@/components/setting/modal/ChangePassword";
+import LogoutModal from "@/components/setting/modal/LogoutModal";
 import SocialActionModal from "@/components/setting/SocialActionModal";
-import AdvancedSettingsModal from "@/components/setting/AdvanceSettingModal";
-import EditProfileModal from "@/components/setting/EditProfileModal";
+import AdvancedSettingsModal from "@/components/setting/modal/AdvanceSettingModal";
+import EditProfileModal from "@/components/setting/modal/EditProfileModal";
 import UpgradeBanner from "@/components/common/UpgradeBanner";
 import { router } from "expo-router";
 import DailyCheckInCard from "@/components/homeScreen/component/DailyCheckInCard";
+import ProfileHeader from "@/components/setting/ProfileHeader";
+import StyledSwitch from "@/components/common/themeComponents/StyledSwitch";
 
 type FormState = {
   darkMode: boolean;
@@ -230,24 +232,17 @@ export default function profile() {
     <GestureHandlerRootView style={styles.gestureContainer}>
       <SafeAreaView style={styles.gestureContainer}>
         <ScrollView>
-          <TouchableOpacity style={styles.profile}>
-            <View style={styles.profileAvatarWrapper}>
-              <Image
-                alt="profile image"
-                style={styles.profileAvatar}
-                source={require("../../../assets/images/loginLatest.png")}
-              />
-            </View>
-          </TouchableOpacity>
-
-          {userProfile && userProfile.username && (
-            <View>
-              <Text style={styles.profileName}>{userProfile?.username}</Text>
-            </View>
-          )}
-
+          <ProfileHeader
+            username={userProfile?.username || "Nimbus Explorer"}
+            emailOrTagline={
+              userProfile?.email || "Grow a calmer, healthier you 🌿"
+            }
+            planLabel={"Nimbus Free"}
+            avatarSource={require("../../../assets/images/loginLatest.png")}
+            onPressManagePlan={() => router.push("/(auth)/upgradePlan")}
+          />
           <View style={{ paddingVertical: 20 }}>
-            <UpgradeBanner />
+            <UpgradeBanner onPress={() => router.push("/(auth)/upgradePlan")} />
           </View>
 
           {Section.map(({ header, items }) => (
@@ -291,13 +286,10 @@ export default function profile() {
                       <View style={{ flex: 1 }} />
 
                       {type === "toogle" && (
-                        <Switch
+                        <StyledSwitch
                           value={formState[id]}
-                          thumbColor={newTheme.accent}
-                          trackColor={{
-                            true: `${newTheme.background}`,
-                          }}
                           onValueChange={(value) => onToggle(id, value, label)}
+                          size="medium"
                         />
                       )}
 
@@ -315,13 +307,7 @@ export default function profile() {
             </View>
           ))}
 
-          {/* Notification Setting Modal */}
-          {/* <NotificationTypeModal
-            visible={showNotificationModal}
-            onClose={() => setShowNotificationModal(false)}
-          /> */}
-
-          <NotificationTypeModal
+          <NotificationListModal
             visible={showNotificationModal}
             onClose={() => setShowNotificationModal(false)}
           />
@@ -400,20 +386,12 @@ const styling = (newTheme: any) =>
       justifyContent: "center",
     },
     profileName: {
-      // marginTop: 20,
       fontSize: 19,
       fontWeight: 600,
       color: newTheme.textPrimary,
-      // color: "#414d63",
       textAlign: "center",
     },
-    // profileAddress: {
-    //   color: newTheme.textSecondary,
-    //   // color: "#989898",
-    //   fontSize: 15,
-    //   marginTop: 5,
-    //   textAlign: "center",
-    // },
+
     profileAvatarWrapper: {
       position: "relative",
     },
@@ -422,17 +400,7 @@ const styling = (newTheme: any) =>
       height: 82,
       borderRadius: 9999,
     },
-    // profileActions: {
-    //   width: 28,
-    //   height: 28,
-    //   borderRadius: 9999,
-    //   backgroundColor: "#007bff",
-    //   position: "absolute",
-    //   right: -4,
-    //   bottom: -10,
-    //   alignItems: "center",
-    //   justifyContent: "center",
-    // },
+
     section: {
       paddingHorizontal: 24,
     },
@@ -441,7 +409,6 @@ const styling = (newTheme: any) =>
       fontSize: 12,
       fontWeight: 600,
       color: newTheme.textPrimary,
-      // color: "red",
       textTransform: "uppercase",
       letterSpacing: 1.1,
     },

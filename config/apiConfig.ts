@@ -38,6 +38,7 @@ export const API_ENDPOINTS = {
   habitDetailsById: `${BASE_URL}/api/habits/`,
   habitDelete: `${BASE_URL}/api/habits/delete`,
   habitUnit: `${BASE_URL}/api/habit-units/`,
+
   habitPatch: `${BASE_URL}/api/habits/`,
 
   getArticleList: `${BASE_URL}/media/media-assets/?type=article`,
@@ -61,6 +62,9 @@ export const API_ENDPOINTS = {
 
   reportBug: `${BASE_URL}/api/bug-reports/`,
   logFeedback: `${BASE_URL}/api/feedback/`,
+
+  markHabitDone: (habitId: number) =>
+    `${BASE_URL}/api/habits/${habitId}/mark_complete/`,
 
   // ✅ NEW: Function for fetching habits with date & filter
   getDailyCheckInByDate: (date: string, isDailyCheckIn = true) =>

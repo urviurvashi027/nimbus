@@ -46,20 +46,34 @@ export type InputFieldProps = {
 };
 
 const colors = {
-  bg: "#2A2D24",
-  fieldBg: "#2A2D24",
-  fieldBgDisabled: "#151821",
-  border: "#1B1F26",
-  borderFocus: "#7B6BFC",
-  borderError: "#FF6B6B",
-  text: "#ECEFF4",
-  textDisabled: "#9AA4B2",
-  placeholder: "#9AA4B2",
-  helper: "#A3ADBD",
-  error: "#FF7A7A",
-  icon: "#C5CBD5",
-  primary: "#6EA8FE",
-  accent: "#A3BE8C",
+  // Background system
+  bg: "#0F120F", // main app background
+  fieldBg: "#181C18", // input + card background
+  fieldBgDisabled: "#1A1D19", // disabled input
+
+  // Borders
+  border: "#232723", // soft border
+  borderFocus: "#A6C48A", // accent border (green)
+  borderError: "#E46868", // red border
+
+  // Text system
+  text: "#ECEFF4", // primary text (almost white)
+  textSecondary: "#A1A69B", // secondary text
+  textDisabled: "#6E736A", // disabled text
+  placeholder: "#7D8378", // subtle placeholder
+  helper: "#8D9388", // helper / label text
+
+  // Errors + Alerts
+  error: "#E46868", // error text
+  warning: "#D9A441", // optional (UNSAVED pill)
+
+  // Icons
+  icon: "#C8CCBF", // neutral icons
+
+  // Accent + Branding
+  primary: "#A6C48A", // green accent (buttons, active pills)
+  accent: "#A6C48A", // alias for clarity
+  accentPressed: "#8FAE74", // darker green on pressed state
 };
 
 function getStateColors({
@@ -330,7 +344,7 @@ const styling = (newTheme: any) =>
       width: "100%",
     },
     label: {
-      color: colors.text,
+      color: colors.textSecondary,
       fontSize: 14,
       fontWeight: "600",
       marginBottom: 8,

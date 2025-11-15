@@ -129,13 +129,8 @@ export default function TabOneScreen() {
 
   const handleHabitDoneClick = async (id: any, count: any) => {
     try {
-      const result = await markHabitDone(
-        {
-          completed: true,
-          actual_count: { count: count.metric_count, unit: count.metric_unit },
-        },
-        id
-      );
+      const payload = { date: isoDate };
+      const result = await markHabitDone(payload, id);
       if (result?.success) {
         Toast.show({
           type: "success",

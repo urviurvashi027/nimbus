@@ -1,5 +1,12 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  Platform,
+  BackHandler,
+} from "react-native";
 import { router, useNavigation } from "expo-router";
 
 import { ONBOARDING_QUESTIONS } from "../../../constant/data/onboardingQuestion";
@@ -9,11 +16,23 @@ import { ScreenView, ThemeKey } from "@/components/Themed";
 import OnboardingHeader from "./component/OnboardingHeader";
 import SignaturePad, { SignaturePadRef } from "./component/SignaturePad";
 import ChoiceItem from "./component/ChoiceItem";
+import InlineTimePicker from "@/components/common/ThemedComponent/InlinedTimePicker";
+import { format } from "date-fns";
+
+const LANDING_ROUTE = "/(public)/landingScreen"; // <-- change if your route is different
 
 const OnboardingFlow = () => {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, any>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const navigation = useNavigation();
+  const { theme, newTheme } = useContext(ThemeContext);
+
+  const styles = styling(theme, newTheme);
+
+  const question = ONBOARDING_QUESTIONS[step];
+  const TOTAL = ONBOARDING_QUESTIONS.length;
 
   // signature ref
   const sigRef = useRef<SignaturePadRef | null>(null);
@@ -29,19 +48,11 @@ const OnboardingFlow = () => {
     setAnswers((prev) => ({ ...prev, [question.id]: null }));
   };
 
-  const navigation = useNavigation();
-  const { theme, newTheme } = useContext(ThemeContext);
-
   useEffect(() => {
     navigation.setOptions({
       headerShown: false,
     });
   }, [navigation]);
-
-  const styles = styling(theme, newTheme);
-
-  const question = ONBOARDING_QUESTIONS[step];
-  const TOTAL = ONBOARDING_QUESTIONS.length;
 
   const toggleAnswer = (id: string) => {
     if (question.type === "single") {
@@ -73,7 +84,8 @@ const OnboardingFlow = () => {
       try {
         setIsSubmitting(true);
         console.log("Submit answers:", step, answers);
-        router.push("/stateScreen/SuccessScreen");
+        router.push("/onboarding/welcomeKickoff");
+        // router.push("/stateScreen/SuccessScreen");
       } catch (err) {
         console.error(err);
         alert("Error Unable to submit. Please try again.");
@@ -83,7 +95,25 @@ const OnboardingFlow = () => {
     }
   };
 
-  const handleOnBack = () => {};
+  // --- BACK: previous step or landing ---
+  const handleOnBack = () => {
+    if (step > 0) {
+      setStep((s) => Math.max(0, s - 1));
+    } else {
+      // First question → leave the flow
+      router.replace(LANDING_ROUTE);
+    }
+  };
+
+  // Optional: Android hardware back
+  useEffect(() => {
+    if (Platform.OS !== "android") return;
+    const sub = BackHandler.addEventListener("hardwareBackPress", () => {
+      handleOnBack();
+      return true; // prevent default
+    });
+    return () => sub.remove();
+  }, [step]);
 
   return (
     <ScreenView style={{ padding: 10, marginTop: 0 }}>
@@ -114,6 +144,25 @@ const OnboardingFlow = () => {
               />
             ))}
           </View>
+        )}
+
+        {question.type === "time" && (
+          <InlineTimePicker
+            label="Select a time"
+            value={
+              // if user already picked, keep it; else default to now at minuteStep
+              answers[question.id] instanceof Date
+                ? answers[question.id]
+                : new Date()
+            }
+            minuteStep={5}
+            use12h={true}
+            onChange={(d) => {
+              const formatted = format(d, "HH:mm:ss");
+              console.log("Time picked:", d, formatted);
+              setAnswers((prev) => ({ ...prev, [question.id]: d }));
+            }}
+          />
         )}
 
         {/* Signature step render */}

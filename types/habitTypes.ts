@@ -159,11 +159,8 @@ export interface HabitDoneResponse {
 }
 
 export interface HabitDoneRequest {
-  completed: boolean;
-  actual_count: {
-    count: number;
-    unit: string;
-  };
+  // completed: boolean;
+  date: string;
 }
 
 // Habit details type

@@ -26,6 +26,8 @@ import {
   timeStringToISO,
 } from "@/utils/notoficationHelper";
 import { arraysEqual, deriveHHmmss } from "@/utils/helper";
+import StyledSwitch from "@/components/common/themeComponents/StyledSwitch";
+import StyledButton from "@/components/common/themeComponents/StyledButton";
 
 type Props = {
   detail: any;
@@ -263,7 +265,7 @@ export default function ReminderDetail({
   }, [notif?.timeISO]);
 
   return (
-    <Modal visible={visible} animationType="slide">
+    <Modal visible={visible} animationType="slide" transparent>
       <View style={[styles.screen]}>
         <View style={styles.headerRow}>
           <TouchableOpacity onPress={cancel} style={styles.back}>
@@ -285,16 +287,10 @@ export default function ReminderDetail({
 
             <View style={styles.row}>
               <Text style={styles.rowLabel}>Reminder</Text>
-              <Switch
+              <StyledSwitch
                 value={!!notif.enabled}
                 onValueChange={toggleEnabled}
-                trackColor={{
-                  true: newTheme.accentPressed,
-                  false: newTheme.divider,
-                }}
-                thumbColor={
-                  notif.enabled ? newTheme.background : newTheme.surface
-                }
+                size="medium"
               />
             </View>
 
@@ -412,19 +408,23 @@ export default function ReminderDetail({
               </Text>
             </View>
 
+            {/* bottom actions */}
             <View style={styles.ctaRow}>
-              <TouchableOpacity style={styles.btnAlt} onPress={cancel}>
-                <Text style={styles.btnAltText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.btnPrimary]}
+              <StyledButton
+                label="Cancel"
+                variant="secondary"
+                fullWidth
+                onPress={cancel}
+              />
+
+              <StyledButton
+                label={saving ? "Saving..." : "Save"}
+                variant="primary"
+                fullWidth
+                loading={saving}
                 onPress={doSave}
-                disabled={saving}
-              >
-                <Text style={styles.btnPrimaryText}>
-                  {saving ? "Saving..." : "Save"}
-                </Text>
-              </TouchableOpacity>
+                style={{ marginTop: 12 }}
+              />
             </View>
           </View>
         )}
@@ -550,26 +550,12 @@ const styling = (newTheme: any) =>
       color: newTheme.textPrimary,
       fontWeight: "700",
     },
-    ctaRow: { marginTop: 25, flexDirection: "row", gap: 12 },
-    btnPrimary: {
-      backgroundColor: newTheme.accent,
-      paddingVertical: 12,
-      paddingHorizontal: 16,
-      borderRadius: 12,
-      flex: 1,
-      alignItems: "center",
+    ctaRow: {
+      marginTop: 24,
+      flexDirection: "column",
+      gap: 10,
+      alignItems: "stretch",
     },
-    btnPrimaryText: { color: newTheme.background, fontWeight: "700" },
-    btnAlt: {
-      borderRadius: 12,
-      paddingVertical: 12,
-      paddingHorizontal: 16,
-      alignItems: "center",
-      borderWidth: 1,
-      borderColor: newTheme.divider,
-      flex: 1,
-    },
-    btnAltText: { color: newTheme.textPrimary, fontWeight: "700" },
     pickerOverlay: {
       flex: 1,
       backgroundColor: "rgba(0,0,0,0.55)",

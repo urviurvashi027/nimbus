@@ -1,3 +1,4 @@
+// ReportBugModal.tsx
 import React, { useContext, useState } from "react";
 import {
   Modal,
@@ -5,32 +6,25 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
-  KeyboardAvoidingView,
   Platform,
   SafeAreaView,
   ScrollView,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/context/ThemeContext";
-import { StyledButton } from "../common/ThemedComponent/StyledButton";
+import { Ionicons } from "@expo/vector-icons";
 import InputField from "../common/ThemedComponent/StyledInput";
+import StyledButton from "../common/themeComponents/StyledButton";
 import { getDeviceDetails } from "@/utils/helper";
 import { reportBug } from "@/services/settingService";
-import Toast from "react-native-toast-message";
 
-type Props = {
-  visible: boolean;
-  onClose: () => void;
-};
-
-export default function ReportBugModal({ visible, onClose }: Props) {
+export default function ReportBugModal({ visible, onClose }: any) {
   const { newTheme } = useContext(ThemeContext);
   const styles = styling(newTheme);
 
-  const [title, setTitle] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
+  const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
@@ -45,57 +39,36 @@ export default function ReportBugModal({ visible, onClose }: Props) {
     if (!description.trim()) return;
 
     const { os, device } = await getDeviceDetails();
-    console.log(description, os, device, "bug");
     setLoading(true);
+
     try {
-      // simulate API call
       const payload = {
         title: description,
-        description: title,
+        description,
         severity: "high",
-        os: os,
-        device: device,
+        os,
+        device,
       };
-      await new Promise((r) => setTimeout(r, 900));
 
       const result = await reportBug(payload);
-      if (result && result.success) {
-        Toast.show({
-          type: "success",
-          text1: "OTP sent",
-          position: "bottom",
-        });
-      }
-
-      if (result && result.error_code) {
-        alert("some error occurred");
-      }
-
-      setSubmitted(true);
-    } catch (err) {
-      console.warn("report failed", err);
+      if (result?.success) setSubmitted(true);
+    } catch (e) {
+      console.warn("Bug report failed", e);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Modal
-      visible={visible}
-      animationType="slide"
-      transparent={false} // <- make modal full-screen (more predictable)
-      statusBarTranslucent={true}
-      onRequestClose={resetAndClose}
-    >
+    <Modal visible={visible} animationType="slide" transparent={false}>
       <SafeAreaView style={styles.safeArea}>
         <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          style={styles.keyboardWrapper}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          style={{ flex: 1 }}
         >
-          {/* touch outside to dismiss keyboard */}
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={styles.card}>
-              {/* header row */}
+              {/* Header */}
               <View style={styles.headerRow}>
                 <TouchableOpacity onPress={resetAndClose}>
                   <Ionicons
@@ -109,52 +82,48 @@ export default function ReportBugModal({ visible, onClose }: Props) {
               <ScrollView
                 style={styles.scroll}
                 contentContainerStyle={styles.scrollContent}
-                keyboardShouldPersistTaps="handled"
               >
-                {/* title */}
                 <View style={styles.titleBlock}>
                   <Text style={styles.emoji}>🐞</Text>
                   <Text style={styles.title}>Report a Bug</Text>
                   <Text style={styles.subtitle}>
-                    Help us improve Nimbus — tell us what happened and we'll
-                    investigate.
+                    Help us improve Nimbus by telling us what happened.
                   </Text>
                 </View>
 
-                {/* form or success */}
                 {!submitted ? (
                   <>
                     <InputField
                       label="Bug Details"
                       value={description}
                       onChangeText={setDescription}
-                      placeholder="Describe the issue: what happened, steps to reproduce, device/OS, screen, etc."
+                      placeholder="Describe the issue..."
                       multiline
                       numberOfLines={6}
+                      helperText={`${description.length} / 1000`}
                       inputStyle={{
                         minHeight: 120,
-                        fontSize: 16,
                         textAlignVertical: "top",
-                        includeFontPadding: false,
                       }}
-                      helperText={`${description.length} / 1000`}
                     />
 
-                    <View style={{ height: 14 }} />
+                    <View style={styles.btnStack}>
+                      {/* Cancel FIRST */}
+                      <StyledButton
+                        label="Cancel"
+                        variant="secondary"
+                        onPress={resetAndClose}
+                        fullWidth
+                      />
 
-                    <StyledButton
-                      label={loading ? "Reporting..." : "Report"}
-                      onPress={submitBug}
-                      disabled={loading || !description.trim()}
-                      style={{ borderRadius: 12 }}
-                    />
-
-                    <TouchableOpacity
-                      style={styles.cancel}
-                      onPress={resetAndClose}
-                    >
-                      <Text style={styles.cancelText}>Cancel</Text>
-                    </TouchableOpacity>
+                      {/* Primary action SECOND */}
+                      <StyledButton
+                        label={loading ? "Reporting..." : "Report Bug"}
+                        onPress={submitBug}
+                        disabled={!description.trim() || loading}
+                        fullWidth
+                      />
+                    </View>
                   </>
                 ) : (
                   <View style={styles.successBlock}>
@@ -162,23 +131,14 @@ export default function ReportBugModal({ visible, onClose }: Props) {
                     <Text style={styles.successTitle}>
                       Thanks — report sent!
                     </Text>
-                    <Text style={styles.successSubtitle}>
-                      We received your report and will investigate. Thanks for
-                      helping make Nimbus better.
-                    </Text>
-
-                    <View style={{ height: 18 }} />
-
                     <StyledButton label="Done" onPress={resetAndClose} />
                   </View>
                 )}
               </ScrollView>
 
-              <View style={styles.footer}>
-                <Text style={styles.footerText}>
-                  Tip: include device & OS version for faster debugging.
-                </Text>
-              </View>
+              <Text style={styles.footerText}>
+                Tip: Include device & OS version for faster debugging.
+              </Text>
             </View>
           </TouchableWithoutFeedback>
         </KeyboardAvoidingView>
@@ -189,90 +149,52 @@ export default function ReportBugModal({ visible, onClose }: Props) {
 
 const styling = (theme: any) =>
   StyleSheet.create({
-    safeArea: {
-      flex: 1,
-      backgroundColor: theme.background,
-    },
-    keyboardWrapper: {
-      flex: 1,
-    },
+    safeArea: { flex: 1, backgroundColor: theme.background },
     card: {
-      flex: 1, // fill whole modal
+      flex: 1,
       backgroundColor: theme.background,
-      paddingHorizontal: 18,
-      paddingTop: 12,
-      paddingBottom: Platform.OS === "ios" ? 34 : 22,
-      // remove top-border radii if you want full-bleed appearance
-      // borderTopLeftRadius: 0,
-      // borderTopRightRadius: 0,
+      paddingHorizontal: 20,
+      paddingTop: 10,
+      paddingBottom: 30,
     },
     headerRow: {
       height: 48,
       justifyContent: "center",
     },
-    scroll: {
-      flex: 1,
-    },
-    // flexGrow makes content fill and allow scroll when needed
-    scrollContent: {
-      paddingBottom: 8,
-      flexGrow: 1,
-    },
+    scroll: { flex: 1 },
+    scrollContent: { paddingBottom: 20 },
     titleBlock: {
       alignItems: "center",
-      marginBottom: 12,
+      marginBottom: 14,
     },
-    emoji: {
-      fontSize: 34,
-      marginBottom: 8,
-    },
+    emoji: { fontSize: 34, marginBottom: 4 },
     title: {
-      color: theme.textPrimary,
       fontSize: 20,
       fontWeight: "700",
-      marginBottom: 6,
+      color: theme.textPrimary,
+      marginBottom: 4,
     },
     subtitle: {
+      textAlign: "center",
       color: theme.textSecondary,
       fontSize: 13,
-      textAlign: "center",
-      maxWidth: 520,
+      maxWidth: 480,
     },
-    cancel: {
-      marginTop: 10,
-      alignItems: "center",
+    btnStack: {
+      marginTop: 20,
+      gap: 12,
     },
-    cancelText: {
-      color: theme.textSecondary,
-      fontSize: 14,
-    },
-
-    successBlock: {
-      alignItems: "center",
-      paddingVertical: 22,
-    },
-    successEmoji: {
-      fontSize: 36,
-      marginBottom: 8,
-    },
+    successBlock: { alignItems: "center", paddingVertical: 30 },
+    successEmoji: { fontSize: 36, marginBottom: 10 },
     successTitle: {
       fontSize: 18,
-      fontWeight: "700",
       color: theme.textPrimary,
-      marginBottom: 6,
-    },
-    successSubtitle: {
-      fontSize: 14,
-      color: theme.textSecondary,
-      textAlign: "center",
-      maxWidth: 520,
-    },
-
-    footer: {
-      marginTop: 10,
-      alignItems: "center",
+      fontWeight: "700",
+      marginBottom: 12,
     },
     footerText: {
+      textAlign: "center",
+      marginTop: 16,
       color: theme.textSecondary,
       fontSize: 12,
     },

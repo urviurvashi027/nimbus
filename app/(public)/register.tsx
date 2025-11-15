@@ -10,7 +10,6 @@ import ThemeContext from "@/context/ThemeContext";
 import { ScreenView, ThemeKey } from "@/components/Themed";
 import { useAuth } from "@/context/AuthContext";
 import Toast from "react-native-toast-message";
-import { getOtp } from "@/services/loginService";
 import SignUpPasswordScreen from "./signUpPassword";
 
 const TOTAL_STEPS = 4;
@@ -30,10 +29,6 @@ const RegistrationFlow = () => {
   const [error, setError] = useState<boolean>(false);
   const [errMsg, setErrMsg] = useState<string>("");
 
-  // api state
-  const [otpSent, setOtpSent] = useState<boolean>(false);
-  const [loading, setLoading] = useState(false);
-
   const { onRegister } = useAuth();
 
   const nextStep = () => setStep((s) => Math.min(TOTAL_STEPS, s + 1));
@@ -42,6 +37,7 @@ const RegistrationFlow = () => {
   const navigation = useNavigation();
 
   const { theme, newTheme } = useContext(ThemeContext);
+  const styles = styling(theme, newTheme);
 
   // useEffect
   useEffect(() => {
@@ -54,10 +50,7 @@ const RegistrationFlow = () => {
     });
   }, [navigation]);
 
-  const styles = styling(theme, newTheme);
-
   // API Call
-
   const onSignUpClick = async (password: string) => {
     if (error) return;
     const result = await onRegister!(
@@ -75,7 +68,6 @@ const RegistrationFlow = () => {
         position: "bottom",
       });
       router.push("/OnBoarding/QuestionScreen");
-      // router.push("/OnBoarding/ProfileScreen");
     }
     // failure handled
     if (result.error_code || !result.success) {
@@ -83,12 +75,16 @@ const RegistrationFlow = () => {
         typeof result.message === "string"
           ? result.message
           : JSON.stringify(result.message); // if object with field errors
+      Toast.show({
+        type: "error",
+        text1: "Something went wrong: Retry again later",
+        position: "bottom",
+      });
       alert(msg);
     }
   };
 
   // Input Validation
-
   const validateEmail = (text: string) => {
     setEmail(text);
     const emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
