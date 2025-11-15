@@ -64,7 +64,7 @@ function RootLayoutNav() {
               options={{ headerShown: false }}
             />
             <Stack.Screen
-              name="(public)/landing"
+              name="(public)/landingScreen"
               options={{ headerShown: false }}
             />
           </Stack>

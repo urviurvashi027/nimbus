@@ -1,21 +1,11 @@
 import React, { useContext, useEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  Image,
-  Dimensions,
-} from "react-native";
-import Svg, { Path, Circle, Ellipse } from "react-native-svg";
+import { View, Text, StyleSheet, Pressable, Dimensions } from "react-native";
 import { StyledButton } from "@/components/common/ThemedComponent/StyledButton"; // reuse your styled button
 import { router, useNavigation } from "expo-router";
 import ThemeContext from "@/context/ThemeContext";
 import { ScreenView, ThemeKey } from "@/components/Themed";
 
 import RelaxMenIcon from "@/assets/images/logoNew/1.svg";
-import MeditationWomenIcon from "@/assets/images/logoNew/2.svg";
-// import SoundscapeIcon from "../../assets/images/buttonLogo/selfcare/soundscape.svg";
 
 const OnboardingScreen = () => {
   const navigation = useNavigation();
@@ -32,8 +22,8 @@ const OnboardingScreen = () => {
   const styles = styling(theme, newTheme);
 
   const firstBtnSegmentBtnClick = () => {
-    router.push("/(auth)/OnBoarding/QuestionScreen");
-    // router.push("/(public)/demo");
+    router.push("/(auth)/onboarding/QuestionScreen");
+    // router.push("/(public)/register");
   };
 
   const secondBtnSegmentBtnClick = () => {
@@ -130,7 +120,7 @@ const styling = (theme: ThemeKey, newTheme: any) =>
     },
 
     helper: {
-      color: newTheme.textPrimary,
+      color: newTheme.textSecondary,
       fontSize: 14,
       marginTop: 6,
       textAlign: "center",
@@ -147,14 +137,15 @@ const styling = (theme: ThemeKey, newTheme: any) =>
       textAlign: "center",
       fontSize: 14,
       fontWeight: "700",
-      color: "#A3BE8C", // accent green
+      color: newTheme.accent, // accent green
     },
 
     headline: {
-      color: "#ECEFF4",
+      color: newTheme.textPrimary,
       fontSize: 28,
       fontWeight: "700",
       marginTop: 12,
+      marginBottom: 8,
       textAlign: "center",
     },
   });

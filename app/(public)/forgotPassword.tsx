@@ -1,12 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-} from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import InputField from "@/components/common/ThemedComponent/StyledInput";
 import { StyledButton } from "@/components/common/ThemedComponent/StyledButton"; // reusable button we created earlier
 import { router, useNavigation } from "expo-router";
