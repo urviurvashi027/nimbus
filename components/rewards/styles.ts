@@ -12,7 +12,7 @@ const cardShadow = Platform.select({
 
 export const styles = (t: any) =>
   StyleSheet.create({
-    screen: { flex: 1, backgroundColor: t.background },
+    screen: { flex: 1, backgroundColor: t.background, marginTop: 30 },
     header: {
       height: 64,
       paddingHorizontal: 12,
@@ -67,5 +67,21 @@ export const styles = (t: any) =>
       alignItems: "center",
       justifyContent: "space-between",
       marginTop: 4,
+    },
+
+    rewardHeader: {
+      // paddingTop: 10,
+      // marginBottom: 20,
+    },
+    rewardTitle: {
+      fontSize: 28,
+      fontWeight: "700",
+      color: t.textPrimary,
+    },
+    rewardSubtitle: {
+      color: t.textSecondary,
+      fontSize: 14,
+      marginTop: 4,
+      marginBottom: 20,
     },
   });

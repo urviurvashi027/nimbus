@@ -3,41 +3,51 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   FlatList,
-  Platform,
   TouchableOpacity,
 } from "react-native";
-import { BarChart } from "react-native-gifted-charts";
 import FilterPill from "./component/FilterPill";
-import StatCard from "./component/StatCard";
-import { ScreenView } from "../Themed";
-import MentalHealthCharts from "./component/MentalHealthChart";
 import ThemeContext from "@/context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "expo-router";
+import ProductivityOverview from "./ProductivityOverview";
+import MentalHealthOverview from "./MentalHealthOverview";
+import PhysicalHealthOverview from "./PhysicalHealthOverview";
+import AllStatsOverview from "./AllStatsOverview";
 
 const dateFilters = ["D", "W", "M", "3M", "6M", "Y"];
-const tagFilters = ["Hormone Level", "Mental Health", "Productivity"];
-
-const productivityData = [
-  { value: 80, label: "S", frontColor: "black" },
-  { value: 95, label: "M", frontColor: "black" },
-  { value: 100, label: "T", frontColor: "black" },
-  { value: 90, label: "W", frontColor: "black" },
-  { value: 60, label: "T", frontColor: "black" },
-  { value: 85, label: "F", frontColor: "black" },
-  { value: 20, label: "S", frontColor: "black" },
+const tagFilters = [
+  { key: "all", label: "All" },
+  { key: "productivity", label: "Productivity" },
+  { key: "mental", label: "Mental Health" },
+  { key: "physical", label: "Physical Health" },
 ];
 
 export default function StatsScreen() {
   const [selectedDate, setSelectedDate] = useState("W");
-  const [selectedTag, setSelectedTag] = useState("Productivity");
+  const [selectedTag, setSelectedTag] = useState(tagFilters[0]);
   const navigation = useNavigation();
 
   const { newTheme } = useContext(ThemeContext);
   const styles = styling(newTheme);
+
+  const renderTagContent = () => {
+    switch (selectedTag.key) {
+      case "productivity":
+        return <ProductivityOverview />;
+
+      case "mental":
+        return <MentalHealthOverview />;
+
+      case "physical":
+        return <PhysicalHealthOverview />;
+
+      case "all":
+      default:
+        return <AllStatsOverview />;
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -82,11 +92,11 @@ export default function StatsScreen() {
             horizontal
             showsHorizontalScrollIndicator={false}
             data={tagFilters}
-            keyExtractor={(item) => item}
+            keyExtractor={(item) => item.key}
             renderItem={({ item }) => (
               <FilterPill
-                label={item}
-                selected={selectedTag === item}
+                label={item.label}
+                selected={selectedTag.key === item.key}
                 onPress={() => setSelectedTag(item)}
                 type="tag"
               />
@@ -95,43 +105,7 @@ export default function StatsScreen() {
           />
         </View>
 
-        {/* Dynamic Charts */}
-        {selectedTag === "Productivity" && (
-          <View style={styles.chartContainer}>
-            <Text style={styles.chartTitle}>Total Activities</Text>
-            <Text style={styles.chartValue}>86%</Text>
-
-            <BarChart
-              data={productivityData}
-              barWidth={28}
-              spacing={20}
-              hideRules
-              yAxisThickness={0}
-              xAxisThickness={0}
-              barBorderRadius={14}
-              xAxisLabelTextStyle={styles.dayLabel}
-              isAnimated
-              height={220}
-              noOfSections={4}
-              yAxisTextStyle={{ color: "transparent" }} // hide numbers
-            />
-          </View>
-        )}
-
-        {selectedTag === "Mental Health" && <MentalHealthCharts />}
-
-        {selectedTag === "Hormone Level" && (
-          <View style={styles.chartContainer}>
-            <Text style={styles.chartTitle}>Hormone Level</Text>
-            <Text style={styles.chartValue}>Coming soon 🚀</Text>
-          </View>
-        )}
-
-        {/* Stats Cards */}
-        <View style={styles.statsRow}>
-          <StatCard emoji="👍" label="Habits Done" value="16" />
-          <StatCard emoji="⛔" label="Habits Skipped" value="1" />
-        </View>
+        {renderTagContent()}
       </SafeAreaView>
     </View>
   );

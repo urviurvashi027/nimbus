@@ -1,10 +1,19 @@
 // app/achievements.tsx
 import React, { useContext } from "react";
-import { ActivityIndicator, View, Text, TouchableOpacity } from "react-native";
+import {
+  ActivityIndicator,
+  View,
+  Text,
+  TouchableOpacity,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+} from "react-native";
 import { useRouter } from "expo-router";
 import ThemeContext from "@/context/ThemeContext";
-import AchievementsScreen from "@/components/achievements/AchievementScreen";
 import { useAchievements } from "@/hooks/useAchievements";
+import RewardDetails from "@/components/rewards/RewardDetails";
+import { ScreenView } from "@/components/Themed";
 
 export default function AchievementsRoute() {
   const router = useRouter();
@@ -70,10 +79,20 @@ export default function AchievementsRoute() {
   }
 
   return (
-    <AchievementsScreen
-      onBack={() => router.back()}
-      achievements={data?.achievements ?? []}
-      badges={data?.badges ?? []}
-    />
+    <ScreenView
+      style={{
+        paddingTop: Platform.OS === "ios" ? 40 : 20,
+      }}
+    >
+      <SafeAreaView>
+        <ScrollView>
+          <RewardDetails
+            onBack={() => router.back()}
+            achievements={data?.achievements ?? []}
+            badges={data?.badges ?? []}
+          />
+        </ScrollView>
+      </SafeAreaView>
+    </ScreenView>
   );
 }
