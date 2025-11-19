@@ -4,7 +4,6 @@ import React, { useContext, useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { format } from "date-fns";
 
-import { themeColors } from "@/constant/theme/Colors";
 import ThemeContext from "@/context/ThemeContext";
 import { ReminderAt } from "@/types/habitTypes";
 // import HabitReminderModal from "./Modal/HabitReminderModal";
@@ -115,7 +114,6 @@ const HabitReminderInput: React.FC<HabitReminderInputProps> = ({
           style={styles.iconLeft}
           name="stopwatch-outline"
           size={20}
-          color={themeColors[theme].text}
         />
         <View style={styles.inputField}>
           <Text style={styles.label}>Reminder At</Text>
@@ -131,7 +129,6 @@ const HabitReminderInput: React.FC<HabitReminderInputProps> = ({
           style={styles.iconRight}
           name="chevron-forward"
           size={20}
-          color={themeColors[theme].text}
         /> */}
       </TouchableOpacity>
       <ReminderModal

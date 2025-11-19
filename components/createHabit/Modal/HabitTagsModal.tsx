@@ -9,9 +9,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-import { themeColors } from "@/constant/theme/Colors";
 import ThemeContext from "@/context/ThemeContext";
-import { FormInput } from "../../Themed";
 import { findIdBName, addObjectAtEnd } from "@/utils/helper";
 import { HabitTag } from "@/types/habitTypes";
 import { selectedTag } from "../HabitTagsInput";

@@ -1,3 +1,19 @@
+// UI Types for Self-Care Module
+
+export interface WorkoutVideoListItem {
+  id: number;
+  title: string;
+  image: {
+    uri: string;
+  };
+  coachName: string;
+  category: string;
+  duration: number;
+  description: string;
+  source: string;
+}
+
+// Backend Tpypes for Self-Care Module
 export interface JournalListItem {
   id: number;
   title: string;

@@ -4,7 +4,6 @@ import React, { useContext, useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { format } from "date-fns";
 
-import { themeColors } from "@/constant/theme/Colors";
 import ThemeContext from "@/context/ThemeContext";
 import { HabitDateType } from "@/types/habitTypes";
 // import HabitDateModal from "./Modal/HabitDateModal";

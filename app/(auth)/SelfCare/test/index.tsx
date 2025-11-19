@@ -13,7 +13,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { router, useNavigation } from "expo-router";
 import { ScreenView, ThemeKey } from "@/components/Themed";
 import ThemeContext from "@/context/ThemeContext";
-// import { themeColors } from "@/constant/theme/Colors";
 import { medTests } from "@/constant/data/medicalTest";
 import { getMentalTestList } from "@/services/selfCareService";
 
@@ -147,7 +146,6 @@ const styling = (theme: any) =>
     activeTabText: {
       fontSize: 18,
       color: theme.textSecondary,
-      // color: themeColors.basic.secondaryColor,
     },
     listItem: {
       flexDirection: "row",

@@ -9,7 +9,6 @@ import {
 import React, { useContext } from "react";
 import ThemeContext from "@/context/ThemeContext";
 import { ThemeKey } from "@/components/Themed";
-import { themeColors } from "@/constant/theme/Colors";
 import { TrackType } from "@/constant/data/soundtrack";
 
 interface PropType {

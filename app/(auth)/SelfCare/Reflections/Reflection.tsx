@@ -15,8 +15,6 @@ import { useNavigation } from "expo-router";
 
 import ThemeContext from "@/context/ThemeContext";
 
-// import { themeColors } from "@/constant/theme/Colors";
-
 import { ScreenView } from "@/components/Themed";
 import { ThemeKey } from "@/components/Themed";
 import JournalModal from "@/components/selfCare/journaling/JorunalingModal";

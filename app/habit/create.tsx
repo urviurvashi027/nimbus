@@ -20,8 +20,6 @@ import Toast from "react-native-toast-message";
 import HabitContext from "@/context/HabitContext";
 import ThemeContext from "@/context/ThemeContext";
 
-import { themeColors } from "@/constant/theme/Colors";
-
 import HabitTypeInput from "@/components/createHabit/HabitTypeInput";
 import HabitTagsInput, {
   selectedTag,

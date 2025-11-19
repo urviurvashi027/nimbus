@@ -1,12 +1,7 @@
-import {
-  ThemeColors,
-  ColorSet,
-  Spacing,
-  Typography,
-} from "../../types/themeTypes";
+import { ThemeColors, Spacing, Typography } from "../../types/themeTypes";
 
 const tintColorLight = "#f5bcdd";
-const tintColorDark = "#f5bcdd";
+// const tintColorDark = "#f5bcdd";
 export const primaryColor = "#f5bcdd";
 
 type ColorSetEx = {
@@ -33,12 +28,6 @@ export default {
     tint: tintColorLight,
     tabIconDefault: "#5f5f5f",
     tabIconSelected: tintColorLight,
-
-    // text: "#fffdf7",
-    // background: "#2f2f2f",
-    // tint: tintColorDark,
-    // tabIconDefault: "#5f5f5f",
-    // tabIconSelected: tintColorDark,
   },
 };
 
@@ -98,18 +87,6 @@ export const themeColors: ThemeColorsEx = {
     divider: "#e6e7eb",
     ...commonColor,
   },
-};
-
-const colors = {
-  placeholder: "",
-  label: "",
-  active: "",
-  deactive: "",
-  lable: "",
-  inputBorder: "",
-  btnBorder: "",
-  text: "",
-  itemDivider: "",
 };
 
 // latest theme color

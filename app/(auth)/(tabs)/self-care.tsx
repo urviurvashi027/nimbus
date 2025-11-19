@@ -9,15 +9,15 @@ import {
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { router, useNavigation } from "expo-router";
+
 // application level import
 import ThemeContext from "@/context/ThemeContext";
-// import { themeColors } from "@/constant/theme/Colors";
+
 import {
   buttons as NavigationButton,
   NavigationButtonType,
 } from "@/constant/data/selfCareButton";
 import { banners } from "@/constant/data/banner";
-// Need to remove these data once api is integrated
 import { medTests } from "@/constant/data/medicalTest";
 
 import { ScreenView } from "@/components/Themed";
@@ -36,12 +36,16 @@ import {
   getWorkoutVideo,
 } from "@/services/selfCareService";
 import { getRoutineList, getSoundscapeList } from "@/services/toolService";
+import { WorkoutListItem, WorkoutVideoListItem } from "@/types/selfCareTypes";
 
 const SelfCare: React.FC = () => {
   const navigation = useNavigation();
   const [selectedButton, setSelectedButton] = useState("");
 
-  const [videoList, setVideoList] = useState<any[]>([]);
+  const [workoutVideoList, setWorkoutVideoList] = useState<
+    WorkoutVideoListItem[]
+  >([]);
+
   const [meditationList, setMeditationList] = useState<any[]>([]);
   const [libraryTracks, setLibraryTracks] = useState<any[]>([]);
   const [medicalListData, setMedicalListData] = useState<any[]>([]);
@@ -51,8 +55,7 @@ const SelfCare: React.FC = () => {
   const [showThingsToDoTagsModal, setShowThingsToDoTagsModal] = useState(false);
   const [routineList, setRoutineList] = useState<any[] | undefined>();
 
-  const { theme, newTheme, toggleTheme, useSystemTheme } =
-    useContext(ThemeContext);
+  const { theme, newTheme, spacing, typography } = useContext(ThemeContext);
 
   const styles = styling(theme, newTheme);
 
@@ -82,7 +85,7 @@ const SelfCare: React.FC = () => {
           };
         });
 
-        setVideoList(processedVideo);
+        setWorkoutVideoList(processedVideo);
       } else {
         // Handle the case where the data is not in the expected format
         console.error("API response data is not an array:", result);
@@ -281,14 +284,14 @@ const SelfCare: React.FC = () => {
           })}
         </ScrollView>
 
-        {/* MasterClass Section */}
         <ScrollView showsVerticalScrollIndicator={false}>
+          {/* Workout Video List Section */}
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             style={{ paddingTop: 16, paddingLeft: 0, paddingBottom: 20 }}
           >
-            {videoList.map((card) => (
+            {workoutVideoList.map((card) => (
               <VideoClassCard
                 key={card.id}
                 title={card.title}
@@ -299,7 +302,7 @@ const SelfCare: React.FC = () => {
             ))}
           </ScrollView>
 
-          {/* {Soundscpae} */}
+          {/* { Soundscpae List Section} */}
           <HorizontalListCardScroll
             title="Soundscape"
             description="The sound of nature gives you better sleep."
@@ -308,7 +311,7 @@ const SelfCare: React.FC = () => {
             onClickOfAll={() => onClickOfAll("soundscape")}
           />
 
-          {/* AudioBook */}
+          {/* AudioBook List Section */}
           <TrendingCardCarousel
             type="rotuine"
             title="New and Trendings"
@@ -317,7 +320,7 @@ const SelfCare: React.FC = () => {
             onPress={handleCardPress}
           />
 
-          {/* Medical Test */}
+          {/* Medical Test List Section */}
           <HorizontalListCardScroll
             title="Medical Test"
             description="Mental health is everything"
@@ -329,7 +332,7 @@ const SelfCare: React.FC = () => {
 
           <HorizontalBanner data={banners} onPress={handleBannerPress} />
 
-          {/* Meditation */}
+          {/* Meditation List Section */}
           <HorizontalListCardScroll
             title="Meditation"
             description="Now is a great time to be present. Now is good, too. And now"
@@ -337,8 +340,6 @@ const SelfCare: React.FC = () => {
             itemList={meditationList}
             onClickOfAll={() => onClickOfAll("meditation")}
           />
-
-          {/* Motivation */}
         </ScrollView>
       </SafeAreaView>
 
@@ -349,6 +350,7 @@ const SelfCare: React.FC = () => {
         onClose={() => setShowSleepTagsModal(false)}
       />
 
+      {/* Pricing Modal */}
       <PricingModal
         visible={showPricingModal}
         onClose={() => {

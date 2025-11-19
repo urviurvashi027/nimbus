@@ -20,7 +20,6 @@ import DateTimePicker, {
 import { Text } from "../../Themed";
 import ThemeContext from "@/context/ThemeContext";
 import { StyledButton } from "@/components/common/ThemedComponent/StyledButton";
-import { themeColors } from "@/constant/theme/Colors";
 
 export interface ReminderAt {
   time?: string | undefined;
@@ -53,7 +52,6 @@ const HabitReminderModal: React.FC<ReminderAtModalProps> = ({
   isEditMode,
 }) => {
   const { theme, newTheme } = useContext(ThemeContext);
-  const colors = themeColors[theme];
 
   // UI state
   const [showTimePicker, setShowTimePicker] = useState(false);

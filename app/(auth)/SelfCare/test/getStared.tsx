@@ -258,7 +258,6 @@ const styling = (theme: ThemeKey) =>
     container: {
       flex: 1,
       // backgroundColor: "blue",
-      // backgroundColor: themeColors[theme].background,
       // paddingHorizontal: 0,
     },
   });

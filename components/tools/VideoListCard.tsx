@@ -12,7 +12,6 @@
 // import { VideoView, useVideoPlayer, VideoSource } from "expo-video";
 // import ThemeContext from "@/context/ThemeContext";
 // import { ThemeKey } from "../Themed";
-// import { themeColors } from "@/constant/theme/Colors";
 
 // const { width, height } = Dimensions.get("window");
 
