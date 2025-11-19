@@ -24,7 +24,6 @@ import AdvancedSettingsModal from "@/components/setting/modal/AdvanceSettingModa
 import EditProfileModal from "@/components/setting/modal/EditProfileModal";
 import UpgradeBanner from "@/components/common/UpgradeBanner";
 import { router } from "expo-router";
-import DailyCheckInCard from "@/components/homeScreen/component/DailyCheckInCard";
 import ProfileHeader from "@/components/setting/ProfileHeader";
 import StyledSwitch from "@/components/common/themeComponents/StyledSwitch";
 
@@ -166,9 +165,8 @@ export default function profile() {
       handleModalVisibilty(label);
     }
     if (type === "screen") {
-      if (label === "Overview") router.push("/(auth)/Overview/details");
-      if (label === "Badges")
-        router.push("/(auth)/AchievementScreen/Achievement");
+      if (label === "Overview") router.push("/(auth)/statisticsScreen/details");
+      if (label === "Badges") router.push("/(auth)/rewardScreen");
     }
   };
 
