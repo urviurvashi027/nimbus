@@ -27,8 +27,8 @@ import HorizontalListCardScroll from "@/components/tools/common/HorizontalListCa
 import VideoClassCard from "@/components/selfCare/VideoClassCard";
 import HorizontalBanner from "@/components/tools/common/HorizontalBanner";
 import PricingModal from "@/components/common/PricingModal";
-import SleepModal from "../SelfCare/Sleep/Sleep";
-import ThingsToDoModal from "../SelfCare/ThingsToDo/ThingsToDo";
+import SleepModal from "../selfCareScreen/SleepScreen";
+import ThingsToDoModal from "../selfCareScreen/ThingsToDoScreen";
 
 import {
   getMeditationAudioList,
@@ -36,20 +36,32 @@ import {
   getWorkoutVideo,
 } from "@/services/selfCareService";
 import { getRoutineList, getSoundscapeList } from "@/services/toolService";
-import { WorkoutListItem, WorkoutVideoListItem } from "@/types/selfCareTypes";
+import {
+  MeditationAudioListItem,
+  WorkoutVideoListItem,
+} from "@/types/selfCareTypes";
+import { SoundscapeTrackListItem } from "@/types/toolsTypes";
 
 const SelfCare: React.FC = () => {
   const navigation = useNavigation();
   const [selectedButton, setSelectedButton] = useState("");
 
+  // Backend api states
   const [workoutVideoList, setWorkoutVideoList] = useState<
     WorkoutVideoListItem[]
   >([]);
 
-  const [meditationList, setMeditationList] = useState<any[]>([]);
-  const [libraryTracks, setLibraryTracks] = useState<any[]>([]);
+  const [meditationList, setMeditationList] = useState<
+    MeditationAudioListItem[]
+  >([]);
+
+  const [soundscapeTrackList, setSoundscapeTrackList] = useState<
+    SoundscapeTrackListItem[]
+  >([]);
+
   const [medicalListData, setMedicalListData] = useState<any[]>([]);
 
+  // Modal States
   const [showPricingModal, setShowPricingModal] = useState(false);
   const [showSleepTagsModal, setShowSleepTagsModal] = useState(false);
   const [showThingsToDoTagsModal, setShowThingsToDoTagsModal] = useState(false);
@@ -64,11 +76,11 @@ const SelfCare: React.FC = () => {
     if (button.action === "navigate") {
       router.push(button.screen);
     } else if (button.action === "modal") {
-      getModalInfo(button.screen);
+      modalHandler(button.screen);
     }
   };
 
-  const getWorkoutListData = async () => {
+  const getWorkoutVideoList = async () => {
     // need to add filters functionality and category param changes
     try {
       const result = await getWorkoutVideo();
@@ -95,7 +107,7 @@ const SelfCare: React.FC = () => {
     }
   };
 
-  const getMeditationlList = async () => {
+  const getMeditationTrackList = async () => {
     // need to add filters functionality and category param changes
     try {
       const result = await getMeditationAudioList();
@@ -121,7 +133,7 @@ const SelfCare: React.FC = () => {
     }
   };
 
-  const getSoundscapeListData = async () => {
+  const getSoundscapeTrackList = async () => {
     try {
       const result = await getSoundscapeList();
       // Check if 'result' and 'result.data' exist and is an array
@@ -135,7 +147,7 @@ const SelfCare: React.FC = () => {
             },
           };
         });
-        setLibraryTracks(processedArticles);
+        setSoundscapeTrackList(processedArticles);
       } else {
         // Handle the case where the data is not in the expected format
         console.error("API response data is not an array:", result);
@@ -145,17 +157,8 @@ const SelfCare: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    getSoundscapeListData();
-  }, []);
-
-  useEffect(() => {
-    getWorkoutListData();
-    getMeditationlList();
-  }, []);
-
   // helper function to enable the modal
-  const getModalInfo = (modalName: string) => {
+  const modalHandler = (modalName: string) => {
     switch (modalName) {
       case "Sleep":
         setShowSleepTagsModal(true);
@@ -174,13 +177,13 @@ const SelfCare: React.FC = () => {
   const onClickOfAll = (title: string) => {
     switch (title) {
       case "medicalTest":
-        router.push("/(auth)/SelfCare/test");
+        router.push("/(auth)/selfCareScreen/test");
         break;
       case "soundscape":
-        router.push("/(auth)/SelfCare/Soundscape/Soundscape");
+        router.push("/(auth)/selfCareScreen/SoundscapeScreen");
         break;
       case "meditation":
-        router.push("/(auth)/SelfCare/Meditation/Meditation");
+        router.push("/(auth)/selfCareScreen/MeditationScreen");
         break;
       case "routine":
         router.push("/(auth)/Tools/Routine/Routine");
@@ -244,6 +247,9 @@ const SelfCare: React.FC = () => {
   };
 
   useEffect(() => {
+    getWorkoutVideoList();
+    getMeditationTrackList();
+    getSoundscapeTrackList();
     getRoutineData();
     // getMentalListData();
   }, []);
@@ -251,7 +257,9 @@ const SelfCare: React.FC = () => {
   return (
     <ScreenView
       style={{
-        paddingTop: Platform.OS === "ios" ? 80 : 20,
+        paddingTop:
+          Platform.OS === "ios" ? spacing["xxl"] + spacing["xxl"] : spacing.xl,
+        paddingHorizontal: spacing.md,
       }}
     >
       <SafeAreaView style={{ flex: 1, padding: 0 }}>
@@ -307,7 +315,7 @@ const SelfCare: React.FC = () => {
             title="Soundscape"
             description="The sound of nature gives you better sleep."
             backgroundColor="#fff9d2"
-            itemList={libraryTracks}
+            itemList={soundscapeTrackList}
             onClickOfAll={() => onClickOfAll("soundscape")}
           />
 

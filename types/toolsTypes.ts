@@ -1,21 +1,18 @@
-interface UserData {
-  username: string;
-  email: string;
-  id: number;
-  refresh: string;
-  access: string;
-}
+// UI data Type
 
-// TODO add types
-interface LogoutData {
-  data: any;
-}
-
-interface SignupData {
+export interface SoundscapeTrackListItem {
   id: number;
   title: string;
-  image: string;
+  image: { uri: string };
+  category: string;
+  duration: number | string;
+  description: string;
+  source: string;
 }
+
+// Backend Data Type
+
+// TODO add types
 
 // TODO ADD PROPER TYPE
 interface ArticleListItem {

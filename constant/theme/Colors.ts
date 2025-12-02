@@ -173,6 +173,7 @@ const spacing: Spacing = {
   lg: 24,
   xl: 32,
   xxl: 48,
+  "2xl": 32,
 };
 
 // Now, create the main theme object that adheres to the ThemeColors interface

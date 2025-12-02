@@ -8,27 +8,26 @@ import {
   Modal,
   StyleSheet,
 } from "react-native";
-
 const activities = [
   {
     text: "Clean your comb",
-    image: require("../../../../assets/images/mentalTest/adhdTest.png"),
+    image: require("../../../assets/images/mentalTest/adhdTest.png"),
   },
   {
     text: "Drink water",
-    image: require("../../../../assets/images/mentalTest/adhdTest.png"),
+    image: require("../../../assets/images/mentalTest/adhdTest.png"),
   },
   {
     text: "Take a deep breath",
-    image: require("../../../../assets/images/mentalTest/adhdTest.png"),
+    image: require("../../../assets/images/mentalTest/adhdTest.png"),
   },
   {
     text: "Stretch your body",
-    image: require("../../../../assets/images/mentalTest/adhdTest.png"),
+    image: require("../../../assets/images/mentalTest/adhdTest.png"),
   },
   {
     text: "Write a journal",
-    image: require("../../../../assets/images/mentalTest/adhdTest.png"),
+    image: require("../../../assets/images/mentalTest/adhdTest.png"),
   },
 ];
 
