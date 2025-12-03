@@ -22,10 +22,10 @@ import { medTests } from "@/constant/data/medicalTest";
 
 import { ScreenView } from "@/components/Themed";
 import { ThemeKey } from "@/components/Themed";
-import TrendingCardCarousel from "@/components/tools/common/TrendingCardCarousel";
-import HorizontalListCardScroll from "@/components/tools/common/HorizontalListCardScroll";
-import VideoClassCard from "@/components/selfCare/VideoClassCard";
-import HorizontalBanner from "@/components/tools/common/HorizontalBanner";
+import TrendingCardCarousel from "@/components/common/TrendingCardCarousel";
+import HorizontalListCardScroll from "@/components/common/HorizontalListCardScroll";
+import VideoClassCard from "@/components/selfCare/MasterclassCard";
+import HorizontalBanner from "@/components/common/HorizontalBanner";
 import PricingModal from "@/components/common/PricingModal";
 import SleepModal from "../selfCareScreen/SleepScreen";
 import ThingsToDoModal from "../selfCareScreen/ThingsToDoScreen";
@@ -41,10 +41,11 @@ import {
   WorkoutVideoListItem,
 } from "@/types/selfCareTypes";
 import { SoundscapeTrackListItem } from "@/types/toolsTypes";
+import NavigationIconButton from "@/components/common/NavigationIconButton";
 
 const SelfCare: React.FC = () => {
   const navigation = useNavigation();
-  const [selectedButton, setSelectedButton] = useState("");
+  const [selectedButton, setSelectedButton] = useState<string | number>("");
 
   // Backend api states
   const [workoutVideoList, setWorkoutVideoList] = useState<
@@ -73,6 +74,7 @@ const SelfCare: React.FC = () => {
 
   // Funstion called on click of navigation button clicked
   const handleNavigationButtonPress = (button: NavigationButtonType) => {
+    // console.log(button.screen, button, "button");
     if (button.action === "navigate") {
       router.push(button.screen);
     } else if (button.action === "modal") {
@@ -247,6 +249,7 @@ const SelfCare: React.FC = () => {
   };
 
   useEffect(() => {
+    setSelectedButton("");
     getWorkoutVideoList();
     getMeditationTrackList();
     getSoundscapeTrackList();
@@ -271,25 +274,21 @@ const SelfCare: React.FC = () => {
           horizontal
           showsHorizontalScrollIndicator={false}
           style={styles.navigationScrollView}
-          contentContainerStyle={{ paddingHorizontal: 0 }}
+          contentContainerStyle={{ paddingHorizontal: 0, paddingBottom: 20 }}
         >
-          {NavigationButton.map((button: NavigationButtonType) => {
-            const IconComponent = button.icon;
-            return (
-              <View style={styles.navigationButtonContainer} key={button.id}>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => handleNavigationButtonPress(button)}
-                >
-                  <IconComponent
-                    width={styles.buttonIcon.width}
-                    height={styles.buttonIcon.height}
-                  />
-                </TouchableOpacity>
-                <Text style={styles.buttonLabel}>{button.label}</Text>
-              </View>
-            );
-          })}
+          {NavigationButton.map((button: NavigationButtonType) => (
+            <NavigationIconButton
+              key={button.id}
+              icon={button.iconName}
+              label={button.label}
+              spacingGap={8}
+              isActive={selectedButton === button.id}
+              onPress={() => {
+                setSelectedButton(button.id);
+                handleNavigationButtonPress(button);
+              }}
+            />
+          ))}
         </ScrollView>
 
         <ScrollView showsVerticalScrollIndicator={false}>
@@ -297,7 +296,7 @@ const SelfCare: React.FC = () => {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            style={{ paddingTop: 16, paddingLeft: 0, paddingBottom: 20 }}
+            style={{ paddingTop: 20, paddingLeft: 0, paddingBottom: 20 }}
           >
             {workoutVideoList.map((card) => (
               <VideoClassCard
@@ -322,7 +321,7 @@ const SelfCare: React.FC = () => {
           {/* AudioBook List Section */}
           <TrendingCardCarousel
             type="rotuine"
-            title="New and Trendings"
+            title="New and Trendingsj"
             data={routineList ?? []}
             onClickOfAll={() => onClickOfAll("routine")}
             onPress={handleCardPress}

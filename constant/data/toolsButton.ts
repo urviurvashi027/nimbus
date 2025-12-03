@@ -8,13 +8,14 @@ import ProteinIntakeIcon from "../../assets/images/buttonLogo/tool/protein.svg";
 import RecipeIcon from "../../assets/images/buttonLogo/tool/recipe.svg";
 import RoutineIcon from "../../assets/images/buttonLogo/tool/routine.svg";
 import TherapyIcon from "../../assets/images/buttonLogo/tool/therapy.svg";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 export type NavigationButtonType = {
   id: number | string;
   label: string;
   action: string;
   screen: any;
-  icon: React.FC<SvgProps>;
+  iconName: keyof typeof MaterialCommunityIcons.glyphMap;
 };
 
 export const buttons: NavigationButtonType[] = [
@@ -23,7 +24,7 @@ export const buttons: NavigationButtonType[] = [
     label: "Routine",
     action: "navigate",
     screen: "/(auth)/Tools/Routine/Routine",
-    icon: RoutineIcon,
+    iconName: "clipboard-text-outline",
   },
   // {
   //   id: 2,
@@ -37,55 +38,55 @@ export const buttons: NavigationButtonType[] = [
     label: "Recipe",
     action: "navigate",
     screen: "/(auth)/Tools/Recipe/Recipe",
-    icon: RecipeIcon,
+    iconName: "clipboard-text-outline",
   },
   {
     id: 3,
     label: "Article",
     action: "navigate",
     screen: "/(auth)/Tools/Article/Article",
-    icon: ArticleIcon,
+    iconName: "clipboard-text-outline",
   },
   {
     id: 4,
     label: "Calorie Cal",
     action: "navigate",
     screen: "/(auth)/Tools/CalorieCal/CalorieCalculator",
-    icon: CalorieIcon,
+    iconName: "clipboard-text-outline",
   },
   {
     id: 5,
     label: "Protein Cal",
     action: "navigate",
     screen: "/(auth)/Tools/ProtienCal/ProteinCalculator",
-    icon: ProteinIntakeIcon,
+    iconName: "clipboard-text-outline",
   },
   {
     id: 6,
     label: "Body Shape Cal",
     action: "navigate",
     screen: "/(auth)/Tools/BodyShapeCal/BodyShapeCalculator",
-    icon: BodyShapeIcon,
+    iconName: "clipboard-text-outline",
   },
   {
     id: 7,
     label: "Therapy",
     action: "navigate",
     screen: "/(auth)/Tools/Therapy/AITherapyScreen",
-    icon: TherapyIcon,
+    iconName: "clipboard-text-outline",
   },
   {
     id: 8,
     label: "Products",
     action: "navigate",
     screen: "/(auth)/Tools/Product/ProductListScreen",
-    icon: TherapyIcon,
+    iconName: "clipboard-text-outline",
   },
   {
     id: 9,
     label: "Ask Nimbus",
     action: "navigate",
     screen: "/(auth)/Tools/AskNimbus/AskNimbusScreen",
-    icon: TherapyIcon,
+    iconName: "clipboard-text-outline",
   },
 ];

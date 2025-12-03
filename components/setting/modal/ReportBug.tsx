@@ -15,8 +15,8 @@ import {
 } from "react-native";
 import ThemeContext from "@/context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
-import InputField from "../common/ThemedComponent/StyledInput";
-import StyledButton from "../common/themeComponents/StyledButton";
+import InputField from "../../common/ThemedComponent/StyledInput";
+import StyledButton from "../../common/themeComponents/StyledButton";
 import { getDeviceDetails } from "@/utils/helper";
 import { reportBug } from "@/services/settingService";
 

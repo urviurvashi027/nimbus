@@ -1,3 +1,4 @@
+// screens/selfCare/Meditation.tsx
 import React, { useState, useEffect, useContext } from "react";
 import {
   View,
@@ -6,49 +7,106 @@ import {
   Image,
   TouchableOpacity,
   StyleSheet,
-  ScrollView,
   Platform,
   Dimensions,
 } from "react-native";
 import { Audio } from "expo-av";
-import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "expo-router";
 
 import ThemeContext from "@/context/ThemeContext";
-
-import { themeColors } from "@/constant/theme/Colors";
-
-import { ScreenView, ThemeKey } from "@/components/Themed";
-import MeditationFeautredCard from "@/components/selfCare/meditation/MeditationFeautredCard";
+import { ScreenView } from "@/components/Themed";
 
 import { Meditations } from "@/types/toolsTypes";
-
 import { getMeditationAudioList } from "@/services/selfCareService";
+
+import MeditationCategoryTabs from "@/components/selfCare/meditation/MeditationCategoryTabs";
+import MeditationListItem from "@/components/selfCare/meditation/MeditationListItem";
+import BottomPlayer from "@/components/common/BottomPlayer";
+import MeditationFeaturedSection from "@/components/selfCare/meditation/MeditationFeaturedSection";
+import MeditationHeader from "@/components/selfCare/meditation/MeditationHeader";
+import {
+  MeditationFeaturedSkeleton,
+  MeditationListSkeleton,
+} from "@/components/selfCare/meditation/MeditationSkeletonSections";
+
+// TODO: remove mock data
+
+// Dummy list used when API fails / for dev UX testing
+const FALLBACK_MEDITATIONS: any[] = [
+  {
+    id: "dummy-1",
+    title: "Quick Calm Breath",
+    description: "2-minute reset for hectic days.",
+    duration: "2",
+    tag: "Stress & Anxiety",
+    isLocked: false,
+    source: "https://example.com/med1.mp3",
+    image: { uri: "https://placehold.co/200x200?text=Calm" },
+  },
+  {
+    id: "dummy-2",
+    title: "Self-Compassion Check-In",
+    description: "Be gentle with yourself for a moment.",
+    duration: "5",
+    tag: "Self-Care",
+    isLocked: false,
+    source: "https://example.com/med2.mp3",
+    image: { uri: "https://placehold.co/200x200?text=Care" },
+  },
+  {
+    id: "dummy-3",
+    title: "First Steps into Meditation",
+    description: "A simple beginner-friendly practice.",
+    duration: "4",
+    tag: "Beginner",
+    isLocked: false,
+    source: "https://example.com/med3.mp3",
+    image: { uri: "https://placehold.co/200x200?text=Start" },
+  },
+];
 
 const categories = ["All", "Stress & Anxiety", "Self-Care", "Beginner"];
 
-const { width } = Dimensions.get("window"); // get screen width
-const CARD_WIDTH = width * 0.8; // 80% of screen width
+export type EnrichedMeditation = Meditations & {
+  tag: string;
+  isLocked: boolean;
+  coachName: string;
+  durationLabel: string;
+  image: any;
+};
 
-const Meditation = () => {
+const Meditation: React.FC = () => {
   const [currentCategory, setCurrentCategory] = useState("All");
-  const [currentTrack, setCurrentTrack] = useState<Meditations | null>(null);
-  const [meditationList, setMeditationList] = useState<any[]>([]);
+  const [meditationList, setMeditationList] = useState<EnrichedMeditation[]>(
+    []
+  );
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [currentTrack, setCurrentTrack] = useState<EnrichedMeditation | null>(
+    null
+  );
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  const { newTheme } = useContext(ThemeContext);
-
-  const styles = styling(newTheme);
-
   const navigation = useNavigation();
+  const { newTheme, spacing, typography } = useContext(ThemeContext);
+  const styles = styling(newTheme, spacing, typography);
 
+  // Soft pastel palette for featured cards
+  const colorPalette = [
+    { bgColor: "#FADBD8", color: "#F6A9A1" },
+    { bgColor: "#D5F5E3", color: "#B7E6C8" },
+    { bgColor: "#F8E187", color: "#FBE3A8" },
+    { bgColor: "#D6EAF8", color: "#A4CEF2" },
+    { bgColor: "#E8DAEF", color: "#CFB5E1" },
+  ];
+
+  // Header hidden (we draw our own)
   useEffect(() => {
-    navigation.setOptions({
-      headerShown: false,
-    });
+    navigation.setOptions({ headerShown: false });
   }, [navigation]);
 
+  // Cleanup audio when sound ref changes
   useEffect(() => {
     return sound
       ? () => {
@@ -57,325 +115,217 @@ const Meditation = () => {
       : undefined;
   }, [sound]);
 
-  const getMeditationlList = async () => {
-    const tags = ["All", "Stress & Anxiety", "Self-Care", "Beginner"];
-
-    // need to add filters functionality and category param changes
+  // // Fetch meditation list
+  const loadMeditations = async () => {
+    setIsLoading(true);
     try {
+      const tags = categories;
       const result = await getMeditationAudioList();
-      // Check if 'result' and 'result.data' exist and is an array
+
       if (result && Array.isArray(result)) {
-        const processedAudio = result.map((item: any) => {
-          const randomTag = tags[Math.floor(Math.random() * tags.length)];
+        const processed: EnrichedMeditation[] = result.map((item: any) => {
+          const randomTag =
+            tags[Math.floor(Math.random() * tags.length)] ?? "All";
           return {
-            ...item, // Spread operator to keep original properties
+            ...item,
             tag: randomTag,
             isLocked: false,
             coachName: "UU",
-            duration: `${item.duration} min`,
-            image: {
-              uri: item.image,
-            },
+            durationLabel: `${item.duration ?? 3} min`,
+            image: { uri: item.image },
           };
         });
-        setMeditationList(processedAudio);
+
+        setMeditationList(processed);
       } else {
-        // Handle the case where the data is not in the expected format
         console.error("API response data is not an array:", result);
       }
-    } catch (error: any) {
+    } catch (error) {
       console.log(error, "API Error Response");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    getMeditationlList();
+    loadMeditations();
   }, []);
 
-  const handlePlayPause = async (track: Meditations) => {
-    if (track.isLocked) {
-      return null;
-    }
-    if (currentTrack?.id === track.id) {
-      if (isPlaying) {
-        await sound?.pauseAsync();
-      } else {
-        await sound?.playAsync();
+  const handlePlayPause = async (track: EnrichedMeditation) => {
+    try {
+      if (track.isLocked) {
+        return;
       }
-      setIsPlaying(!isPlaying);
-      return;
-    }
 
-    if (sound) {
-      await sound.unloadAsync();
+      // Toggle if same track
+      if (currentTrack?.id === track.id) {
+        if (isPlaying) {
+          await sound?.pauseAsync();
+        } else {
+          await sound?.playAsync();
+        }
+        setIsPlaying(!isPlaying);
+        return;
+      }
+
+      // Switch to new track
+      if (sound) {
+        await sound.unloadAsync();
+      }
+
+      const { sound: newSound } = await Audio.Sound.createAsync(
+        typeof track.source === "string" ? { uri: track.source } : track.source
+      );
+
+      setSound(newSound);
+      setCurrentTrack(track);
+      setIsPlaying(true);
+      await newSound.playAsync();
+    } catch (err) {
+      console.error("Error playing meditation:", err);
     }
-    const { sound: newSound } = await Audio.Sound.createAsync(
-      typeof track.source === "string" ? { uri: track.source } : track.source
-    );
-    setSound(newSound);
-    setCurrentTrack(track);
-    setIsPlaying(true);
-    await newSound.playAsync();
   };
 
-  // Filter meditations dynamically
-  // const filteredMeditations = meditationList.filter(
-  //   (item) => item.category === currentCategory || currentCategory === "All"
-  // );
+  const handleClosePlayer = async () => {
+    try {
+      if (sound) {
+        await sound.stopAsync();
+        await sound.unloadAsync();
+        setSound(null);
+      }
+    } catch (err) {
+      console.warn("Error stopping meditation:", err);
+    } finally {
+      setIsPlaying(false);
+      setCurrentTrack(null);
+    }
+  };
 
-  // Define your color palette. Add as many colors as you like.
-  const colorPalette = [
-    { bgColor: "#fadbd8", color: "#f19c94" },
-    { bgColor: "#d5f5e3", color: "#acebc8" },
-    { bgColor: "#f8e187", color: "#fbedb7" },
-    { bgColor: "#d6eaf8", color: "#95c9ed" },
-    { bgColor: "#E8DAEF", color: "#c7a5d8" },
-  ];
+  // Filter based on category
+  const filteredMeditations =
+    currentCategory === "All"
+      ? meditationList
+      : meditationList.filter((m) => m.tag === currentCategory);
+
+  const listHeader = isLoading ? (
+    <>
+      <MeditationFeaturedSkeleton />
+      <MeditationListSkeleton />
+    </>
+  ) : (
+    <>
+      <MeditationFeaturedSection
+        data={meditationList}
+        onPress={handlePlayPause}
+        colorPalette={colorPalette}
+      />
+
+      <MeditationCategoryTabs
+        categories={categories}
+        currentCategory={currentCategory}
+        onChangeCategory={setCurrentCategory}
+      />
+
+      <View style={[styles.sectionContainer, { marginBottom: spacing.md }]}>
+        <Text style={styles.sectionTitle}>Library</Text>
+      </View>
+    </>
+  );
 
   return (
     <ScreenView
       style={{
-        paddingTop: Platform.OS === "ios" ? 40 : 20,
+        paddingTop:
+          Platform.OS === "ios"
+            ? spacing["xxl"] + spacing["xxl"] * 0.4
+            : spacing.xl,
+        paddingHorizontal: spacing.md,
       }}
     >
       <View style={styles.container}>
-        {/* Back Button */}
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Ionicons
-            name="arrow-back"
-            size={24}
-            color={newTheme.textSecondary}
-          />
-        </TouchableOpacity>
-        {/* Header */}
-        <Text style={styles.header}>Meditate</Text>
-        <Text style={styles.subHeader}>Find peace through meditation.</Text>
+        {/* 🔝 Non-scrollable header – matches Soundscape */}
+        <MeditationHeader onBack={() => navigation.goBack()} />
+        {/* Single vertical scroll for featured + library */}
+        <FlatList
+          data={filteredMeditations}
+          keyExtractor={(item) => item.id}
+          ListHeaderComponent={listHeader}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingBottom: currentTrack ? spacing["xxl"] * 1.4 : spacing.xl,
+          }}
+          ListEmptyComponent={
+            !isLoading && meditationList.length === 0
+              ? () => (
+                  <Text style={styles.emptyText}>No meditations found.</Text>
+                )
+              : !isLoading && currentCategory !== "All"
+              ? () => (
+                  <Text style={styles.emptyText}>
+                    No meditations under “{currentCategory}” yet.
+                  </Text>
+                )
+              : null
+          }
+          renderItem={({ item }) => (
+            <MeditationListItem
+              item={item}
+              isActive={currentTrack?.id === item.id}
+              isPlaying={isPlaying}
+              onPress={() => handlePlayPause(item)}
+            />
+          )}
+        />
 
-        {/* new Featured section  */}
-        <Text style={styles.heading}>For you</Text>
-
-        {/* new Featured Card */}
-
-        <View>
-          <FlatList
-            horizontal
-            data={meditationList}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item, index }) => (
-              <MeditationFeautredCard
-                data={item}
-                onPress={handlePlayPause}
-                cardColor={colorPalette[index % colorPalette.length]}
-              />
-            )}
-            showsHorizontalScrollIndicator={false}
-            snapToAlignment="start"
-            snapToInterval={CARD_WIDTH + 10} // card width + margin
-            decelerationRate="fast"
-            contentContainerStyle={{ paddingHorizontal: 0 }}
-          />
-        </View>
-
-        {/* Category Tabs */}
-        <View style={styles.tabsWrapper}>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.tabsContainer}
-          >
-            {categories.map((category) => (
-              <TouchableOpacity
-                key={category}
-                onPress={() => setCurrentCategory(category)}
-                style={styles.tabContainer}
-              >
-                <Text
-                  style={[
-                    styles.tabText,
-                    currentCategory === category && styles.activeTabText,
-                  ]}
-                >
-                  {category}
-                </Text>
-                {currentCategory === category && (
-                  <View style={styles.activeTabIndicator} />
-                )}
-                {/* Bottom border */}
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
-
-        {/* Wrap FlatList inside View to prevent shrinking */}
-        <View style={{ flex: 1 }}>
-          <FlatList
-            data={meditationList}
-            keyExtractor={(item) => item.id}
-            contentContainerStyle={{ flexGrow: 1 }} // ✅ Ensures it fills space
-            ListEmptyComponent={() => (
-              <Text style={styles.emptyText}>No meditations found</Text>
-            )} // ✅ Prevents collapsing
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={styles.listItem}
-                onPress={() => handlePlayPause(item)}
-              >
-                <Image source={item.image} style={styles.listImage} />
-                <View style={styles.listText}>
-                  <Text style={styles.listTitle}>{item.title}</Text>
-                  <View style={styles.itemDetails}>
-                    <Text style={styles.listDuration}>{item.duration}</Text>
-                    {item.isLocked && (
-                      <Ionicons
-                        name="lock-closed"
-                        size={13}
-                        color={themeColors.basic.mediumGrey}
-                        style={styles.lockIcon}
-                      />
-                    )}
-                  </View>
-                </View>
-              </TouchableOpacity>
-            )}
-          />
-        </View>
-
-        {/* Bottom Audio Player */}
+        {/* Bottom Player */}
         {currentTrack && (
-          <View style={styles.bottomPlayer}>
-            <Image source={currentTrack.image} style={styles.playerImage} />
-            <View style={styles.playerText}>
-              <Text style={styles.playerTitle}>{currentTrack.title}</Text>
-              <Text style={styles.playerDuration}>
-                {currentTrack.duration} · Meditation
-              </Text>
-            </View>
-            <TouchableOpacity onPress={() => handlePlayPause(currentTrack)}>
-              <Ionicons
-                name={isPlaying ? "pause" : "play"}
-                size={24}
-                color={styles.iconColor.color}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setCurrentTrack(null)}>
-              <Ionicons name="close" size={24} color={styles.iconColor.color} />
-            </TouchableOpacity>
-          </View>
+          <BottomPlayer
+            title={currentTrack.title}
+            subtitle={`${currentTrack.durationLabel} · Meditation`}
+            image={currentTrack.image}
+            isPlaying={isPlaying}
+            onPlayPause={() => handlePlayPause(currentTrack)}
+            onClose={handleClosePlayer}
+          />
         )}
       </View>
     </ScreenView>
   );
 };
 
-const styling = (theme: any) =>
+const styling = (newTheme: any, spacing: any, typography: any) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      // paddingHorizontal: 10
     },
     backButton: {
-      marginTop: 50,
-      marginBottom: 10,
+      marginBottom: spacing.md,
     },
-    iconColor: {
-      color: themeColors.basic.primaryColor,
+    headerBlock: {
+      marginBottom: spacing.lg,
     },
     header: {
-      fontSize: 26,
-      fontWeight: "bold",
-      color: theme.textPrimary,
+      ...typography.h2,
+      color: newTheme.textPrimary,
     },
     subHeader: {
-      fontSize: 14,
-      color: theme.textSecondary,
-      marginBottom: 20,
+      ...typography.body,
+      color: newTheme.textSecondary,
+      marginTop: spacing.xs,
     },
-    tabsWrapper: { marginBottom: 5 },
+    sectionContainer: {
+      marginBottom: spacing.lg,
+    },
+    sectionTitle: {
+      ...typography.h3,
+      color: newTheme.textPrimary,
+      marginBottom: spacing.sm,
+    },
     emptyText: {
       textAlign: "center",
-      fontSize: 16,
-      color: theme.textSecondary,
-      marginTop: 20,
-    },
-    flatListContainer: { flex: 1 },
-    tabsContainer: { marginBottom: 10, paddingHorizontal: 0 },
-    tabContainer: {
-      alignItems: "center",
-      marginRight: 15,
-      paddingHorizontal: 5,
-      paddingVertical: 5,
-    },
-    itemDetails: {
-      flexDirection: "row",
-    },
-    tab: {
-      marginRight: 15,
-      paddingVertical: 5,
-      paddingHorizontal: 10,
-      height: 60,
-    },
-    tabText: {
-      fontSize: 16,
-      color: theme.textSecondary,
-    },
-    activeTabText: {
-      color: theme.textSecondary,
-
-      fontWeight: "bold",
-    },
-    activeTabIndicator: {
-      height: 2,
-      width: "100%",
-      backgroundColor: theme.background,
-      marginTop: 3,
-    },
-
-    listItem: {
-      flexDirection: "row",
-      padding: 10,
-      alignItems: "center",
-      borderBottomWidth: 1,
-      borderBottomColor: theme.divider,
-    },
-    listImage: { width: 50, height: 50, borderRadius: 25, marginRight: 20 },
-    listText: { flex: 1 },
-    listTitle: {
-      fontSize: 16,
-      fontWeight: "bold",
-      color: theme.textPrimary,
-      marginBottom: 5,
-    },
-    lockIcon: {
-      marginLeft: 5,
-      marginTop: 1,
-    },
-    listDuration: { fontSize: 14, color: theme.textSecondary },
-    bottomPlayer: {
-      position: "absolute",
-      bottom: 100,
-      left: 0,
-      right: 0,
-      backgroundColor: theme.surface,
-      padding: 12,
-      flexDirection: "row",
-      alignItems: "center",
-    },
-    playerImage: { width: 50, height: 50, borderRadius: 10 },
-    playerText: { flex: 1, marginLeft: 10 },
-    playerTitle: {
-      color: themeColors.basic.primaryColor,
-      fontSize: 16,
-      fontWeight: "bold",
-    },
-    playerDuration: { color: themeColors.basic.lightGrey, fontSize: 14 },
-
-    heading: {
-      fontSize: 18,
-      color: theme.textPrimary,
-      fontWeight: "bold",
+      ...typography.body,
+      color: newTheme.textSecondary,
+      marginTop: spacing.lg,
     },
   });
 

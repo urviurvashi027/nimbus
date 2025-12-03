@@ -18,7 +18,7 @@ import {
 
 import { ScreenView } from "@/components/Themed";
 import { ThemeKey } from "@/components/Themed";
-import TrendingCardCarousel from "@/components/tools/common/TrendingCardCarousel";
+import TrendingCardCarousel from "@/components/common/TrendingCardCarousel";
 import MoodTrackerModal from "../Tools/MoodTracker/MoodTracker";
 import VideoScroller from "@/components/tools/videoScroller/VideoScroller";
 import AudiobookScroller from "@/components/tools/audioScroller/AudioScroller";
@@ -28,9 +28,12 @@ import {
   getRecipeList,
   getRoutineList,
 } from "@/services/toolService";
+import NavigationIconButton from "@/components/common/NavigationIconButton";
 
 const Tools: React.FC = () => {
   const navigation = useNavigation();
+
+  const [selectedButton, setSelectedButton] = useState<string | number>("");
   const [showMoodTracker, setShowMoodTracker] = useState(false);
   const [mood, setMood] = useState<string | null>(null);
   // Data set states
@@ -214,20 +217,18 @@ const Tools: React.FC = () => {
           contentContainerStyle={{ paddingHorizontal: 0 }}
         >
           {NavigationButton.map((button: NavigationButtonType) => {
-            const IconComponent = button.icon;
+            // const IconComponent = button.icon;
             return (
-              <View style={styles.navigationButtonContainer} key={button.id}>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => handleNavigationButtonPress(button)}
-                >
-                  <IconComponent
-                    width={styles.buttonIcon.width}
-                    height={styles.buttonIcon.height}
-                  />
-                </TouchableOpacity>
-                <Text style={styles.buttonLabel}>{button.label}</Text>
-              </View>
+              <NavigationIconButton
+                key={button.id}
+                icon={button.iconName}
+                label={button.label}
+                isActive={selectedButton === button.id}
+                onPress={() => {
+                  setSelectedButton(button.id);
+                  handleNavigationButtonPress(button);
+                }}
+              />
             );
           })}
         </ScrollView>

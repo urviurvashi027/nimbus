@@ -11,12 +11,12 @@ import { Ionicons } from "@expo/vector-icons";
 
 import ThemeContext from "@/context/ThemeContext";
 import { ThemeKey } from "@/components/Themed";
-import HorizontalListCardScroll from "@/components/tools/common/HorizontalListCardScroll";
-import HorizontalBannerCardScroll from "@/components/tools/common/HorizontalBannerCardScroll";
+import HorizontalListCardScroll from "@/components/common/HorizontalListCardScroll";
+// import HorizontalBannerCardScroll from "@/components/tools/common/HorizontalBannerCardScroll";
 
 import { router } from "expo-router";
 import { banners } from "@/constant/data/banner";
-import HorizontalBanner from "@/components/tools/common/HorizontalBanner";
+import HorizontalBanner from "@/components/common/HorizontalBanner";
 import { getSoundscapeList } from "@/services/toolService";
 
 const SleepModal = ({ visible, onClose }: any) => {
@@ -35,7 +35,7 @@ const SleepModal = ({ visible, onClose }: any) => {
   };
 
   const onClickOfAll = () => {
-    router.push("/(auth)/SelfCare/Soundscape/Soundscape");
+    router.push("/(auth)/selfCareScreen/SoundscapeScreen");
   };
 
   const getSoundscapeListData = async () => {

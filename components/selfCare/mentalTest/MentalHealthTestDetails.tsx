@@ -24,7 +24,7 @@ interface StartScreenProps {
   medicalTestData?: any;
 }
 
-const StartScreen: React.FC<StartScreenProps> = ({
+const MentalHealthTestDetails: React.FC<StartScreenProps> = ({
   onStart,
   medicalTestData,
 }) => {
@@ -208,7 +208,7 @@ const StartScreen: React.FC<StartScreenProps> = ({
   );
 };
 
-export default StartScreen;
+export default MentalHealthTestDetails;
 
 const styling = (theme: ThemeKey, color?: string) =>
   StyleSheet.create({

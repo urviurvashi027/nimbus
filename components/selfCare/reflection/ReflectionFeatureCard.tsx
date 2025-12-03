@@ -1,123 +1,49 @@
-import { ThemeKey } from "@/components/Themed";
-import ThemeContext from "@/context/ThemeContext";
-import React, { useContext } from "react";
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  Pressable,
-  Dimensions,
-} from "react-native";
+// src/components/selfCare/soundscape/SoundscapeFeaturedCard.tsx
 
-const { width } = Dimensions.get("window"); // get screen width
-const CARD_WIDTH = width * 0.8; // 80% of screen width
+import React from "react";
+import NimbusPastelFeaturedCard from "@/components/common/PastelFeaturedCard";
 
-interface itemDetails {
+interface ItemDetails {
   id: string;
   title: string;
   duration: string;
-  description: string;
-  image: any; // Image source (can be refined later)
-  //   source: any; // Audio source (can be refined later)
-  category: string;
+  description?: string;
+  image: any;
+  source: any;
+  category?: string;
   isLocked: boolean;
-  color: any;
 }
 
-interface ReflectionFeauturedCardProps {
-  data: itemDetails;
-  onPress: (data: itemDetails) => void;
+interface ReflectionFeaturedCardProps {
+  data: ItemDetails;
+  onPress: (data: ItemDetails) => void;
   cardColor: {
     bgColor: string;
     color: string;
   };
 }
 
-const ReflectionFeaturedCard: React.FC<ReflectionFeauturedCardProps> = ({
+const ReflectionFeaturedCard: React.FC<ReflectionFeaturedCardProps> = ({
   data,
   onPress,
   cardColor,
 }) => {
-  const { image, title, duration, description } = data;
-  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
+  const { title, duration, description, category, image } = data;
 
-  console.log(image, "image featured card");
+  const descText =
+    description ||
+    (category ? category : "Calming ambience · Best with headphones");
 
-  const styles = styling(theme, cardColor);
   return (
-    <Pressable onPress={() => onPress(data)} style={styles.card}>
-      <View>
-        <View style={styles.content}>
-          <Image
-            source={image} // Replace with your image URL
-            style={styles.avatar}
-          />
-          <View style={styles.textContent}>
-            <Text style={styles.title}>{title}</Text>
-            {/* <Text style={styles.duration}>{duration}</Text> */}
-          </View>
-        </View>
-        <View style={styles.footer}>
-          <Text style={styles.description}>{description}</Text>
-        </View>
-      </View>
-    </Pressable>
+    <NimbusPastelFeaturedCard
+      title={title}
+      subtitle={`${duration || "3"} min · Reflection`}
+      description={descText}
+      image={image}
+      colors={{ bg: cardColor.bgColor, footer: cardColor.color }}
+      onPress={() => onPress(data)}
+    />
   );
 };
-
-const styling = (
-  theme: ThemeKey,
-  cardColor: { bgColor: string; color: string }
-) =>
-  StyleSheet.create({
-    card: {
-      marginVertical: 20,
-      backgroundColor: cardColor.bgColor,
-      borderRadius: 15,
-      marginRight: 16,
-      width: CARD_WIDTH, // controlled card width
-    },
-    label: {
-      fontSize: 16,
-      fontWeight: "600",
-      marginBottom: 8,
-    },
-    content: {
-      flexDirection: "row",
-      alignItems: "center",
-    },
-    avatar: {
-      width: 80,
-      height: 80,
-      marginTop: 10,
-      marginLeft: 10,
-      borderRadius: 30,
-      marginRight: 12,
-    },
-    textContent: {
-      flex: 1,
-      padding: 10,
-    },
-    title: {
-      fontSize: 16,
-      fontWeight: "700",
-    },
-    duration: {
-      fontSize: 13,
-      color: "#888",
-      marginTop: 2,
-    },
-    footer: {
-      backgroundColor: cardColor.color,
-      padding: 15,
-      borderRadius: 10,
-      marginTop: 12,
-    },
-    description: {
-      color: "white",
-      fontSize: 13,
-    },
-  });
 
 export default ReflectionFeaturedCard;

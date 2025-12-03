@@ -7,16 +7,16 @@ import {
   TouchableOpacity,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
-import ThemeContext from "@/context/ThemeContext";
-import { ThemeKey } from "@/components/Themed";
-import { themeColors } from "@/constant/theme/Colors";
-import { TrackType } from "@/constant/data/soundtrack";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Audio } from "expo-av";
 
+import ThemeContext from "@/context/ThemeContext";
+
+import { TrackType } from "@/constant/data/soundtrack";
+
 interface PropType {
-  backgroundColor: string;
+  backgroundColor: string; // now treated as optional tint / fallback
   title: string;
   description: string;
   itemList: Array<TrackType | any>;
@@ -34,29 +34,29 @@ const HorizontalListCardScroll: React.FC<PropType> = (props) => {
     noOfRows,
   } = props;
 
-  // console.log(itemList, "itemList");
-
   const [currentTrack, setCurrentTrack] = useState<TrackType | null>(null);
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [showForYou, setShowForYou] = useState(true);
-  const [showLibrary, setShowLibrary] = useState(true);
-  // Split data into rows of 3 items each
-  const chunkedData = [];
+
+  // Split data into rows of N items each
+  const chunkedData: any[] = [];
   const rowCount = noOfRows || 3;
   for (let i = 0; i < itemList.length; i += rowCount) {
     chunkedData.push(itemList.slice(i, i + rowCount));
   }
 
-  // console.log(chunkedData, backgroundColor, "chunkedData");
+  const { newTheme, spacing, typography } = useContext(ThemeContext);
 
-  const { theme, newTheme, toggleTheme, useSystemTheme } =
-    useContext(ThemeContext);
+  // compute section-specific background variations
+  const { outerBg, innerBg } = getVariantColors(
+    title,
+    newTheme,
+    backgroundColor
+  );
 
-  const styles = styling(theme, newTheme, backgroundColor);
+  const styles = styling(newTheme, spacing, typography);
 
   const handleItemClick = (title: string, entry: any) => {
-    console.log("I am clicked", title, entry);
     switch (title) {
       case "Soundscape":
       case "Meditation":
@@ -64,9 +64,11 @@ const HorizontalListCardScroll: React.FC<PropType> = (props) => {
         break;
       case "Medical Test":
         router.push({
-          pathname: "/(auth)/SelfCare/test/getStared",
+          pathname: "/(auth)/selfCareScreen/test/getStared",
           params: { id: entry.id },
         });
+        break;
+      default:
         break;
     }
   };
@@ -95,7 +97,6 @@ const HorizontalListCardScroll: React.FC<PropType> = (props) => {
         await sound.unloadAsync();
       }
 
-      // const { sound: newSound } = await Audio.Sound.createAsync(track.source);
       const { sound: newSound } = await Audio.Sound.createAsync(
         typeof track.source === "string" ? { uri: track.source } : track.source
       );
@@ -108,8 +109,7 @@ const HorizontalListCardScroll: React.FC<PropType> = (props) => {
     }
   };
 
-  const onCloseModal = async (currentTrack: any) => {
-    // handlePlayPause(currentTrack);
+  const onCloseModal = async () => {
     if (isPlaying) {
       await sound?.pauseAsync();
     }
@@ -117,21 +117,23 @@ const HorizontalListCardScroll: React.FC<PropType> = (props) => {
   };
 
   return (
-    <View style={[styles.card, { backgroundColor: backgroundColor }]}>
+    <View style={[styles.card, { backgroundColor: outerBg }]}>
       <View style={styles.headerRow}>
         <Text style={styles.cardTitle}>{title}</Text>
         <TouchableOpacity onPress={onClickOfAll}>
-          <Text style={styles.allButton}>All {">"}</Text>
+          <Text style={styles.allButton}>All ›</Text>
         </TouchableOpacity>
       </View>
+
       <Text style={styles.cardDescription}>{description}</Text>
+
       <FlatList
         data={chunkedData}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={(_, index) => index.toString()}
         horizontal
         showsHorizontalScrollIndicator={false}
         renderItem={({ item }) => (
-          <View style={styles.rowContainer}>
+          <View style={[styles.rowContainer, { backgroundColor: innerBg }]}>
             {item.map((entry: any) => (
               <TouchableOpacity
                 key={entry.id}
@@ -141,7 +143,7 @@ const HorizontalListCardScroll: React.FC<PropType> = (props) => {
                   <Image source={entry.image} style={styles.itemImage} />
                   <View style={styles.itemInfo}>
                     <Text style={styles.itemTitle}>{entry.title}</Text>
-                    {entry.duration && (
+                    {!!entry.duration && (
                       <Text style={styles.itemDuration}>
                         {entry.duration || "3"} min
                       </Text>
@@ -153,9 +155,15 @@ const HorizontalListCardScroll: React.FC<PropType> = (props) => {
           </View>
         )}
       />
+
       {/* Bottom Player */}
       {currentTrack && (
-        <View style={styles.bottomPlayer}>
+        <View
+          style={[
+            styles.bottomPlayer,
+            { backgroundColor: newTheme.cardRaised },
+          ]}
+        >
           <Image source={currentTrack.image} style={styles.playerImage} />
           <View style={styles.playerText}>
             <Text style={styles.playerTitle}>{currentTrack.title}</Text>
@@ -166,12 +174,12 @@ const HorizontalListCardScroll: React.FC<PropType> = (props) => {
           <TouchableOpacity onPress={() => handlePlayPause(currentTrack)}>
             <Ionicons
               name={isPlaying ? "pause" : "play"}
-              size={24}
-              color="white"
+              size={22}
+              color={newTheme.accent}
             />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => onCloseModal(currentTrack)}>
-            <Ionicons name="close" size={24} color="white" />
+          <TouchableOpacity onPress={onCloseModal} style={{ marginLeft: 8 }}>
+            <Ionicons name="close" size={20} color={newTheme.textSecondary} />
           </TouchableOpacity>
         </View>
       )}
@@ -181,123 +189,129 @@ const HorizontalListCardScroll: React.FC<PropType> = (props) => {
 
 export default HorizontalListCardScroll;
 
-const styling = (theme: ThemeKey, newTheme: any, color: string) =>
+// section-specific background variations
+const getVariantColors = (
+  title: string,
+  newTheme: any,
+  fallback: string
+): { outerBg: string; innerBg: string } => {
+  switch (title) {
+    case "Soundscape":
+      return {
+        outerBg: newTheme.cardRaised,
+        innerBg: newTheme.surfaceMuted,
+      };
+    case "Meditation":
+      return {
+        outerBg: "#26262F", // subtle indigo tint
+        innerBg: "#2F3038",
+      };
+    case "Medical Test":
+      return {
+        outerBg: "#262B30", // soft blue-grey
+        innerBg: "#30343A",
+      };
+    default:
+      return {
+        outerBg: newTheme.cardRaised || fallback,
+        innerBg: newTheme.surfaceMuted,
+      };
+  }
+};
+
+const styling = (newTheme: any, spacing: any, typography: any) =>
   StyleSheet.create({
     card: {
-      marginVertical: 20,
-      borderRadius: 15,
-      padding: 15,
-      borderWidth: 1,
-      // backgroundColor: color,
-      borderColor: color,
+      marginVertical: spacing.lg,
+      borderRadius: 20,
+      padding: spacing.lg,
+      shadowColor: newTheme.shadow,
+      shadowOpacity: 0.25,
+      shadowRadius: 12,
+      shadowOffset: { width: 0, height: 4 },
+      elevation: 6,
     },
     headerRow: {
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
+      marginBottom: spacing.xs,
     },
     cardTitle: {
-      fontSize: 18,
-      fontWeight: "bold",
-      marginBottom: 5,
-      color: themeColors.basic.commonBlack,
+      ...typography.h3,
+      color: newTheme.textPrimary,
     },
     cardDescription: {
-      fontSize: 14,
-      color: themeColors.basic.commonBlack,
-      marginBottom: 10,
+      ...typography.body,
+      color: newTheme.textSecondary,
+      marginBottom: spacing.md,
     },
     allButton: {
-      fontSize: 14,
-      color: themeColors.basic.commonBlack,
+      ...typography.body,
+      color: newTheme.accent,
+      fontWeight: "600",
     },
     rowContainer: {
       flexDirection: "column",
       justifyContent: "space-between",
-      // paddingVertical: 8,
-      // paddingHorizontal: 10,
-      backgroundColor: color,
-      borderRadius: 10,
-      marginRight: 15,
+      borderRadius: 16,
+      marginRight: spacing.md,
+      overflow: "hidden",
     },
     itemRow: {
       flexDirection: "row",
       alignItems: "center",
-      width: "100%",
-      // paddingVertical: 10,
-      minWidth: 250,
-      // paddingHorizontal: 10,
-      // borderBottomWidth: 1,
-      // borderBottomColor: "#ddd",
+      minWidth: 260,
+      borderBottomWidth: 1,
+      borderBottomColor: newTheme.borderMuted,
     },
     itemInfo: {
       flex: 1,
-      paddingVertical: 16,
-      paddingHorizontal: 10,
-      borderBottomWidth: 1,
-      borderBottomColor: "#ddd",
-      marginRight: 5,
-    },
-    startButton: {
-      alignSelf: "center",
-      marginVertical: 30,
-      width: 200,
-      height: 200,
-      borderRadius: 100,
-      backgroundColor: "#7A4DF3",
-      justifyContent: "center",
-      alignItems: "center",
-      elevation: 5,
-    },
-    startButtonText: {
-      color: "white",
-      fontSize: 24,
-      fontWeight: "bold",
-    },
-    startButtonSubText: {
-      color: "white",
-      fontSize: 14,
-      marginTop: 5,
+      paddingVertical: spacing.md,
+      paddingHorizontal: spacing.md,
     },
     itemImage: {
-      width: 80,
-      height: 80,
-      // borderRadius: 25,
-      marginRight: 5,
+      width: 70,
+      height: 70,
+      borderRadius: 12,
+      marginLeft: spacing.sm,
     },
     itemTitle: {
-      fontSize: 16,
+      ...typography.body,
+      color: newTheme.textPrimary,
+      marginBottom: 4,
     },
     itemDuration: {
-      fontSize: 12,
-      color: "#666",
+      ...typography.caption,
+      color: newTheme.textSecondary,
     },
     bottomPlayer: {
       position: "absolute",
       bottom: 0,
       left: 0,
       right: 0,
-      backgroundColor: "#333",
-      padding: 10,
+      padding: spacing.sm,
       flexDirection: "row",
       alignItems: "center",
+      borderTopLeftRadius: 16,
+      borderTopRightRadius: 16,
     },
     playerImage: {
-      width: 50,
-      height: 50,
+      width: 44,
+      height: 44,
       borderRadius: 10,
     },
     playerText: {
       flex: 1,
-      marginLeft: 10,
+      marginLeft: spacing.sm,
     },
     playerTitle: {
-      color: "#fff",
-      fontSize: 16,
-      fontWeight: "bold",
+      ...typography.body,
+      color: newTheme.textPrimary,
+      fontWeight: "600",
     },
     playerDuration: {
-      color: "#ccc",
-      fontSize: 14,
+      ...typography.caption,
+      color: newTheme.textSecondary,
     },
   });

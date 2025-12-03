@@ -12,14 +12,14 @@ import ThemeContext from "@/context/ThemeContext";
 
 import NotificationListModal from "@/components/setting/modal/NotificationListModal";
 // import RoutineSettingModal from "@/components/setting/RoutineSetting";
-import ReportBugModal from "@/components/setting/ReportBug";
-import FeedbackModal from "@/components/setting/Feeback";
+import ReportBugModal from "@/components/setting/modal/ReportBug";
+import FeedbackModal from "@/components/setting/modal/Feeback";
 import PrivacyPolicyModal from "@/components/setting/modal/PrivacyPoilcy";
 import TermsModal from "@/components/setting/modal/TermsAndService";
 import FAQModal from "@/components/setting/modal/HelpCenter";
 import ChangePasswordModal from "@/components/setting/modal/ChangePassword";
 import LogoutModal from "@/components/setting/modal/LogoutModal";
-import SocialActionModal from "@/components/setting/SocialActionModal";
+import SocialActionModal from "@/components/setting/modal/SocialActionModal";
 import AdvancedSettingsModal from "@/components/setting/modal/AdvanceSettingModal";
 import EditProfileModal from "@/components/setting/modal/EditProfileModal";
 import UpgradeBanner from "@/components/common/UpgradeBanner";
