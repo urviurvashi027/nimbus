@@ -62,80 +62,10 @@ const DeleteHabitModal: React.FC<DeleteHabitModalProps> = ({
           </View>
 
           {/* List of Task Types */}
-          <View style={styles.listContainer}>
-            {/* {habitTypeList.map((type, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={styles.typeButton}
-                  onPress={() => {
-                    onSelect(type);
-                    onClose();
-                  }}
-                >
-                  <Text style={styles.typeText}>{type.name}</Text>
-                </TouchableOpacity>
-              ))} */}
-          </View>
+          <View style={styles.listContainer}></View>
         </View>
       </View>
     </Modal>
-    // <Modal
-    //   animationType="slide"
-    //   transparent={true}
-    //   visible={visible}
-    //   onRequestClose={secondaryBtnClick}
-    // >
-    //   <View style={styles.modalOverlay}>
-    //     <View style={styles.modalContainer}>
-    //       {/* Header */}
-    //       <View style={styles.header}>
-    //         <Text style={styles.title}>{header}</Text>
-    //         <TouchableOpacity onPress={secondaryBtnClick}>
-    //           <Ionicons
-    //             name="close"
-    //             size={24}
-    //             color={themeColors[theme].text}
-    //           />
-    //         </TouchableOpacity>
-    //       </View>
-
-    //       <View>
-    //         <Text>{title}</Text>
-    //         <Text>{content}</Text>
-    //       </View>
-    //       <View style={styles.rowDirection}>
-    //         <TouchableOpacity
-    //           style={styles.createButton}
-    //           onPress={secondaryBtnClick}
-    //         >
-    //           <Text
-    //             style={{
-    //               color: themeColors.basic.PRIMARY,
-    //               textAlign: "center",
-    //               fontSize: 17,
-    //             }}
-    //           >
-    //             {secondaryBtnText}
-    //           </Text>
-    //         </TouchableOpacity>
-    //         <TouchableOpacity
-    //           style={styles.createButton}
-    //           onPress={onDeleteClick}
-    //         >
-    //           <Text
-    //             style={{
-    //               color: themeColors.basic.PRIMARY,
-    //               textAlign: "center",
-    //               fontSize: 17,
-    //             }}
-    //           >
-    //             {primaryBtnText}
-    //           </Text>
-    //         </TouchableOpacity>
-    //       </View>
-    //     </View>
-    //   </View>
-    // </Modal>
   );
 };
 

@@ -31,9 +31,9 @@ const testData: medicalTestData[] = [
     id: "1",
     title: "Childhood Trauma Assement",
     color: "#cc66ff",
-    image: "childhoodTrauma",
+    image: "latest",
     progressBarBg: "#b31aff",
-    description: `Welcome to our self-screening questionnaire for childhood trauma.
+    description: `Welcomes to our self-screening questionnaire for childhood trauma.
 Throughout our childhood, we have all felt the anguish of rejection, neglect, and even bullying from someone else. 
 
 Yet, when does the pain we experience start to transition into lasting
@@ -91,70 +91,70 @@ A roadmap to gradually overcome the lasting impact of childhood trauma.`,
         id: "1",
         category: "emotional abuse",
         question:
-          "Did you frequently feel belittled or criticized by your caregivers during childhood?",
+          "Did you frequently feel belittled, mocked, or criticized by caregivers during childhood?",
         options: ["Never", "Rarely", "Sometimes", "Often", "Very Often"],
       },
       {
         id: "2",
-        category: "physical abuse",
+        category: "emotional abuse",
         question:
-          "Were you ever physically hurt or disciplined harshly as a child?",
+          "Did you feel that your emotions were dismissed, ignored, or called 'overreacting' when you were upset?",
         options: ["Never", "Rarely", "Sometimes", "Often", "Very Often"],
       },
       {
         id: "3",
-        category: "neglect",
+        category: "physical abuse",
         question:
-          "Did you often feel emotionally neglected or ignored during your childhood?",
+          "Were you ever hit, slapped, or physically punished in ways that left you feeling unsafe or afraid?",
         options: ["Never", "Rarely", "Sometimes", "Often", "Very Often"],
       },
       {
         id: "4",
-        category: "sexual abuse",
+        category: "neglect",
         question:
-          "Were you ever subjected to inappropriate physical contact or sexual abuse as a child?",
+          "Did you feel you lacked consistent emotional support, comfort, or affection from caregivers?",
         options: ["Never", "Rarely", "Sometimes", "Often", "Very Often"],
       },
       {
         id: "5",
-        category: "emotional abuse",
+        category: "neglect",
         question:
-          "Did someone in your childhood use words or actions to make you feel worthless or unloved?",
+          "Were your basic needs (food, clean clothing, safety, supervision) sometimes not met properly?",
         options: ["Never", "Rarely", "Sometimes", "Often", "Very Often"],
       },
       {
         id: "6",
-        category: "neglect",
+        category: "household dysfunction",
         question:
-          "Did you often feel that your basic needs—emotional or physical—were not met during childhood?",
+          "Did you grow up in a home where adults frequently argued, yelled, or behaved unpredictably?",
         options: ["Never", "Rarely", "Sometimes", "Often", "Very Often"],
       },
       {
         id: "7",
-        category: "physical abuse",
+        category: "household dysfunction",
         question:
-          "Were there frequent instances of physical punishment that left you in pain?",
+          "Was anyone in your household struggling with alcohol, drugs, or other addictive behaviors?",
         options: ["Never", "Rarely", "Sometimes", "Often", "Very Often"],
       },
       {
         id: "8",
-        category: "emotional abuse",
+        category: "sexual abuse",
         question:
-          "Did you experience excessive control or manipulation from a caregiver?",
+          "Did anyone make you feel uncomfortable by crossing physical boundaries or behaving inappropriately toward you?",
         options: ["Never", "Rarely", "Sometimes", "Often", "Very Often"],
       },
       {
         id: "9",
-        category: "sexual abuse",
+        category: "emotional abuse",
         question:
-          "Did you ever feel unsafe around adults or caregivers without knowing why?",
+          "Did you often feel unloved, unwanted, or like you had to earn affection or approval?",
         options: ["Never", "Rarely", "Sometimes", "Often", "Very Often"],
       },
       {
         id: "10",
-        category: "neglect",
+        category: "physical abuse",
         question:
-          "Did you often feel isolated or unloved during your early years?",
+          "Did you fear physical punishment or feel unsafe due to the behavior of the adults at home?",
         options: ["Never", "Rarely", "Sometimes", "Often", "Very Often"],
       },
     ],

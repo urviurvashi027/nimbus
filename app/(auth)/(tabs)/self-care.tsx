@@ -9,26 +9,26 @@ import {
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { router, useNavigation } from "expo-router";
+
 // application level import
 import ThemeContext from "@/context/ThemeContext";
-// import { themeColors } from "@/constant/theme/Colors";
+
 import {
   buttons as NavigationButton,
   NavigationButtonType,
 } from "@/constant/data/selfCareButton";
 import { banners } from "@/constant/data/banner";
-// Need to remove these data once api is integrated
 import { medTests } from "@/constant/data/medicalTest";
 
 import { ScreenView } from "@/components/Themed";
 import { ThemeKey } from "@/components/Themed";
-import TrendingCardCarousel from "@/components/tools/common/TrendingCardCarousel";
-import HorizontalListCardScroll from "@/components/tools/common/HorizontalListCardScroll";
-import VideoClassCard from "@/components/selfCare/VideoClassCard";
-import HorizontalBanner from "@/components/tools/common/HorizontalBanner";
+import TrendingCardCarousel from "@/components/common/TrendingCardCarousel";
+import HorizontalListCardScroll from "@/components/common/HorizontalListCardScroll";
+import VideoClassCard from "@/components/selfCare/MasterclassCard";
+import HorizontalBanner from "@/components/common/HorizontalBanner";
 import PricingModal from "@/components/common/PricingModal";
-import SleepModal from "../SelfCare/Sleep/Sleep";
-import ThingsToDoModal from "../SelfCare/ThingsToDo/ThingsToDo";
+import SleepModal from "../selfCareScreen/SleepScreen";
+import ThingsToDoModal from "../selfCareScreen/ThingsToDoScreen";
 
 import {
   getMeditationAudioList,
@@ -36,36 +36,53 @@ import {
   getWorkoutVideo,
 } from "@/services/selfCareService";
 import { getRoutineList, getSoundscapeList } from "@/services/toolService";
+import {
+  MeditationAudioListItem,
+  WorkoutVideoListItem,
+} from "@/types/selfCareTypes";
+import { SoundscapeTrackListItem } from "@/types/toolsTypes";
+import NavigationIconButton from "@/components/common/NavigationIconButton";
 
 const SelfCare: React.FC = () => {
   const navigation = useNavigation();
-  const [selectedButton, setSelectedButton] = useState("");
+  const [selectedButton, setSelectedButton] = useState<string | number>("");
 
-  const [videoList, setVideoList] = useState<any[]>([]);
-  const [meditationList, setMeditationList] = useState<any[]>([]);
-  const [libraryTracks, setLibraryTracks] = useState<any[]>([]);
+  // Backend api states
+  const [workoutVideoList, setWorkoutVideoList] = useState<
+    WorkoutVideoListItem[]
+  >([]);
+
+  const [meditationList, setMeditationList] = useState<
+    MeditationAudioListItem[]
+  >([]);
+
+  const [soundscapeTrackList, setSoundscapeTrackList] = useState<
+    SoundscapeTrackListItem[]
+  >([]);
+
   const [medicalListData, setMedicalListData] = useState<any[]>([]);
 
+  // Modal States
   const [showPricingModal, setShowPricingModal] = useState(false);
   const [showSleepTagsModal, setShowSleepTagsModal] = useState(false);
   const [showThingsToDoTagsModal, setShowThingsToDoTagsModal] = useState(false);
   const [routineList, setRoutineList] = useState<any[] | undefined>();
 
-  const { theme, newTheme, toggleTheme, useSystemTheme } =
-    useContext(ThemeContext);
+  const { theme, newTheme, spacing, typography } = useContext(ThemeContext);
 
   const styles = styling(theme, newTheme);
 
   // Funstion called on click of navigation button clicked
   const handleNavigationButtonPress = (button: NavigationButtonType) => {
+    // console.log(button.screen, button, "button");
     if (button.action === "navigate") {
       router.push(button.screen);
     } else if (button.action === "modal") {
-      getModalInfo(button.screen);
+      modalHandler(button.screen);
     }
   };
 
-  const getWorkoutListData = async () => {
+  const getWorkoutVideoList = async () => {
     // need to add filters functionality and category param changes
     try {
       const result = await getWorkoutVideo();
@@ -82,7 +99,7 @@ const SelfCare: React.FC = () => {
           };
         });
 
-        setVideoList(processedVideo);
+        setWorkoutVideoList(processedVideo);
       } else {
         // Handle the case where the data is not in the expected format
         console.error("API response data is not an array:", result);
@@ -92,7 +109,7 @@ const SelfCare: React.FC = () => {
     }
   };
 
-  const getMeditationlList = async () => {
+  const getMeditationTrackList = async () => {
     // need to add filters functionality and category param changes
     try {
       const result = await getMeditationAudioList();
@@ -118,7 +135,7 @@ const SelfCare: React.FC = () => {
     }
   };
 
-  const getSoundscapeListData = async () => {
+  const getSoundscapeTrackList = async () => {
     try {
       const result = await getSoundscapeList();
       // Check if 'result' and 'result.data' exist and is an array
@@ -132,7 +149,7 @@ const SelfCare: React.FC = () => {
             },
           };
         });
-        setLibraryTracks(processedArticles);
+        setSoundscapeTrackList(processedArticles);
       } else {
         // Handle the case where the data is not in the expected format
         console.error("API response data is not an array:", result);
@@ -142,17 +159,8 @@ const SelfCare: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    getSoundscapeListData();
-  }, []);
-
-  useEffect(() => {
-    getWorkoutListData();
-    getMeditationlList();
-  }, []);
-
   // helper function to enable the modal
-  const getModalInfo = (modalName: string) => {
+  const modalHandler = (modalName: string) => {
     switch (modalName) {
       case "Sleep":
         setShowSleepTagsModal(true);
@@ -171,13 +179,13 @@ const SelfCare: React.FC = () => {
   const onClickOfAll = (title: string) => {
     switch (title) {
       case "medicalTest":
-        router.push("/(auth)/SelfCare/test");
+        router.push("/(auth)/selfCareScreen/test");
         break;
       case "soundscape":
-        router.push("/(auth)/SelfCare/Soundscape/Soundscape");
+        router.push("/(auth)/selfCareScreen/SoundscapeScreen");
         break;
       case "meditation":
-        router.push("/(auth)/SelfCare/Meditation/Meditation");
+        router.push("/(auth)/selfCareScreen/MeditationScreen");
         break;
       case "routine":
         router.push("/(auth)/Tools/Routine/Routine");
@@ -241,6 +249,10 @@ const SelfCare: React.FC = () => {
   };
 
   useEffect(() => {
+    setSelectedButton("");
+    getWorkoutVideoList();
+    getMeditationTrackList();
+    getSoundscapeTrackList();
     getRoutineData();
     // getMentalListData();
   }, []);
@@ -248,7 +260,9 @@ const SelfCare: React.FC = () => {
   return (
     <ScreenView
       style={{
-        paddingTop: Platform.OS === "ios" ? 80 : 20,
+        paddingTop:
+          Platform.OS === "ios" ? spacing["xxl"] + spacing["xxl"] : spacing.xl,
+        paddingHorizontal: spacing.md,
       }}
     >
       <SafeAreaView style={{ flex: 1, padding: 0 }}>
@@ -260,35 +274,31 @@ const SelfCare: React.FC = () => {
           horizontal
           showsHorizontalScrollIndicator={false}
           style={styles.navigationScrollView}
-          contentContainerStyle={{ paddingHorizontal: 0 }}
+          contentContainerStyle={{ paddingHorizontal: 0, paddingBottom: 20 }}
         >
-          {NavigationButton.map((button: NavigationButtonType) => {
-            const IconComponent = button.icon;
-            return (
-              <View style={styles.navigationButtonContainer} key={button.id}>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => handleNavigationButtonPress(button)}
-                >
-                  <IconComponent
-                    width={styles.buttonIcon.width}
-                    height={styles.buttonIcon.height}
-                  />
-                </TouchableOpacity>
-                <Text style={styles.buttonLabel}>{button.label}</Text>
-              </View>
-            );
-          })}
+          {NavigationButton.map((button: NavigationButtonType) => (
+            <NavigationIconButton
+              key={button.id}
+              icon={button.iconName}
+              label={button.label}
+              spacingGap={8}
+              isActive={selectedButton === button.id}
+              onPress={() => {
+                setSelectedButton(button.id);
+                handleNavigationButtonPress(button);
+              }}
+            />
+          ))}
         </ScrollView>
 
-        {/* MasterClass Section */}
         <ScrollView showsVerticalScrollIndicator={false}>
+          {/* Workout Video List Section */}
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            style={{ paddingTop: 16, paddingLeft: 0, paddingBottom: 20 }}
+            style={{ paddingTop: 20, paddingLeft: 0, paddingBottom: 20 }}
           >
-            {videoList.map((card) => (
+            {workoutVideoList.map((card) => (
               <VideoClassCard
                 key={card.id}
                 title={card.title}
@@ -299,25 +309,25 @@ const SelfCare: React.FC = () => {
             ))}
           </ScrollView>
 
-          {/* {Soundscpae} */}
+          {/* { Soundscpae List Section} */}
           <HorizontalListCardScroll
             title="Soundscape"
             description="The sound of nature gives you better sleep."
             backgroundColor="#fff9d2"
-            itemList={libraryTracks}
+            itemList={soundscapeTrackList}
             onClickOfAll={() => onClickOfAll("soundscape")}
           />
 
-          {/* AudioBook */}
+          {/* AudioBook List Section */}
           <TrendingCardCarousel
             type="rotuine"
-            title="New and Trendings"
+            title="New and Trendingsj"
             data={routineList ?? []}
             onClickOfAll={() => onClickOfAll("routine")}
             onPress={handleCardPress}
           />
 
-          {/* Medical Test */}
+          {/* Medical Test List Section */}
           <HorizontalListCardScroll
             title="Medical Test"
             description="Mental health is everything"
@@ -329,7 +339,7 @@ const SelfCare: React.FC = () => {
 
           <HorizontalBanner data={banners} onPress={handleBannerPress} />
 
-          {/* Meditation */}
+          {/* Meditation List Section */}
           <HorizontalListCardScroll
             title="Meditation"
             description="Now is a great time to be present. Now is good, too. And now"
@@ -337,8 +347,6 @@ const SelfCare: React.FC = () => {
             itemList={meditationList}
             onClickOfAll={() => onClickOfAll("meditation")}
           />
-
-          {/* Motivation */}
         </ScrollView>
       </SafeAreaView>
 
@@ -349,6 +357,7 @@ const SelfCare: React.FC = () => {
         onClose={() => setShowSleepTagsModal(false)}
       />
 
+      {/* Pricing Modal */}
       <PricingModal
         visible={showPricingModal}
         onClose={() => {

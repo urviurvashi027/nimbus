@@ -1,12 +1,7 @@
-import {
-  ThemeColors,
-  ColorSet,
-  Spacing,
-  Typography,
-} from "../../types/themeTypes";
+import { ThemeColors, Spacing, Typography } from "../../types/themeTypes";
 
 const tintColorLight = "#f5bcdd";
-const tintColorDark = "#f5bcdd";
+// const tintColorDark = "#f5bcdd";
 export const primaryColor = "#f5bcdd";
 
 type ColorSetEx = {
@@ -33,12 +28,6 @@ export default {
     tint: tintColorLight,
     tabIconDefault: "#5f5f5f",
     tabIconSelected: tintColorLight,
-
-    // text: "#fffdf7",
-    // background: "#2f2f2f",
-    // tint: tintColorDark,
-    // tabIconDefault: "#5f5f5f",
-    // tabIconSelected: tintColorDark,
   },
 };
 
@@ -100,39 +89,27 @@ export const themeColors: ThemeColorsEx = {
   },
 };
 
-const colors = {
-  placeholder: "",
-  label: "",
-  active: "",
-  deactive: "",
-  lable: "",
-  inputBorder: "",
-  btnBorder: "",
-  text: "",
-  itemDivider: "",
-};
-
 // latest theme color
 // Define a base set of colors that might be shared or used as a default
 const basicColors: any = {
   primary: "#007AFF",
   secondary: "#5856D6",
-  // border: "#D1D1D6",
-  // overlay: "rgba(0, 0, 0, 0.5)",
 
-  // new property value
   background: "#1C1E1A",
   divider: "#242721",
   surface: "#2A2D24",
-  textPrimary: "#ECEFF4",
-  textSecondary: "#A1A69B",
   disabled: "#5C6157",
+
   accent: "#A3BE8C",
   accentPressed: "#8FAD78",
+
   info: "#5E81AC",
   success: "#90B47A",
   warning: "#EBCB8B",
   error: "#BF616A",
+
+  textPrimary: "#ECEFF4",
+  textSecondary: "#A1A69B",
   // NEW — neutrals for elevation/borders
   card: "#22251E", // slightly lighter than background
   cardRaised: "#262A22", // for prominent cards
@@ -196,6 +173,7 @@ const spacing: Spacing = {
   lg: 24,
   xl: 32,
   xxl: 48,
+  "2xl": 32,
 };
 
 // Now, create the main theme object that adheres to the ThemeColors interface

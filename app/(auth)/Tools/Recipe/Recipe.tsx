@@ -15,7 +15,6 @@ import RoutineCard from "../../../../components/tools/RoutineCard";
 import AnimatedChip from "@/components/tools/common/AnimatedChips";
 import { ScreenView } from "@/components/Themed";
 import { Ionicons } from "@expo/vector-icons";
-// import { themeColors } from "@/constant/theme/Colors";
 import ThemeContext from "@/context/ThemeContext";
 import { getRecipeList } from "@/services/toolService";
 

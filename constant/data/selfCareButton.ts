@@ -1,20 +1,11 @@
-import { SvgProps } from "react-native-svg";
-
-import MedicalTestIcon from "../../assets/images/buttonLogo/selfcare/test.svg";
-import WorkoutIcon from "../../assets/images/buttonLogo/selfcare/fitness.svg";
-import WaterIntakeIcon from "../../assets/images/buttonLogo/selfcare/drink.svg";
-import JournalingIcon from "../../assets/images/buttonLogo/selfcare/journaling.svg";
-import MeditationIcon from "../../assets/images/buttonLogo/selfcare/meditation.svg";
-import SleepIcon from "../../assets/images/buttonLogo/selfcare/sleep.svg";
-import SoundscapeIcon from "../../assets/images/buttonLogo/selfcare/soundscape.svg";
-import ThingsToDoIcon from "../../assets/images/buttonLogo/selfcare/things.svg";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 export type NavigationButtonType = {
   id: number | string;
   label: string;
   action: string;
   screen: any;
-  icon: React.FC<SvgProps>;
+  iconName: keyof typeof MaterialCommunityIcons.glyphMap;
 };
 
 export const buttons: NavigationButtonType[] = [
@@ -22,49 +13,51 @@ export const buttons: NavigationButtonType[] = [
     id: 1,
     label: "Test",
     action: "navigate",
-    screen: "/(auth)/SelfCare/test",
-    icon: MedicalTestIcon,
+    // screen: "/(auth)/selfCareScreen/test",
+
+    screen: "/(auth)/selfCareScreen/MentalHealthTestScreen",
+    iconName: "clipboard-text-outline",
   },
   {
     id: 2,
     label: "Meditation",
     action: "navigate",
-    screen: "/(auth)/SelfCare/Meditation/Meditation",
-    icon: MeditationIcon,
+    screen: "/(auth)/selfCareScreen/MeditationScreen",
+    iconName: "meditation",
   },
   {
     id: 3,
     label: "Workout",
     action: "navigate",
-    screen: "/(auth)/SelfCare/Workout/Workout",
-    icon: WorkoutIcon,
+    screen: "/(auth)/selfCareScreen/WorkoutScreen",
+    iconName: "dumbbell",
   },
   {
     id: 4,
     label: "Soundscape",
     action: "navigate",
-    screen: "/(auth)/SelfCare/Soundscape/Soundscape",
-    icon: SoundscapeIcon,
+    screen: "/(auth)/selfCareScreen/SoundscapeScreen",
+    iconName: "music-circle-outline",
   },
   {
     id: 5,
     label: "Reflection",
     action: "navigate",
-    screen: "/(auth)/SelfCare/Reflections/Reflection",
-    icon: JournalingIcon,
+    screen: "/(auth)/selfCareScreen/ReflectionScreen",
+    iconName: "book-open-variant",
   },
   {
     id: 6,
     label: "Sleep",
     action: "modal",
     screen: "Sleep",
-    icon: SleepIcon,
+    iconName: "weather-night",
   },
   {
     id: 7,
     label: "Things To Do",
     action: "modal",
     screen: "thingsToDo",
-    icon: ThingsToDoIcon,
+    iconName: "check-circle-outline",
   },
 ];

@@ -15,7 +15,6 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/context/ThemeContext";
-import { themeColors } from "@/constant/theme/Colors";
 import { Text } from "@/components/Themed";
 import { StyledButton } from "@/components/common/ThemedComponent/StyledButton"; // adjust path if required
 import InputField from "@/components/common/ThemedComponent/StyledInput";
@@ -43,7 +42,6 @@ export default function HabitMetricModal({
 }: HabitMetricModalProps) {
   //  const { theme, newTheme } = useContext(ThemeContext);
   //   const { theme,newTheme } = useContext(The);
-  //   const colors = themeColors[theme];
 
   const [unitPickerOpen, setUnitPickerOpen] = useState(false);
   const [selectedUnitId, setSelectedUnitId] = useState<number | null>(null);

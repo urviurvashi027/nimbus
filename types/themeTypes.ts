@@ -97,6 +97,7 @@ export interface Spacing {
   lg: number; // Large (24px)
   xl: number; // Extra Large (32px)
   xxl: number; // Extra Extra Large (48px)
+  "2xl": number;
 }
 
 /**

@@ -1,3 +1,81 @@
+// UI Types for Self-Care Module
+
+export interface WorkoutVideoListItem {
+  id: number;
+  title: string;
+  image: {
+    uri: string;
+  };
+  coachName: string;
+  category: string;
+  duration: number;
+  description: string;
+  source: string;
+}
+
+export interface MeditationAudioListItem {
+  id: number;
+  title: string;
+  image: {
+    uri: string;
+  };
+  coachName: string;
+  category: string;
+  duration: number;
+  description: string;
+  source: string;
+}
+
+// Workout UI Types
+
+type ExerciseCategory = "cardio" | "strength" | "stretching" | "full_body";
+
+type DifficultyLevel = "easy" | "medium" | "hard";
+
+type MetricType = "time" | "reps";
+
+export interface Exercise {
+  id: string;
+  name: string; // "Dumbbell Shoulder Press"
+  category: ExerciseCategory; // 'strength'
+  difficulty: DifficultyLevel;
+
+  thumbnailUrl: string; // or require('...') for local image
+
+  // primary metrics to display on that row
+  durationSeconds: number; // 30
+  reps: number; // 3 or 4
+
+  // optional extras if you need later
+  equipment?: string[]; // ["dumbbells", "bench"]
+  muscles?: string[]; // ["shoulders", "triceps"]
+}
+
+export interface ExerciseFilterTab {
+  id: ExerciseCategory;
+  label: string; // "Strength"
+}
+
+export const EXERCISE_FILTER_TABS: ExerciseFilterTab[] = [
+  { id: "cardio", label: "Cardio" },
+  { id: "strength", label: "Strength" },
+  { id: "stretching", label: "Stretching" },
+  { id: "full_body", label: "Full Body" },
+];
+
+export const DIFFICULTY_CONFIG: Record<
+  DifficultyLevel,
+  {
+    label: string;
+    color: string; // Nimbus green / yellow / orange
+  }
+> = {
+  easy: { label: "Easy", color: "#4ADE80" },
+  medium: { label: "Medium", color: "#FACC15" },
+  hard: { label: "Hard", color: "#FB923C" },
+};
+
+// Backend Tpypes for Self-Care Module
 export interface JournalListItem {
   id: number;
   title: string;

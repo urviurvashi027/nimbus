@@ -1,5 +1,4 @@
 import { View, TouchableOpacity, StyleSheet, Platform } from "react-native";
-import { themeColors } from "@/constant/theme/Colors";
 import { ThemeKey } from "@/components/Themed";
 
 const styling = (theme: ThemeKey, newTheme?: any) =>

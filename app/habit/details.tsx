@@ -8,7 +8,6 @@ import {
 import { ScrollView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-// import { themeColors } from "@/constant/theme/Colors";
 import { ScreenView, ThemeKey } from "@/components/Themed";
 import { getHabitDetailsById } from "@/services/habitService";
 import ThemeContext from "@/context/ThemeContext";
@@ -163,7 +162,7 @@ const HabitDetails = () => {
   };
 
   const handleStatsPress = () => {
-    router.push("/(auth)/Overview/details");
+    router.push("/(auth)/statisticsScreen/details");
   };
 
   return (
@@ -260,7 +259,6 @@ const styling = (newTheme: any) =>
   StyleSheet.create({
     gestureContainer: {
       // flex: 1,
-      // backgroundColor: themeColors[theme].background,
     },
     container: {
       // paddingVertical: 5,
