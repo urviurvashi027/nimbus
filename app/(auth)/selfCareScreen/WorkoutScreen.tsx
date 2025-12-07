@@ -1,436 +1,456 @@
-import React, { useContext, useEffect, useState } from "react";
+// src/app/(auth)/selfCareScreen/Workout/WorkoutListScreen.tsx
+
+import React, { useContext, useEffect, useState, useMemo } from "react";
 import {
   View,
-  Text,
   FlatList,
-  ImageBackground,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-  Modal,
-  ActivityIndicator,
   Platform,
-  Dimensions,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useVideoPlayer, VideoView } from "expo-video"; // ✅ Import correct expo-video hooks
-
 import { router, useNavigation } from "expo-router";
+
 import ThemeContext from "@/context/ThemeContext";
-import { themeColors } from "@/constant/theme/Colors";
-import { ScreenView, ThemeKey } from "@/components/Themed";
+
+import { ScreenView } from "@/components/Themed";
+import WorkoutCard, {
+  DifficultyLevel,
+} from "@/components/selfCare/workout/WorkoutCard";
+import FilterPill from "@/components/selfCare/workout/FilterPill";
+import WorkoutHeader from "@/components/selfCare/workout/WorkoutHeader";
+
 import { getWorkoutVideo } from "@/services/selfCareService";
-import WorkoutFeaturedCard from "@/components/selfCare/workout/WorkoutFeaturedCard";
 
-const { width } = Dimensions.get("window");
-const CARD_WIDTH = width * 0.8;
+/* ---------- Types ---------- */
 
-const FitnessVideoList = () => {
-  const [forYouSectionData, setForYouSectionData] = useState<any[]>([]);
-  const [videoList, setVideoList] = useState<any[]>([]);
+type WorkoutCategory = "cardio" | "strength" | "stretching" | "full_body";
 
-  const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
+interface WorkoutApiItem {
+  id: number;
+  title: string;
+  image: string;
+  coach_name: string;
+  category: string; // "workout", "strength", etc.
+  duration: number; // minutes
+  description: string;
+  source: string;
+}
 
-  const [currentVideoUrl, setCurrentVideoUrl] = useState<string | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [loading, setLoading] = useState(false);
+/* ---------- Demo dataset (same shape as backend) ---------- */
 
-  const { newTheme } = useContext(ThemeContext);
+const DEMO_WORKOUTS: WorkoutApiItem[] = [
+  {
+    id: 101,
+    title: "Dumbbell Shoulder Press",
+    image: "https://images.pexels.com/photos/1552242/pexels-photo-1552242.jpeg",
+    coach_name: "Kelly Pahuja",
+    category: "strength",
+    duration: 12,
+    description:
+      "Build upper-body strength and improve shoulder stability using controlled dumbbell movements.",
+    source:
+      "https://nimbus-fe-assets.s3.amazonaws.com/workouts/shoulder_press.mp4",
+  },
+  {
+    id: 102,
+    title: "Bench Press Basics",
+    image: "https://images.pexels.com/photos/2261485/pexels-photo-2261485.jpeg",
+    coach_name: "Alex Carter",
+    category: "strength",
+    duration: 10,
+    description:
+      "A foundational movement to build chest, triceps, and pushing power.",
+    source:
+      "https://nimbus-fe-assets.s3.amazonaws.com/workouts/bench_press.mp4",
+  },
+  {
+    id: 103,
+    title: "Kettlebell Swing Power",
+    image: "https://images.pexels.com/photos/4164469/pexels-photo-4164469.jpeg",
+    coach_name: "Samira Lopez",
+    category: "strength",
+    duration: 8,
+    description:
+      "Explosive hip hinge movement to build glutes, hamstrings, and total-body power.",
+    source: "https://nimbus-fe-assets.s3.amazonaws.com/workouts/kb_swing.mp4",
+  },
+  {
+    id: 201,
+    title: "HIIT Fat Burner",
+    image: "https://images.pexels.com/photos/4761664/pexels-photo-4761664.jpeg",
+    coach_name: "Mia Johnson",
+    category: "cardio",
+    duration: 15,
+    description:
+      "High-intensity intervals designed to elevate your heart rate and burn calories fast.",
+    source:
+      "https://nimbus-fe-assets.s3.amazonaws.com/workouts/hiit_burner.mp4",
+  },
+  {
+    id: 202,
+    title: "Jump Rope Conditioning",
+    image: "https://images.pexels.com/photos/1552103/pexels-photo-1552103.jpeg",
+    coach_name: "Ryan Hall",
+    category: "cardio",
+    duration: 10,
+    description:
+      "Improve coordination, agility, and cardiovascular endurance with jump rope cycles.",
+    source: "https://nimbus-fe-assets.s3.amazonaws.com/workouts/jump_rope.mp4",
+  },
+  {
+    id: 203,
+    title: "Treadmill Speed Intervals",
+    image: "https://images.pexels.com/photos/1954524/pexels-photo-1954524.jpeg",
+    coach_name: "Katie Brooks",
+    category: "cardio",
+    duration: 12,
+    description:
+      "Push your pace with controlled speed bursts and active recovery.",
+    source:
+      "https://nimbus-fe-assets.s3.amazonaws.com/workouts/speed_intervals.mp4",
+  },
+  {
+    id: 301,
+    title: "Full Body Mobility Flow",
+    image: "https://images.pexels.com/photos/3823039/pexels-photo-3823039.jpeg",
+    coach_name: "Lara Kim",
+    category: "stretching",
+    duration: 14,
+    description:
+      "Gentle mobility movements to restore flexibility and reduce stiffness.",
+    source:
+      "https://nimbus-fe-assets.s3.amazonaws.com/workouts/mobility_flow.mp4",
+  },
+  {
+    id: 302,
+    title: "Lower Back Release",
+    image: "https://images.pexels.com/photos/4325468/pexels-photo-4325468.jpeg",
+    coach_name: "Daniel Wu",
+    category: "stretching",
+    duration: 8,
+    description:
+      "Targeted stretches to ease tension and improve lumbar mobility.",
+    source:
+      "https://nimbus-fe-assets.s3.amazonaws.com/workouts/back_release.mp4",
+  },
+  {
+    id: 303,
+    title: "Hamstring Stretch Routine",
+    image: "https://images.pexels.com/photos/6453399/pexels-photo-6453399.jpeg",
+    coach_name: "Ava Singh",
+    category: "stretching",
+    duration: 6,
+    description:
+      "Improve hamstring flexibility and reduce tightness in your legs.",
+    source:
+      "https://nimbus-fe-assets.s3.amazonaws.com/workouts/hamstring_stretch.mp4",
+  },
+  {
+    id: 401,
+    title: "Full Body Burner",
+    image: "https://images.pexels.com/photos/269977/pexels-photo-269977.jpeg",
+    coach_name: "Mark Jacobs",
+    category: "full_body",
+    duration: 18,
+    description:
+      "An energetic flow mixing strength, cardio, and mobility for a complete workout.",
+    source:
+      "https://nimbus-fe-assets.s3.amazonaws.com/workouts/fullbody_burner.mp4",
+  },
+  {
+    id: 402,
+    title: "Bodyweight Sculpt",
+    image: "https://images.pexels.com/photos/3823063/pexels-photo-3823063.jpeg",
+    coach_name: "Nora Patel",
+    category: "full_body",
+    duration: 20,
+    description:
+      "High-repetition bodyweight movements to tone your entire body with no equipment.",
+    source:
+      "https://nimbus-fe-assets.s3.amazonaws.com/workouts/bodyweight_sculpt.mp4",
+  },
+  {
+    id: 403,
+    title: "Core + Glutes Activation",
+    image: "https://images.pexels.com/photos/6453398/pexels-photo-6453398.jpeg",
+    coach_name: "Leo Martin",
+    category: "full_body",
+    duration: 12,
+    description:
+      "Strengthen your entire midsection with glute and core engagement circuits.",
+    source:
+      "https://nimbus-fe-assets.s3.amazonaws.com/workouts/core_glutes.mp4",
+  },
+];
 
-  const styles = styling(newTheme);
+/* ---------- UI model & mapping ---------- */
+
+interface WorkoutCardModel {
+  id: number;
+  title: string;
+  coachName: string;
+  imageUri: string;
+  durationSeconds: number;
+  reps: number;
+  difficulty: DifficultyLevel;
+  category: WorkoutCategory;
+  description: string;
+  source: string;
+}
+
+const FILTERS: { id: WorkoutCategory; label: string }[] = [
+  { id: "cardio", label: "Cardio" },
+  { id: "strength", label: "Strength" },
+  { id: "stretching", label: "Stretching" },
+  { id: "full_body", label: "Full Body" },
+];
+
+const CATEGORY_DEFAULTS: Record<
+  WorkoutCategory,
+  { difficulty: DifficultyLevel; durationSeconds: number; reps: number }
+> = {
+  strength: { difficulty: "medium", durationSeconds: 30, reps: 4 },
+  cardio: { difficulty: "easy", durationSeconds: 45, reps: 0 },
+  stretching: { difficulty: "easy", durationSeconds: 40, reps: 0 },
+  full_body: { difficulty: "hard", durationSeconds: 30, reps: 4 },
+};
+
+const mapBackendCategory = (backendCategory: string): WorkoutCategory => {
+  switch (backendCategory.toLowerCase()) {
+    case "cardio":
+      return "cardio";
+    case "stretch":
+    case "stretching":
+      return "stretching";
+    case "full_body":
+    case "full body":
+    case "workout":
+      return "full_body";
+    case "strength":
+    default:
+      return "strength";
+  }
+};
+
+const mapWorkoutToCardModel = (item: WorkoutApiItem): WorkoutCardModel => {
+  const category = mapBackendCategory(item.category);
+  const defaults = CATEGORY_DEFAULTS[category];
+
+  return {
+    id: item.id,
+    title: item.title,
+    coachName: item.coach_name,
+    imageUri: item.image,
+    category,
+    difficulty: defaults.difficulty,
+    durationSeconds: item.duration
+      ? item.duration * 60
+      : defaults.durationSeconds,
+    reps: defaults.reps,
+    description: item.description,
+    source: item.source,
+  };
+};
+
+/* ---------- Screen component ---------- */
+
+const WorkoutListScreen = () => {
+  const [selectedCategory, setSelectedCategory] =
+    useState<WorkoutCategory>("strength");
+  const [rawWorkouts, setRawWorkouts] = useState<
+    WorkoutApiItem[] | undefined
+  >();
+  const [isLoading, setIsLoading] = useState(true);
 
   const navigation = useNavigation();
-
-  const getWorkoutListData = async () => {
-    // need to add filters functionality and category param changes
-    try {
-      const result = await getWorkoutVideo();
-      // Check if 'result' and 'result.data' exist and is an array
-      if (result && Array.isArray(result)) {
-        const processedVideo = result.map((item: any) => {
-          // Assign a random tag from the 'tags' array
-          // Return a new object with the original properties plus the new ones
-          return {
-            ...item, // Spread operator to keep original properties
-            isLocked: false,
-            coachName: "UU",
-            image: {
-              uri: item.image,
-            },
-          };
-        });
-
-        setVideoList(processedVideo);
-      } else {
-        // Handle the case where the data is not in the expected format
-        console.error("API response data is not an array:", result);
-      }
-    } catch (error: any) {
-      console.log(error, "API Error Response");
-    }
-  };
-
-  const getForYouSectionData = async () => {
-    // need to add filters functionality and category param changes
-    try {
-      const result = await getWorkoutVideo();
-      // Check if 'result' and 'result.data' exist and is an array
-      if (result && Array.isArray(result)) {
-        const processedVideo = result.map((item: any) => {
-          return {
-            ...item, // Spread operator to keep original properties
-            title: "testing Section Data",
-            isLocked: false,
-            coachName: "UU",
-            image: {
-              uri: item.image,
-            },
-          };
-        });
-
-        setForYouSectionData(processedVideo);
-      } else {
-        // Handle the case where the data is not in the expected format
-        console.error("API response data is not an array:", result);
-      }
-    } catch (error: any) {
-      console.log(error, "API Error Response");
-    }
-  };
+  const { newTheme, spacing, typography } = useContext(ThemeContext);
+  const styles = styling(newTheme, spacing, typography);
 
   useEffect(() => {
-    getWorkoutListData();
-    getForYouSectionData();
-  }, []);
-
-  useEffect(() => {
-    if (videoList.length) {
-      setPlayingVideoId(videoList[0].source);
-    }
-  }, [videoList]);
-
-  useEffect(() => {
-    navigation.setOptions({
-      headerShown: false,
-    });
+    navigation.setOptions({ headerShown: false });
   }, [navigation]);
 
-  // ✅ Initialize Video Player with first video
-  const player = useVideoPlayer(currentVideoUrl, (player) => {
-    player.loop = true;
-    if (isPlaying) player.play();
-  });
+  const fetchWorkouts = async () => {
+    try {
+      setIsLoading(true);
+      const result = await getWorkoutVideo(); // backend items
 
-  const handlePlayVideo = (
-    videoId: string,
-    islocked: boolean,
-    videoUrl: string
-  ) => {
-    if (islocked) return;
-    player.play();
-    setPlayingVideoId(videoId);
-    setCurrentVideoUrl(videoUrl);
-    setIsPlaying(true);
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-    }, 1500);
-  };
-
-  const togglePlayPause = () => {
-    if (isPlaying) {
-      player.pause();
-    } else {
-      player.play();
+      if (result && Array.isArray(result)) {
+        // ✅ MERGE BACKEND + DEMO DATA
+        const merged: WorkoutApiItem[] = [...result, ...DEMO_WORKOUTS];
+        setRawWorkouts(merged);
+      } else {
+        console.error("Workout API response is not an array:", result);
+        // fallback to demo only
+        setRawWorkouts(DEMO_WORKOUTS);
+      }
+    } catch (err) {
+      console.error("Workout API error:", err);
+      // on error, still show demo
+      setRawWorkouts(DEMO_WORKOUTS);
+    } finally {
+      setIsLoading(false);
     }
-    setIsPlaying(!isPlaying);
   };
 
-  const skipForward = () => {
-    player.currentTime += 10;
+  useEffect(() => {
+    fetchWorkouts();
+  }, []);
+
+  const workoutCards: WorkoutCardModel[] = useMemo(() => {
+    if (!rawWorkouts) return [];
+    return rawWorkouts.map(mapWorkoutToCardModel);
+  }, [rawWorkouts]);
+
+  const filteredWorkouts = useMemo(
+    () => workoutCards.filter((w) => w.category === selectedCategory),
+    [workoutCards, selectedCategory]
+  );
+
+  const handleStartWorkout = (workout: WorkoutCardModel) => {
+    console.log("Start workout:", workout.id);
+
+    router.push({
+      pathname: "/(auth)/selfCareScreen/WorkoutSessionScreen",
+      params: {
+        id: workout.id.toString(),
+        title: workout.title,
+        imageUri: workout.imageUri,
+        description: workout.description,
+        reps: workout.reps.toString(),
+        durationSeconds: workout.durationSeconds.toString(),
+      },
+    });
   };
 
-  const skipBackward = () => {
-    player.currentTime -= 10;
-  };
-
-  const openFullscreen = () => {
-    setIsFullscreen(true);
-  };
-
-  const closeFullscreen = () => {
-    setIsFullscreen(false);
-    togglePlayPause();
-  };
-
-  const onFeaturePostClick = (
-    id: string,
-    isLocked: boolean,
-    videoUrl: string
-  ) => {
-    handlePlayVideo(id, isLocked, videoUrl);
-    openFullscreen();
-  };
-
-  const renderVideoItem = ({ item }: any) => {
-    const isPlayingThis = playingVideoId === item.id;
-
-    return (
-      <TouchableOpacity
-        style={styles.videoItem}
-        onPress={() => handlePlayVideo(item.id, item.isLocked, item.source)}
-      >
-        {isPlayingThis ? (
-          <TouchableOpacity
-            onPress={openFullscreen}
-            style={styles.videoContainer}
-          >
-            {loading && (
-              <View style={styles.loadingOverlay}>
-                <ActivityIndicator size="large" color={newTheme.textPrimary} />
-              </View>
-            )}
-            <VideoView
-              style={styles.videoPlayer}
-              player={player}
-              allowsFullscreen
-              allowsPictureInPicture
-            />
-          </TouchableOpacity>
-        ) : (
-          <ImageBackground
-            source={item.image}
-            style={styles.videoThumbnail}
-            imageStyle={{ borderRadius: 10 }}
-          >
-            <View style={styles.playButton}>
-              <Ionicons
-                name="play-circle"
-                size={30}
-                color={newTheme.textPrimary}
-              />
-            </View>
-          </ImageBackground>
+  const renderListHeader = () => (
+    <View>
+      <FlatList
+        data={FILTERS}
+        keyExtractor={(item) => item.id}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.filterRow}
+        renderItem={({ item }) => (
+          <FilterPill
+            label={item.label}
+            isActive={selectedCategory === item.id}
+            onPress={() => setSelectedCategory(item.id)}
+          />
         )}
-        <View style={styles.videoInfo}>
-          <Text style={styles.videoTitle}>{item.title}</Text>
-          <View style={styles.itemDetails}>
-            <Text style={styles.videoDuration}>{item.duration} min</Text>
-            {item.isLocked && (
-              <Ionicons
-                name="lock-closed"
-                size={13}
-                color={newTheme.textPrimary}
-                style={styles.lockIcon}
-              />
-            )}
-          </View>
-        </View>
-      </TouchableOpacity>
-    );
-  };
+      />
+    </View>
+  );
 
+  /* Loading state */
+  if (isLoading) {
+    return (
+      <ScreenView
+        style={{
+          paddingTop:
+            Platform.OS === "ios"
+              ? spacing["xxl"] + spacing["xxl"] * 0.4
+              : spacing.xl,
+          paddingHorizontal: spacing.md,
+        }}
+      >
+        <SafeAreaView style={{ flex: 1 }}>
+          <View style={styles.container}>
+            <View style={styles.headerRow}>
+              <TouchableOpacity onPress={() => navigation.goBack()}>
+                <Text style={styles.backText}>‹</Text>
+              </TouchableOpacity>
+              <Text style={styles.headerTitle}>Workouts</Text>
+            </View>
+            <Text style={styles.loadingText}>Loading workouts...</Text>
+          </View>
+        </SafeAreaView>
+      </ScreenView>
+    );
+  }
+
+  /* Loaded state */
   return (
     <ScreenView
       style={{
-        paddingTop: Platform.OS === "ios" ? 40 : 20,
+        paddingTop:
+          Platform.OS === "ios"
+            ? spacing["xxl"] + spacing["xxl"] * 0.4
+            : spacing.xl,
+        paddingHorizontal: spacing.md,
       }}
     >
-      <View style={styles.container}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Ionicons
-            name="arrow-back"
-            size={24}
-            color={newTheme.textSecondary}
+      <SafeAreaView style={{ flex: 1 }}>
+        <View style={styles.container}>
+          <WorkoutHeader onBack={() => navigation.goBack()} />
+
+          <FlatList
+            data={filteredWorkouts}
+            keyExtractor={(item) => item.id.toString()}
+            showsVerticalScrollIndicator={false}
+            ListHeaderComponent={renderListHeader}
+            renderItem={({ item }) => (
+              <WorkoutCard
+                title={item.title}
+                imageUri={item.imageUri}
+                durationSeconds={item.durationSeconds}
+                reps={item.reps}
+                difficulty={item.difficulty}
+                onPressStart={() => handleStartWorkout(item)}
+              />
+            )}
+            contentContainerStyle={{
+              paddingBottom: spacing.xl * 2,
+            }}
           />
-        </TouchableOpacity>
-        {videoList.length ? (
-          <ScrollView>
-            <Text style={styles.header}>Workout</Text>
-            <Text style={styles.subHeader}>
-              Make workouts part of your daily life.
-            </Text>
-
-            <Text style={styles.sectionTitle}>For you</Text>
-            <FlatList
-              data={forYouSectionData}
-              renderItem={({ item }) => (
-                <WorkoutFeaturedCard item={item} onPress={onFeaturePostClick} />
-              )}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ paddingHorizontal: 0 }}
-              snapToAlignment="start"
-              snapToInterval={CARD_WIDTH + 16}
-              decelerationRate="fast"
-              keyExtractor={(item) => item.id}
-              horizontal
-            />
-
-            <Text style={styles.sectionTitle}>All</Text>
-            <FlatList
-              data={videoList}
-              renderItem={renderVideoItem}
-              keyExtractor={(item) => item.id}
-              scrollEnabled={false}
-            />
-
-            {/* Fullscreen Modal */}
-            <Modal
-              visible={isFullscreen}
-              animationType="slide"
-              transparent={true}
-            >
-              <View style={styles.modalContainer}>
-                <TouchableOpacity
-                  style={styles.closeButton}
-                  onPress={closeFullscreen}
-                >
-                  <Ionicons
-                    name="close"
-                    size={30}
-                    color={themeColors.basic.commonWhite}
-                    style={{ marginTop: 30, marginRight: 10 }}
-                  />
-                </TouchableOpacity>
-
-                <VideoView
-                  style={styles.fullscreenVideo}
-                  player={player}
-                  allowsFullscreen
-                  allowsPictureInPicture
-                />
-
-                <View style={styles.fullscreenControls}>
-                  <TouchableOpacity onPress={skipBackward}>
-                    <Ionicons name="play-back" size={40} color="#fff" />
-                  </TouchableOpacity>
-
-                  <TouchableOpacity onPress={togglePlayPause}>
-                    <Ionicons
-                      name={isPlaying ? "pause" : "play"}
-                      size={50}
-                      color={themeColors.basic.commonWhite}
-                    />
-                  </TouchableOpacity>
-
-                  <TouchableOpacity onPress={skipForward}>
-                    <Ionicons name="play-forward" size={40} color="#fff" />
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </Modal>
-          </ScrollView>
-        ) : (
-          <View>
-            <Text>Loading ....</Text>
-          </View>
-        )}
-      </View>
+        </View>
+      </SafeAreaView>
     </ScreenView>
   );
 };
 
-const styling = (theme: any) =>
+const styling = (newTheme: any, spacing: any, typography: any) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      // paddingHorizontal: 10
     },
-    backButton: {
-      marginTop: 50,
-      marginBottom: 10,
+    headerRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginBottom: spacing.lg,
     },
-    header: {
-      fontSize: 26,
-      fontWeight: "bold",
-      color: theme.textPrimary,
+    backText: {
+      fontSize: 24,
+      color: newTheme.textPrimary,
+      marginRight: spacing.sm,
     },
-    subHeader: {
-      fontSize: 14,
-      color: theme.textSecondary,
-      marginBottom: 20,
+    headerTitle: {
+      ...typography.h2,
+      color: newTheme.textPrimary,
+    },
+    sectionHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginBottom: spacing.md,
     },
     sectionTitle: {
-      fontSize: 18,
-      fontWeight: "bold",
-      marginVertical: 10,
-      color: theme.textSecondary,
+      ...typography.h3,
+      color: newTheme.textSecondary,
     },
-    lockIcon: {
-      marginLeft: 5,
-      marginTop: 1,
+    sectionAction: {
+      ...typography.bodySmall,
+      color: newTheme.accent,
     },
-    itemDetails: {
-      flexDirection: "row",
-      marginTop: 4,
+    filterRow: {
+      paddingBottom: spacing.md,
     },
-    videoItem: {
-      flexDirection: "row",
-      alignItems: "center",
-      marginBottom: 15,
-      width: "100%",
-    },
-    videoThumbnail: {
-      width: 120,
-      height: 70,
-      justifyContent: "center",
-      alignItems: "center",
-    },
-    playButton: {
-      backgroundColor: "rgba(0,0,0,0.5)",
-      borderRadius: 25,
-      padding: 5,
-    },
-    videoInfo: {
-      marginLeft: 10,
-      flex: 1,
-      padding: 20,
-      paddingBottom: 10,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.divider,
-    },
-    videoTitle: {
-      fontSize: 16,
-      fontWeight: "bold",
-      color: theme.textSecondary,
-    },
-    videoDuration: { fontSize: 14, color: themeColors.basic.mediumGrey },
-    videoContainer: {
-      width: 120,
-      height: 70,
-      borderRadius: 10,
-      overflow: "hidden",
-      position: "relative",
-    },
-    videoPlayer: { width: "100%", height: "100%" },
-    loadingOverlay: {
-      position: "absolute",
-      width: "100%",
-      height: "100%",
-      justifyContent: "center",
-      alignItems: "center",
-      backgroundColor: "rgba(0,0,0,0.5)",
-      borderRadius: 10,
-    },
-    modalContainer: {
-      flex: 1,
-      backgroundColor: "#000",
-      justifyContent: "center",
-      alignItems: "center",
-    },
-    closeButton: { position: "absolute", top: 30, right: 20 },
-    fullscreenVideo: { width: "100%", height: 300 },
-    fullscreenControls: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-around",
-      width: "80%",
-      marginTop: 20,
+    loadingText: {
+      ...typography.body,
+      color: newTheme.textSecondary,
     },
   });
 
-export default FitnessVideoList;
+export default WorkoutListScreen;
