@@ -7,10 +7,10 @@ import { ScreenView, ThemeKey } from "@/components/Themed";
 import ThemeContext from "@/context/ThemeContext";
 import { medTests } from "@/constant/data/medicalTest";
 
-import MentalHealthHeader from "@/components/selfCare/mentalTest/MentalHealthHeader";
+import MentalHealthHeader from "@/components/selfCare/mentalTest/mentalHealthScreen/MentalHealthHeader";
 import MentalHealthTestItem, {
   MentalTest,
-} from "@/components/selfCare/mentalTest/MentalHealthTestItem";
+} from "@/components/selfCare/mentalTest/mentalHealthScreen/MentalHealthTestItem";
 
 const MentalHealthTestScreen = () => {
   const navigation = useNavigation();

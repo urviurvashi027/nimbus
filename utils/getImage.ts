@@ -3,6 +3,8 @@
 export const imageMap = {
   anxietyRelease: require("../assets/images/mentalTest/eqTest.png"),
   childhoodTrauma: require("../assets/images/mentalTest/childhoodTrauma.png"),
+  latest: require("../assets/images/mt.jpg"),
+  result: require("../assets/images/result.jpg"),
   // traumaRelease: require("../"),
   //   innerChildHealing: require("../assets/images/meditation/innerChildHealing.png"),
   // Add all your static images here

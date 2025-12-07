@@ -11,14 +11,16 @@ import {
 } from "react-native";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 
-import { Ionicons } from "@expo/vector-icons";
-
 import ThemeContext from "@/context/ThemeContext";
-import { ScreenView, ThemeKey } from "@/components/Themed";
+import { ScreenView } from "@/components/Themed";
 
-import MentalHealthTestDetails from "@/components/selfCare/mentalTest/MentalHealthTestDetails";
-import QuestionScreen from "@/components/selfCare/mentalTest/QuestionScreen";
-import TestResult from "@/components/selfCare/mentalTest/TestResult";
+import MentalHealthTestDetails from "@/components/selfCare/mentalTest/getStartedScreen/MentalHealthTestDetails";
+import MentalHealthQuestion from "@/components/selfCare/mentalTest/getStartedScreen/MentalHealthQuestion";
+import MentalHealthTestResult, {
+  ResultData,
+} from "@/components/selfCare/mentalTest/getStartedScreen/MentalHealthTestResult";
+import MedicalTestShell from "@/components/selfCare/mentalTest/getStartedScreen/MedicalTestShell";
+import MedicalTestHeader from "@/components/selfCare/mentalTest/getStartedScreen/MentalTestHeader";
 
 import testData, { medicalTestData } from "@/constant/data/medicalTest";
 
@@ -55,7 +57,7 @@ const scoreMapping: Record<ScoreOption, number> = {
 // Main Screen
 // ────────────────────────────────────────────────────────────────
 
-const MedicalTestScreen: React.FC = () => {
+const MentalHealthGetStartedScreen: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<StepState>(0);
   const [responses, setResponses] = useState<ResponsesState>({});
   const [selectedAnswers, setSelectedAnswers] = useState<
@@ -68,8 +70,8 @@ const MedicalTestScreen: React.FC = () => {
   const { id } = useLocalSearchParams();
   const navigation = useNavigation();
 
-  const { theme, newTheme, spacing, typography } = useContext(ThemeContext);
-  const styles = styling(theme, newTheme, spacing, typography);
+  const { newTheme, spacing, typography } = useContext(ThemeContext);
+  const styles = styling(newTheme, spacing, typography);
 
   // Hide default header, we use custom Nimbus header
   useEffect(() => {
@@ -97,6 +99,7 @@ const MedicalTestScreen: React.FC = () => {
     category: string,
     selectedOption: ScoreOption
   ) => {
+    console.log(questionId, category, selectedOption, "selected option");
     setSelectedAnswers((prev) => ({ ...prev, [questionId]: selectedOption }));
     setResponses((prev) => ({
       ...prev,
@@ -159,12 +162,12 @@ const MedicalTestScreen: React.FC = () => {
     return rows;
   }, [calculated]);
 
-  const resultData = useMemo(() => {
+  const resultData: ResultData = useMemo(() => {
     // You can later wire this to real backend messaging
     return {
       title: "Courageous Optimist",
       quote: "“Life is 10% what happens to us and 90% how we react to it.”",
-      image: "anxietyRelease",
+      image: "result",
       description:
         "It appears from your responses that you’ve cultivated resilience despite early challenges. Take a moment to recognize both your strength and any parts of you that still need care and attention.",
       tips: [
@@ -188,11 +191,11 @@ const MedicalTestScreen: React.FC = () => {
 
   const isLoading = !medicalTestDetails;
 
-  const bgColor = medicalTestDetails?.color ?? newTheme.background;
+  // const bgColor = medicalTestDetails?.color ?? newTheme.background;
 
   return (
     <ScreenView
-      bgColor={bgColor}
+      // bgColor={bgColor}
       style={{
         paddingHorizontal: 0,
         paddingTop:
@@ -226,17 +229,17 @@ const MedicalTestScreen: React.FC = () => {
           )}
 
           {!isLoading && currentStep === "result" && (
-            <TestResult data={resultData} />
+            <MentalHealthTestResult data={resultData} />
           )}
 
           {!isLoading &&
             typeof currentStep === "number" &&
             currentStep > 0 &&
             medicalTestDetails && (
-              <QuestionScreen
+              <MentalHealthQuestion
                 questionData={medicalTestDetails.questions[currentStep - 1]}
                 totalSteps={medicalTestDetails.questions.length}
-                color={medicalTestDetails.progressBarBg}
+                // color={medicalTestDetails.progressBarBg}
                 currentStep={currentStep}
                 onAnswerSelect={handleAnswerSelect}
                 onNext={handleNext}
@@ -249,79 +252,10 @@ const MedicalTestScreen: React.FC = () => {
 };
 
 // ────────────────────────────────────────────────────────────────
-// Internal presentational components
-// ────────────────────────────────────────────────────────────────
-
-type HeaderProps = {
-  title: string;
-  subtitle?: string;
-  onBack: () => void;
-};
-
-const MedicalTestHeader: React.FC<HeaderProps> = ({
-  title,
-  subtitle,
-  onBack,
-}) => {
-  const { newTheme, spacing, typography } = useContext(ThemeContext);
-  const styles = headerStyles(newTheme, spacing, typography);
-
-  return (
-    <View style={styles.wrapper}>
-      <View style={styles.row}>
-        <TouchableOpacity onPress={onBack} hitSlop={12}>
-          <Ionicons
-            name="arrow-back"
-            size={24}
-            color={newTheme.textSecondary}
-          />
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.textBlock}>
-        <Text style={styles.title} numberOfLines={2}>
-          {title}
-        </Text>
-        {subtitle ? (
-          <Text style={styles.subtitle} numberOfLines={2}>
-            {subtitle}
-          </Text>
-        ) : null}
-      </View>
-    </View>
-  );
-};
-
-type ShellProps = { children: React.ReactNode };
-
-const MedicalTestShell: React.FC<ShellProps> = ({ children }) => {
-  const { newTheme, spacing } = useContext(ThemeContext);
-  return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: newTheme.background,
-        borderTopLeftRadius: 28,
-        borderTopRightRadius: 28,
-        paddingHorizontal: spacing.md,
-        paddingTop: spacing.lg,
-      }}
-    >
-      {children}
-    </View>
-  );
-};
-
-// ────────────────────────────────────────────────────────────────
 // Styles
 // ────────────────────────────────────────────────────────────────
 
-const styling = (
-  theme: ThemeKey,
-  newTheme: any,
-  spacing: any,
-  typography: any
-) =>
+const styling = (newTheme: any, spacing: any, typography: any) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -333,29 +267,4 @@ const styling = (
     },
   });
 
-const headerStyles = (newTheme: any, spacing: any, typography: any) =>
-  StyleSheet.create({
-    wrapper: {
-      paddingHorizontal: spacing.md,
-      marginBottom: spacing.md,
-    },
-    row: {
-      flexDirection: "row",
-      alignItems: "center",
-      marginBottom: spacing.lg,
-    },
-    textBlock: {
-      paddingRight: spacing.lg,
-    },
-    title: {
-      ...typography.h2,
-      color: newTheme.textPrimary,
-    },
-    subtitle: {
-      ...typography.body,
-      color: newTheme.textSecondary,
-      marginTop: spacing.xs,
-    },
-  });
-
-export default MedicalTestScreen;
+export default MentalHealthGetStartedScreen;
