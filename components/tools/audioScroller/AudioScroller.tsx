@@ -1,20 +1,15 @@
-import React, { useEffect, useState, useRef, useContext } from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  ActivityIndicator,
-  StyleSheet,
-  Platform,
-} from "react-native";
+// src/components/audiobooks/AudiobookScroller.tsx
+
+import React, { useEffect, useState, useContext } from "react";
+import { View, Text, FlatList, StyleSheet } from "react-native";
 
 import { getAudioBookList } from "@/services/toolService";
 import AudiobookThumbnail from "./components/AudiobookThumbnail";
 import FullScreenAudioPlayer from "./components/FullScreenAudioPlayer";
 import ThemeContext from "@/context/ThemeContext";
 import { ThemeKey } from "@/components/Themed";
+import AudiobookScrollerSkeleton from "./components/AudiobookScrollerSkeleton";
 
-// --- TYPES ---
 export interface AudiobookData {
   id: string;
   title: string;
@@ -24,7 +19,6 @@ export interface AudiobookData {
   duration: string;
 }
 
-// AudiobookScroller Component
 const AudiobookScroller: React.FC = () => {
   const [audiobooks, setAudiobooks] = useState<AudiobookData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,32 +26,27 @@ const AudiobookScroller: React.FC = () => {
     useState<AudiobookData | null>(null);
   const [isPlayerVisible, setPlayerVisible] = useState(false);
 
-  const { theme, newTheme, toggleTheme, useSystemTheme } =
-    useContext(ThemeContext);
-
-  const scrollerStyles = styling(theme, newTheme);
+  const { theme, newTheme, spacing, typography } = useContext(ThemeContext);
+  const styles = styling(theme, newTheme, spacing, typography);
 
   useEffect(() => {
     const loadAudiobooks = async () => {
       try {
-        const result = await getAudioBookList(); // Assume this fetches the data
+        const result = await getAudioBookList();
 
         if (result && Array.isArray(result)) {
-          // Map the API response to match the AudiobookData interface
           const processedAudiobooks: AudiobookData[] = result.map(
-            (item: any) => {
-              return {
-                id: item.id.toString(), // Convert number to string
-                title: item.title,
-                coach_name: "Unknown Author", // Add a placeholder since it's missing
-                coverImageUrl: item.image, // Map 'image' to 'coverImageUrl'
-                audioUrl: item.source, // Map 'source' to 'audioUrl'
-                duration: `${item.duration}m`, // Convert number to a string format
-              };
-            }
+            (item: any) => ({
+              id: item.id.toString(),
+              title: item.title,
+              coach_name: "Unknown Author",
+              coverImageUrl: item.image,
+              audioUrl: item.source,
+              duration: `${item.duration}m`,
+            })
           );
 
-          setAudiobooks(processedAudiobooks); // Set state with the corrected data
+          setAudiobooks(processedAudiobooks);
         }
       } catch (error) {
         console.error("Failed to fetch audiobooks:", error);
@@ -65,6 +54,7 @@ const AudiobookScroller: React.FC = () => {
         setLoading(false);
       }
     };
+
     loadAudiobooks();
   }, []);
 
@@ -79,18 +69,17 @@ const AudiobookScroller: React.FC = () => {
   };
 
   if (loading) {
-    return (
-      <ActivityIndicator
-        size="large"
-        color="#8E8E93"
-        style={scrollerStyles.loader}
-      />
-    );
+    return <AudiobookScrollerSkeleton />;
+  }
+
+  if (!audiobooks.length) {
+    return null;
   }
 
   return (
-    <View style={scrollerStyles.container}>
-      <Text style={scrollerStyles.header}>Listen Again</Text>
+    <View style={styles.container}>
+      <Text style={styles.header}>Listen Again</Text>
+
       <FlatList
         data={audiobooks}
         renderItem={({ item }) => (
@@ -99,11 +88,12 @@ const AudiobookScroller: React.FC = () => {
             onPress={() => handleThumbnailPress(item)}
           />
         )}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => item.id}
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={scrollerStyles.listContentContainer}
+        contentContainerStyle={styles.listContentContainer}
       />
+
       <FullScreenAudioPlayer
         visible={isPlayerVisible}
         audiobook={selectedAudiobook}
@@ -115,23 +105,24 @@ const AudiobookScroller: React.FC = () => {
 
 export default AudiobookScroller;
 
-const styling = (theme: ThemeKey, newTheme: any) =>
+const styling = (
+  theme: ThemeKey,
+  newTheme: any,
+  spacing: any,
+  typography: any
+) =>
   StyleSheet.create({
     container: {
-      paddingVertical: 20,
+      paddingVertical: spacing.lg,
     },
     header: {
-      fontSize: 24,
-      fontWeight: "bold",
+      ...typography.h3,
       color: newTheme.textPrimary,
-      // color: "#1C1C1E",
-      marginBottom: 20,
-      fontFamily: Platform.OS === "ios" ? "Avenir-Heavy" : "Roboto-Bold",
+      marginBottom: spacing.md,
+      fontWeight: "700",
+      letterSpacing: 0.2,
     },
-    listContentContainer: {},
-    loader: {
-      flex: 1,
-      justifyContent: "center",
-      alignItems: "center",
+    listContentContainer: {
+      paddingRight: spacing.md,
     },
   });

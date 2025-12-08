@@ -101,7 +101,7 @@ const styling = (
 ) =>
   StyleSheet.create({
     container: {
-      marginVertical: spacing.xl,
+      marginVertical: spacing.lg,
     },
     header: {
       flexDirection: "row",

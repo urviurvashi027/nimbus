@@ -42,7 +42,6 @@ export async function setStoredUser(user: User | null): Promise<void> {
     await AsyncStorage.removeItem(USER_KEY);
     return;
   }
-  console.log("coming here set user", user);
   await AsyncStorage.setItem(USER_KEY, JSON.stringify(user));
 }
 
