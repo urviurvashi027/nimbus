@@ -1,7 +1,6 @@
 import {
   View,
   Text,
-  TouchableOpacity,
   StyleSheet,
   ScrollView,
   Platform,
@@ -11,6 +10,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { router, useNavigation } from "expo-router";
 // application level import
 import ThemeContext from "@/context/ThemeContext";
+
 import {
   buttons as NavigationButton,
   NavigationButtonType,
@@ -19,7 +19,7 @@ import {
 import { ScreenView } from "@/components/Themed";
 import { ThemeKey } from "@/components/Themed";
 import TrendingCardCarousel from "@/components/common/TrendingCardCarousel";
-import MoodTrackerModal from "../Tools/MoodTracker/MoodTracker";
+import MoodTrackerModal from "../toolsScreen/MoodTracker/MoodTracker";
 import VideoScroller from "@/components/tools/videoScroller/VideoScroller";
 import AudiobookScroller from "@/components/tools/audioScroller/AudioScroller";
 
@@ -33,6 +33,7 @@ import NavigationIconButton from "@/components/common/NavigationIconButton";
 const Tools: React.FC = () => {
   const navigation = useNavigation();
 
+  // Ui states
   const [selectedButton, setSelectedButton] = useState<string | number>("");
   const [showMoodTracker, setShowMoodTracker] = useState(false);
   const [mood, setMood] = useState<string | null>(null);
@@ -47,8 +48,7 @@ const Tools: React.FC = () => {
   >();
   const [routineFitness, setRoutineFitnessList] = useState<any[] | undefined>();
 
-  const { theme, newTheme, toggleTheme, useSystemTheme } =
-    useContext(ThemeContext);
+  const { theme, newTheme, spacing, typography } = useContext(ThemeContext);
 
   const styles = styling(theme, newTheme);
 
@@ -164,7 +164,7 @@ const Tools: React.FC = () => {
 
   const handleCardPress = (id: string, type: string) => {
     router.push({
-      pathname: "/(auth)/Tools/Details/Details",
+      pathname: "/(auth)/toolsScreen/Details/Details",
       params: { id: id, type: type },
     });
   };
@@ -174,27 +174,27 @@ const Tools: React.FC = () => {
   };
 
   const onClickOfArticleAll = () => {
-    router.push("/(auth)/Tools/Article/Article");
+    router.push("/(auth)/toolsScreen/ArticleScreen");
   };
 
   const onClickOfRoutineAll = () => {
-    router.push("/(auth)/Tools/Routine/Routine");
+    router.push("/(auth)/toolsScreen/RoutineScreen");
   };
 
   const onClickOfRecipeAll = () => {
-    router.push("/(auth)/Tools/Recipe/Recipe");
+    router.push("/(auth)/toolsScreen/RecipeScreen");
   };
 
   const onClickOfSkincareRoutineAll = () => {
     router.push({
-      pathname: "/(auth)/Tools/Routine/Routine",
+      pathname: "/(auth)/toolsScreen/RoutineScreen",
       params: { filter: "Skincare" },
     });
   };
 
   const onClickOfHacksRoutineAll = () => {
     router.push({
-      pathname: "/(auth)/Tools/Routine/Routine",
+      pathname: "/(auth)/toolsScreen/RoutineScreen",
       params: { filter: "Hacks" },
     });
   };
@@ -202,7 +202,9 @@ const Tools: React.FC = () => {
   return (
     <ScreenView
       style={{
-        paddingTop: Platform.OS === "ios" ? 80 : 20,
+        paddingTop:
+          Platform.OS === "ios" ? spacing["xxl"] + spacing["xxl"] : spacing.xl,
+        paddingHorizontal: spacing.md,
       }}
     >
       <SafeAreaView style={{ flex: 1, padding: 0 }}>
@@ -214,10 +216,9 @@ const Tools: React.FC = () => {
           horizontal
           showsHorizontalScrollIndicator={false}
           style={styles.navigationScrollView}
-          contentContainerStyle={{ paddingHorizontal: 0 }}
+          contentContainerStyle={{ paddingHorizontal: 0, paddingBottom: 30 }}
         >
           {NavigationButton.map((button: NavigationButtonType) => {
-            // const IconComponent = button.icon;
             return (
               <NavigationIconButton
                 key={button.id}
@@ -236,11 +237,9 @@ const Tools: React.FC = () => {
         {/* Verticle Scroll View */}
         <ScrollView
           showsVerticalScrollIndicator={false}
-          style={{ paddingTop: 16, paddingLeft: 0, paddingBottom: 20 }}
+          style={{ paddingTop: 0, paddingLeft: 0, paddingBottom: 20 }}
         >
-          {/* Reel Scroll */}
           <VideoScroller />
-          {/* Audio Book Scroll */}
           <AudiobookScroller />
 
           {/* Wellness Routine Template */}
@@ -307,7 +306,6 @@ const styling = (theme: ThemeKey, newTheme: any) =>
       padding: 0,
     },
     screenTitle: {
-      paddingHorizontal: 10,
       marginBottom: 30,
     },
     screenTitleText: {

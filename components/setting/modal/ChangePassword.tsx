@@ -60,7 +60,7 @@ export default function ChangePasswordModal({
   const submitPassword = async () => {
     if (!validate()) return;
     // validation
-    console.log("Submitting password change", oldPassword, newPassword);
+
 
     try {
       setLoading(true);
@@ -69,7 +69,7 @@ export default function ChangePasswordModal({
         old_password: oldPassword,
         new_password: newPassword,
       };
-      console.log("Payload for password change:", payload);
+
       const r = await changePassword(payload);
 
       if (r?.success) {

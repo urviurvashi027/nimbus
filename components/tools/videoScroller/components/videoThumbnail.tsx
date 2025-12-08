@@ -1,4 +1,5 @@
-// src/components/audiobooks/components/AudiobookThumbnail.tsx
+// src/components/shorts/component/videoThumbnail/videoThumbnail.tsx
+// (adjust path as per your project)
 
 import React, { useContext } from "react";
 import {
@@ -10,17 +11,24 @@ import {
   Platform,
 } from "react-native";
 import ThemeContext from "@/context/ThemeContext";
-import { AudiobookData } from "../AudioScroller"; // adjust path if needed
+// import { VideoData } from "../../VideoScroller"; // adjust if you want to import the type
 
-interface AudiobookThumbnailProps {
-  audiobook: AudiobookData;
+// Re-declare if you don't want to import
+export interface VideoData {
+  id: number;
+  title: string;
+  image: string;
+  category?: string;
+  source: string;
+  views?: string;
+}
+
+interface VideoThumbnailProps {
+  video: VideoData;
   onPress: () => void;
 }
 
-const AudiobookThumbnail: React.FC<AudiobookThumbnailProps> = ({
-  audiobook,
-  onPress,
-}) => {
+const VideoThumbnail: React.FC<VideoThumbnailProps> = ({ video, onPress }) => {
   const { newTheme, spacing, typography } = useContext(ThemeContext);
   const styles = styling(newTheme, spacing, typography);
 
@@ -30,22 +38,33 @@ const AudiobookThumbnail: React.FC<AudiobookThumbnailProps> = ({
       style={({ pressed }) => [styles.container, pressed && styles.pressed]}
     >
       <ImageBackground
-        source={{ uri: audiobook.coverImageUrl }}
+        source={{ uri: video.image }}
         style={styles.imageBackground}
         imageStyle={styles.imageStyle}
       >
-        {/* soft overlay for readability */}
+        {/* global soft overlay for readability */}
         <View style={styles.overlay} />
+
+        {/* category pill */}
+        {video.category ? (
+          <View style={styles.categoryPill}>
+            <Text style={styles.categoryText} numberOfLines={1}>
+              {video.category.toLowerCase()}
+            </Text>
+          </View>
+        ) : null}
 
         {/* bottom glass panel */}
         <View style={styles.bottomWrapper}>
           <View style={styles.bottomGlass}>
             <Text style={styles.title} numberOfLines={2}>
-              {audiobook.title}
+              {video.title}
             </Text>
-            <Text style={styles.author} numberOfLines={1}>
-              {audiobook.coach_name || "Unknown Author"}
-            </Text>
+            {video.views ? (
+              <Text style={styles.views} numberOfLines={1}>
+                {video.views}
+              </Text>
+            ) : null}
           </View>
         </View>
       </ImageBackground>
@@ -53,7 +72,7 @@ const AudiobookThumbnail: React.FC<AudiobookThumbnailProps> = ({
   );
 };
 
-export default AudiobookThumbnail;
+export default VideoThumbnail;
 
 const styling = (newTheme: any, spacing: any, typography: any) =>
   StyleSheet.create({
@@ -69,12 +88,12 @@ const styling = (newTheme: any, spacing: any, typography: any) =>
       ...Platform.select({
         ios: {
           shadowColor: "#000",
-          shadowOffset: { width: 0, height: 8 },
+          shadowOffset: { width: 0, height: 10 },
           shadowOpacity: 0.18,
-          shadowRadius: 16,
+          shadowRadius: 18,
         },
         android: {
-          elevation: 4,
+          elevation: 5,
         },
       }),
     },
@@ -84,15 +103,35 @@ const styling = (newTheme: any, spacing: any, typography: any) =>
     },
     imageBackground: {
       flex: 1,
-      justifyContent: "flex-end",
+      justifyContent: "space-between",
     },
     imageStyle: {
       borderRadius: 22,
     },
     overlay: {
       ...StyleSheet.absoluteFillObject,
-      backgroundColor: "rgba(0,0,0,0.18)",
+      backgroundColor: "rgba(0,0,0,0.18)", // slightly lighter than before
     },
+
+    // top category pill
+    categoryPill: {
+      alignSelf: "flex-start",
+      marginTop: spacing.sm,
+      marginLeft: spacing.sm,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 4,
+      borderRadius: 12, // softened, not a perfect pill
+      backgroundColor: "rgba(0,0,0,0.35)",
+    },
+    categoryText: {
+      ...typography.caption,
+      fontSize: 11,
+      color: "rgba(255,255,255,0.86)",
+      fontWeight: "500",
+      letterSpacing: 0.2,
+    },
+
+    // bottom glass
     bottomWrapper: {
       paddingHorizontal: spacing.sm,
       paddingBottom: spacing.sm,
@@ -101,7 +140,8 @@ const styling = (newTheme: any, spacing: any, typography: any) =>
       borderRadius: 18,
       paddingHorizontal: spacing.sm,
       paddingVertical: spacing.sm * 0.9,
-      backgroundColor: "rgba(0,0,0,0.45)",
+      backgroundColor: "rgba(0,0,0,0.42)",
+      // fake "gradient" by adding a top border fade
       borderTopWidth: StyleSheet.hairlineWidth,
       borderTopColor: "rgba(255,255,255,0.08)",
     },
@@ -111,9 +151,9 @@ const styling = (newTheme: any, spacing: any, typography: any) =>
       fontWeight: "700",
       marginBottom: 4,
     },
-    author: {
+    views: {
       ...typography.caption,
-      color: "rgba(255,255,255,0.85)",
+      color: "rgba(255,255,255,0.8)",
       fontWeight: "500",
     },
   });

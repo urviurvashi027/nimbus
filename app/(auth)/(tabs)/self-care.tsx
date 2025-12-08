@@ -1,7 +1,6 @@
 import {
   View,
   Text,
-  TouchableOpacity,
   StyleSheet,
   ScrollView,
   Platform,
@@ -27,6 +26,7 @@ import HorizontalListCardScroll from "@/components/common/HorizontalListCardScro
 import VideoClassCard from "@/components/selfCare/MasterclassCard";
 import HorizontalBanner from "@/components/common/HorizontalBanner";
 import PricingModal from "@/components/common/PricingModal";
+import NavigationIconButton from "@/components/common/NavigationIconButton";
 import SleepModal from "../selfCareScreen/SleepScreen";
 import ThingsToDoModal from "../selfCareScreen/ThingsToDoScreen";
 
@@ -36,12 +36,12 @@ import {
   getWorkoutVideo,
 } from "@/services/selfCareService";
 import { getRoutineList, getSoundscapeList } from "@/services/toolService";
+
 import {
   MeditationAudioListItem,
   WorkoutVideoListItem,
 } from "@/types/selfCareTypes";
 import { SoundscapeTrackListItem } from "@/types/toolsTypes";
-import NavigationIconButton from "@/components/common/NavigationIconButton";
 
 const SelfCare: React.FC = () => {
   const navigation = useNavigation();
@@ -179,7 +179,7 @@ const SelfCare: React.FC = () => {
   const onClickOfAll = (title: string) => {
     switch (title) {
       case "medicalTest":
-        router.push("/(auth)/selfCareScreen/test");
+        router.push("/(auth)/selfCareScreen/MentalHealthTestScreen");
         break;
       case "soundscape":
         router.push("/(auth)/selfCareScreen/SoundscapeScreen");
@@ -188,7 +188,7 @@ const SelfCare: React.FC = () => {
         router.push("/(auth)/selfCareScreen/MeditationScreen");
         break;
       case "routine":
-        router.push("/(auth)/Tools/Routine/Routine");
+        router.push("/(auth)/toolsScreen/RoutineScreen");
         break;
     }
   };
