@@ -23,7 +23,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter, useLocalSearchParams, useNavigation } from "expo-router";
 import ThemeContext from "@/context/ThemeContext";
 import { StyledButton } from "@/components/common/ThemedComponent/StyledButton"; // if you have this
-import SegmentedTabs from "@/components/common/SegmentedTabs";
+// import SegmentedTabs from "@/components/common/SegmentedTabs";
 // If not available: swap to TouchableOpacity with styles below
 
 type Recipe = {
@@ -188,11 +188,11 @@ export default function FavoritesRecipesScreen() {
         </TouchableOpacity> */}
       </View>
       {/* // inside render (just below header) */}
-      <SegmentedTabs
+      {/* <SegmentedTabs
         tabs={["Saved Recipes", "Your Recipes"]}
         activeIndex={activeTab}
         onChange={(i) => setActiveTab(i)}
-      />
+      /> */}
       <View style={styles.body}>
         {activeTab === 0 ? (
           // Saved Recipes list

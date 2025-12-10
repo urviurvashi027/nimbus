@@ -1,19 +1,27 @@
 // app/(auth)/index/TabOneScreen.tsx
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import {
   ActivityIndicator,
   FlatList,
   Platform,
   StyleSheet,
   TouchableOpacity,
+  View,
+  Text,
 } from "react-native";
-import { View, Text, ScreenView } from "@/components/Themed";
 import { router } from "expo-router";
 import Toast from "react-native-toast-message";
-import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
 import { format, isToday, isTomorrow, isYesterday, startOfDay } from "date-fns";
 
+import { ScreenView } from "@/components/Themed";
 import ThemeContext from "@/context/ThemeContext";
 import { useAuth } from "@/context/AuthContext";
 import { getHabitList, markHabitDone } from "@/services/habitService";
@@ -24,26 +32,35 @@ import DailyCheckInPanel from "@/components/homeScreen/DailyCheckInPanel";
 import HabitItemCard from "@/components/homeScreen/component/HabitItem";
 import TopBadge from "@/components/homeScreen/TopBadge";
 import NewUserScreen from "../FirstTimeUser/NewUserScreen";
+import ProgressPill from "@/components/homeScreen/component/ProgressPill";
 
+// ---------- Nimbus visual helpers ----------
+const HABIT_ICONS = ["🍰", "🌱", "🏃‍♂️", "🧘", "📚", "💧"];
+const HABIT_COLORS = ["#FF6B6B", "#4ECDC4", "#FFD93D", "#1A535C", "#6A4C93"];
+
+// ---------- Screen ----------
 export default function TabOneScreen() {
-  const { newTheme } = useContext(ThemeContext);
-  const styles = styling(newTheme);
+  const { newTheme, spacing, typography } = useContext(ThemeContext);
+  const styles = styling(newTheme, spacing, typography);
 
-  // Controlled date (single source of truth)
   const [selectedDate, setSelectedDate] = useState(startOfDay(new Date()));
-  const isoDate = useMemo(
-    () => format(selectedDate, "yyyy-MM-dd"),
-    [selectedDate]
-  );
-  const [userInfo, setUserInfo] = useState<any>(null);
-  // API + UI state
   const [habitList, setHabitList] = useState<HabitItem[]>([]);
   const [completedHabit, setCompletedHabit] = useState<number>(0);
   const [loading, setLoading] = useState(true);
+  const [userInfo, setUserInfo] = useState<any>(null);
 
   const { userProfile } = useAuth();
-  // const userInfo = userProfile || null;
 
+  const isoDate = useMemo(() => {
+    console.log(
+      selectedDate,
+      format(selectedDate, "yyyy-MM-dd"),
+      "selected date"
+    );
+    return format(selectedDate, "yyyy-MM-dd");
+  }, [selectedDate]);
+
+  // Friendly label for the selected date
   const dateLabel = useMemo(() => {
     if (isToday(selectedDate)) return "Today";
     if (isTomorrow(selectedDate)) return "Tomorrow";
@@ -51,128 +68,165 @@ export default function TabOneScreen() {
     return format(selectedDate, "EEE, MMM dd");
   }, [selectedDate]);
 
-  // map helpers
-  const habitIcons = ["🍰", "🌱", "🏃‍♂️", "🧘", "📚", "💧"];
-  const habitColors = ["#FF6B6B", "#4ECDC4", "#FFD93D", "#1A535C", "#6A4C93"];
+  // Section header – one clear “Today” / “Tomorrow” etc.
+  const sectionTitle = useMemo(() => dateLabel, [dateLabel]);
+  const sectionSubtitle = useMemo(
+    () => format(selectedDate, "EEE, MMM dd"),
+    [selectedDate]
+  );
 
+  // keep userInfo in sync
   useEffect(() => {
-    const init = async () => {
-      if (!userProfile) {
-        console.log("coming here index");
-        // const fetched = await getUserDetails?.();
-        // setUserInfo();
-      } else {
-        setUserInfo(userProfile);
-      }
-    };
-    init();
+    setUserInfo(userProfile || null);
   }, [userProfile]);
 
-  // Single fetch path tied to isoDate
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
+  // decorate habits with Nimbus icon + color
+  const decorateHabits = useCallback((data: any[]): HabitItem[] => {
+    return data.map((item: any, idx: number) => ({
+      ...item,
+      done: item.completed,
+      color: HABIT_COLORS[idx % HABIT_COLORS.length],
+      icon: HABIT_ICONS[idx % HABIT_ICONS.length],
+    }));
+  }, []);
+
+  // single loader used everywhere
+  const loadHabits = useCallback(
+    async (dateString: string) => {
       try {
         setLoading(true);
-        const res = await getHabitList(isoDate); // one call here
-        if (!mounted) return;
-        if (res?.success) {
-          setCompletedHabit(res.data.filter((h: any) => h.completed).length);
-          const formatted = res.data.map((item: any, idx: number) => ({
-            ...item,
-            done: item.completed,
-            color: habitColors[idx % habitColors.length],
-            icon: habitIcons[idx % habitIcons.length],
-          }));
+        const res = await getHabitList(dateString);
+
+        if (res?.success && Array.isArray(res.data)) {
+          const formatted = decorateHabits(res.data);
           setHabitList(formatted);
+          setCompletedHabit(res.data.filter((h: any) => h.completed).length);
         } else {
           setHabitList([]);
           setCompletedHabit(0);
         }
-      } catch (e) {
-        if (mounted) {
-          setHabitList([]);
-          setCompletedHabit(0);
-        }
-      } finally {
-        mounted && setLoading(false);
-      }
-    })();
-    return () => {
-      mounted = false;
-    };
-  }, [isoDate]); // <-- ONLY when date string changes
-
-  const onCreateClick = () => router.push("/habit/create");
-
-  const refreshData = () => {
-    // force re-run by changing state to same date (or refetch inline)
-    (async () => {
-      setLoading(true);
-      try {
-        const res = await getHabitList(isoDate);
-        if (res?.success) {
-          setCompletedHabit(res.data.filter((h: any) => h.completed).length);
-          const formatted = res.data.map((item: any, idx: number) => ({
-            ...item,
-            done: item.completed,
-            color: habitColors[idx % habitColors.length],
-            icon: habitIcons[idx % habitIcons.length],
-          }));
-          setHabitList(formatted);
-        }
+      } catch {
+        setHabitList([]);
+        setCompletedHabit(0);
       } finally {
         setLoading(false);
       }
-    })();
-  };
+    },
+    [decorateHabits]
+  );
+  const onCreateClick = () => router.push("/habit/create");
+  // fetch when date changes
+  useEffect(() => {
+    loadHabits(isoDate);
+  }, [isoDate, loadHabits]);
 
-  const handleHabitDoneClick = async (id: any, count: any) => {
+  const handleHabitDoneClick = async (id: string, count: any) => {
+    const currentIsoDate = format(startOfDay(selectedDate), "yyyy-MM-dd");
+
     try {
-      const payload = { date: isoDate };
+      const payload = { date: currentIsoDate };
       const result = await markHabitDone(payload, id);
+
       if (result?.success) {
-        Toast.show({
-          type: "success",
-          text1: "Habit marked done successfuly",
-          position: "bottom",
-        });
-        refreshData();
+        Toast.show({ type: "success", text1: "Habit marked as done" });
+        loadHabits(currentIsoDate);
       }
     } catch {
-      Toast.show({
-        type: "error",
-        text1: "Something went wrong",
-        position: "bottom",
-      });
+      Toast.show({ type: "error", text1: "Something went wrong" });
     }
   };
 
-  // Initial “whole screen” loading
+  // ---------- Loading state ----------
   if (loading && !userInfo) {
     return (
-      <ScreenView style={{ flex: 1, justifyContent: "center" }}>
+      <ScreenView style={styles.loadingScreen}>
         <ActivityIndicator size="large" color={newTheme.accent} />
-        <Text
-          style={{
-            textAlign: "center",
-            marginTop: 12,
-            color: newTheme.textSecondary,
-          }}
-        >
-          Loading your dashboard...
-        </Text>
+        <Text style={styles.loadingText}>Preparing your routine…</Text>
       </ScreenView>
     );
   }
 
+  const isFirstTimeUser = !!userInfo?.firstTimeUser;
+
   return (
-    <ScreenView style={{ paddingTop: Platform.OS === "ios" ? 80 : 20 }}>
+    <ScreenView
+      style={{
+        paddingTop:
+          Platform.OS === "ios"
+            ? spacing["xxl"] + spacing["xxl"] * 0.4
+            : spacing.xl,
+        paddingHorizontal: spacing.md,
+      }}
+    >
       <GestureHandlerRootView style={styles.gestureContainer}>
         <FlatList
-          data={userInfo?.firstTimeUser ? [] : habitList} // if first-time user → no habit data
-          // data={userInfo?.firstTimeUser ? [] : habitList}
+          data={isFirstTimeUser ? [] : habitList}
           keyExtractor={(item) => item.id.toString()}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.listContent}
+          ListHeaderComponent={
+            <>
+              {/* Greeting + coach badge */}
+              {userInfo && (
+                <View style={styles.greetingRow}>
+                  <View>
+                    <Text style={styles.greetingTitle}>
+                      {`Good ${getTimeOfDayGreeting()}, ${userInfo.username}.`}
+                    </Text>
+                    {/* No “today” duplication – simple Nimbus line */}
+                    <Text style={styles.greetingSubtitle}>
+                      Here’s your routine.
+                    </Text>
+                  </View>
+
+                  <TopBadge
+                    iconName="star"
+                    variant="pill"
+                    onPress={() =>
+                      router.push("/(auth)/CoachScreen/CoachScreen")
+                    }
+                  />
+                </View>
+              )}
+
+              {/* Date scroller */}
+              <DateScroller
+                value={selectedDate}
+                onChange={(d) => setSelectedDate(startOfDay(d))}
+                isLoading={loading}
+                // centerSelected
+              />
+
+              {/* First-time user path */}
+              {isFirstTimeUser ? (
+                <View style={styles.taskListContainer}>
+                  <NewUserScreen />
+                </View>
+              ) : (
+                <>
+                  {/* Daily check-in */}
+                  <View style={styles.checkInContainer}>
+                    <DailyCheckInPanel date={isoDate} />
+                  </View>
+
+                  {/* Habits section header */}
+                  {habitList.length > 0 && (
+                    <View style={styles.sectionHeader}>
+                      <View>
+                        <Text style={styles.sectionTitle}>{sectionTitle}</Text>
+                        <Text style={styles.sectionSubtitle}>
+                          {sectionSubtitle}
+                        </Text>
+                      </View>
+                      <ProgressPill
+                        label={`${completedHabit}/${habitList.length}`}
+                      />
+                    </View>
+                  )}
+                </>
+              )}
+            </>
+          }
           renderItem={({ item }) => (
             <HabitItemCard
               id={item.id.toString()}
@@ -187,130 +241,153 @@ export default function TabOneScreen() {
               }}
               description={item.description}
               done={item.completed}
-              onToggle={(id: string, actual_count: any) =>
-                handleHabitDoneClick(id, actual_count)
-              }
+              onToggle={handleHabitDoneClick}
+              selectedDate={isoDate}
             />
           )}
-          ListHeaderComponent={
-            <>
-              {userInfo && (
-                <View
-                  style={{
-                    paddingVertical: 20,
-                    backgroundColor: newTheme.background,
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Text style={styles.dateLabel}>{userInfo.username}</Text>
-                  <TopBadge
-                    iconName="star"
-                    variant="pill"
-                    onPress={() =>
-                      router.push("/(auth)/CoachScreen/CoachScreen")
-                    }
-                  />
-                </View>
-              )}
-
-              <DateScroller
-                value={selectedDate}
-                onChange={(d) => setSelectedDate(startOfDay(d))}
-                isLoading={loading}
-                centerSelected
-              />
-
-              {userInfo?.firstTimeUser ? (
-                <View style={styles.taskListContainer}>
-                  <NewUserScreen />
-                </View>
-              ) : (
-                <>
-                  <View style={{ marginVertical: 30 }}>
-                    {/* This component will do ONE more call using `date={isoDate}` */}
-                    <DailyCheckInPanel date={isoDate} />
-                  </View>
-
-                  {habitList.length > 0 && (
-                    <View style={styles.header}>
-                      <Text style={styles.title}>{dateLabel}</Text>
-                      <View style={styles.pill}>
-                        <Text style={styles.pillText}>
-                          {completedHabit}/{habitList.length}
-                        </Text>
-                      </View>
-                    </View>
-                  )}
-                </>
-              )}
-            </>
-          }
           ListEmptyComponent={
-            !userInfo?.firstTimeUser ? (
-              <Text
-                style={{
-                  textAlign: "center",
-                  marginTop: 20,
-                  color: newTheme.textSecondary,
-                }}
-              >
-                No habits found for {dateLabel}. Start creating one!
-              </Text>
+            !isFirstTimeUser ? (
+              <View style={styles.emptyStateContainer}>
+                <Text style={styles.emptyTitle}>No habits yet</Text>
+                <Text style={styles.emptyText}>
+                  Create a habit to start building your routine for this day.
+                </Text>
+              </View>
             ) : null
           }
-          contentContainerStyle={{ paddingBottom: 100 }}
-          showsVerticalScrollIndicator={false}
         />
       </GestureHandlerRootView>
 
+      {/* Floating add button */}
       <TouchableOpacity style={styles.floatingButton} onPress={onCreateClick}>
-        <Ionicons name="add" size={24} color={styles.iconColor.color} />
+        <Ionicons name="add" size={26} color={styles.fabIcon.color} />
       </TouchableOpacity>
     </ScreenView>
   );
 }
 
-const styling = (newTheme: any) =>
+// simple time-of-day helper for greeting
+function getTimeOfDayGreeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) return "morning";
+  if (hour < 18) return "afternoon";
+  return "evening";
+}
+
+const styling = (theme: any, spacing: any, typography: any) =>
   StyleSheet.create({
-    gestureContainer: { backgroundColor: newTheme.background, flex: 1 },
-    taskListContainer: {
-      backgroundColor: newTheme.background,
-      flex: 12,
-      marginTop: 20,
+    gestureContainer: {
+      backgroundColor: theme.background,
+      flex: 1,
     },
-    iconColor: { color: newTheme.textPrimary },
-    floatingButton: {
-      position: "absolute",
-      right: 20,
-      bottom: 20,
-      width: 60,
-      height: 60,
-      borderRadius: 30,
-      backgroundColor: newTheme.surface,
+    listContent: {
+      paddingBottom: spacing.xl * 2, // horizontal padding is on ScreenView
+    },
+
+    // Loading
+    loadingScreen: {
+      flex: 1,
       justifyContent: "center",
       alignItems: "center",
-      shadowColor: newTheme.accent,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.8,
-      shadowRadius: 2,
-      elevation: 5,
+      backgroundColor: theme.background,
     },
-    dateLabel: { fontSize: 22, fontWeight: "600", color: newTheme.textPrimary },
-    header: {
+    loadingText: {
+      marginTop: 12,
+      color: theme.textSecondary,
+      ...typography.bodySmall,
+    },
+
+    // Greeting
+    greetingRow: {
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      marginBottom: 16,
-      backgroundColor: newTheme.background,
+      marginBottom: spacing.xl,
+      marginTop: spacing.md,
     },
-    title: { fontSize: 20, fontWeight: "600", color: newTheme.textPrimary },
+    greetingTitle: {
+      ...typography.title,
+      color: theme.textPrimary,
+    },
+    greetingSubtitle: {
+      ...typography.bodySmall,
+      color: theme.textSecondary,
+      marginTop: 4,
+    },
+
+    // Daily check-in
+    checkInContainer: {
+      marginTop: spacing.lg,
+      marginBottom: spacing.xs,
+    },
+
+    // Section header
+    sectionHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: spacing.md,
+      marginTop: spacing.xs,
+    },
+    sectionTitle: {
+      ...typography.subtitle,
+      color: theme.textPrimary,
+    },
+    sectionSubtitle: {
+      ...typography.caption,
+      color: theme.textSecondary,
+      marginTop: 2,
+    },
     pill: {
-      backgroundColor: newTheme.surface,
-      paddingHorizontal: 10,
-      paddingVertical: 4,
-      borderRadius: 6,
+      backgroundColor: theme.surface,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: spacing.xs,
+      borderRadius: 999,
     },
-    pillText: { color: newTheme.textSecondary, fontWeight: "500" },
+    pillText: {
+      ...typography.caption,
+      color: theme.textSecondary,
+    },
+
+    taskListContainer: {
+      marginTop: spacing.lg,
+    },
+
+    // Empty state
+    emptyStateContainer: {
+      marginTop: spacing.xl,
+      alignItems: "center",
+    },
+    emptyTitle: {
+      ...typography.subtitle,
+      color: theme.textPrimary,
+      marginBottom: spacing.xs,
+    },
+    emptyText: {
+      textAlign: "center",
+      color: theme.textSecondary,
+      ...typography.bodySmall,
+      paddingHorizontal: spacing.lg,
+    },
+
+    // FAB – slightly smaller & softer
+    floatingButton: {
+      position: "absolute",
+      right: spacing.lg,
+      bottom: spacing.lg,
+      width: 56,
+      height: 56,
+      borderRadius: 28,
+      backgroundColor: theme.accent,
+      justifyContent: "center",
+      alignItems: "center",
+      shadowColor: theme.accent,
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.25,
+      shadowRadius: 14,
+      elevation: 8,
+    },
+    fabIcon: {
+      color: theme.surface,
+    },
   });
