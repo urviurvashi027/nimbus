@@ -1,5 +1,5 @@
 import ThemeContext from "@/context/ThemeContext";
-import React, { useContext } from "react";
+import React, { useContext, useMemo } from "react";
 import { View, Text, StyleSheet } from "react-native";
 
 interface SummaryItem {
@@ -12,44 +12,82 @@ interface Props {
 }
 
 export default function SummaryPanel({ data }: Props) {
-  const { newTheme } = useContext(ThemeContext);
-  const styles = styling(newTheme);
+  const { newTheme, spacing, typography } = useContext(ThemeContext);
+  const styles = useMemo(
+    () => styling(newTheme, spacing, typography),
+    [newTheme, spacing, typography]
+  );
+
+  const formatValue = (item: SummaryItem): string => {
+    const { label, value } = item;
+
+    // Numeric success rate → "65%"
+    if (label.toLowerCase().includes("success rate")) {
+      if (typeof value === "number") return `${value}%`;
+      if (typeof value === "string" && !value.trim().endsWith("%")) {
+        return `${value.trim()}%`;
+      }
+      return String(value);
+    }
+
+    // Handle plural grammar like "1 days" / "1 times"
+    if (typeof value === "string") {
+      const match = value.match(/^(\d+)\s+(\w+)$/); // "1 days"
+      if (match) {
+        const count = parseInt(match[1], 10);
+        let noun = match[2];
+        if (count === 1 && noun.endsWith("s")) {
+          noun = noun.slice(0, -1); // days → day, times → time
+        }
+        return `${count} ${noun}`;
+      }
+    }
+
+    return String(value);
+  };
+
   return (
     <View style={styles.container}>
       {data.map((item, index) => (
         <View key={index} style={styles.card}>
           <Text style={styles.label}>{item.label}</Text>
-          <Text style={styles.value}>{item.value}</Text>
+          <Text style={styles.value}>{formatValue(item)}</Text>
         </View>
       ))}
     </View>
   );
 }
 
-const styling = (newTheme: any) =>
+const styling = (theme: any, spacing: any, typography: any) =>
   StyleSheet.create({
     container: {
       flexDirection: "row",
       flexWrap: "wrap",
       justifyContent: "space-between",
-      marginVertical: 12,
+      marginVertical: spacing.md,
     },
     card: {
-      backgroundColor: newTheme.surface,
-      borderRadius: 10,
-      padding: 12,
+      backgroundColor: theme.surface,
+      borderRadius: spacing.lg,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
       width: "48%", // 2 per row
-      marginBottom: 12,
+      marginBottom: spacing.sm,
+      // Nimbus soft shadow
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.12,
+      shadowRadius: 8,
+      elevation: 3,
     },
     label: {
-      fontSize: 14,
-      color: newTheme.textSecondary,
-
-      marginBottom: 6,
+      ...typography.caption,
+      color: theme.textSecondary,
+      marginBottom: spacing.xs,
     },
     value: {
-      fontSize: 18,
+      ...typography.bodyLarge,
       fontWeight: "700",
-      color: newTheme.textPrimary,
+      color: theme.textPrimary,
     },
   });

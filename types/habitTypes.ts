@@ -172,6 +172,7 @@ export interface HabitDetail {
   description: string;
   color: string;
   reminder_time: string;
+  success_rate: number;
   // API need to send proper format either calculate and send or send startime and endtime
   duration: string;
   current_streak: number;
@@ -180,6 +181,7 @@ export interface HabitDetail {
   start_time: string;
   end_time: string;
   all_day: boolean;
+  total_completed_habits: number;
   // API: need to send habit type name
   habit_type: number;
   // API: need to send proper format

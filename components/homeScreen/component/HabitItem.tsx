@@ -1,14 +1,20 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import React, { useMemo } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  GestureResponderEvent,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/context/ThemeContext";
 import { router } from "expo-router";
-// import { ThemeKey } from "../Themed";
 
 interface HabitItemProps {
+  selectedDate: string;
   id: string;
   name: string;
-  icon?: any; // pass require() or URI
+  icon?: any; // emoji string is fine
   time?: string;
   done: boolean;
   description?: string;
@@ -21,36 +27,53 @@ interface HabitItemProps {
 const HabitItemCard: React.FC<HabitItemProps> = ({
   id,
   name,
+  selectedDate,
   icon,
   time,
   done,
   frequency,
   description,
   actual_count,
+  color,
   onToggle,
-}: HabitItemProps) => {
-  const { theme, newTheme } = React.useContext(ThemeContext);
+}) => {
+  const { newTheme, spacing, typography } = React.useContext(ThemeContext);
+  const styles = useMemo(
+    () => styling(newTheme, spacing, typography),
+    [newTheme, spacing, typography]
+  );
 
-  const handlePress = () => {
+  const handleToggle = (e: GestureResponderEvent) => {
+    e.stopPropagation(); // don’t trigger card navigation
     onToggle(id, actual_count);
   };
 
   const handleHabitClick = () => {
-    console.log(id, actual_count, "habitClikc");
-    router.push({ pathname: "/habit/details", params: { id: id } });
+    router.push({
+      pathname: "/(auth)/habit/details",
+      params: { id, date: selectedDate },
+    });
   };
+
+  // line below title: “Every day • 8:00 AM”
+  const subtitle = time ? `${frequency} • ${time}` : frequency;
+
+  // soft tint for icon background if color is provided
+  const iconBgStyle = color
+    ? { backgroundColor: `${color}33` } // #RRGGBB + 0.2 alpha
+    : null;
+  const accentBorderStyle = color ? { borderColor: color } : null;
 
   return (
     <TouchableOpacity
-      style={styles(newTheme).container}
+      style={styles.card}
       onPress={handleHabitClick}
+      activeOpacity={0.9}
     >
       {/* Icon */}
-
-      {/* Icon with round surface background */}
-      <View style={styles(newTheme).iconContainer}>
+      <View style={[styles.iconContainer, iconBgStyle]}>
         {icon ? (
-          <Text style={styles(newTheme).iconText}>{icon}</Text>
+          <Text style={styles.iconText}>{icon}</Text>
         ) : (
           <Ionicons
             name="leaf-outline"
@@ -61,85 +84,101 @@ const HabitItemCard: React.FC<HabitItemProps> = ({
       </View>
 
       {/* Text info */}
-      <View style={styles(newTheme).textContainer}>
-        <Text style={styles(newTheme).title}>{name}</Text>
-        {frequency && (
-          <Text style={styles(newTheme).frequency}>{frequency}</Text>
+      <View style={styles.textContainer}>
+        <Text style={styles.title} numberOfLines={1}>
+          {name}
+        </Text>
+        {!!subtitle && (
+          <Text style={styles.subtitle} numberOfLines={1}>
+            {subtitle}
+          </Text>
         )}
-        {time && <Text style={styles(newTheme).time}>{time}</Text>}
+        {!!description && (
+          <Text style={styles.description} numberOfLines={1}>
+            {description}
+          </Text>
+        )}
       </View>
 
       {/* Status circle */}
-      <View style={styles(newTheme).statusContainer}>
-        {done ? (
-          <View style={[styles(newTheme).circle, styles(newTheme).circleDone]}>
-            <Ionicons name="checkmark" size={16} color={newTheme.surface} />
-          </View>
-        ) : (
-          <TouchableOpacity
-            style={styles(newTheme).container}
-            onPress={handlePress}
-          >
-            <View
-              style={[styles(newTheme).circle, styles(newTheme).circleEmpty]}
-            />
-          </TouchableOpacity>
-        )}
-      </View>
+      <TouchableOpacity
+        onPress={handleToggle}
+        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        style={styles.statusTouchable}
+      >
+        <View
+          style={[
+            styles.circle,
+            accentBorderStyle,
+            done ? styles.circleDone : styles.circleEmpty,
+          ]}
+        >
+          {done && (
+            <Ionicons name="checkmark" size={14} color={newTheme.surface} />
+          )}
+        </View>
+      </TouchableOpacity>
     </TouchableOpacity>
   );
 };
 
-const styles = (newTheme: any) =>
+const styling = (theme: any, spacing: any, typography: any) =>
   StyleSheet.create({
-    container: {
+    card: {
       flexDirection: "row",
       alignItems: "center",
-      padding: 10,
-      backgroundColor: newTheme.surface,
-      borderRadius: 12,
-      marginVertical: 12,
+      paddingVertical: spacing.md,
+      paddingHorizontal: spacing.md,
+      backgroundColor: theme.surface,
+      borderRadius: spacing.lg,
+      marginVertical: spacing.sm,
+      // subtle lift
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.12,
+      shadowRadius: 10,
+      elevation: 3,
     },
-    // New rounded background for icon
+
+    // Icon
     iconContainer: {
       width: 40,
       height: 40,
       borderRadius: 20,
-      backgroundColor: newTheme.surface ?? "#2A2A2A", // fallback if no surfaceVariant
+      backgroundColor: theme.surface, // overridden with tint when color passed
       justifyContent: "center",
       alignItems: "center",
-      marginRight: 12,
+      marginRight: spacing.md,
     },
     iconText: {
-      fontSize: 20,
-      color: newTheme.textPrimary,
+      fontSize: 22,
+      color: theme.textPrimary,
     },
-    icon: {
-      width: 32,
-      height: 32,
-      borderRadius: 8,
-      marginRight: 12,
-    },
+
+    // Text
     textContainer: {
       flex: 1,
+      justifyContent: "center",
     },
     title: {
-      fontSize: 16,
+      ...typography.bodyLarge,
       fontWeight: "600",
-      color: newTheme.textPrimary,
+      color: theme.textPrimary,
     },
-    frequency: {
-      fontSize: 12,
-      color: newTheme.textSecondary,
+    subtitle: {
+      ...typography.bodySmall,
+      color: theme.textSecondary,
       marginTop: 2,
     },
-    time: {
-      fontSize: 12,
-      color: newTheme.textSecondary,
+    description: {
+      ...typography.caption,
+      color: theme.textMuted ?? theme.textSecondary,
       marginTop: 2,
     },
-    statusContainer: {
-      marginLeft: 12,
+
+    // Status
+    statusTouchable: {
+      marginLeft: spacing.md,
     },
     circle: {
       width: 24,
@@ -150,12 +189,11 @@ const styles = (newTheme: any) =>
     },
     circleDone: {
       borderWidth: 1,
-      borderColor: newTheme.accent,
-      backgroundColor: newTheme.accent,
+      borderColor: theme.accent,
+      backgroundColor: theme.accent,
     },
     circleEmpty: {
       borderWidth: 1,
-      borderColor: newTheme.textSecondary,
       backgroundColor: "transparent",
     },
   });

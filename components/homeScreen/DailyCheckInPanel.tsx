@@ -30,6 +30,7 @@ import {
 import { DailyCheckinSkeletonCard } from "./component/DailyCheckinSkeletonCard";
 import axios from "axios";
 import { Unit } from "@/types/dailyCheckin";
+import ProgressPill from "./component/ProgressPill";
 
 type CardItem = {
   name: string;
@@ -186,11 +187,7 @@ const DailyCheckInPanel = ({ date }: Props) => {
         </View>
 
         {/* Count pill always visible */}
-        <View style={styles.pill}>
-          <Text style={styles.pillText}>
-            {completedCount}/{items.length || 0}
-          </Text>
-        </View>
+        <ProgressPill label={`${completedCount}/${items.length || 0}`} />
       </TouchableOpacity>
 
       {/* Horizontal scroll list */}

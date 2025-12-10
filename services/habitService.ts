@@ -99,11 +99,12 @@ export const getHabitUnitData = async (): Promise<HabitUnitesponse> => {
 
 // get habit details by id
 export const getHabitDetailsById = async (
-  id: string
+  id: string,
+  date?: string
 ): Promise<HabitDetailResponse> => {
   try {
     const response: AxiosResponse<HabitDetailResponse> = await axios.get(
-      `${API_ENDPOINTS.habitDetailsById}${id}/`
+      `${API_ENDPOINTS.habitDetailsById}${id}/?${date}&is_daily_checkin=false`
     );
     return response.data; // Return the list data
   } catch (error: any) {
