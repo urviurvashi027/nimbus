@@ -50,7 +50,7 @@ const HabitItemCard: React.FC<HabitItemProps> = ({
 
   const handleHabitClick = () => {
     router.push({
-      pathname: "/(auth)/habit/details",
+      pathname: "/(auth)/habit/HabitDetailScreen",
       params: { id, date: selectedDate },
     });
   };

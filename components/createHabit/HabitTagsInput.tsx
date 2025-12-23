@@ -1,48 +1,43 @@
 import React, { useContext, useEffect, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Modal } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+  StyleProp,
+  ViewStyle,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import ThemeContext from "@/context/ThemeContext";
+
 import { getHabitTag } from "@/services/habitService";
+
 import { HabitTag } from "@/types/habitTypes";
-import { ThemeKey } from "../Themed";
+
 import HabitTagsModal from "./Modal/HabitTagsModal";
 import styling from "./style/HabitInputStyle";
-// import styling from "./style/HabitTagsInputStyle";
 
 export type selectedTag = {
   old?: HabitTag[];
   new?: string;
 };
 
-// type selectedTag = {
-//   tags: number[];
-// };
-
 interface HabitTagsInputProps {
   onSelect: (selectedTag: selectedTag) => void;
+  style?: StyleProp<ViewStyle>;
 }
 
-const HabitTagsInput: React.FC<HabitTagsInputProps> = ({ onSelect }) => {
+const HabitTagsInput: React.FC<HabitTagsInputProps> = ({ onSelect, style }) => {
   const [tagsList, setTagsList] = useState<HabitTag[]>([]);
 
   const [selectedTag, setSelectedTag] = useState<HabitTag[]>([]);
 
   const [showHabitTagsModal, setShowHabitTagsModal] = useState(false);
 
-  const { theme, newTheme } = useContext(ThemeContext);
-  const styles = styling(theme, newTheme);
-
-  // const onLoginClick = async () => {
-  //   try {
-  //     const result = await getHabitTag();
-  //     if (result?.success) {
-  //          setTagsList(result.data);
-  //     }
-  //   } catch (error: any) {
-  //     console.log(error, "API Error Response");
-  //   }
-  // };
+  const { spacing, newTheme } = useContext(ThemeContext);
+  const styles = styling(newTheme, spacing);
 
   const getHabitTagList = async () => {
     try {
@@ -108,7 +103,7 @@ const HabitTagsInput: React.FC<HabitTagsInputProps> = ({ onSelect }) => {
     <>
       <View>
         <TouchableOpacity
-          style={styles.rowItem}
+          style={[styles.rowItem, style]}
           onPress={() => setShowHabitTagsModal(true)}
         >
           <View style={styles.rowLeft}>
@@ -118,7 +113,7 @@ const HabitTagsInput: React.FC<HabitTagsInputProps> = ({ onSelect }) => {
               size={20}
               color={newTheme.textSecondary}
             />
-            <Text style={styles.rowLabel}>Types</Text>
+            <Text style={styles.rowLabel}>Add a vibe</Text>
           </View>
 
           <View style={styles.rowRight}>

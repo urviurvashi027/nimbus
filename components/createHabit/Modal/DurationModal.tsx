@@ -15,6 +15,8 @@ import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/context/ThemeContext";
 import { Text } from "@/components/Themed";
 import { StyledButton } from "@/components/common/ThemedComponent/StyledButton";
+import StyledSwitch from "@/components/common/themeComponents/StyledSwitch";
+import TimeInput from "@/components/common/picker/TimeInput";
 
 export type Duration = {
   all_day?: boolean;
@@ -56,9 +58,8 @@ export default function HabitDurationModal({
   onSave,
   isEditMode,
 }: DurationModalProps) {
-  const { theme, newTheme } = useContext(ThemeContext);
+  const { newTheme } = useContext(ThemeContext);
   const styles = styling(newTheme);
-  //   const colors = newTheme;
 
   // state
   const [allDayEnabled, setAllDayEnabled] = useState<boolean>(true);
@@ -168,10 +169,6 @@ export default function HabitDurationModal({
     onClose();
   };
 
-  // helpers to format times (short)
-  const fmt = (d: Date) =>
-    d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-
   return (
     <Modal
       visible={visible}
@@ -217,30 +214,13 @@ export default function HabitDurationModal({
                 </Text>
               </View>
 
-              <TouchableOpacity
-                onPress={() => {
+              <StyledSwitch
+                value={allDayEnabled}
+                onValueChange={() => {
                   setAllDayEnabled((s) => !s);
                 }}
-                style={[
-                  styles.toggle,
-                  {
-                    backgroundColor: allDayEnabled
-                      ? newTheme.accent
-                      : newTheme.surface,
-                  },
-                ]}
-              >
-                <View
-                  style={[
-                    styles.toggleKnob,
-                    {
-                      backgroundColor: allDayEnabled
-                        ? newTheme.background
-                        : newTheme.divider,
-                    },
-                  ]}
-                />
-              </TouchableOpacity>
+                size="medium"
+              />
             </View>
 
             {/* Presets */}
@@ -333,52 +313,31 @@ export default function HabitDurationModal({
             {/* Time pickers */}
             {!allDayEnabled && (
               <View style={{ marginTop: 12 }}>
-                <Text
-                  style={[styles.fieldLabel, { color: newTheme.textSecondary }]}
-                >
-                  Start
-                </Text>
-                <TouchableOpacity
-                  onPress={() => setShowStartPicker(true)}
-                  style={[styles.selector, { borderColor: newTheme.divider }]}
-                >
-                  <Text style={{ color: newTheme.textPrimary }}>
-                    {fmt(start)}
-                  </Text>
-                  <Ionicons
-                    name="time-outline"
-                    size={18}
-                    color={newTheme.textSecondary}
-                  />
-                </TouchableOpacity>
+                <TimeInput
+                  label="Start"
+                  value={start}
+                  onChange={(next) => {
+                    setStart(next);
+                    setError("");
+                    if (mode === "period" && next >= end) {
+                      setEnd(new Date(next.getTime() + 60 * 60 * 1000));
+                    }
+                  }}
+                  title="Start time"
+                />
 
                 {mode === "period" && (
-                  <>
-                    <Text
-                      style={[
-                        styles.fieldLabel,
-                        { color: newTheme.textSecondary, marginTop: 10 },
-                      ]}
-                    >
-                      End
-                    </Text>
-                    <TouchableOpacity
-                      onPress={() => setShowEndPicker(true)}
-                      style={[
-                        styles.selector,
-                        { borderColor: newTheme.divider },
-                      ]}
-                    >
-                      <Text style={{ color: newTheme.textPrimary }}>
-                        {fmt(end)}
-                      </Text>
-                      <Ionicons
-                        name="time-outline"
-                        size={18}
-                        color={newTheme.textSecondary}
-                      />
-                    </TouchableOpacity>
-                  </>
+                  <TimeInput
+                    label="End"
+                    value={end}
+                    onChange={(next) => {
+                      setEnd(next);
+                      if (next <= start)
+                        setError("End time must be after start time.");
+                      else setError("");
+                    }}
+                    title="End time"
+                  />
                 )}
               </View>
             )}
@@ -391,15 +350,12 @@ export default function HabitDurationModal({
 
             {/* actions */}
             <View style={styles.actionsRow}>
-              <TouchableOpacity
+              <StyledButton
+                label="Cancel"
                 onPress={onClose}
-                style={[
-                  styles.actionBtn,
-                  { backgroundColor: newTheme.surface },
-                ]}
-              >
-                <Text style={{ color: newTheme.textPrimary }}>Cancel</Text>
-              </TouchableOpacity>
+                variant="outline"
+                style={{ minWidth: 140 }}
+              />
 
               <StyledButton
                 label="Save"
@@ -413,7 +369,7 @@ export default function HabitDurationModal({
       </KeyboardAvoidingView>
 
       {/* native datetime pickers */}
-      {showStartPicker && (
+      {/* {showStartPicker && (
         <View style={styles.pickerContainer}>
           <DateTimePicker
             value={start}
@@ -431,8 +387,8 @@ export default function HabitDurationModal({
             </TouchableOpacity>
           </View>
         </View>
-      )}
-      {showEndPicker && (
+      )} */}
+      {/* {showEndPicker && (
         <View style={styles.pickerContainer}>
           <DateTimePicker
             value={end}
@@ -450,7 +406,7 @@ export default function HabitDurationModal({
             </TouchableOpacity>
           </View>
         </View>
-      )}
+      )} */}
     </Modal>
   );
 }
@@ -529,27 +485,6 @@ const styling = (newTheme: any) =>
       flexDirection: "row",
       justifyContent: "space-between",
       marginTop: 18,
-    },
-    actionBtn: {
-      flex: 1,
-      marginRight: 12,
-      paddingVertical: 12,
-      borderRadius: 10,
-      alignItems: "center",
-    },
-    toggle: {
-      width: 52,
-      height: 32,
-      borderRadius: 999,
-      justifyContent: "center",
-      padding: 4,
-    },
-    toggleKnob: {
-      width: 24,
-      height: 24,
-      borderRadius: 999,
-      alignSelf: "flex-start",
-      marginLeft: 4,
     },
     pickerButtons: {
       flexDirection: "row",

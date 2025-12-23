@@ -1,40 +1,8 @@
 import { View, TouchableOpacity, StyleSheet, Platform } from "react-native";
 import { ThemeKey } from "@/components/Themed";
 
-const styling = (theme: ThemeKey, newTheme?: any) =>
+const styling = (newTheme: any, spacing: any) =>
   StyleSheet.create({
-    // label: {
-    //   fontSize: 16,
-    //   marginBottom: 5,
-    //   marginTop: 5,
-    //   marginRight: 5,
-    //   color: themeColors.basic.mediumGrey,
-    //   width: "50%",
-    // },
-    // inputField: {
-    //   borderBottomWidth: 1, // Only bottom border
-    //   borderColor: themeColors[theme].inpurBorderColor,
-    //   width: "90%",
-    //   flex: 1,
-    //   flexDirection: "row",
-    //   alignItems: "center",
-    //   paddingVertical: 5,
-    //   paddingHorizontal: 5,
-    // },
-    // selectorButton: {
-    //   flexDirection: "row",
-    //   alignItems: "center",
-    //   paddingVertical: 9,
-    //   paddingHorizontal: 5,
-    //   width: "100%",
-    // },
-    // selectorText: {
-    //   fontSize: 16,
-    //   width: 130,
-    //   color: themeColors.basic.mediumGrey,
-    //   //   paddingLeft: 30,
-    //   margin: "auto",
-    // },
     iconLeft: {
       padding: 0,
       marginRight: 5,
@@ -69,13 +37,13 @@ const styling = (theme: ThemeKey, newTheme?: any) =>
     // new style
 
     rowItem: {
-      paddingVertical: 16,
-      paddingHorizontal: 4,
+      paddingVertical: spacing.md + 2, // ↑ more breathing space
+      paddingHorizontal: spacing.md, // consistent left/right
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
       borderBottomWidth: 1,
-      borderBottomColor: "rgba(255,255,255,0.03)",
+      borderBottomColor: "rgba(255,255,255,0.06)",
     },
     rowLeft: { flexDirection: "row", alignItems: "center", gap: 12 },
     rowLabel: {

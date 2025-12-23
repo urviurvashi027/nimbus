@@ -1,34 +1,40 @@
-import { TouchableOpacity, View } from "react-native";
+import {
+  StyleProp,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+  Text,
+} from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 
-import { Text } from "@/components/Themed";
-import { themeColors } from "@/constant/theme/Colors";
 import ThemeContext from "@/context/ThemeContext";
+
 import { MetricFormat } from "@/types/habitTypes";
-// import HabitMetricModal from "./Modal/HabitMetricModal";
-import styling from "./style/HabitInputStyle";
-import { getHabitUnitData } from "@/services/habitService";
 import { HabitUnit } from "@/types/habitTypes";
+
+import { getHabitUnitData } from "@/services/habitService";
+
+import styling from "./style/HabitInputStyle";
 import MetricModal from "./Modal/MetricModal";
-// import styling from "./style/HabitMetricInputStyle";
 
 type EditData = {
   count: string;
   unit: number;
-  // unitId: number;
 };
 
 interface HabitMetricInputProp {
   isEditMode?: EditData;
-  onSelect: (metricValue: any) => void;
+  style?: StyleProp<ViewStyle>;
+  onSelect: (metricValue: { count: string; unit: number }) => void;
 }
 
 const HabitMetricInput: React.FC<HabitMetricInputProp> = ({
   onSelect,
+  style,
   isEditMode,
 }) => {
-  const { theme, newTheme } = useContext(ThemeContext);
+  const { newTheme, spacing } = useContext(ThemeContext);
 
   const [habitMetric, setHabitMetric] = useState<MetricFormat | null>(null);
   const [tagList, setTaglist] = useState<HabitUnit[]>([]);
@@ -36,26 +42,18 @@ const HabitMetricInput: React.FC<HabitMetricInputProp> = ({
 
   // function to handle metric
   const handleHabitMetricSave = (value: MetricFormat) => {
-    const res = {
-      count: value.count,
-      label: value.label,
-      unit: value.unit,
-    };
     setHabitMetric(value);
     setShowHabitMetricModal(false);
 
-    // TODO need to change this according to the API
     const result = { count: value.count, unit: value.unit };
-    console.log(result, res, "result");
     onSelect(result);
   };
 
-  const styles = styling(theme, newTheme);
+  const styles = styling(newTheme, spacing);
 
   const getHabitUniLtist = async () => {
     try {
       const result = await getHabitUnitData();
-      // console.log(tagList, "tagList");
       if (result?.success) {
         setTaglist(result.data);
       }
@@ -68,10 +66,6 @@ const HabitMetricInput: React.FC<HabitMetricInputProp> = ({
     getHabitUniLtist();
   }, []);
 
-  // useEffect(() => {
-  //   console.log(showHabitMetricModal, "showHabitMetricModal");
-  // }, [showHabitMetricModal]);
-
   useEffect(() => {
     if (isEditMode) {
       setHabitMetric(isEditMode);
@@ -81,20 +75,18 @@ const HabitMetricInput: React.FC<HabitMetricInputProp> = ({
 
   return (
     <>
-      {/* Habit Metric Button */}
       <TouchableOpacity
-        style={styles.rowItem}
-        // style={styles.selectorButton}
+        style={[styles.rowItem, style]}
         onPress={() => setShowHabitMetricModal(true)}
       >
         <View style={styles.rowLeft}>
           <Ionicons
             style={styles.iconLeft}
-            name="ticket-outline"
+            name="speedometer-outline"
             size={20}
             color={newTheme.textSecondary}
           />
-          <Text style={styles.rowLabel}>Metric</Text>
+          <Text style={styles.rowLabel}>How you’ll track it</Text>
         </View>
 
         <View style={styles.rowRight}>
@@ -114,24 +106,10 @@ const HabitMetricInput: React.FC<HabitMetricInputProp> = ({
       <MetricModal
         visible={showHabitMetricModal}
         onClose={() => setShowHabitMetricModal(false)}
-        // visible={metricModalVisible}
         habitUnitList={tagList}
-        // onClose={() => setMetricModalVisible(false)}
         onSave={handleHabitMetricSave}
-        // onSave={(val) => {
-        //   setHabitMetric(val);
-        //   setMetric(val); // if you already have metric state
-        // }}
         isEditMode={habitMetric}
       />
-
-      {/* <HabitMetricModal
-        visible={showHabitMetricModal}
-        onClose={() => setShowHabitMetricModal(false)}
-        isEditMode={habitMetric}
-        habitUnitList={tagList}
-        onSave={handleHabitMetricSave}
-      /> */}
     </>
   );
 };
