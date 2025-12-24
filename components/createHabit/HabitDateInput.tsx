@@ -1,114 +1,100 @@
-import { Text } from "react-native";
-import { View, TouchableOpacity } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
+import {
+  StyleProp,
+  Text,
+  ViewStyle,
+  View,
+  TouchableOpacity,
+} from "react-native";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { format } from "date-fns";
 
 import ThemeContext from "@/context/ThemeContext";
 import { HabitDateType } from "@/types/habitTypes";
-// import HabitDateModal from "./Modal/HabitDateModal";
-// import styling from "./style/HabitDateInputStyle";
 import styling from "./style/HabitInputStyle";
 import StartDateModal from "./Modal/StartDateModal";
 
 interface HabitDateInputProps {
   onSelect: (value: any) => void;
   isEditMode?: HabitDateType;
+  style?: StyleProp<ViewStyle>;
 }
 
 const HabitDateInput: React.FC<HabitDateInputProps> = ({
   onSelect,
+  style,
   isEditMode,
 }) => {
+  const { spacing, newTheme } = useContext(ThemeContext);
+  const styles = styling(newTheme, spacing);
+
   const [habitDate, setHabitDate] = useState<HabitDateType>({
     start_date: new Date(),
   });
-  const [userDisplay, setUserDisplay] = useState<string>();
 
   const [showStartTaskModal, setShowStartTaskModal] = useState(false);
 
-  const { theme, newTheme } = useContext(ThemeContext);
-
-  const styles = styling(theme, newTheme);
-
-  // function which will be called on
-  const handleStartSave = (habitDate: HabitDateType) => {
-    console.log(habitDate, "habitDate");
-    setHabitDate(habitDate);
-
-    setShowStartTaskModal(false);
-    handleSave(habitDate);
-  };
-
-  const handleSave = (habitDate: HabitDateType) => {
-    const { start_date, end_date, ...rest } = habitDate;
-    let result = {};
-    if (start_date && end_date) {
-      result = {
-        start_date: format(start_date, "yyyy-MM-dd"),
-        end_date: format(end_date, "yyyy-MM-dd"),
-      };
-    } else {
-      result = {
-        start_date: format(start_date, "yyyy-MM-dd"),
-      };
-    }
-
-    if (rest.frequency_type) {
-      result = {
-        ...result,
-        ...rest,
-      };
-      console.log(result, "going to parent");
-    }
-    onSelect(result);
-  };
-
+  // ✅ keep local state in sync when parent sends edit data
   useEffect(() => {
     if (isEditMode) {
-      setHabitDate(habitDate);
-    } else {
-      // console.log("Edit mode is off");
+      setHabitDate({
+        ...isEditMode,
+        start_date: isEditMode.start_date
+          ? new Date(isEditMode.start_date)
+          : new Date(),
+        end_date: isEditMode.end_date
+          ? new Date(isEditMode.end_date)
+          : undefined,
+      });
     }
   }, [isEditMode]);
 
+  const userDisplay = useMemo(() => {
+    const start = habitDate.start_date
+      ? new Date(habitDate.start_date)
+      : new Date();
+    const end = habitDate.end_date ? new Date(habitDate.end_date) : undefined;
+
+    return end
+      ? `${format(start, "dd-MM-yyyy")} - ${format(end, "dd-MM-yyyy")}`
+      : `${format(start, "dd-MM-yyyy")}`;
+  }, [habitDate]);
+
+  const pushToParent = (hd: HabitDateType) => {
+    const { start_date, end_date, ...rest } = hd;
+
+    let result: any = end_date
+      ? {
+          start_date: format(new Date(start_date), "yyyy-MM-dd"),
+          end_date: format(new Date(end_date), "yyyy-MM-dd"),
+        }
+      : {
+          start_date: format(new Date(start_date), "yyyy-MM-dd"),
+        };
+
+    if (rest.frequency_type) {
+      result = { ...result, ...rest };
+    }
+
+    onSelect(result);
+  };
+
+  const handleStartSave = (next: HabitDateType) => {
+    setHabitDate(next);
+    setShowStartTaskModal(false);
+    pushToParent(next);
+  };
+
+  // ✅ initial push once (optional)
   useEffect(() => {
-    const { start_date, end_date, ...rest } = habitDate;
-    // let result = {};
-
-    const userDisplay = end_date
-      ? `${format(start_date, "dd-MM-yyyy")} - ${format(
-          end_date,
-          "dd-MM-yyyy"
-        )}`
-      : `${format(start_date, "dd-MM-yyyy")}`;
-
-    setUserDisplay(userDisplay);
-    handleSave(habitDate);
-    // if (start_date && end_date) {
-    //   result = {
-    //     start_date: format(start_date, "yyyy-MM-dd"),
-    //     end_date: format(end_date, "yyyy-MM-dd"),
-    //   };
-    // } else {
-    //   result = {
-    //     start_date: format(start_date, "yyyy-MM-dd"),
-    //   };
-    // }
-
-    // if (rest.frequency_type) {
-    //   result = {
-    //     ...result,
-    //     ...rest,
-    //   };
-    // }
-    // onSelect(result);
+    pushToParent(habitDate);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <>
       <TouchableOpacity
-        style={styles.rowItem}
+        style={[styles.rowItem, style]}
         onPress={() => setShowStartTaskModal(true)}
       >
         <View style={styles.rowLeft}>
@@ -118,13 +104,11 @@ const HabitDateInput: React.FC<HabitDateInputProps> = ({
             size={20}
             color={newTheme.textSecondary}
           />
-          <Text style={styles.rowLabel}>When</Text>
+          <Text style={styles.rowLabel}>Start your journey</Text>
         </View>
 
         <View style={styles.rowRight}>
-          <Text style={styles.rowValue}>
-            {habitDate ? userDisplay : "Select Date"}
-          </Text>
+          <Text style={styles.rowValue}>{userDisplay}</Text>
           <Ionicons
             name="chevron-forward"
             size={18}
@@ -133,26 +117,12 @@ const HabitDateInput: React.FC<HabitDateInputProps> = ({
         </View>
       </TouchableOpacity>
 
-      {/* The modal itself */}
       <StartDateModal
         visible={showStartTaskModal}
         onClose={() => setShowStartTaskModal(false)}
-        // visible={dateModalVisible}
-        // onClose={() => setDateModalVisible(false)}
-        isEditMode={habitDate || undefined} // pass existing data for editing
+        isEditMode={habitDate} // ✅ always pass latest selection
         onSave={handleStartSave}
-        // onSave={(value) => {
-        //   setHabitDate(value); // save to state
-        //   setDateModalVisible(false);
-        // }}
       />
-
-      {/* <HabitDateModal
-        visible={showStartTaskModal}
-        onClose={() => setShowStartTaskModal(false)}
-        onSave={handleStartSave}
-        isEditMode={isEditMode}
-      /> */}
     </>
   );
 };

@@ -114,7 +114,7 @@ export default function TabOneScreen() {
     },
     [decorateHabits]
   );
-  const onCreateClick = () => router.push("/habit/create");
+  const onCreateClick = () => router.push("/(auth)/habit/CreateHabitScreen");
   // fetch when date changes
   useEffect(() => {
     loadHabits(isoDate);

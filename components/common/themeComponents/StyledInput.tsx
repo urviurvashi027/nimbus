@@ -80,10 +80,12 @@ function getStateColors({
   focused,
   error,
   disabled,
+  newTheme,
 }: {
   focused: boolean;
   error: boolean;
   disabled?: boolean;
+  newTheme?: any;
 }) {
   const border = error
     ? colors.borderError
@@ -91,7 +93,7 @@ function getStateColors({
     ? colors.borderFocus
     : colors.border;
   return {
-    bg: disabled ? colors.fieldBgDisabled : colors.fieldBg,
+    bg: disabled ? colors.fieldBgDisabled : newTheme.background,
     border,
     text: disabled ? colors.textDisabled : colors.text,
     placeholder: colors.placeholder,
@@ -238,7 +240,14 @@ export const InputField: React.FC<InputFieldProps> = ({
   const padX = paddings[size];
   const baseHeight = heights[size];
 
-  const stateColors = getStateColors({ focused, error: !!error, disabled });
+  // const { newTheme } = useContext(ThemeContext);
+
+  const stateColors = getStateColors({
+    focused,
+    error: !!error,
+    disabled,
+    newTheme,
+  });
 
   // Compute dynamic heights for multiline auto-grow
   const computedMinHeight =
@@ -345,7 +354,7 @@ const styling = (newTheme: any) =>
     },
     label: {
       color: colors.textSecondary,
-      fontSize: 14,
+      fontSize: 13,
       fontWeight: "600",
       marginBottom: 8,
     },

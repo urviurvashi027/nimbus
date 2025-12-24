@@ -1,27 +1,36 @@
 import React, { useContext, useEffect, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Modal } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleProp,
+  ViewStyle,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import ThemeContext from "@/context/ThemeContext";
+
 import { getHabitType } from "@/services/habitService";
+
 import { HabitType } from "@/types/habitTypes";
-import { ThemeKey } from "../Themed";
-// import HabitTypeModal from "./Modal/HabitTypeModal";
+
 import styling from "./style/HabitInputStyle";
-import TypeModal from "./Modal/TypeModal";
-// import styling from "./style/HabitTypeInputStyle";
+import SelectableListModal, {
+  SelectableItem,
+} from "../common/modal/SelectableListModal";
 
 interface HabitTypeModalProps {
   onSelect: (id: number) => void;
+  style?: StyleProp<ViewStyle>;
 }
 
-const HabitTypeInput: React.FC<HabitTypeModalProps> = ({ onSelect }) => {
+const HabitTypeInput: React.FC<HabitTypeModalProps> = ({ onSelect, style }) => {
   const [habitTypeList, setHabitTypeList] = useState<HabitType[]>([]);
   const [showHabitTypeModal, setShowHabitTypeModal] = useState(false);
   const [selectedHabitType, setSelectedHabitType] = useState<HabitType>();
 
-  const { theme, newTheme } = useContext(ThemeContext);
-  const styles = styling(theme, newTheme);
+  const { newTheme, spacing } = useContext(ThemeContext);
+  const styles = styling(newTheme, spacing);
 
   const getHabitTypeList = async () => {
     const result = await getHabitType();
@@ -57,20 +66,26 @@ const HabitTypeInput: React.FC<HabitTypeModalProps> = ({ onSelect }) => {
     }
   }, [selectedHabitType]);
 
+  const typeOptions: SelectableItem[] = habitTypeList.map((t) => ({
+    id: t.id,
+    title: t.name,
+    subtitle: t.description, // optional
+  }));
+
   return (
     <>
       <TouchableOpacity
-        style={styles.rowItem}
+        style={[styles.rowItem, style]}
         onPress={() => setShowHabitTypeModal(true)}
       >
         <View style={styles.rowLeft}>
           <Ionicons
             style={styles.iconLeft}
-            name="ticket-outline"
+            name="sparkles-outline"
             size={20}
             color={newTheme.textSecondary}
           />
-          <Text style={styles.rowLabel}>Types</Text>
+          <Text style={styles.rowLabel}>Habit intention</Text>
         </View>
 
         <View style={styles.rowRight}>
@@ -83,19 +98,24 @@ const HabitTypeInput: React.FC<HabitTypeModalProps> = ({ onSelect }) => {
         </View>
       </TouchableOpacity>
 
-      <TypeModal
+      <SelectableListModal
+        visible={showHabitTypeModal}
+        onClose={() => setShowHabitTypeModal(false)}
+        title="Select habit intention"
+        options={typeOptions}
+        selectedId={selectedHabitType?.id ?? null}
+        onSelect={(item) => {
+          const picked = habitTypeList.find((x) => x.id === item.id);
+          if (picked) setSelectedHabitType(picked);
+          setShowHabitTypeModal(false);
+        }}
+      />
+
+      {/* <TypeModal
         visible={showHabitTypeModal}
         onClose={() => setShowHabitTypeModal(false)}
         options={habitTypeList}
         selectedId={selectedHabitType?.id ?? null}
-        // selectedId={taskType?.id ?? null}
-        onSelect={handleOnSelect}
-      />
-
-      {/* <HabitTypeModal
-        habitTypeList={habitTypeList}
-        visible={showHabitTypeModal}
-        onClose={() => setShowHabitTypeModal(false)}
         onSelect={handleOnSelect}
       /> */}
     </>
