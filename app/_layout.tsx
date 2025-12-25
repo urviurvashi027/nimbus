@@ -7,7 +7,7 @@ import React, { useEffect, useState } from "react";
 import Toast from "react-native-toast-message";
 
 import HabitContext from "@/context/HabitContext";
-import { useColorScheme } from "@/components/UseColorScheme";
+// import { useColorScheme } from "@/components/UseColorScheme";
 import AuthProvider from "@/context/AuthContext";
 import { HabitCreateRequest } from "@/types/habitTypes";
 import { OnboardingProvider } from "@/context/OnBoardingContext";
@@ -50,7 +50,7 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   const [habitData, setHabitData] = useState<HabitCreateRequest>(habitInfo);
-  const colorScheme = useColorScheme();
+  // const colorScheme = useColorScheme();
 
   return (
     <AuthProvider>

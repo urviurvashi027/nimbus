@@ -15,7 +15,7 @@ import React, { useState } from "react";
 
 // import Colors, { themeColors } from "@/constant/theme/Colors";
 // import { theme } from "@/constant/theme/Colors";
-import { useColorScheme } from "./UseColorScheme";
+// import { useColorScheme } from "./UseColorScheme";
 import { useContext } from "react";
 import ThemeContext from "@/context/ThemeContext";
 import { Spacing, Typography } from "@/types/themeTypes";

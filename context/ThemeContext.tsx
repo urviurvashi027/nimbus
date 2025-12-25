@@ -12,31 +12,6 @@ import { theme as themeKit } from "@/constant/theme/Colors";
 import { useColorScheme } from "react-native";
 import { ColorSet, Spacing, Typography } from "@/types/themeTypes";
 
-// export const saveString = async (key: any, value: any) => {
-//   try {
-//     await AsyncStorage.setItem(key, value);
-//     return true;
-//   } catch (error) {
-//     return false;
-//   }
-// };
-
-// export const save = async (key: any, value: any) =>
-//   saveString(key, JSON.stringify(value));
-
-// export const get = async (key: any) => {
-//   try {
-//     const itemString = await AsyncStorage.getItem(key);
-//     if (itemString) {
-//       return JSON.parse(itemString);
-//     } else {
-//       return null;
-//     }
-//   } catch (error) {
-//     return null;
-//   }
-// };
-
 // 1. Define the shape of our context data
 interface ThemeContextData {
   theme: "basic" | "light" | "dark";
@@ -72,23 +47,6 @@ export const ThemeProvider: FC<ThemeProviderProps> = ({ children }) => {
 
   const mainTheme = themeKit.dark;
 
-  // const [initialValue, setInitialValue] = useState(0);
-
-  //   const data = [
-  //     {
-  //       label: "Light Mode",
-  //       value: "light",
-  //     },
-  //     {
-  //       label: "Dark Mode",
-  //       value: "dark",
-  //     },
-  //     {
-  //       label: "System Default",
-  //       value: "default",
-  //     },
-  //   ];
-
   useEffect(() => {
     // set theme to system selected theme
     if (colorScheme) {
@@ -123,54 +81,6 @@ export const ThemeProvider: FC<ThemeProviderProps> = ({ children }) => {
     if (colorScheme) AsyncStorage.setItem("theme", colorScheme);
   };
 
-  // const setAppTheme = useCallback(async () => {
-  //   const IS_FIRST = await get("IS_FIRST");
-  //   if (IS_FIRST === null) {
-  //     save("Theme", colorScheme);
-  //     save("IsDefault", true);
-  //     save("IS_FIRST", true);
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
-
-  //  useEffect(() => {
-  //    setAppTheme();
-  //  }, [setAppTheme]);
-
-  //    const setThemeApp = useCallback(async (theme: any, isDefault: any) => {
-  //      save("Theme", theme);
-  //      save("IsDefault", isDefault);
-  //      setThemeValue(theme);
-  //    }, []);
-
-  //  const themeOperations = (theme: any) => {
-  //    switch (theme) {
-  //      case "dark":
-  //        setThemeApp(theme, false);
-  //        setInitialValue(2);
-  //        return;
-  //      case "light":
-  //        setThemeApp(theme, false);
-  //        setInitialValue(1);
-  //        return;
-  //      case "default":
-  //        setThemeApp(theme, true);
-  //        setInitialValue(3);
-  //        return;
-  //    }
-  //  };
-
-  //    const getAppTheme = useCallback(async () => {
-  //      const theme = await get("Theme");
-  //      const isDefault = await get("IsDefault");
-  //      isDefault ? themeOperations("default") : themeOperations(theme);
-  //      // eslint-disable-next-line react-hooks/exhaustive-deps
-  //    }, []);
-
-  //   useEffect(() => {
-  //     getAppTheme();
-  //   }, [getAppTheme]);
-
   // 2. Create the full context value that matches the interface
   const contextValue: ThemeContextData = {
     theme,
@@ -189,3 +99,69 @@ export const ThemeProvider: FC<ThemeProviderProps> = ({ children }) => {
 };
 
 export default ThemeContext;
+
+// import React, { createContext, useEffect, useMemo, useState } from "react";
+// import AsyncStorage from "@react-native-async-storage/async-storage";
+// import { useColorScheme } from "react-native";
+// import { getTheme } from "@/theme";
+// import type { AppTheme, ThemeName } from "@/theme/types";
+
+// type ThemeContextData = {
+//   themeName: ThemeName;
+//   theme: AppTheme;
+//   setTheme: (t: ThemeName) => void;
+//   useSystemTheme: () => void;
+// };
+
+// const STORAGE_KEY = "theme"; // keep same
+
+// export const ThemeContext = createContext<ThemeContextData>({
+//   themeName: "dark",
+//   theme: getTheme("dark"),
+//   setTheme: () => {},
+//   useSystemTheme: () => {},
+// });
+
+// export function ThemeProvider({ children }: { children: React.ReactNode }) {
+//   const system = useColorScheme(); // "dark" | "light" | null
+//   const [themeName, setThemeName] = useState<ThemeName>("dark");
+
+//   // load saved theme once
+//   useEffect(() => {
+//     (async () => {
+//       const saved = (await AsyncStorage.getItem(
+//         STORAGE_KEY
+//       )) as ThemeName | null;
+//       if (saved === "dark" || saved === "light") {
+//         setThemeName(saved);
+//       } else if (system === "light" || system === "dark") {
+//         setThemeName(system);
+//       }
+//     })();
+//   }, []);
+
+//   // if you want: when OS changes AND user didn't pick manually, handle it later with a flag
+//   // for now: keep it simple.
+
+//   const setTheme = async (t: ThemeName) => {
+//     setThemeName(t);
+//     await AsyncStorage.setItem(STORAGE_KEY, t);
+//   };
+
+//   const useSystemTheme = async () => {
+//     const next = system === "light" ? "light" : "dark";
+//     setThemeName(next);
+//     await AsyncStorage.setItem(STORAGE_KEY, next);
+//   };
+
+//   const theme = useMemo(() => getTheme(themeName), [themeName]);
+
+//   const value = useMemo(
+//     () => ({ themeName, theme, setTheme, useSystemTheme }),
+//     [themeName, theme]
+//   );
+
+//   return (
+//     <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
+//   );
+// }
