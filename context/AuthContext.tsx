@@ -9,6 +9,8 @@ import { useContext, useState } from "react";
 import { router, useSegments } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import axios from "axios";
+
+import { StoreKey } from "@/constant/Constant";
 import {
   login,
   signup,
@@ -17,14 +19,7 @@ import {
   saveUpdateUser,
 } from "@/services/loginService";
 import { setStoredUser, User, getStoredUser } from "@/services/storageSerives";
-
-// type UserL = {
-//   userId: number | null;
-//   username: string | null;
-//   email?: string | null;
-//   full_name?: string;
-//   phone_number?: string;
-// };
+import { storageKey } from "@/services/remiderStorageService";
 
 type UserProfile = {
   full_name?: string | null;
@@ -40,11 +35,13 @@ type UserProfile = {
 };
 
 // Cache Token Key
-const TOKEN_KEY = "my-jwt";
-const USER_KEY = "user";
-const REFRESH_TOKEN = "refresh-token";
-const USER_PROFILE_KEY = "user-profile";
-const LAST_ACTIVE_KEY = "last-active-ts";
+const TOKEN_KEY = StoreKey.TOKEN_KEY;
+const USER_KEY = StoreKey.USER_KEY;
+const REFRESH_TOKEN = StoreKey.REFRESH_TOKEN;
+const USER_PROFILE_KEY = StoreKey.USER_PROFILE_KEY;
+const LAST_ACTIVE_KEY = StoreKey.LAST_ACTIVE_KEY;
+const WELCOME_SEEN_KEY = StoreKey.WELCOME_SEEN_KEY;
+const ONBOARDING_DONE_KEY = StoreKey.ONBOARDING_DONE_KEY;
 
 // Refresh intervals & expiry
 const REFRESH_INTERVAL_MS = 15 * 60 * 1000; // 15 minutes
@@ -85,17 +82,24 @@ function useProtectedRoute(authState: {
   authenticated: boolean | null;
 }) {
   const segments = useSegments();
+
   useEffect(() => {
-    const inAuthGroup = segments[0] === "(auth)";
+    // Wait until we know (prevents flicker)
+    if (authState.authenticated === null) return;
+
+    const group = segments[0]; // "(public)" | "(auth)" | etc.
+    const inAuthGroup = group === "(auth)";
 
     if (!authState.authenticated && inAuthGroup) {
-      router.replace("/landingScreen");
-    } else if (authState.authenticated && !inAuthGroup) {
-      router.replace("/(auth)/(tabs)");
-    } else {
-      router.replace("/landingScreen");
+      router.replace("/(public)/landingScreen");
+      return;
     }
-  }, [authState.authenticated]);
+
+    if (authState.authenticated && !inAuthGroup) {
+      router.replace("/(auth)/(tabs)");
+      return;
+    }
+  }, [authState.authenticated, segments]);
 }
 
 export default function AuthProvider({ children }: { children: ReactNode }) {
@@ -108,7 +112,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   const [authState, setAuthState] = useState<{
     token: string | null;
     authenticated: boolean | null;
-  }>({ token: null, authenticated: false });
+  }>({ token: null, authenticated: null });
 
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
@@ -148,29 +152,24 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const loadToken = async () => {
-      await SecureStore.deleteItemAsync(TOKEN_KEY);
+      try {
+        const token = await SecureStore.getItemAsync(TOKEN_KEY);
+        const refresh = await SecureStore.getItemAsync(REFRESH_TOKEN);
+        const profileInfo = await SecureStore.getItemAsync(USER_PROFILE_KEY);
 
-      // check is token exist or not
-      const token = await SecureStore.getItem(TOKEN_KEY);
-      const userInfo = await SecureStore.getItem(USER_KEY);
-      const profileInfo = await SecureStore.getItem(USER_PROFILE_KEY);
+        if (token) {
+          axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+          setAuthState({ token, authenticated: true });
 
-      // console.log("I am auth context");
-
-      if (token) {
-        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-        setAuthState({
-          token: token,
-          authenticated: true,
-        });
-        const userData = JSON.parse(JSON.stringify(userInfo));
-        setUser(userData);
-        const profileInfo = await SecureStore.getItem(USER_PROFILE_KEY);
-        if (profileInfo) {
-          setUserProfile(JSON.parse(profileInfo));
+          if (profileInfo) setUserProfile(JSON.parse(profileInfo));
+        } else {
+          setAuthState({ token: null, authenticated: false });
         }
+      } catch (e) {
+        setAuthState({ token: null, authenticated: false });
       }
     };
+
     loadToken();
   }, []);
 

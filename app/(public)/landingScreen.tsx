@@ -22,8 +22,7 @@ const OnboardingScreen = () => {
   const styles = styling(theme, newTheme);
 
   const firstBtnSegmentBtnClick = () => {
-    router.push("/(auth)/onboarding/QuestionScreen");
-    // router.push("/(public)/register");
+    router.push("/(public)/register");
   };
 
   const secondBtnSegmentBtnClick = () => {

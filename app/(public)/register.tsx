@@ -67,7 +67,7 @@ const RegistrationFlow = () => {
         text1: "Account created successfuly",
         position: "bottom",
       });
-      router.push("/OnBoarding/QuestionScreen");
+      router.push("/(auth)/onboarding/QuestionScreen");
     }
     // failure handled
     if (result.error_code || !result.success) {

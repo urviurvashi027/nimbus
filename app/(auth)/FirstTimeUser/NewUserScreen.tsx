@@ -11,7 +11,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import ThemeContext from "@/context/ThemeContext";
 import { ThemeKey } from "@/components/Themed";
-import { themeColors } from "@/constant/theme/Colors";
+// import { themeColors } from "@/constant/theme/Colors";
 
 export default function NewUserScreen() {
   // const navigation = useNavigation();
@@ -21,7 +21,7 @@ export default function NewUserScreen() {
   const styles = styling(theme);
 
   const handleOnboardingStart = () => {
-    router.push("/(auth)/OnBoarding/onboardingScreen");
+    // router.push("/(auth)/OnBoarding/onboardingScreen");
   };
   return (
     <View style={styles.container}>
@@ -90,7 +90,7 @@ const styling = (theme: ThemeKey) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: themeColors.basic.primaryColor,
+      backgroundColor: "red",
       // paddingTop: 50,
     },
     backButton: {

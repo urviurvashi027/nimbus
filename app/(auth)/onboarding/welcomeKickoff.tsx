@@ -67,7 +67,7 @@ const WelcomeKickoffScreen: React.FC<Props> = ({ username = "You" }) => {
       {/* Primary CTA */}
       <StyledButton
         label="Start my first routine"
-        onPress={() => router.push("/habit/create")} // ⬅️ adjust if your route differs
+        onPress={() => router.push("/(auth)/habit/CreateHabitScreen")} // ⬅️ adjust if your route differs
         style={s.primaryBtn}
       />
 
