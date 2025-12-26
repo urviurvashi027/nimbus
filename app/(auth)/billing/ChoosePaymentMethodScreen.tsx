@@ -12,14 +12,14 @@ import { useNavigation, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 
 import ThemeContext from "@/context/ThemeContext";
-import { ScreenView, ThemeKey } from "@/components/Themed";
+import { ScreenView } from "@/components/Themed";
 import { PaymentMethod } from "@/types/payment";
 import PaymentMethodCard from "@/components/payment/PaymentMethodCard";
 import NimbusPrimaryButton from "@/components/common/ThemedComponent/PrimaryButton";
 
 const ChoosePaymentMethodScreen = () => {
   const { theme, newTheme } = useContext(ThemeContext);
-  const styles = styling(theme, newTheme);
+  const styles = styling(newTheme);
   const navigation = useNavigation();
   const router = useRouter();
 
@@ -123,7 +123,7 @@ const ChoosePaymentMethodScreen = () => {
   );
 };
 
-const styling = (theme: ThemeKey, newTheme: any) =>
+const styling = (newTheme: any) =>
   StyleSheet.create({
     header: {
       height: 52,

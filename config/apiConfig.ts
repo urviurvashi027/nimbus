@@ -63,6 +63,9 @@ export const API_ENDPOINTS = {
   reportBug: `${BASE_URL}/api/bug-reports/`,
   logFeedback: `${BASE_URL}/api/feedback/`,
 
+  personaQuestion: `${BASE_URL}/profile/persona-questions/`,
+  submitPersonaAnswers: `${BASE_URL}/profile/persona-answers/`,
+
   markHabitDone: (habitId: number) =>
     `${BASE_URL}/api/habits/${habitId}/mark_complete/`,
 

@@ -7,13 +7,13 @@ import {
   Platform,
   KeyboardAvoidingView,
   SafeAreaView,
+  Text,
 } from "react-native";
 import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
 import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/context/ThemeContext";
-import { Text } from "@/components/Themed";
 import { StyledButton } from "@/components/common/ThemedComponent/StyledButton";
 import StyledSwitch from "@/components/common/themeComponents/StyledSwitch";
 import TimeInput from "@/components/common/picker/TimeInput";

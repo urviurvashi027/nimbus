@@ -11,7 +11,6 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/context/ThemeContext";
-import { ThemeKey } from "@/components/Themed";
 
 const { width } = Dimensions.get("window");
 
@@ -33,7 +32,7 @@ const BottomPlayer: React.FC<BottomPlayerProps> = ({
   onClose,
 }) => {
   const { theme, newTheme, spacing, typography } = useContext(ThemeContext);
-  const styles = styling(theme, newTheme, spacing, typography);
+  const styles = styling(newTheme, spacing, typography);
 
   return (
     <View style={styles.wrapper}>
@@ -77,12 +76,7 @@ const BottomPlayer: React.FC<BottomPlayerProps> = ({
   );
 };
 
-const styling = (
-  theme: ThemeKey,
-  newTheme: any,
-  spacing: any,
-  typography: any
-) =>
+const styling = (newTheme: any, spacing: any, typography: any) =>
   StyleSheet.create({
     wrapper: {
       position: "absolute",

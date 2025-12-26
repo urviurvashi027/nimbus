@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -6,152 +6,163 @@ import {
   StyleSheet,
   Platform,
   BackHandler,
+  ActivityIndicator,
 } from "react-native";
 import { router, useNavigation } from "expo-router";
-import * as SecureStore from "expo-secure-store";
 import { format } from "date-fns";
 
-import { ONBOARDING_QUESTIONS } from "../../../constant/data/onboardingQuestion";
-import { StyledButton } from "@/components/common/ThemedComponent/StyledButton";
 import ThemeContext from "@/context/ThemeContext";
-import { ScreenView, ThemeKey } from "@/components/Themed";
+import { ScreenView } from "@/components/Themed";
 import OnboardingHeader from "./component/OnboardingHeader";
-import SignaturePad, { SignaturePadRef } from "./component/SignaturePad";
 import ChoiceItem from "./component/ChoiceItem";
 import InlineTimePicker from "@/components/common/ThemedComponent/InlinedTimePicker";
-
-import { StoreKey } from "@/constant/Constant";
+import SignaturePad, { SignaturePadRef } from "./component/SignaturePad";
+import { StyledButton } from "@/components/common/ThemedComponent/StyledButton";
 import { useAuth } from "@/context/AuthContext";
+
 import {
-  OnboardingQuestion,
-  fetchOnboardingQuestions,
+  PersonaQuestion, // or OnboardingQuestion (use your actual type name)
+  // PersonaAnswerValue,
+  // PersonaAnswersMap,
+  fetchPersonaQuestions,
+  submitPersonaAnswers,
 } from "@/services/onboardingService";
 
-const OnboardingFlow = () => {
+import { serializePersonaAnswers } from "@/services/onboardingService";
+
+const SIGNATURE_LOCAL_ID = -999; // local-only id (we will NOT send this to backend)
+
+const makeSignatureQuestion = (): PersonaQuestion => ({
+  id: SIGNATURE_LOCAL_ID,
+  title: "Confirm & sign ✍️",
+  subtitle: "This is only for your record — we won’t upload your signature.",
+  type: "signature",
+  choices: [],
+});
+
+export default function OnboardingFlow() {
   const navigation = useNavigation();
   const { newTheme } = useContext(ThemeContext);
+  const styles = useMemo(() => styling(newTheme), [newTheme]);
 
-  const styles = styling(newTheme);
-
-  const { resetToPublic, markOnboardingDone } = useAuth();
+  const { resetToPublic, markOnboardingDone, getUserDetails } = useAuth();
 
   const [loadingQuestions, setLoadingQuestions] = useState(true);
-  const [questions, setQuestions] = useState<OnboardingQuestion[]>([]);
+  const [questions, setQuestions] = useState<PersonaQuestion[]>([]);
   const [step, setStep] = useState(0);
 
-  const [answers, setAnswers] = useState<Record<string, any>>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [answers, setAnswers] = useState<any>({});
+  const [errMsg, setErrMsg] = useState<string>("");
+  const [submitting, setSubmitting] = useState(false);
 
-  const [pendingSigNext, setPendingSigNext] = useState(false);
+  // signature
   const sigRef = useRef<SignaturePadRef | null>(null);
+  const [pendingSigNext, setPendingSigNext] = useState(false);
 
   const question = questions[step];
   const TOTAL = questions.length;
 
   useEffect(() => {
-    navigation.setOptions({
-      headerShown: false,
-    });
+    navigation.setOptions({ headerShown: false });
   }, [navigation]);
 
-  // ✅ Fetch questions from backend
+  // ✅ Fetch questions from backend and append signature as the LAST step
   useEffect(() => {
     const load = async () => {
       try {
         setLoadingQuestions(true);
-        const res = await fetchOnboardingQuestions();
-        if (res?.success && Array.isArray(res?.data?.questions)) {
-          setQuestions(res.data.questions);
+        setErrMsg("");
+
+        console.log("Fetching persona questions...");
+
+        const res = await fetchPersonaQuestions();
+
+        // Contract: { success, message, data: PersonaQuestion[] }
+        if (res?.success && Array.isArray(res?.data)) {
+          const list = [...res.data, makeSignatureQuestion()];
+          setQuestions(list);
           setStep(0);
           return;
         }
-        alert(res?.message ?? "Unable to load onboarding questions.");
+
+        setErrMsg(res?.message ?? "Unable to load onboarding questions.");
       } catch (e: any) {
-        alert(e?.message ?? "Unable to load onboarding questions.");
+        setErrMsg(
+          typeof e?.message === "string"
+            ? e.message
+            : "Unable to load onboarding questions."
+        );
       } finally {
         setLoadingQuestions(false);
       }
     };
+
     load();
   }, []);
 
-  // Optional: Android hardware back
+  // Android hardware back
   useEffect(() => {
     if (Platform.OS !== "android") return;
     const sub = BackHandler.addEventListener("hardwareBackPress", () => {
       handleOnBack();
-      return true; // prevent default
+      return true;
     });
     return () => sub.remove();
-  }, [step]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step, questions.length]);
 
   const handleOnBack = async () => {
-    if (step > 0) {
-      setStep((s) => Math.max(0, s - 1));
-    } else {
-      await resetToPublic?.(); // ✅ this will stop the guard from pulling you back
-    }
+    setErrMsg("");
+    if (step > 0) setStep((s) => Math.max(0, s - 1));
+    else await resetToPublic?.();
   };
 
-  // called when user signs on signature pad
-  const onSignatureOK = (dataUrl: string) => {
-    // setAnswers((prev) => ({ ...prev, [question.id]: dataUrl }));
+  // -------------------------
+  // Validation per step
+  // -------------------------
+  const validateCurrentStep = () => {
+    if (!question) return "Loading…";
 
-    // if user pressed Continue, proceed automatically once we have data
-    if (pendingSigNext) {
-      setPendingSigNext(false);
-      if (step < TOTAL - 1) setStep(step + 1);
-      else finishOnboarding(); // we'll add this helper below
+    const v = answers[question.id];
+
+    if (question.type === "single") {
+      if (!v || typeof v !== "string") return "Please select one option.";
     }
-  };
 
-  const finishOnboarding = async () => {
-    try {
-      setIsSubmitting(true);
-      // console.log(answers, "ans");
-      await markOnboardingDone?.();
-      await SecureStore.setItemAsync(StoreKey.ONBOARDING_DONE_KEY, "true");
-      router.replace("/(auth)/onboarding/welcomeKickoff");
-      console.log("ONBOARDING_DONE set to true");
-      //  router.replace("/(auth)/(tabs)"); // ✅ only this
-    } catch (err) {
-      console.error(err);
-      alert("Error Unable to submit. Please try again.");
-    } finally {
-      setIsSubmitting(false);
+    if (question.type === "multiple") {
+      if (!Array.isArray(v) || v.length === 0)
+        return "Please select at least one option.";
     }
-  };
 
-  const next = async () => {
+    if (question.type === "time") {
+      if (!(v instanceof Date)) return "Please select a time.";
+    }
+
     if (question.type === "signature") {
-      const sig = answers[question.id];
-
-      // If we don't have signature yet, capture it automatically
-      if (!sig) {
-        setPendingSigNext(true);
-        sigRef.current?.read(); // triggers onOK if there's content
-        // if empty, onEmpty will fire and pendingSigNext should be cancelled there
-        return;
-      }
+      // we only gate on "completed", not image
+      if (v !== true) return "Please sign to continue.";
     }
 
-    if (step < TOTAL - 1) setStep(step + 1);
-    else await finishOnboarding();
+    return "";
   };
 
-  const clearSignature = () => {
-    sigRef.current?.clear();
-    setAnswers((prev) => ({ ...prev, [question.id]: null }));
-  };
-
+  // -------------------------
+  // Answer toggles
+  // -------------------------
   const toggleAnswer = (choiceId: string) => {
     if (!question) return;
+    setErrMsg("");
+
     if (question.type === "single") {
-      setAnswers((prev) => ({ ...prev, [question.id]: choiceId }));
+      setAnswers((prev: any) => ({ ...prev, [question.id]: choiceId }));
       return;
-    } else if (question.type === "multiple") {
-      setAnswers((prev) => {
-        const existing: string[] = prev[question.id] || [];
+    }
+
+    if (question.type === "multiple") {
+      setAnswers((prev: any) => {
+        const existing = Array.isArray(prev[question.id])
+          ? (prev[question.id] as string[])
+          : [];
         const next = existing.includes(choiceId)
           ? existing.filter((x) => x !== choiceId)
           : [...existing, choiceId];
@@ -160,8 +171,162 @@ const OnboardingFlow = () => {
     }
   };
 
+  const setTime = (d: Date) => {
+    if (!question) return;
+    setErrMsg("");
+    setAnswers((prev: any) => ({ ...prev, [question.id]: d }));
+  };
+
+  // -------------------------
+  // Signature handlers (no upload)
+  // -------------------------
+  const onSignatureOK = (_dataUrl: string) => {
+    if (!question) return;
+
+    // mark local boolean only
+    setAnswers((prev: any) => ({ ...prev, [question.id]: true }));
+
+    if (pendingSigNext) {
+      setPendingSigNext(false);
+      goNextOrSubmit();
+    }
+  };
+
+  const clearSignature = () => {
+    if (!question) return;
+    sigRef.current?.clear();
+    setAnswers((prev: any) => ({ ...prev, [question.id]: false }));
+  };
+
+  // -------------------------
+  // Submit to backend (omit signature)
+  // -------------------------
+  const buildSubmitPayload = () => {
+    const payload: Record<string, any> = {};
+
+    Object.entries(answers).forEach(([qidStr, val]) => {
+      const qid = Number(qidStr);
+
+      // ❌ do not send signature at all
+      if (qid === SIGNATURE_LOCAL_ID) return;
+
+      // ✅ convert Date to what backend expects
+      if (val instanceof Date) {
+        // safest: send ISO; if backend expects "HH:mm:ss", switch to format(val, "HH:mm:ss")
+        payload[String(qid)] = val.toISOString();
+        return;
+      }
+
+      payload[String(qid)] = val;
+    });
+    console.log(payload, "payload");
+    return payload;
+  };
+
+  const finishOnboarding = async () => {
+    try {
+      setSubmitting(true);
+      setErrMsg("");
+
+      const payload = serializePersonaAnswers(answers, {
+        skipIds: [SIGNATURE_LOCAL_ID],
+      });
+      const res = await submitPersonaAnswers(payload);
+
+      // const payload = buildSubmitPayload();
+      // const res = await submitPersonaAnswers({ answers: payload });
+
+      if (res.success) await getUserDetails?.();
+
+      if (!res?.success) {
+        setErrMsg(
+          res?.message ?? "Unable to submit answers. Please try again."
+        );
+        return;
+      }
+
+      // ✅ mark onboarding done AFTER successful submit
+      await markOnboardingDone?.();
+
+      router.replace("/(auth)/onboarding/welcomeKickoff");
+    } catch (e: any) {
+      setErrMsg(
+        typeof e?.message === "string"
+          ? e.message
+          : "Unable to finish onboarding. Please try again."
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const goNextOrSubmit = async () => {
+    if (step < TOTAL - 1) setStep((s) => s + 1);
+    else await finishOnboarding();
+  };
+
+  const next = async () => {
+    if (!question) return;
+
+    setErrMsg("");
+
+    // signature step: trigger read + proceed when onSignatureOK fires
+    if (question.type === "signature") {
+      const done = answers[question.id] === true;
+      if (!done) {
+        setPendingSigNext(true);
+        sigRef.current?.read(); // triggers onOK if signature exists
+        return;
+      }
+    }
+
+    const e = validateCurrentStep();
+    if (e) {
+      setErrMsg(e);
+      return;
+    }
+
+    await goNextOrSubmit();
+  };
+
+  // -------------------------
+  // UI states
+  // -------------------------
+  if (loadingQuestions) {
+    return (
+      <ScreenView style={{ padding: 16 }} bgColor={newTheme.background}>
+        <View style={{ marginTop: 80, alignItems: "center" }}>
+          <ActivityIndicator />
+          <Text style={{ marginTop: 12, color: newTheme.textSecondary }}>
+            Loading your onboarding…
+          </Text>
+        </View>
+      </ScreenView>
+    );
+  }
+
+  if (!question) {
+    return (
+      <ScreenView style={{ padding: 16 }} bgColor={newTheme.background}>
+        <View style={{ marginTop: 80 }}>
+          <Text style={{ color: newTheme.textPrimary, fontSize: 18 }}>
+            No onboarding questions found.
+          </Text>
+          {!!errMsg && (
+            <Text style={{ marginTop: 10, color: newTheme.error }}>
+              {errMsg}
+            </Text>
+          )}
+        </View>
+      </ScreenView>
+    );
+  }
+
   return (
-    <ScreenView style={{ padding: 10, marginTop: 0 }}>
+    <ScreenView
+      style={{ padding: 10, marginTop: 0 }}
+      bgColor={newTheme.background}
+    >
       <View style={styles.container}>
         <OnboardingHeader
           step={step + 1}
@@ -171,11 +336,19 @@ const OnboardingFlow = () => {
 
         <View style={styles.titleContainer}>
           <Text style={styles.title}>{question.title}</Text>
-          <Text style={styles.subtitle}>{question.subtitle}</Text>
+          {!!question.subtitle && (
+            <Text style={styles.subtitle}>{question.subtitle}</Text>
+          )}
         </View>
 
+        {!!errMsg && (
+          <Text style={[styles.errorText, { color: newTheme.error }]}>
+            {errMsg}
+          </Text>
+        )}
+
         {question.type !== "time" && question.type !== "signature" && (
-          <View>
+          <View style={{ marginTop: 10 }}>
             {question.choices?.map((c) => (
               <ChoiceItem
                 key={c.id}
@@ -183,7 +356,8 @@ const OnboardingFlow = () => {
                 selected={
                   question.type === "single"
                     ? answers[question.id] === c.id
-                    : answers[question.id]?.includes(c.id)
+                    : Array.isArray(answers[question.id]) &&
+                      (answers[question.id] as string[]).includes(c.id)
                 }
                 onPress={() => toggleAnswer(c.id)}
               />
@@ -192,35 +366,34 @@ const OnboardingFlow = () => {
         )}
 
         {question.type === "time" && (
-          <InlineTimePicker
-            label="Select a time"
-            value={
-              // if user already picked, keep it; else default to now at minuteStep
-              answers[question.id] instanceof Date
-                ? answers[question.id]
-                : new Date()
-            }
-            minuteStep={5}
-            use12h={true}
-            onChange={(d) => {
-              const formatted = format(d, "HH:mm:ss");
-              console.log("Time picked:", d, formatted);
-              setAnswers((prev) => ({ ...prev, [question.id]: d }));
-            }}
-          />
+          <View style={{ marginTop: 12 }}>
+            <InlineTimePicker
+              label="Select a time"
+              value={
+                answers[question.id] instanceof Date
+                  ? (answers[question.id] as Date)
+                  : new Date()
+              }
+              minuteStep={5}
+              use12h={true}
+              onChange={(d) => {
+                // optional: you can store formatted string instead if backend expects HH:mm:ss
+                console.log("Time picked:", d, format(d, "HH:mm:ss"));
+                setTime(d);
+              }}
+            />
+          </View>
         )}
 
-        {/* Signature step render */}
         {question.type === "signature" && (
           <View style={{ marginTop: 12 }}>
             <SignaturePad
               ref={sigRef}
               onOK={onSignatureOK}
-              // onEmpty={() => setAnswers((p) => ({ ...p, [question.id]: null }))}
               onEmpty={() => {
                 setPendingSigNext(false);
-                setAnswers((p) => ({ ...p, [question.id]: null }));
-                alert("Please add your signature to continue.");
+                setAnswers((p: any) => ({ ...p, [question.id]: false }));
+                setErrMsg("Please sign to continue.");
               }}
               penColor={newTheme.accent}
               backgroundColor={newTheme.surface}
@@ -240,9 +413,9 @@ const OnboardingFlow = () => {
                 onPress={clearSignature}
               >
                 <Text
-                  style={{ color: newTheme.textPrimary, fontWeight: "700" }}
+                  style={{ color: newTheme.textPrimary, fontWeight: "600" }}
                 >
-                  Clear signature
+                  Clear
                 </Text>
               </Pressable>
 
@@ -251,54 +424,42 @@ const OnboardingFlow = () => {
           </View>
         )}
 
-        {/* TODO: Time Picker UI for type==="time" */}
-
         <StyledButton
-          label="Continue"
+          label={submitting ? "Finishing…" : "Continue"}
           onPress={next}
-          style={{ marginTop: 30 }}
+          disabled={submitting}
+          style={{ marginTop: 26 }}
         />
       </View>
     </ScreenView>
   );
-};
+}
 
-const styling = (newTheme: any) =>
+const styling = (t: any) =>
   StyleSheet.create({
-    container: {
-      paddingTop: 10,
-    },
+    container: { paddingTop: 10 },
+    titleContainer: {},
     title: {
-      marginTop: 30,
+      marginTop: 22,
       fontSize: 24,
       fontWeight: "700",
       textAlign: "center",
-      color: newTheme.textPrimary,
-      marginBottom: 10,
+      color: t.textPrimary,
+      marginBottom: 8,
       lineHeight: 32,
-    },
-    titleContainer: {
-      //   textAlign: "center",
     },
     subtitle: {
       textAlign: "center",
       fontSize: 14,
-      color: newTheme.textSecondary,
+      color: t.textSecondary,
       lineHeight: 22,
-      marginBottom: 20,
+      marginBottom: 14,
     },
-    choiceItem: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      borderWidth: 2,
-      borderColor: newTheme.surface,
-      borderRadius: 12,
-      padding: 16,
-      marginBottom: 12,
-    },
-    choiceText: {
-      fontSize: 16,
-      color: newTheme.textPrimary,
+    errorText: {
+      textAlign: "center",
+      fontSize: 13,
+      fontWeight: "600",
+      marginBottom: 8,
     },
     smallBtn: {
       paddingHorizontal: 14,
@@ -306,5 +467,3 @@ const styling = (newTheme: any) =>
       borderRadius: 12,
     },
   });
-
-export default OnboardingFlow;

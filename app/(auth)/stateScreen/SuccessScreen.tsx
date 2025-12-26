@@ -9,7 +9,7 @@ import RegisterIcon from "@/assets/images/logoNew/2.svg";
 import ResetPasswordIcon from "@/assets/images/logoNew/2.svg";
 import { Href, router, useNavigation } from "expo-router";
 import ThemeContext from "@/context/ThemeContext";
-import { ScreenView, ThemeKey } from "@/components/Themed";
+import { ScreenView } from "@/components/Themed";
 
 type SuccessType =
   | "finishedOnboarding"
@@ -71,7 +71,7 @@ const SuccessScreen: React.FC<SuccessScreenProps> = ({
     successConfig[type] ?? successConfig.finishedResetPassword;
 
   const navigation = useNavigation();
-  const { theme, newTheme } = useContext(ThemeContext);
+  const { newTheme } = useContext(ThemeContext);
 
   useEffect(() => {
     navigation.setOptions({
@@ -79,7 +79,7 @@ const SuccessScreen: React.FC<SuccessScreenProps> = ({
     });
   }, [navigation]);
 
-  const styles = styling(theme, newTheme);
+  const styles = styling(newTheme);
 
   const handlePress = () => {
     if (onButtonPress) {
@@ -112,7 +112,7 @@ const SuccessScreen: React.FC<SuccessScreenProps> = ({
   );
 };
 
-const styling = (theme: ThemeKey, newTheme: any) =>
+const styling = (newTheme: any) =>
   StyleSheet.create({
     container: {
       paddingTop: 90,

@@ -9,7 +9,6 @@ import {
 import React, { useContext } from "react";
 import { Ionicons } from "@expo/vector-icons";
 // import { themeColors } from "@/constant/theme/Colors";
-import { ThemeKey } from "@/components/Themed";
 import ThemeContext from "@/context/ThemeContext";
 
 interface DeleteHabitModalProps {
@@ -37,8 +36,8 @@ const DeleteHabitModal: React.FC<DeleteHabitModalProps> = ({
     primaryBtnClick();
   };
 
-  const { theme } = useContext(ThemeContext);
-  const styles = styling(theme);
+  // const { theme } = useContext(ThemeContext);
+  const styles = styling();
 
   return (
     <Modal
@@ -71,7 +70,7 @@ const DeleteHabitModal: React.FC<DeleteHabitModalProps> = ({
 
 export default DeleteHabitModal;
 
-const styling = (theme: ThemeKey) =>
+const styling = () =>
   StyleSheet.create({
     modalOverlay: {
       flex: 1,

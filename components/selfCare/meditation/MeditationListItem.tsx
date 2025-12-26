@@ -4,7 +4,6 @@ import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import ThemeContext from "@/context/ThemeContext";
-import { ThemeKey } from "@/components/Themed";
 import { Meditations } from "@/types/toolsTypes";
 
 interface Props {
@@ -20,8 +19,8 @@ const MeditationListItem: React.FC<Props> = ({
   isPlaying,
   onPress,
 }) => {
-  const { theme, newTheme, spacing, typography } = useContext(ThemeContext);
-  const styles = styling(theme, newTheme, spacing, typography);
+  const { newTheme, spacing, typography } = useContext(ThemeContext);
+  const styles = styling(newTheme, spacing, typography);
 
   return (
     <TouchableOpacity
@@ -49,12 +48,7 @@ const MeditationListItem: React.FC<Props> = ({
   );
 };
 
-const styling = (
-  theme: ThemeKey,
-  newTheme: any,
-  spacing: any,
-  typography: any
-) =>
+const styling = (newTheme: any, spacing: any, typography: any) =>
   StyleSheet.create({
     item: {
       flexDirection: "row",

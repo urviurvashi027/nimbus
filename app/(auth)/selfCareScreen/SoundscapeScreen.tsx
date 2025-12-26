@@ -13,7 +13,7 @@ import { useNavigation } from "expo-router";
 
 import { TrackType } from "@/constant/data/soundtrack";
 import ThemeContext from "@/context/ThemeContext";
-import { ScreenView, ThemeKey } from "@/components/Themed";
+import { ScreenView } from "@/components/Themed";
 import { getSoundscapeList } from "@/services/toolService";
 import BottomPlayer from "@/components/common/BottomPlayer";
 
@@ -38,7 +38,7 @@ const Soundscape = () => {
 
   const navigation = useNavigation();
   const { theme, newTheme, spacing, typography } = useContext(ThemeContext);
-  const styles = styling(theme, newTheme, spacing, typography);
+  const styles = styling(newTheme, spacing, typography);
 
   // soft pastel palette for featured cards
   const colorPalette = [
@@ -223,12 +223,7 @@ const Soundscape = () => {
   );
 };
 
-const styling = (
-  theme: ThemeKey,
-  newTheme: any,
-  spacing: any,
-  typography: any
-) =>
+const styling = (newTheme: any, spacing: any, typography: any) =>
   StyleSheet.create({
     container: {
       flex: 1,

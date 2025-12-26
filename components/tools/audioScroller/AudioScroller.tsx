@@ -7,7 +7,6 @@ import { getAudioBookList } from "@/services/toolService";
 import AudiobookThumbnail from "./components/AudiobookThumbnail";
 import FullScreenAudioPlayer from "./components/FullScreenAudioPlayer";
 import ThemeContext from "@/context/ThemeContext";
-import { ThemeKey } from "@/components/Themed";
 import AudiobookScrollerSkeleton from "./components/AudiobookScrollerSkeleton";
 
 export interface AudiobookData {
@@ -26,8 +25,8 @@ const AudiobookScroller: React.FC = () => {
     useState<AudiobookData | null>(null);
   const [isPlayerVisible, setPlayerVisible] = useState(false);
 
-  const { theme, newTheme, spacing, typography } = useContext(ThemeContext);
-  const styles = styling(theme, newTheme, spacing, typography);
+  const { newTheme, spacing, typography } = useContext(ThemeContext);
+  const styles = styling(newTheme, spacing, typography);
 
   useEffect(() => {
     const loadAudiobooks = async () => {
@@ -105,12 +104,7 @@ const AudiobookScroller: React.FC = () => {
 
 export default AudiobookScroller;
 
-const styling = (
-  theme: ThemeKey,
-  newTheme: any,
-  spacing: any,
-  typography: any
-) =>
+const styling = (newTheme: any, spacing: any, typography: any) =>
   StyleSheet.create({
     container: {
       paddingVertical: spacing.lg,

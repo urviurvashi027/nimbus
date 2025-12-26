@@ -9,11 +9,12 @@ import {
   StyleSheet,
   SafeAreaView,
   TextInput,
+  Text,
   TouchableWithoutFeedback,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-import { Text } from "../../Themed";
+// import { Text } from "../../Themed";
 import ThemeContext from "@/context/ThemeContext";
 import { StyledButton } from "@/components/common/ThemedComponent/StyledButton";
 import StyledSwitch from "@/components/common/themeComponents/StyledSwitch";

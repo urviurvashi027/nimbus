@@ -10,7 +10,6 @@ import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import ThemeContext from "@/context/ThemeContext";
-import { ThemeKey } from "@/components/Themed";
 // import { themeColors } from "@/constant/theme/Colors";
 
 export default function NewUserScreen() {
@@ -18,7 +17,7 @@ export default function NewUserScreen() {
 
   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
 
-  const styles = styling(theme);
+  const styles = styling();
 
   const handleOnboardingStart = () => {
     // router.push("/(auth)/OnBoarding/onboardingScreen");
@@ -86,7 +85,7 @@ export default function NewUserScreen() {
   );
 }
 
-const styling = (theme: ThemeKey) =>
+const styling = () =>
   StyleSheet.create({
     container: {
       flex: 1,

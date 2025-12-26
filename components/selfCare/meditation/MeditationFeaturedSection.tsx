@@ -2,7 +2,6 @@ import React, { useContext } from "react";
 import { View, Text, FlatList, StyleSheet, Dimensions } from "react-native";
 
 import ThemeContext from "@/context/ThemeContext";
-import { ThemeKey } from "@/components/Themed";
 import MeditationFeaturedCard from "@/components/selfCare/meditation/MeditationFeautredCard";
 import { EnrichedMeditation } from "@/app/(auth)/selfCareScreen/MeditationScreen";
 
@@ -20,8 +19,8 @@ const MeditationFeaturedSection: React.FC<MeditationFeaturedSectionProps> = ({
   onPress,
   colorPalette,
 }) => {
-  const { theme, newTheme, spacing, typography } = useContext(ThemeContext);
-  const styles = styling(theme, newTheme, spacing, typography);
+  const { newTheme, spacing, typography } = useContext(ThemeContext);
+  const styles = styling(newTheme, spacing, typography);
 
   if (!data.length) return null;
 
@@ -49,12 +48,7 @@ const MeditationFeaturedSection: React.FC<MeditationFeaturedSectionProps> = ({
   );
 };
 
-const styling = (
-  theme: ThemeKey,
-  newTheme: any,
-  spacing: any,
-  typography: any
-) =>
+const styling = (newTheme: any, spacing: any, typography: any) =>
   StyleSheet.create({
     sectionContainer: {
       marginBottom: spacing.lg,

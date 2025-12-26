@@ -124,6 +124,7 @@ function useProtectedRoute(
       if (root === "(public)") router.replace("/(auth)/(tabs)");
       return; // ✅ allow any /(auth) route
     }
+    if (isAuthed && onboardingDone === null) return;
   }, [authState.authenticated, onboardingDone, segments.join("/")]);
 }
 
@@ -144,8 +145,18 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     (async () => {
-      const v = await SecureStore.getItemAsync(StoreKey.ONBOARDING_DONE_KEY);
-      setOnboardingDone(v === "true");
+      const key = await SecureStore.getItemAsync(StoreKey.ONBOARDING_DONE_KEY);
+
+      // If user is authenticated and key is missing, treat as existing user => skip onboarding
+      if (authState.authenticated === true && key == null) {
+        await SecureStore.setItemAsync(StoreKey.ONBOARDING_DONE_KEY, "true");
+        setOnboardingDone(true);
+        return;
+      }
+
+      if (key === "true") setOnboardingDone(true);
+      else if (key === "false") setOnboardingDone(false);
+      else setOnboardingDone(null); // still not sure (pre-login state)
     })();
   }, [authState.authenticated]);
 
@@ -244,12 +255,15 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       const { success, data } = result || {};
       // ✅ If backend returns tokens on signup, apply them immediately
       if (success && data?.access) {
-        await SecureStore.setItemAsync(REFRESH_TOKEN, data.refresh ?? "");
+        await SecureStore.setItemAsync(
+          StoreKey.REFRESH_TOKEN,
+          data.refresh ?? ""
+        );
         await SecureStore.setItemAsync(StoreKey.TOKEN_KEY, data.access);
         await SecureStore.setItemAsync(StoreKey.ONBOARDING_DONE_KEY, "false");
         setOnboardingDone(false);
         await applyAccessToken(data.access); // sets axios header + authState + TOKEN_KEY
-        await _fetchUserProfile(); // optional but recommended
+        // await _fetchUserProfile(); // optional but recommended
 
         axios.defaults.headers.common[
           "Authorization"
@@ -297,7 +311,10 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         await SecureStore.setItemAsync(REFRESH_TOKEN, tokens.refresh);
 
         const ob = await SecureStore.getItemAsync(StoreKey.ONBOARDING_DONE_KEY);
-        setOnboardingDone(ob === "true"); // if missing => false
+        if (ob == null) {
+          await SecureStore.setItemAsync(StoreKey.ONBOARDING_DONE_KEY, "true");
+          setOnboardingDone(true);
+        }
 
         await _fetchUserProfile();
 

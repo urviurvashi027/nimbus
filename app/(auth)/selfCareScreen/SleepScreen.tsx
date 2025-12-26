@@ -10,7 +10,6 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 
 import ThemeContext from "@/context/ThemeContext";
-import { ThemeKey } from "@/components/Themed";
 import HorizontalListCardScroll from "@/components/common/HorizontalListCardScroll";
 // import HorizontalBannerCardScroll from "@/components/tools/common/HorizontalBannerCardScroll";
 

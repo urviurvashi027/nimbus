@@ -9,7 +9,6 @@ import {
 } from "react-native";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import ThemeContext from "@/context/ThemeContext";
-import { ThemeKey } from "@/components/Themed";
 import { PaymentMethod } from "@/types/payment";
 
 type Props = {
@@ -25,8 +24,8 @@ const PaymentMethodCard: React.FC<Props> = ({
   onPress,
   compact = false,
 }) => {
-  const { theme, newTheme } = useContext(ThemeContext);
-  const styles = styling(theme, newTheme);
+  const { newTheme } = useContext(ThemeContext);
+  const styles = styling(newTheme);
 
   const renderIcon = () => {
     switch (method.type) {
@@ -107,7 +106,7 @@ const PaymentMethodCard: React.FC<Props> = ({
   );
 };
 
-const styling = (theme: ThemeKey, newTheme: any) =>
+const styling = (newTheme: any) =>
   StyleSheet.create({
     container: {
       flexDirection: "row",

@@ -11,7 +11,6 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/context/ThemeContext";
-import { ThemeKey } from "@/components/Themed";
 
 interface Props {
   item: any;
@@ -24,8 +23,8 @@ const SoundscapeLibraryItem: React.FC<Props> = ({
   isActive,
   onPress,
 }) => {
-  const { theme, newTheme, spacing, typography } = useContext(ThemeContext);
-  const styles = styling(theme, newTheme, spacing, typography);
+  const { newTheme, spacing, typography } = useContext(ThemeContext);
+  const styles = styling(newTheme, spacing, typography);
 
   return (
     <TouchableOpacity style={styles.item} onPress={onPress} activeOpacity={0.8}>
@@ -47,12 +46,7 @@ const SoundscapeLibraryItem: React.FC<Props> = ({
   );
 };
 
-const styling = (
-  theme: ThemeKey,
-  newTheme: any,
-  spacing: any,
-  typography: any
-) =>
+const styling = (newTheme: any, spacing: any, typography: any) =>
   StyleSheet.create({
     item: {
       flexDirection: "row",

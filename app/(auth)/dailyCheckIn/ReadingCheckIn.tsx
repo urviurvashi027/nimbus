@@ -12,7 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import ThemeContext from "@/context/ThemeContext";
-import { ScreenView, ThemeKey } from "@/components/Themed";
+import { ScreenView } from "@/components/Themed";
 import NotificationSettingRow from "@/components/DailyCheckIn/common/NotificationSettingRow";
 import ReadingOverviewCard from "@/components/DailyCheckIn/reading/ReadingOverviewCard";
 import LogReadingModal from "@/components/DailyCheckIn/reading/LogReadingSheet";

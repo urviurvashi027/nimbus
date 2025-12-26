@@ -9,6 +9,7 @@ import {
   Switch,
   Platform,
   SafeAreaView,
+  Text,
   TouchableWithoutFeedback,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -16,7 +17,6 @@ import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
 import ThemeContext from "@/context/ThemeContext";
-import { Text } from "@/components/Themed";
 
 export type OptionItem = { key: string; label: string };
 

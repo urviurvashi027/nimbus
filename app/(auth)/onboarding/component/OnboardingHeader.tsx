@@ -3,7 +3,7 @@ import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/context/ThemeContext";
-import { ThemeKey } from "@/components/Themed";
+// import { ThemeKey } from "@/components/Themed";
 
 type OnboardingHeaderProps = {
   step: number;
@@ -22,7 +22,7 @@ const OnboardingHeader: React.FC<OnboardingHeaderProps> = ({
 
   const { theme, newTheme } = useContext(ThemeContext);
 
-  const styles = styling(theme, newTheme);
+  const styles = styling(newTheme);
 
   return (
     <View style={styles.container}>
@@ -47,7 +47,7 @@ const OnboardingHeader: React.FC<OnboardingHeaderProps> = ({
   );
 };
 
-const styling = (theme: ThemeKey, newTheme: any) =>
+const styling = (newTheme: any) =>
   StyleSheet.create({
     container: {
       marginTop: 50,

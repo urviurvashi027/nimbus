@@ -3,13 +3,13 @@ import { View, Text, StyleSheet, Pressable, Dimensions } from "react-native";
 import { StyledButton } from "@/components/common/ThemedComponent/StyledButton"; // reuse your styled button
 import { router, useNavigation } from "expo-router";
 import ThemeContext from "@/context/ThemeContext";
-import { ScreenView, ThemeKey } from "@/components/Themed";
+import { ScreenView } from "@/components/Themed";
 
 import RelaxMenIcon from "@/assets/images/logoNew/1.svg";
 
 const LandingScreen = () => {
   const navigation = useNavigation();
-  const { theme, newTheme } = useContext(ThemeContext);
+  const { newTheme } = useContext(ThemeContext);
 
   const { width } = Dimensions.get("window");
 
@@ -19,7 +19,7 @@ const LandingScreen = () => {
     });
   }, [navigation]);
 
-  const styles = styling(theme, newTheme);
+  const styles = styling(newTheme);
 
   const firstBtnSegmentBtnClick = () => {
     router.push("/(public)/register");
@@ -75,7 +75,7 @@ const LandingScreen = () => {
   );
 };
 
-const styling = (theme: ThemeKey, newTheme: any) =>
+const styling = (newTheme: any) =>
   StyleSheet.create({
     container: {
       backgroundColor: newTheme.background,

@@ -10,7 +10,6 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 
 import ThemeContext from "@/context/ThemeContext";
-import { ThemeKey } from "@/components/Themed";
 
 interface ReflectionItemCardProps {
   item: {
@@ -28,8 +27,8 @@ const ReflectionItemCard: React.FC<ReflectionItemCardProps> = ({
   item,
   onPress,
 }) => {
-  const { theme, newTheme, spacing, typography } = useContext(ThemeContext);
-  const styles = styling(theme, newTheme, spacing, typography);
+  const { newTheme, spacing, typography } = useContext(ThemeContext);
+  const styles = styling(newTheme, spacing, typography);
 
   const handlePress = () => {
     if (!item.locked) {
@@ -91,12 +90,7 @@ const ReflectionItemCard: React.FC<ReflectionItemCardProps> = ({
   );
 };
 
-const styling = (
-  theme: ThemeKey,
-  newTheme: any,
-  spacing: any,
-  typography: any
-) =>
+const styling = (newTheme: any, spacing: any, typography: any) =>
   StyleSheet.create({
     card: {
       flexDirection: "row",

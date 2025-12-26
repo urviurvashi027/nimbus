@@ -3,7 +3,6 @@
 import React, { useContext } from "react";
 import { View, Text, FlatList, StyleSheet, Dimensions } from "react-native";
 import ThemeContext from "@/context/ThemeContext";
-import { ThemeKey } from "@/components/Themed";
 import ReflectionFeaturedCard from "@/components/selfCare/reflection/ReflectionFeatureCard";
 
 const { width } = Dimensions.get("window");
@@ -24,8 +23,8 @@ const ReflectionForYouSection: React.FC<Props> = ({
   colorPalette,
   onPressCard,
 }) => {
-  const { theme, newTheme, spacing, typography } = useContext(ThemeContext);
-  const styles = styling(theme, newTheme, spacing, typography);
+  const { newTheme, spacing, typography } = useContext(ThemeContext);
+  const styles = styling(newTheme, spacing, typography);
 
   if (!data || data.length === 0) return null;
 
@@ -57,12 +56,7 @@ const ReflectionForYouSection: React.FC<Props> = ({
   );
 };
 
-const styling = (
-  theme: ThemeKey,
-  newTheme: any,
-  spacing: any,
-  typography: any
-) =>
+const styling = (newTheme: any, spacing: any, typography: any) =>
   StyleSheet.create({
     sectionContainer: {
       marginBottom: spacing.xl,

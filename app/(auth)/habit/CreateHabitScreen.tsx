@@ -23,7 +23,7 @@ import HabitTypeInput from "@/components/createHabit/HabitTypeInput";
 import HabitTagsInput, {
   selectedTag,
 } from "@/components/createHabit/HabitTagsInput";
-import { ScreenView, ThemeKey } from "@/components/Themed";
+import { ScreenView } from "@/components/Themed";
 
 import HabitMetricInput from "@/components/createHabit/HabitMetricInput";
 import HabitDurationInput from "@/components/createHabit/HabitDurationInput";
@@ -74,7 +74,7 @@ export default function HabitBasic() {
   // context
   const { setHabitData } = useContext(HabitContext);
   const { theme, newTheme, spacing, typography } = useContext(ThemeContext);
-  const styles = styling(theme, newTheme, spacing, typography);
+  const styles = styling(newTheme, spacing, typography);
 
   // navigation & safe area
   const navigation = useNavigation();
@@ -379,12 +379,7 @@ export default function HabitBasic() {
 }
 
 /* ----- Styles ----- */
-const styling = (
-  theme: ThemeKey,
-  newTheme: any,
-  spacing: any,
-  typography: any
-) =>
+const styling = (newTheme: any, spacing: any, typography: any) =>
   StyleSheet.create({
     gestureContainer: { flex: 1 },
     header: { color: newTheme.textPrimary },

@@ -20,7 +20,6 @@ import { banners } from "@/constant/data/banner";
 import { medTests } from "@/constant/data/medicalTest";
 
 import { ScreenView } from "@/components/Themed";
-import { ThemeKey } from "@/components/Themed";
 import TrendingCardCarousel from "@/components/common/TrendingCardCarousel";
 import HorizontalListCardScroll from "@/components/common/HorizontalListCardScroll";
 import VideoClassCard from "@/components/selfCare/MasterclassCard";
@@ -70,7 +69,7 @@ const SelfCare: React.FC = () => {
 
   const { theme, newTheme, spacing, typography } = useContext(ThemeContext);
 
-  const styles = styling(theme, newTheme);
+  const styles = styling(newTheme);
 
   // Funstion called on click of navigation button clicked
   const handleNavigationButtonPress = (button: NavigationButtonType) => {
@@ -377,7 +376,7 @@ const SelfCare: React.FC = () => {
   );
 };
 
-const styling = (theme: ThemeKey, newTheme: any) =>
+const styling = (newTheme: any) =>
   StyleSheet.create({
     screenTitle: {
       marginBottom: 30,

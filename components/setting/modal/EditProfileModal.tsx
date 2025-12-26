@@ -95,6 +95,7 @@ export default function EditProfileModal({ visible, onClose, onSaved }: Props) {
     setLoading(true);
     (async () => {
       const cached = await loadUserFromStorage?.(); // ← safe call
+      console.log(cached, "cached");
       const profile = cached.profile;
       const p = {
         id: cached?.id,
@@ -139,7 +140,7 @@ export default function EditProfileModal({ visible, onClose, onSaved }: Props) {
       );
       setLoading(false);
     })();
-  }, [loadUserFromStorage]); // include in deps
+  }, []); // include in deps
 
   // isDirty should consider all editable fields
   const isDirty = () => {

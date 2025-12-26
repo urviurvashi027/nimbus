@@ -16,7 +16,6 @@ import { ProgressBar } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
 
 import ThemeContext from "@/context/ThemeContext";
-// import { ThemeKey } from "@/components/Themed";
 import StyledButton from "@/components/common/themeComponents/StyledButton";
 
 import {

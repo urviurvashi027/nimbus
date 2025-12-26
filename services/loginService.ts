@@ -18,7 +18,6 @@ import {
   SetPasswordResponse,
   SetPasswordRequest,
 } from "@/types/loginTypes";
-import Toast from "react-native-toast-message";
 
 type UserProfile = {
   full_name?: string | null;

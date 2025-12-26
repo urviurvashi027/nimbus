@@ -1,4 +1,3 @@
-import { ThemeKey } from "@/components/Themed";
 import ThemeContext from "@/context/ThemeContext";
 import React, { useContext } from "react";
 import {
@@ -34,9 +33,9 @@ const TrendingCardCarousel: React.FC<TrendingCardCarouselProps> = ({
   onPress,
   onClickOfAll,
 }) => {
-  const { theme, newTheme, spacing, typography } = useContext(ThemeContext);
+  const { newTheme, spacing, typography } = useContext(ThemeContext);
 
-  const styles = styling(theme, newTheme, spacing, typography);
+  const styles = styling(newTheme, spacing, typography);
 
   return (
     <View style={styles.container}>
@@ -93,12 +92,7 @@ const TrendingCardCarousel: React.FC<TrendingCardCarouselProps> = ({
   );
 };
 
-const styling = (
-  theme: ThemeKey,
-  newTheme: any,
-  spacing: any,
-  typography: any
-) =>
+const styling = (newTheme: any, spacing: any, typography: any) =>
   StyleSheet.create({
     container: {
       marginVertical: spacing.lg,

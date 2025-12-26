@@ -1,11 +1,10 @@
 import React, { useContext } from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
 import ThemeContext from "@/context/ThemeContext";
-import { ThemeKey } from "@/components/Themed";
 
 export const MeditationFeaturedSkeleton: React.FC = () => {
-  const { theme, newTheme, spacing } = useContext(ThemeContext);
-  const styles = skeletonStyles(theme, newTheme, spacing);
+  const { newTheme, spacing } = useContext(ThemeContext);
+  const styles = skeletonStyles(newTheme, spacing);
 
   return (
     <View style={styles.featureBlock}>
@@ -40,8 +39,8 @@ export const MeditationFeaturedSkeleton: React.FC = () => {
 };
 
 export const MeditationListSkeleton: React.FC = () => {
-  const { theme, newTheme, spacing } = useContext(ThemeContext);
-  const styles = skeletonStyles(theme, newTheme, spacing);
+  const { newTheme, spacing } = useContext(ThemeContext);
+  const styles = skeletonStyles(newTheme, spacing);
 
   return (
     <View style={styles.listBlock}>
@@ -66,7 +65,7 @@ export const MeditationListSkeleton: React.FC = () => {
   );
 };
 
-const skeletonStyles = (theme: ThemeKey, newTheme: any, spacing: any) =>
+const skeletonStyles = (newTheme: any, spacing: any) =>
   StyleSheet.create({
     featureBlock: {
       marginBottom: spacing.lg,
