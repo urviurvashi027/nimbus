@@ -27,12 +27,12 @@ const OnboardingHeader: React.FC<OnboardingHeaderProps> = ({
   return (
     <View style={styles.container}>
       {/* Back Button */}
-      <Pressable
+      {/* <Pressable
         onPress={onBack || (() => router.back())}
         style={styles.backButton}
       >
         <Ionicons name="arrow-back" size={22} color="#ECEFF4" />
-      </Pressable>
+      </Pressable> */}
 
       {/* Progress Bar */}
       <View style={styles.progressBar}>

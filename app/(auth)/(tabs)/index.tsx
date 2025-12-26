@@ -33,6 +33,7 @@ import HabitItemCard from "@/components/homeScreen/component/HabitItem";
 import TopBadge from "@/components/homeScreen/TopBadge";
 import NewUserScreen from "../FirstTimeUser/NewUserScreen";
 import ProgressPill from "@/components/homeScreen/component/ProgressPill";
+import { useNimbusToast } from "@/components/common/toast/useNimbusToast";
 
 // ---------- Nimbus visual helpers ----------
 const HABIT_ICONS = ["🍰", "🌱", "🏃‍♂️", "🧘", "📚", "💧"];
@@ -50,6 +51,8 @@ export default function TabOneScreen() {
   const [userInfo, setUserInfo] = useState<any>(null);
 
   const { userProfile } = useAuth();
+
+  const toast = useNimbusToast();
 
   const isoDate = useMemo(() => {
     console.log(
@@ -128,11 +131,19 @@ export default function TabOneScreen() {
       const result = await markHabitDone(payload, id);
 
       if (result?.success) {
-        Toast.show({ type: "success", text1: "Habit marked as done" });
+        toast.show({
+          variant: "success",
+          title: "Habit",
+          message: "Habit marked as done",
+        });
         loadHabits(currentIsoDate);
       }
     } catch {
-      Toast.show({ type: "error", text1: "Something went wrong" });
+      toast.show({
+        variant: "error",
+        title: "Something went wrong",
+        message: "Not able to update the habit",
+      });
     }
   };
 
@@ -198,33 +209,33 @@ export default function TabOneScreen() {
               />
 
               {/* First-time user path */}
-              {isFirstTimeUser ? (
+              {/* {isFirstTimeUser ? (
                 <View style={styles.taskListContainer}>
                   <NewUserScreen />
                 </View>
-              ) : (
-                <>
-                  {/* Daily check-in */}
-                  <View style={styles.checkInContainer}>
-                    <DailyCheckInPanel date={isoDate} />
-                  </View>
+              ) : ( */}
+              <>
+                {/* Daily check-in */}
+                <View style={styles.checkInContainer}>
+                  <DailyCheckInPanel date={isoDate} />
+                </View>
 
-                  {/* Habits section header */}
-                  {habitList.length > 0 && (
-                    <View style={styles.sectionHeader}>
-                      <View>
-                        <Text style={styles.sectionTitle}>{sectionTitle}</Text>
-                        <Text style={styles.sectionSubtitle}>
-                          {sectionSubtitle}
-                        </Text>
-                      </View>
-                      <ProgressPill
-                        label={`${completedHabit}/${habitList.length}`}
-                      />
+                {/* Habits section header */}
+                {habitList.length > 0 && (
+                  <View style={styles.sectionHeader}>
+                    <View>
+                      <Text style={styles.sectionTitle}>{sectionTitle}</Text>
+                      <Text style={styles.sectionSubtitle}>
+                        {sectionSubtitle}
+                      </Text>
                     </View>
-                  )}
-                </>
-              )}
+                    <ProgressPill
+                      label={`${completedHabit}/${habitList.length}`}
+                    />
+                  </View>
+                )}
+              </>
+              {/* )} */}
             </>
           }
           renderItem={({ item }) => (

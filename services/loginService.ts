@@ -91,15 +91,6 @@ export const login = async (data: LoginRequest): Promise<LoginResponse> => {
     const errorMessage =
       error.response?.data?.message ||
       "Something went wrong. Please try again.";
-
-    // Show error toast
-    Toast.show({
-      type: "error",
-      text1: "Login Failed",
-      text2: errorMessage,
-      position: "bottom",
-    });
-
     throw error.response ? error.response.data : error.message;
   }
 };

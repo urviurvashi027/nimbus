@@ -8,6 +8,8 @@ import {
   BackHandler,
 } from "react-native";
 import { router, useNavigation } from "expo-router";
+import * as SecureStore from "expo-secure-store";
+import { format } from "date-fns";
 
 import { ONBOARDING_QUESTIONS } from "../../../constant/data/onboardingQuestion";
 import { StyledButton } from "@/components/common/ThemedComponent/StyledButton";
@@ -17,36 +19,34 @@ import OnboardingHeader from "./component/OnboardingHeader";
 import SignaturePad, { SignaturePadRef } from "./component/SignaturePad";
 import ChoiceItem from "./component/ChoiceItem";
 import InlineTimePicker from "@/components/common/ThemedComponent/InlinedTimePicker";
-import { format } from "date-fns";
 
-const LANDING_ROUTE = "/(public)/landingScreen"; // <-- change if your route is different
+import { StoreKey } from "@/constant/Constant";
+import { useAuth } from "@/context/AuthContext";
+import {
+  OnboardingQuestion,
+  fetchOnboardingQuestions,
+} from "@/services/onboardingService";
 
 const OnboardingFlow = () => {
+  const navigation = useNavigation();
+  const { newTheme } = useContext(ThemeContext);
+
+  const styles = styling(newTheme);
+
+  const { resetToPublic, markOnboardingDone } = useAuth();
+
+  const [loadingQuestions, setLoadingQuestions] = useState(true);
+  const [questions, setQuestions] = useState<OnboardingQuestion[]>([]);
   const [step, setStep] = useState(0);
+
   const [answers, setAnswers] = useState<Record<string, any>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const navigation = useNavigation();
-  const { theme, newTheme } = useContext(ThemeContext);
-
-  const styles = styling(theme, newTheme);
-
-  const question = ONBOARDING_QUESTIONS[step];
-  const TOTAL = ONBOARDING_QUESTIONS.length;
-
-  // signature ref
+  const [pendingSigNext, setPendingSigNext] = useState(false);
   const sigRef = useRef<SignaturePadRef | null>(null);
 
-  // called when user signs on signature pad
-  const onSignatureOK = (dataUrl: string) => {
-    // store the dataUrl (base64 image) in answers keyed by question.id
-    setAnswers((prev) => ({ ...prev, [question.id]: dataUrl }));
-  };
-
-  const clearSignature = () => {
-    sigRef.current?.clear();
-    setAnswers((prev) => ({ ...prev, [question.id]: null }));
-  };
+  const question = questions[step];
+  const TOTAL = questions.length;
 
   useEffect(() => {
     navigation.setOptions({
@@ -54,56 +54,26 @@ const OnboardingFlow = () => {
     });
   }, [navigation]);
 
-  const toggleAnswer = (id: string) => {
-    if (question.type === "single") {
-      setAnswers({ ...answers, [question.id]: id });
-    } else if (question.type === "multiple") {
-      const existing = answers[question.id] || [];
-      setAnswers({
-        ...answers,
-        [question.id]: existing.includes(id)
-          ? existing.filter((x: string) => x !== id)
-          : [...existing, id],
-      });
-    }
-  };
-
-  const next = () => {
-    // if signature step, must ensure signature present
-    if (question.type === "signature") {
-      const sig = answers[question.id];
-      if (!sig) {
-        alert(
-          "Please sign to continue We need your signature to finish the contract."
-        );
-        return;
-      }
-    }
-    if (step < TOTAL - 1) setStep(step + 1);
-    else {
+  // ✅ Fetch questions from backend
+  useEffect(() => {
+    const load = async () => {
       try {
-        setIsSubmitting(true);
-        console.log("Submit answers:", step, answers);
-        router.push("/onboarding/welcomeKickoff");
-        // router.push("/stateScreen/SuccessScreen");
-      } catch (err) {
-        console.error(err);
-        alert("Error Unable to submit. Please try again.");
+        setLoadingQuestions(true);
+        const res = await fetchOnboardingQuestions();
+        if (res?.success && Array.isArray(res?.data?.questions)) {
+          setQuestions(res.data.questions);
+          setStep(0);
+          return;
+        }
+        alert(res?.message ?? "Unable to load onboarding questions.");
+      } catch (e: any) {
+        alert(e?.message ?? "Unable to load onboarding questions.");
       } finally {
-        setIsSubmitting(false);
+        setLoadingQuestions(false);
       }
-    }
-  };
-
-  // --- BACK: previous step or landing ---
-  const handleOnBack = () => {
-    if (step > 0) {
-      setStep((s) => Math.max(0, s - 1));
-    } else {
-      // First question → leave the flow
-      router.replace(LANDING_ROUTE);
-    }
-  };
+    };
+    load();
+  }, []);
 
   // Optional: Android hardware back
   useEffect(() => {
@@ -114,6 +84,81 @@ const OnboardingFlow = () => {
     });
     return () => sub.remove();
   }, [step]);
+
+  const handleOnBack = async () => {
+    if (step > 0) {
+      setStep((s) => Math.max(0, s - 1));
+    } else {
+      await resetToPublic?.(); // ✅ this will stop the guard from pulling you back
+    }
+  };
+
+  // called when user signs on signature pad
+  const onSignatureOK = (dataUrl: string) => {
+    // setAnswers((prev) => ({ ...prev, [question.id]: dataUrl }));
+
+    // if user pressed Continue, proceed automatically once we have data
+    if (pendingSigNext) {
+      setPendingSigNext(false);
+      if (step < TOTAL - 1) setStep(step + 1);
+      else finishOnboarding(); // we'll add this helper below
+    }
+  };
+
+  const finishOnboarding = async () => {
+    try {
+      setIsSubmitting(true);
+      // console.log(answers, "ans");
+      await markOnboardingDone?.();
+      await SecureStore.setItemAsync(StoreKey.ONBOARDING_DONE_KEY, "true");
+      router.replace("/(auth)/onboarding/welcomeKickoff");
+      console.log("ONBOARDING_DONE set to true");
+      //  router.replace("/(auth)/(tabs)"); // ✅ only this
+    } catch (err) {
+      console.error(err);
+      alert("Error Unable to submit. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const next = async () => {
+    if (question.type === "signature") {
+      const sig = answers[question.id];
+
+      // If we don't have signature yet, capture it automatically
+      if (!sig) {
+        setPendingSigNext(true);
+        sigRef.current?.read(); // triggers onOK if there's content
+        // if empty, onEmpty will fire and pendingSigNext should be cancelled there
+        return;
+      }
+    }
+
+    if (step < TOTAL - 1) setStep(step + 1);
+    else await finishOnboarding();
+  };
+
+  const clearSignature = () => {
+    sigRef.current?.clear();
+    setAnswers((prev) => ({ ...prev, [question.id]: null }));
+  };
+
+  const toggleAnswer = (choiceId: string) => {
+    if (!question) return;
+    if (question.type === "single") {
+      setAnswers((prev) => ({ ...prev, [question.id]: choiceId }));
+      return;
+    } else if (question.type === "multiple") {
+      setAnswers((prev) => {
+        const existing: string[] = prev[question.id] || [];
+        const next = existing.includes(choiceId)
+          ? existing.filter((x) => x !== choiceId)
+          : [...existing, choiceId];
+        return { ...prev, [question.id]: next };
+      });
+    }
+  };
 
   return (
     <ScreenView style={{ padding: 10, marginTop: 0 }}>
@@ -171,25 +216,34 @@ const OnboardingFlow = () => {
             <SignaturePad
               ref={sigRef}
               onOK={onSignatureOK}
-              onEmpty={() => setAnswers((p) => ({ ...p, [question.id]: null }))}
+              // onEmpty={() => setAnswers((p) => ({ ...p, [question.id]: null }))}
+              onEmpty={() => {
+                setPendingSigNext(false);
+                setAnswers((p) => ({ ...p, [question.id]: null }));
+                alert("Please add your signature to continue.");
+              }}
               penColor={newTheme.accent}
               backgroundColor={newTheme.surface}
               style={{ height: 260 }}
             />
 
-            <View style={{ flexDirection: "row", gap: 12, marginTop: 12 }}>
+            <View style={{ flexDirection: "row", marginTop: 12 }}>
               <Pressable
-                style={[styles.smallBtn, { backgroundColor: newTheme.surface }]}
-                onPress={() => clearSignature()}
+                style={[
+                  styles.smallBtn,
+                  {
+                    backgroundColor: newTheme.surface,
+                    borderWidth: 1,
+                    borderColor: newTheme.border,
+                  },
+                ]}
+                onPress={clearSignature}
               >
-                <Text style={{ color: newTheme.textPrimary }}>Clear</Text>
-              </Pressable>
-
-              <Pressable
-                style={[styles.smallBtn, { backgroundColor: newTheme.surface }]}
-                onPress={() => sigRef.current?.read()}
-              >
-                <Text style={{ color: newTheme.textPrimary }}>Save</Text>
+                <Text
+                  style={{ color: newTheme.textPrimary, fontWeight: "700" }}
+                >
+                  Clear signature
+                </Text>
               </Pressable>
 
               <View style={{ flex: 1 }} />
@@ -209,7 +263,7 @@ const OnboardingFlow = () => {
   );
 };
 
-const styling = (theme: ThemeKey, newTheme: any) =>
+const styling = (newTheme: any) =>
   StyleSheet.create({
     container: {
       paddingTop: 10,
@@ -249,7 +303,7 @@ const styling = (theme: ThemeKey, newTheme: any) =>
     smallBtn: {
       paddingHorizontal: 14,
       paddingVertical: 10,
-      borderRadius: 10,
+      borderRadius: 12,
     },
   });
 

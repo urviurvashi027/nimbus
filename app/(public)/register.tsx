@@ -1,339 +1,247 @@
-import React, { useContext, useEffect, useState } from "react";
-import { View, Text, StyleSheet, Pressable } from "react-native";
-import Svg, { Path } from "react-native-svg";
-
-import InputField from "@/components/common/ThemedComponent/StyledInput";
-import { StyledButton } from "@/components/common/ThemedComponent/StyledButton";
-import OtpVerificationScreen from "./otpVerification";
-import { router, useNavigation } from "expo-router";
-import ThemeContext from "@/context/ThemeContext";
-import { ScreenView, ThemeKey } from "@/components/Themed";
-import { useAuth } from "@/context/AuthContext";
+import React, { useContext, useState } from "react";
+import { View, Text } from "react-native";
+import { Stack, router } from "expo-router";
 import Toast from "react-native-toast-message";
-import SignUpPasswordScreen from "./signUpPassword";
+
+import ThemeContext from "@/context/ThemeContext";
+import { useAuth } from "@/context/AuthContext";
+
+import { NimbusAuthLayout } from "@/components/public/NimbusAuthLayout";
+import { NimbusInput } from "@/components/common/themeComponents/NimbusInput";
+import { NimbusButton } from "@/components/common/themeComponents/NimbusButton";
+
+import NimbusOtpVerifyStep from "@/components/public/NimbusOtpVerifyStep";
+import NimbusPasswordStep from "@/components/public/NimbusPasswordStep";
+import { useNimbusToast } from "@/components/common/toast/useNimbusToast";
 
 const TOTAL_STEPS = 4;
+type Step = 1 | 2 | 3 | 4;
 
-const RegistrationFlow = () => {
-  const [step, setStep] = useState<number>(1);
+export default function RegistrationScreen() {
+  return (
+    <>
+      <Stack.Screen options={{ headerShown: false }} />
+      <RegistrationFlowInner />
+    </>
+  );
+}
 
-  // input state
-  const [fullName, setFullName] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
-  const [username, setUsername] = useState<string>("");
-  const [countryCode, setCountryCode] = useState("+91");
-  const [mobile, setMobile] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-
-  // error state
-  const [error, setError] = useState<boolean>(false);
-  const [errMsg, setErrMsg] = useState<string>("");
-
+function RegistrationFlowInner() {
+  const { newTheme } = useContext(ThemeContext);
   const { onRegister } = useAuth();
 
-  const nextStep = () => setStep((s) => Math.min(TOTAL_STEPS, s + 1));
-  const prevStep = () => setStep((s) => Math.max(1, s - 1));
+  const [step, setStep] = useState<Step>(1);
 
-  const navigation = useNavigation();
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [countryCode, setCountryCode] = useState("+91");
+  const [mobile, setMobile] = useState("");
 
-  const { theme, newTheme } = useContext(ThemeContext);
-  const styles = styling(theme, newTheme);
+  const [errMsg, setErrMsg] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // useEffect
-  useEffect(() => {
-    navigation.setOptions({
-      headerShown: true,
-      headerTransparent: true,
-      headerBackButtonDisplayMode: "minimal",
-      headerTintColor: newTheme.textPrimary,
-      headerTitle: "",
-    });
-  }, [navigation]);
+  const toast = useNimbusToast();
 
-  // API Call
-  const onSignUpClick = async (password: string) => {
-    if (error) return;
-    const result = await onRegister!(
-      username,
-      fullName,
-      mobile,
-      email,
-      password
-    );
-    // success handled
-    if (result && result.success) {
-      Toast.show({
-        type: "success",
-        text1: "Account created successfuly",
-        position: "bottom",
-      });
-      router.push("/(auth)/onboarding/QuestionScreen");
-    }
-    // failure handled
-    if (result.error_code || !result.success) {
-      let msg =
-        typeof result.message === "string"
-          ? result.message
-          : JSON.stringify(result.message); // if object with field errors
-      Toast.show({
-        type: "error",
-        text1: "Something went wrong: Retry again later",
-        position: "bottom",
-      });
-      alert(msg);
+  const next = () => setStep((s) => Math.min(TOTAL_STEPS, s + 1) as Step);
+
+  //   const back =
+  //     step > 1 ? () => setStep((s) => Math.max(1, s - 1) as Step) : undefined;
+
+  const back = () => {
+    setErrMsg(""); // optional: clear error when going back
+    if (step > 1) {
+      setStep((s) => Math.max(1, s - 1) as Step);
+    } else {
+      router.replace("/(public)/landing");
     }
   };
 
-  // Input Validation
-  const validateEmail = (text: string) => {
-    setEmail(text);
+  const title = (txt: string) => (
+    <Text
+      style={{ color: newTheme.textPrimary, fontSize: 28, fontWeight: "900" }}
+    >
+      {txt}
+    </Text>
+  );
+
+  const subtitle = (txt: string) => (
+    <Text
+      style={{
+        color: newTheme.textSecondary,
+        marginTop: 10,
+        marginBottom: 22,
+        lineHeight: 20,
+      }}
+    >
+      {txt}
+    </Text>
+  );
+
+  const error = () =>
+    errMsg ? (
+      <Text style={{ color: newTheme.error, marginTop: 12, fontWeight: "800" }}>
+        {errMsg}
+      </Text>
+    ) : null;
+
+  const validateStep1 = () => {
+    setErrMsg("");
     const emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
-    if (text.length === 0) {
-      setError(true);
-      setErrMsg("Email is required");
-    } else if (!emailRegex.test(text)) {
-      setError(true);
-      setErrMsg("Please enter a valid email address");
-    } else {
-      setError(false);
-      setErrMsg("");
-    }
+    if (!fullName.trim()) return setErrMsg("Full name is required."), false;
+    if (!email.trim()) return setErrMsg("Email is required."), false;
+    if (!emailRegex.test(email.trim()))
+      return setErrMsg("Please enter a valid email address."), false;
+    return true;
   };
 
-  const validatePhone = (text: string) => {
-    setMobile(text);
-    if (text.length === 0) {
-      setError(true);
-      setErrMsg("Mobile number is required");
-    } else if (!/^[0-9]{10}$/.test(text)) {
-      setError(true);
-      setErrMsg("Enter a valid 10-digit number");
-    } else {
-      setError(false);
-      setErrMsg("");
-    }
+  const validateStep2 = () => {
+    setErrMsg("");
+    if (!username.trim()) return setErrMsg("Username is required."), false;
+
+    const codeOk = /^\+?[0-9]{2,3}$/.test(countryCode.trim());
+    if (!codeOk) return setErrMsg("Country code must be like +91."), false;
+
+    if (!/^[0-9]{10}$/.test(mobile.trim()))
+      return setErrMsg("Enter a valid 10-digit mobile number."), false;
+
+    return true;
   };
 
-  const validateCountryCode = (text: string) => {
-    setCountryCode(text);
-    if (text.length < 2 || text.length > 3) {
-      setError(true);
-      setErrMsg("Code must be 2–3 digits");
-    } else if (!/^\\+?[0-9]{2,3}$/.test(text)) {
-      setError(true);
-      setErrMsg("Invalid code");
-    } else {
-      setError(false);
-      setError(true);
-      setErrMsg("");
-    }
-  };
+  const completeSignup = async (pwd: string) => {
+    setLoading(true);
+    setErrMsg("");
 
-  // Button and callback handler
+    try {
+      const result = await onRegister?.(username, fullName, mobile, email, pwd);
 
-  const onSetNewPasswordHandler = (password: string) => {
-    setPassword(password);
-    onSignUpClick(password);
-  };
+      if (result?.success) {
+        toast.show({
+          variant: "success",
+          title: "Account created",
+          message: "Account created sucessfull",
+        });
+        console.log("coming here succsess page");
+        // router.replace("/(auth)/onboarding/QuestionScreen");
+        return;
+      }
 
-  const nextStepHandler = () => {
-    if (!error) nextStep();
-  };
-
-  const renderStep = () => {
-    switch (step) {
-      case 1:
-        return (
-          <View>
-            <Text style={styles.title}>Welcome! 👋</Text>
-            <Text style={styles.subtitle}>
-              Let’s start your journey. Tell us your full name and email to get
-              going.
-            </Text>
-            <InputField
-              label="Full Name"
-              value={fullName}
-              onChangeText={setFullName}
-              placeholder="John Doe"
-            />
-            <View style={{ height: 20 }} />
-            <InputField
-              label="Email"
-              preset="email"
-              value={email}
-              onChangeText={validateEmail}
-              placeholder="john@domain.com"
-            />
-            <View style={{ marginTop: 40 }} />
-            <View>
-              <Text style={{ color: newTheme.error }}>{errMsg}</Text>
-            </View>
-            <View style={{ marginTop: 10 }} />
-            <StyledButton label="Next" onPress={nextStepHandler} />
-          </View>
-        );
-
-      case 2:
-        return (
-          <View>
-            <Text style={styles.title}>Almost There 🚀</Text>
-            <Text style={styles.subtitle}>
-              Choose a unique username and add your mobile number so we can stay
-              connected.
-            </Text>
-            <InputField
-              label="Username"
-              value={username}
-              onChangeText={setUsername}
-              placeholder="johnny123"
-            />
-            <View style={{ height: 20 }} />
-            {/* Country code + Phone row */}
-            <View style={styles.phoneRow}>
-              <View style={{ flex: 0.2, marginRight: 10 }}>
-                <InputField
-                  label="Code"
-                  value={countryCode}
-                  onChangeText={validateCountryCode}
-                  placeholder="+91"
-                  keyboardType="phone-pad"
-                />
-              </View>
-              <View style={{ flex: 0.8 }}>
-                <InputField
-                  label="Mobile Number"
-                  value={mobile}
-                  onChangeText={validatePhone}
-                  placeholder="9876543210"
-                  keyboardType="phone-pad"
-                />
-              </View>
-            </View>
-
-            <View style={{ marginTop: 40 }} />
-            <View>
-              <Text style={{ color: newTheme.error }}>{errMsg}</Text>
-            </View>
-            <View style={{ marginTop: 10 }} />
-            <StyledButton label="Next" onPress={nextStepHandler} />
-          </View>
-        );
-
-      case 3:
-        return (
-          <OtpVerificationScreen
-            isEmbedded={true}
-            mode="embedded"
-            email={email}
-            mobile={mobile}
-            onVerified={() => {
-              nextStepHandler();
-            }}
-          />
-        );
-
-      case 4:
-        return <SignUpPasswordScreen submitHanlder={onSetNewPasswordHandler} />;
-
-      default:
-        return null;
+      const msg =
+        typeof result?.message === "string"
+          ? result.message
+          : JSON.stringify(result?.message ?? "Signup failed");
+      setErrMsg(msg);
+      toast.show({
+        variant: "error",
+        title: "Signup failed",
+        message: "Signup failed",
+      });
+    } catch (e: any) {
+      setErrMsg(e?.message ?? "Signup failed.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <ScreenView style={styles.mainContainer} bgColor={newTheme.background}>
-      <View style={styles.container}>
-        {/* Header */}
-        <View style={styles.header}>
-          {step > 1 ? (
-            <Pressable onPress={prevStep}>
-              <Svg width={24} height={24} viewBox="0 0 24 24">
-                <Path
-                  d="M15 18l-6-6 6-6"
-                  stroke="#ECEFF4"
-                  strokeWidth={2}
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </Svg>
-            </Pressable>
-          ) : (
-            <View style={styles.backPlaceholder} /> // keeps space even if hidden
+    <NimbusAuthLayout step={step} total={TOTAL_STEPS} onBack={back}>
+      {step === 1 && (
+        <>
+          {title("Welcome! 👋")}
+          {subtitle(
+            "Let’s start your journey. Tell us your full name and email to get going."
           )}
-          <Text style={styles.progressText}>
-            {step} / {TOTAL_STEPS}
-          </Text>
-        </View>
 
-        {/* Progress Bar */}
-        <View style={styles.progressBarWrapper}>
-          <View
-            style={[
-              styles.progressBarFill,
-              { width: `${(step / TOTAL_STEPS) * 100}%` },
-            ]}
+          <NimbusInput
+            label="Full Name"
+            value={fullName}
+            onChangeText={setFullName}
+            placeholder="John Doe"
           />
-        </View>
+          <View style={{ height: 16 }} />
+          <NimbusInput
+            label="Email"
+            preset="email"
+            value={email}
+            onChangeText={setEmail}
+            placeholder="john@domain.com"
+          />
 
-        {/* Step Content */}
-        <View style={{ flex: 1, marginTop: 30 }}>{renderStep()}</View>
-      </View>
-    </ScreenView>
+          {error()}
+
+          <View style={{ height: 18 }} />
+          <NimbusButton
+            label="Next"
+            onPress={() => validateStep1() && next()}
+          />
+        </>
+      )}
+
+      {step === 2 && (
+        <>
+          {title("Almost There 🚀")}
+          {subtitle(
+            "Choose a unique username and add your mobile number so we can stay connected."
+          )}
+
+          <NimbusInput
+            label="Username"
+            value={username}
+            onChangeText={setUsername}
+            placeholder="johnny123"
+          />
+          <View style={{ height: 16 }} />
+
+          <View style={{ flexDirection: "row", gap: 12 }}>
+            <View style={{ flex: 0.3 }}>
+              <NimbusInput
+                label="Code"
+                preset="phone"
+                value={countryCode}
+                onChangeText={setCountryCode}
+                placeholder="+91"
+                keyboardType="phone-pad"
+                maxLength={4}
+              />
+            </View>
+            <View style={{ flex: 0.7 }}>
+              <NimbusInput
+                label="Mobile Number"
+                preset="phone"
+                value={mobile}
+                onChangeText={setMobile}
+                placeholder="9876543210"
+                keyboardType="phone-pad"
+                maxLength={10}
+              />
+            </View>
+          </View>
+
+          {error()}
+
+          <View style={{ height: 18 }} />
+          <NimbusButton
+            label="Send OTP"
+            onPress={() => validateStep2() && next()}
+          />
+        </>
+      )}
+
+      {step === 3 && (
+        <NimbusOtpVerifyStep
+          username={username}
+          email={email}
+          onVerified={() => next()}
+          onError={(msg) => setErrMsg(msg)}
+        />
+      )}
+
+      {step === 4 && (
+        <NimbusPasswordStep
+          loading={loading}
+          onSubmit={(pwd) => completeSignup(pwd)}
+        />
+      )}
+    </NimbusAuthLayout>
   );
-};
-
-const styling = (theme: ThemeKey, newTheme: any) =>
-  StyleSheet.create({
-    mainContainer: {
-      paddingTop: 95,
-    },
-    container: {
-      flex: 1,
-      backgroundColor: newTheme.background,
-    },
-    header: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      paddingTop: 20,
-    },
-    backButton: { width: 40, alignItems: "flex-start" },
-    backPlaceholder: { width: 40 }, // invisible placeholder
-    progressText: {
-      color: newTheme.textPrimary,
-      fontSize: 14,
-      fontWeight: "600",
-      marginLeft: "auto",
-    },
-    phoneRow: {
-      flexDirection: "row",
-      alignItems: "flex-start",
-    },
-    progressBarWrapper: {
-      height: 6,
-      borderRadius: 6,
-      backgroundColor: newTheme.surface,
-      marginTop: 12,
-    },
-    progressBarFill: {
-      height: 6,
-      borderRadius: 6,
-      backgroundColor: newTheme.accent,
-    },
-    title: {
-      color: newTheme.textPrimary,
-      fontSize: 22,
-      fontWeight: "700",
-      marginTop: 10,
-      marginBottom: 8,
-    },
-    subtitle: {
-      color: newTheme.textSecondary,
-      fontSize: 14,
-      marginBottom: 24,
-      lineHeight: 20,
-    },
-  });
-
-export default RegistrationFlow;
+}

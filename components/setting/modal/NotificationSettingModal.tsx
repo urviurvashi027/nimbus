@@ -16,7 +16,6 @@ import { format } from "date-fns";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import ThemeContext from "@/context/ThemeContext";
 import type { ReminderSettings } from "@/services/remiderStorageService";
-import Toast from "react-native-toast-message";
 import { useAuth } from "@/context/AuthContext";
 import {
   daysShortToNums,
@@ -28,6 +27,7 @@ import {
 import { arraysEqual, deriveHHmmss } from "@/utils/helper";
 import StyledSwitch from "@/components/common/themeComponents/StyledSwitch";
 import StyledButton from "@/components/common/themeComponents/StyledButton";
+import { useNimbusToast } from "@/components/common/toast/useNimbusToast";
 
 type Props = {
   detail: any;
@@ -59,6 +59,8 @@ export default function ReminderDetail({
   const [saving, setSaving] = useState(false);
 
   const { loadUserFromStorage, updateProfile } = useAuth();
+
+  const toast = useNimbusToast();
 
   useEffect(() => {
     console.log(detail, "details");
@@ -194,10 +196,10 @@ export default function ReminderDetail({
 
       // nothing changed? bail early
       if (Object.keys(patch).length === 0) {
-        Toast.show({
-          type: "info",
-          text1: "No changes to save",
-          position: "bottom",
+        toast.show({
+          variant: "info",
+          title: "No changes to save",
+          message: "No changes to save",
         });
         setSaving(false);
         return;
@@ -218,10 +220,10 @@ export default function ReminderDetail({
 
       if (success) {
         onSaved?.();
-        Toast.show({
-          type: "success",
-          text1: "Reminder updated",
-          position: "bottom",
+        toast.show({
+          variant: "success",
+          title: "Reminder updated",
+          message: "Reminder updated",
         });
 
         // update originals so dirty check resets
@@ -237,10 +239,10 @@ export default function ReminderDetail({
       }
     } catch (e) {
       console.warn("save error", e);
-      Toast.show({
-        type: "error",
-        text1: "Could not save reminder",
-        position: "bottom",
+      toast.show({
+        variant: "error",
+        title: "Could not save reminder",
+        message: "Could not save reminder",
       });
     } finally {
       setSaving(false);

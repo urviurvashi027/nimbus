@@ -21,6 +21,17 @@ import {
 import { setStoredUser, User, getStoredUser } from "@/services/storageSerives";
 import { storageKey } from "@/services/remiderStorageService";
 
+export async function clearAuthAndOnboarding() {
+  await SecureStore.deleteItemAsync(StoreKey.TOKEN_KEY);
+  await SecureStore.deleteItemAsync(StoreKey.REFRESH_TOKEN);
+  await SecureStore.deleteItemAsync(StoreKey.ONBOARDING_DONE_KEY);
+}
+
+const resetApp = async () => {
+  await clearAuthAndOnboarding();
+  router.replace("/(public)/landing");
+};
+
 type UserProfile = {
   full_name?: string | null;
   phone_number?: string | null;
@@ -51,12 +62,11 @@ const AUTO_LOGOUT_MS = AUTO_LOGOUT_DAYS * 24 * 60 * 60 * 1000;
 interface AuthProps {
   authState?: { token: string | null; authenticated: boolean | null };
   onRegister?: (
-    // test added optional paramter
-    email: string,
-    password: string,
+    username: string,
+    fullName: string,
     mobile: string,
-    username?: string,
-    fullname?: string
+    email: string,
+    password: string
   ) => Promise<any>;
   onLogin?: (userName: string, password: string) => Promise<any>;
   onLogout?: () => Promise<any>;
@@ -64,6 +74,9 @@ interface AuthProps {
   getUserDetails?: () => Promise<any>;
   updateProfile?: (val: any) => Promise<any>;
   loadUserFromStorage?: () => Promise<any>;
+  resetToPublic?: () => Promise<void>;
+  markOnboardingDone?: () => Promise<void>;
+  onboardingDone?: boolean | null;
   user?: User;
 }
 
@@ -77,29 +90,41 @@ export const useAuth = () => {
   return useContext(AuthContext);
 };
 
-function useProtectedRoute(authState: {
-  token: string | null;
-  authenticated: boolean | null;
-}) {
-  const segments = useSegments();
+function useProtectedRoute(
+  authState: { token: string | null; authenticated: boolean | null },
+  onboardingDone: boolean | null
+) {
+  const segments = useSegments() as string[];
 
   useEffect(() => {
-    // Wait until we know (prevents flicker)
     if (authState.authenticated === null) return;
+    if (!segments?.length) return;
 
-    const group = segments[0]; // "(public)" | "(auth)" | etc.
-    const inAuthGroup = group === "(auth)";
+    const isAuthed = authState.authenticated === true;
+    const root = segments[0];
+    const child = segments[1];
 
-    if (!authState.authenticated && inAuthGroup) {
-      router.replace("/(public)/landingScreen");
+    if (isAuthed && onboardingDone === null) return;
+
+    // not authed -> block auth routes
+    if (!isAuthed && root === "(auth)") {
+      router.replace("/(public)/landing");
       return;
     }
 
-    if (authState.authenticated && !inAuthGroup) {
-      router.replace("/(auth)/(tabs)");
+    // authed but onboarding not done -> must be in onboarding
+    if (isAuthed && onboardingDone === false) {
+      const inOnboarding = root === "(auth)" && child === "onboarding";
+      if (!inOnboarding) router.replace("/(auth)/onboarding/QuestionScreen");
       return;
     }
-  }, [authState.authenticated, segments]);
+
+    // authed + onboarding done -> block public screens only
+    if (isAuthed && onboardingDone === true) {
+      if (root === "(public)") router.replace("/(auth)/(tabs)");
+      return; // ✅ allow any /(auth) route
+    }
+  }, [authState.authenticated, onboardingDone, segments.join("/")]);
 }
 
 export default function AuthProvider({ children }: { children: ReactNode }) {
@@ -115,6 +140,14 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   }>({ token: null, authenticated: null });
 
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [onboardingDone, setOnboardingDone] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      const v = await SecureStore.getItemAsync(StoreKey.ONBOARDING_DONE_KEY);
+      setOnboardingDone(v === "true");
+    })();
+  }, [authState.authenticated]);
 
   // refs for refresh flow
   const isRefreshingRef = useRef(false);
@@ -152,16 +185,22 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const loadToken = async () => {
+      resetApp();
       try {
         const token = await SecureStore.getItemAsync(TOKEN_KEY);
         const refresh = await SecureStore.getItemAsync(REFRESH_TOKEN);
         const profileInfo = await SecureStore.getItemAsync(USER_PROFILE_KEY);
+
+        // ✅ Always load onboarding key too
+        const ob = await SecureStore.getItemAsync(StoreKey.ONBOARDING_DONE_KEY);
 
         if (token) {
           axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
           setAuthState({ token, authenticated: true });
 
           if (profileInfo) setUserProfile(JSON.parse(profileInfo));
+          // ✅ If key missing, decide a default (recommended: false)
+          setOnboardingDone(ob === "true");
         } else {
           setAuthState({ token: null, authenticated: false });
         }
@@ -171,6 +210,18 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     loadToken();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      const v = await SecureStore.getItemAsync(StoreKey.ONBOARDING_DONE_KEY);
+      console.log("onboardingDone key: auth", v);
+    })();
+  }, []);
+
+  const markOnboardingDone = useCallback(async () => {
+    await SecureStore.setItemAsync(StoreKey.ONBOARDING_DONE_KEY, "true");
+    setOnboardingDone(true);
   }, []);
 
   // test added optional paramter
@@ -189,9 +240,29 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         full_name: fullName,
         password,
       };
-      return await signup(request);
+      const result = await signup(request);
+      const { success, data } = result || {};
+      // ✅ If backend returns tokens on signup, apply them immediately
+      if (success && data?.access) {
+        await SecureStore.setItemAsync(REFRESH_TOKEN, data.refresh ?? "");
+        await SecureStore.setItemAsync(StoreKey.TOKEN_KEY, data.access);
+        await SecureStore.setItemAsync(StoreKey.ONBOARDING_DONE_KEY, "false");
+        setOnboardingDone(false);
+        await applyAccessToken(data.access); // sets axios header + authState + TOKEN_KEY
+        await _fetchUserProfile(); // optional but recommended
+
+        axios.defaults.headers.common[
+          "Authorization"
+        ] = `Bearer ${data.access}`;
+        setAuthState({ token: data.access, authenticated: true });
+        return result;
+      }
     } catch (e) {
-      return { error: true, msg: (e as any).response.data.msg };
+      return {
+        success: false,
+        error: true,
+        message: "Signup failed",
+      };
     }
   };
 
@@ -225,6 +296,9 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
         await SecureStore.setItemAsync(REFRESH_TOKEN, tokens.refresh);
 
+        const ob = await SecureStore.getItemAsync(StoreKey.ONBOARDING_DONE_KEY);
+        setOnboardingDone(ob === "true"); // if missing => false
+
         await _fetchUserProfile();
 
         // await SecureStore.setItemAsync(USER_KEY, JSON.stringify(userInfo));
@@ -248,8 +322,10 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       const result = await logout(request);
 
       if (result.success && result.message) {
+        await clearAuthAndOnboarding();
         await SecureStore.setItemAsync(TOKEN_KEY, "");
-        axios.defaults.headers.common["Authorization"] = "";
+        setOnboardingDone(null);
+        delete axios.defaults.headers.common["Authorization"];
         await SecureStore.setItemAsync(USER_KEY, "");
         await SecureStore.setItemAsync(REFRESH_TOKEN, "");
         setLoggedInUser({ username: null, email: null });
@@ -257,6 +333,8 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
           authenticated: false,
           token: null,
         });
+        setUserProfile(null);
+        router.replace("/(public)/landing");
       }
     } catch (e) {}
   };
@@ -272,6 +350,19 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   //   setUser(u);
   //   await setStoredUser(u);
   // }, []);
+
+  const resetToPublic = useCallback(async () => {
+    await SecureStore.deleteItemAsync(StoreKey.TOKEN_KEY);
+    await SecureStore.deleteItemAsync(StoreKey.REFRESH_TOKEN);
+    await SecureStore.deleteItemAsync(StoreKey.ONBOARDING_DONE_KEY);
+    setOnboardingDone(null);
+    delete axios.defaults.headers.common["Authorization"];
+
+    setAuthState({ token: null, authenticated: false });
+    setUserProfile(null);
+
+    router.replace("/(public)/landing");
+  }, []);
 
   const _fetchUserProfile = async () => {
     try {
@@ -365,12 +456,15 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     onLogout: _logout,
     userProfile,
     authState,
+    resetToPublic,
     getUserDetails: _fetchUserProfile,
     updateProfile: updateProfile,
     loadUserFromStorage: loadUserFromStorage,
+    markOnboardingDone,
+    onboardingDone,
   };
 
-  useProtectedRoute(authState);
+  useProtectedRoute(authState, onboardingDone);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

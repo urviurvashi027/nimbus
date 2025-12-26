@@ -7,7 +7,7 @@ import { ScreenView, ThemeKey } from "@/components/Themed";
 
 import RelaxMenIcon from "@/assets/images/logoNew/1.svg";
 
-const OnboardingScreen = () => {
+const LandingScreen = () => {
   const navigation = useNavigation();
   const { theme, newTheme } = useContext(ThemeContext);
 
@@ -26,7 +26,7 @@ const OnboardingScreen = () => {
   };
 
   const secondBtnSegmentBtnClick = () => {
-    router.push("/(public)/signIn");
+    router.push("/(public)/sign-in");
   };
 
   return (
@@ -149,4 +149,4 @@ const styling = (theme: ThemeKey, newTheme: any) =>
     },
   });
 
-export default OnboardingScreen;
+export default LandingScreen;

@@ -8,14 +8,13 @@ import {
   SafeAreaView,
   ScrollView,
   Pressable,
-  Text as RNText,
+  Text,
   Platform,
 } from "react-native";
 import { router, useNavigation } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import Toast from "react-native-toast-message";
 
 import HabitContext from "@/context/HabitContext";
 import ThemeContext from "@/context/ThemeContext";
@@ -24,7 +23,7 @@ import HabitTypeInput from "@/components/createHabit/HabitTypeInput";
 import HabitTagsInput, {
   selectedTag,
 } from "@/components/createHabit/HabitTagsInput";
-import { ScreenView, Text, ThemeKey } from "@/components/Themed";
+import { ScreenView, ThemeKey } from "@/components/Themed";
 
 import HabitMetricInput from "@/components/createHabit/HabitMetricInput";
 import HabitDurationInput from "@/components/createHabit/HabitDurationInput";
@@ -43,6 +42,7 @@ import {
   HabitDateType,
 } from "@/types/habitTypes";
 import StyledButton from "@/components/common/themeComponents/StyledButton";
+import { useNimbusToast } from "@/components/common/toast/useNimbusToast";
 
 const COLOR_OPTIONS = [
   "#FFEDFA",
@@ -65,6 +65,8 @@ export default function HabitBasic() {
   const [date, setDate] = useState<HabitDateType>();
   const [reminderAt, setReminderAt] = useState<ReminderAt>({});
   const [emoji, setEmoji] = useState<string>("🙂");
+
+  const toast = useNimbusToast();
 
   // ui / api state
   const [isLoading, setIsLoading] = useState(false);
@@ -159,15 +161,27 @@ export default function HabitBasic() {
     try {
       const result = await createHabit(payload);
       if (result?.success) {
-        Toast.show({ type: "success", text1: "Habit created" });
+        toast.show({
+          variant: "success",
+          title: "Habit is created",
+          message: "Habit created",
+        });
         setTimeout(() => {
           router.replace("/(auth)/(tabs)");
         }, 650);
       } else {
-        Toast.show({ type: "error", text1: "Failed to create habit" });
+        toast.show({
+          variant: "error",
+          title: "Somthing went wrong",
+          message: "Failed to create habit",
+        });
       }
     } catch (err: any) {
-      Toast.show({ type: "error", text1: "Network error" });
+      toast.show({
+        variant: "error",
+        title: "Somthing went wrong",
+        message: "Network error",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -176,7 +190,11 @@ export default function HabitBasic() {
   const onSubmitClick = () => {
     const { ok, payload, msg } = validateAndBuild() as any;
     if (!ok) {
-      Toast.show({ type: "error", text1: msg });
+      toast.show({
+        variant: "error",
+        title: "Somthing went wrong",
+        message: msg,
+      });
       return;
     }
     creatHabitApi(payload);

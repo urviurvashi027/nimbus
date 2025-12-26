@@ -33,13 +33,6 @@ export const createHabit = async (
       error.response?.data?.message ||
       "Something went wrong. Please try again.";
 
-    // Show error toast
-    Toast.show({
-      type: "error",
-      text1: "Habit Creation Failed",
-      text2: errorMessage,
-      position: "bottom",
-    });
     throw error.response ? error.response.data : error.message;
   }
 };
@@ -142,19 +135,9 @@ export const markHabitDone = async (
       data
     );
     if (response.status === 204) {
-      Toast.show({
-        type: "success",
-        text1: "Meditation Deleted",
-        text2: "The meditation track was successfully removed.",
-      });
     }
     return response.data; // Return the list data
   } catch (error: any) {
-    Toast.show({
-      type: "error",
-      text1: "Delete Failed",
-      text2: "Something went wrong. Please try again.",
-    });
     throw error.response ? error.response.data : error.message;
   }
 };

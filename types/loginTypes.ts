@@ -46,6 +46,7 @@ export interface SignupRequest {
 
 export interface GetOtpRequest {
   recipient: string;
+  name?: string;
 }
 
 export interface GetOtpResponse {
@@ -63,7 +64,7 @@ export interface ForgotPasswordResponse {
   success: boolean;
   message: string;
   data: any;
-  error?: string;
+  error_code?: string;
 }
 
 export interface ResetPasswordRequest {
