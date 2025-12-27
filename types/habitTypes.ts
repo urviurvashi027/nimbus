@@ -16,14 +16,7 @@ type HabitFrequency = {
   end_date?: string;
 };
 
-// export interface ReminderAt {
-//   time?: string | undefined;
-//   ten_min_before?: boolean;
-//   thirty_min_before?: boolean;
-// }
-
 export type ReminderAt = {
-  // remind_at: string;
   time?: string | undefined;
   ten_min_before?: boolean;
   thirty_min_before?: boolean;

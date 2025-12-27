@@ -19,6 +19,7 @@ import AppHeader from "@/components/common/AppHeader";
 import { format, startOfDay } from "date-fns";
 import { formatReminderTime } from "@/utils/dates";
 import HabitDetailsSkeleton from "@/components/habitDetails/HabitDetailsSkeleton";
+import { DeleteHabitModal } from "@/components/habitDetails/DeleteHabitModal";
 
 const HabitDetails = () => {
   const router = useRouter();
@@ -31,6 +32,7 @@ const HabitDetails = () => {
   }>();
   const [habit, setHabit] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const [error, setError] = useState("");
 
   const styles = styling(newTheme, spacing);
@@ -93,6 +95,8 @@ const HabitDetails = () => {
     }
   }, [id, date]);
 
+  const habitId = Array.isArray(id) ? id[0] : id;
+
   if (loading) {
     return (
       <ScreenView
@@ -146,6 +150,11 @@ const HabitDetails = () => {
                   : "Review your streaks and progress."
               }
               onBack={() => router.back()}
+              rightAction={{
+                icon: "ellipsis-horizontal",
+                onPress: () => setDeleteOpen(true),
+                accessibilityLabel: "Habit options",
+              }}
             />
 
             {/* Top details card */}
@@ -203,6 +212,21 @@ const HabitDetails = () => {
           </ScrollView>
         </SafeAreaView>
       </GestureHandlerRootView>
+      {/* Delete Modal */}
+      <DeleteHabitModal
+        visible={deleteOpen}
+        habit={{
+          id: habitId,
+          name: habit?.name ?? "Habit",
+          current_streak: habit?.current_streak ?? 0,
+          longest_streak: habit?.total_completed_habits ?? 0,
+          ...habit,
+        }}
+        onClose={() => setDeleteOpen(false)}
+        onDeleted={() => {
+          router.back(); // go back after deletion
+        }}
+      />
     </ScreenView>
   );
 };

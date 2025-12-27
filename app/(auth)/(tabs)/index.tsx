@@ -15,7 +15,7 @@ import {
   View,
   Text,
 } from "react-native";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import Toast from "react-native-toast-message";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
@@ -55,11 +55,6 @@ export default function TabOneScreen() {
   const toast = useNimbusToast();
 
   const isoDate = useMemo(() => {
-    console.log(
-      selectedDate,
-      format(selectedDate, "yyyy-MM-dd"),
-      "selected date"
-    );
     return format(selectedDate, "yyyy-MM-dd");
   }, [selectedDate]);
 
@@ -77,11 +72,6 @@ export default function TabOneScreen() {
     () => format(selectedDate, "EEE, MMM dd"),
     [selectedDate]
   );
-
-  // keep userInfo in sync
-  useEffect(() => {
-    setUserInfo(userProfile || null);
-  }, [userProfile]);
 
   // decorate habits with Nimbus icon + color
   const decorateHabits = useCallback((data: any[]): HabitItem[] => {
@@ -117,11 +107,25 @@ export default function TabOneScreen() {
     },
     [decorateHabits]
   );
-  const onCreateClick = () => router.push("/(auth)/habit/CreateHabitScreen");
-  // fetch when date changes
+
+  useFocusEffect(
+    useCallback(() => {
+      // runs every time this screen is focused again
+      loadHabits(isoDate);
+    }, [loadHabits, isoDate])
+  );
+
+  // keep userInfo in sync
   useEffect(() => {
-    loadHabits(isoDate);
-  }, [isoDate, loadHabits]);
+    setUserInfo(userProfile || null);
+  }, [userProfile]);
+
+  // // fetch when date changes
+  // useEffect(() => {
+  //   loadHabits(isoDate);
+  // }, [isoDate, loadHabits]);
+
+  const onCreateClick = () => router.push("/(auth)/habit/CreateHabitScreen");
 
   const handleHabitDoneClick = async (id: string, count: any) => {
     const currentIsoDate = format(startOfDay(selectedDate), "yyyy-MM-dd");
@@ -253,6 +257,7 @@ export default function TabOneScreen() {
               description={item.description}
               done={item.completed}
               onToggle={handleHabitDoneClick}
+              // onHabitDelete={loadHabits(selectedDate)}
               selectedDate={isoDate}
             />
           )}
