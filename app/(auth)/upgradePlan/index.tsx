@@ -11,7 +11,7 @@ import { router, useNavigation } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 
 import ThemeContext from "@/context/ThemeContext";
-import { ScreenView, ThemeKey } from "@/components/Themed";
+import { ScreenView } from "@/components/Themed";
 import { StyledButton } from "@/components/common/ThemedComponent/StyledButton";
 import { PlanDetailsCard } from "@/components/upgradePlan/PlanDetailsCard";
 import { BillingToggle } from "@/components/upgradePlan/BillingToggle";
@@ -50,10 +50,10 @@ const PLANS: Record<BillingPeriod, Plan> = {
 
 const UpgradePlanScreen = () => {
   const navigation = useNavigation();
-  const { theme, newTheme } = useContext(ThemeContext);
+  const { newTheme } = useContext(ThemeContext);
   const [billing, setBilling] = useState<BillingPeriod>("monthly");
 
-  const styles = useMemo(() => styling(theme, newTheme), [theme, newTheme]);
+  const styles = useMemo(() => styling(newTheme), [newTheme]);
   const activePlan = PLANS[billing];
 
   //    const navigation = useNavigation();
@@ -137,7 +137,7 @@ export default UpgradePlanScreen;
 
 /* ----------------- Styles for screen ----------------- */
 
-const styling = (theme: ThemeKey, t: any) =>
+const styling = (t: any) =>
   StyleSheet.create({
     header: {
       flexDirection: "row",

@@ -14,7 +14,7 @@ import { useLocalSearchParams, useNavigation } from "expo-router";
 
 import ThemeContext from "@/context/ThemeContext";
 
-import { ScreenView, ThemeKey } from "@/components/Themed";
+import { ScreenView } from "@/components/Themed";
 import NotificationSettingRow from "@/components/DailyCheckIn/common/NotificationSettingRow";
 import SleepPerformanceCard from "@/components/DailyCheckIn/sleep/SleepPerformance";
 import SleepTimeCard from "@/components/DailyCheckIn/sleep/SleepTimeCard";

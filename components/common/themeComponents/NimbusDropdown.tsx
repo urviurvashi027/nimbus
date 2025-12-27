@@ -8,7 +8,6 @@ import React, {
 import { View, Text, StyleSheet, ViewStyle } from "react-native";
 import DropDownPicker, { ItemType } from "react-native-dropdown-picker";
 import ThemeContext from "@/context/ThemeContext";
-import { ThemeKey } from "@/components/Themed";
 
 export type NimbusDropdownOption<T = any> = {
   label: string;
@@ -49,8 +48,8 @@ function NimbusDropdown<T = any>({
   setItems,
   containerStyle,
 }: Props<T>) {
-  const { theme, newTheme, spacing, typography } = useContext(ThemeContext);
-  const styles = styling(theme, newTheme, spacing, typography);
+  const { newTheme, spacing, typography } = useContext(ThemeContext);
+  const styles = styling(newTheme, spacing, typography);
 
   // Keep items internal; parent usually doesn't need to mutate them
   const [internalItems, setInternalItems] = useState<ItemType<T>[]>(items);
@@ -93,12 +92,7 @@ function NimbusDropdown<T = any>({
 
 export default NimbusDropdown;
 
-const styling = (
-  theme: ThemeKey,
-  newTheme: any,
-  spacing: any,
-  typography: any
-) =>
+const styling = (newTheme: any, spacing: any, typography: any) =>
   StyleSheet.create({
     wrapper: {
       width: "100%",

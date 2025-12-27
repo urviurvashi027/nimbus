@@ -3,7 +3,7 @@ import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/context/ThemeContext";
-import { ThemeKey } from "@/components/Themed";
+// import { ThemeKey } from "@/components/Themed";
 
 type OnboardingHeaderProps = {
   step: number;
@@ -22,17 +22,17 @@ const OnboardingHeader: React.FC<OnboardingHeaderProps> = ({
 
   const { theme, newTheme } = useContext(ThemeContext);
 
-  const styles = styling(theme, newTheme);
+  const styles = styling(newTheme);
 
   return (
     <View style={styles.container}>
       {/* Back Button */}
-      <Pressable
+      {/* <Pressable
         onPress={onBack || (() => router.back())}
         style={styles.backButton}
       >
         <Ionicons name="arrow-back" size={22} color="#ECEFF4" />
-      </Pressable>
+      </Pressable> */}
 
       {/* Progress Bar */}
       <View style={styles.progressBar}>
@@ -47,7 +47,7 @@ const OnboardingHeader: React.FC<OnboardingHeaderProps> = ({
   );
 };
 
-const styling = (theme: ThemeKey, newTheme: any) =>
+const styling = (newTheme: any) =>
   StyleSheet.create({
     container: {
       marginTop: 50,

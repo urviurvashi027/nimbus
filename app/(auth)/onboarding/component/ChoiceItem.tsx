@@ -1,4 +1,3 @@
-import { ThemeKey } from "@/components/Themed";
 import ThemeContext from "@/context/ThemeContext";
 import React, { useContext, useEffect, useState } from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
@@ -7,7 +6,7 @@ import Svg, { Path } from "react-native-svg";
 const ChoiceItem = ({ choice, selected, onPress }: any) => {
   const { theme, newTheme } = useContext(ThemeContext);
 
-  const styles = styling(theme, newTheme);
+  const styles = styling(newTheme);
   return (
     <Pressable
       onPress={onPress}
@@ -32,7 +31,7 @@ const ChoiceItem = ({ choice, selected, onPress }: any) => {
 
 export default ChoiceItem;
 
-const styling = (theme: ThemeKey, newTheme: any) =>
+const styling = (newTheme: any) =>
   StyleSheet.create({
     choiceItem: {
       flexDirection: "row",

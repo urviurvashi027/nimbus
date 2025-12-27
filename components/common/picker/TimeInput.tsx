@@ -1,8 +1,7 @@
 import React, { useMemo, useState } from "react";
-import { View, TouchableOpacity, StyleSheet } from "react-native";
+import { View, TouchableOpacity, StyleSheet, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/context/ThemeContext";
-import { Text } from "@/components/Themed";
 import TimePickerSheet from "@/components/common/picker/TimePickerSheet";
 
 type Props = {

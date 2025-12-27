@@ -3,11 +3,10 @@
 import React, { useContext } from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
 import ThemeContext from "@/context/ThemeContext";
-import { ThemeKey } from "@/components/Themed";
 
 const ReflectionForYouSkeleton: React.FC = () => {
-  const { theme, newTheme, spacing, typography } = useContext(ThemeContext);
-  const styles = styling(theme, newTheme, spacing, typography);
+  const { newTheme, spacing, typography } = useContext(ThemeContext);
+  const styles = styling(newTheme, spacing, typography);
 
   return (
     <View style={styles.sectionContainer}>
@@ -37,12 +36,7 @@ const ReflectionForYouSkeleton: React.FC = () => {
   );
 };
 
-const styling = (
-  theme: ThemeKey,
-  newTheme: any,
-  spacing: any,
-  typography: any
-) =>
+const styling = (newTheme: any, spacing: any, typography: any) =>
   StyleSheet.create({
     sectionContainer: {
       marginBottom: spacing.xl,

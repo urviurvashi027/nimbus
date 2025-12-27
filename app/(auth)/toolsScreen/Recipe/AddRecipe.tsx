@@ -15,7 +15,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/context/ThemeContext";
-import { FormInput } from "@/components/Themed";
+// import { FormInput } from "@/components/Themed";
 import { StyledButton } from "@/components/common/ThemedComponent/StyledButton";
 // If you do not use expo-image-picker, the optional upload will be disabled
 import * as ImagePicker from "expo-image-picker";

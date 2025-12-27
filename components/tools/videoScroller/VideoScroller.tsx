@@ -10,7 +10,6 @@ import VideoThumbnail from "./components/videoThumbnail";
 import { getShortVideo } from "@/services/toolService";
 
 import ThemeContext from "@/context/ThemeContext";
-import { ThemeKey } from "@/components/Themed";
 // ⬅️ NEW import
 
 export interface VideoData {
@@ -28,8 +27,8 @@ const VideoScroller: React.FC = () => {
   const [selectedVideo, setSelectedVideo] = useState<VideoData | null>(null);
   const [isPlayerVisible, setPlayerVisible] = useState(false);
 
-  const { theme, newTheme, spacing, typography } = useContext(ThemeContext);
-  const styles = styling(theme, newTheme, spacing, typography);
+  const { newTheme, spacing, typography } = useContext(ThemeContext);
+  const styles = styling(newTheme, spacing, typography);
 
   useEffect(() => {
     const loadVideos = async () => {
@@ -105,12 +104,7 @@ const VideoScroller: React.FC = () => {
 
 export default VideoScroller;
 
-const styling = (
-  theme: ThemeKey,
-  newTheme: any,
-  spacing: any,
-  typography: any
-) =>
+const styling = (newTheme: any, spacing: any, typography: any) =>
   StyleSheet.create({
     container: {
       paddingVertical: spacing.lg,

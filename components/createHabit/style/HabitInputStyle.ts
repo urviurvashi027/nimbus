@@ -1,5 +1,4 @@
 import { View, TouchableOpacity, StyleSheet, Platform } from "react-native";
-import { ThemeKey } from "@/components/Themed";
 
 const styling = (newTheme: any, spacing: any) =>
   StyleSheet.create({

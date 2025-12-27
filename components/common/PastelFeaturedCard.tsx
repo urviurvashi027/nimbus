@@ -11,7 +11,6 @@ import {
   ImageSourcePropType,
 } from "react-native";
 import ThemeContext from "@/context/ThemeContext";
-import { ThemeKey } from "@/components/Themed";
 
 const { width } = Dimensions.get("window");
 const DEFAULT_CARD_WIDTH = width * 0.8;
@@ -38,10 +37,9 @@ const PastelFeaturedCard: React.FC<PastelFeaturedCardProps> = ({
   colors,
   width,
 }) => {
-  const { theme, newTheme, spacing, typography } = useContext(ThemeContext);
+  const { newTheme, spacing, typography } = useContext(ThemeContext);
 
   const styles = styling(
-    theme,
     newTheme,
     spacing,
     typography,
@@ -81,7 +79,6 @@ const PastelFeaturedCard: React.FC<PastelFeaturedCardProps> = ({
 };
 
 const styling = (
-  theme: ThemeKey,
   newTheme: any,
   spacing: any,
   typography: any,

@@ -8,8 +8,7 @@ import {
 } from "react-native";
 import React, { useContext } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { themeColors } from "@/constant/theme/Colors";
-import { ThemeKey } from "@/components/Themed";
+// import { themeColors } from "@/constant/theme/Colors";
 import ThemeContext from "@/context/ThemeContext";
 
 interface DeleteHabitModalProps {
@@ -37,8 +36,8 @@ const DeleteHabitModal: React.FC<DeleteHabitModalProps> = ({
     primaryBtnClick();
   };
 
-  const { theme } = useContext(ThemeContext);
-  const styles = styling(theme);
+  // const { theme } = useContext(ThemeContext);
+  const styles = styling();
 
   return (
     <Modal
@@ -56,7 +55,7 @@ const DeleteHabitModal: React.FC<DeleteHabitModalProps> = ({
               <Ionicons
                 name="close"
                 size={24}
-                color={themeColors[theme].text}
+                // color={themeColors[theme].text}
               />
             </TouchableOpacity>
           </View>
@@ -71,7 +70,7 @@ const DeleteHabitModal: React.FC<DeleteHabitModalProps> = ({
 
 export default DeleteHabitModal;
 
-const styling = (theme: ThemeKey) =>
+const styling = () =>
   StyleSheet.create({
     modalOverlay: {
       flex: 1,
@@ -81,7 +80,7 @@ const styling = (theme: ThemeKey) =>
     },
     modalContainer: {
       width: "90%",
-      backgroundColor: themeColors[theme].background,
+      // backgroundColor: themeColors[theme].background,
       borderRadius: 10,
       padding: 20,
       maxHeight: "80%",
@@ -114,7 +113,7 @@ const styling = (theme: ThemeKey) =>
     createButton: {
       padding: 15,
       borderRadius: 15,
-      backgroundColor: themeColors.basic.WHITE,
+      // backgroundColor: themeColors.basic.WHITE,
       marginTop: 20,
       borderWidth: 1,
     },

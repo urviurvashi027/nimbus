@@ -14,7 +14,6 @@ import {
 } from "react-native";
 import { addDays, isSameDay, startOfDay } from "date-fns";
 import ThemeContext from "@/context/ThemeContext";
-import { ThemeKey } from "../Themed";
 
 type Props = {
   value: Date;
@@ -41,8 +40,8 @@ export default function DateScroller({
   const itemWidth = screenWidth / 5;
   const sidePad = centerSelected ? (screenWidth - itemWidth) / 2 : 0;
 
-  const { theme, newTheme } = useContext(ThemeContext);
-  const styles = styling(theme, newTheme, itemWidth);
+  const { newTheme } = useContext(ThemeContext);
+  const styles = styling(newTheme, itemWidth);
 
   const today = useMemo(() => atMidnight(new Date()), []);
   const selected = useMemo(() => atMidnight(value), [value]);
@@ -151,7 +150,7 @@ export default function DateScroller({
   );
 }
 
-const styling = (theme: ThemeKey, newTheme: any, itemWidth: number) =>
+const styling = (newTheme: any, itemWidth: number) =>
   StyleSheet.create({
     dateBox: {
       width: itemWidth - 12,

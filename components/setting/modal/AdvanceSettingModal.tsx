@@ -12,6 +12,7 @@ import ThemeContext from "@/context/ThemeContext";
 import SettingDetail from "./PreferenceDetailModal";
 import { useAuth } from "@/context/AuthContext";
 import Toast from "react-native-toast-message";
+import { useNimbusToast } from "@/components/common/toast/useNimbusToast";
 // import { useReminder } from "@/context/ReminderContext";
 
 type PreferenceKey =
@@ -94,6 +95,8 @@ export default function AdvancedSettingsModal({
   const { loadUserFromStorage, updateProfile } = useAuth();
   // const { getUserProfile, save } = useReminder();
 
+  const toast = useNimbusToast();
+
   useEffect(() => {
     // console.log("coming here useefect", loadUserFromStorage);
     setLoading(true);
@@ -127,18 +130,18 @@ export default function AdvancedSettingsModal({
         }));
 
         setMerged(updated);
-        Toast.show({
-          type: "success",
-          text1: "Advanced Setting Updated",
-          position: "bottom",
+        toast.show({
+          variant: "success",
+          title: "Advanced Setting Updated",
+          message: "Advanced Setting Updated",
         });
       }
     } catch (e) {
       console.warn("save error", e);
-      Toast.show({
-        type: "error",
-        text1: "Could not save setting. Please try again.",
-        position: "bottom",
+      toast.show({
+        variant: "error",
+        title: "Something went wrong",
+        message: "Could not save setting. Please try again.",
       });
     } finally {
       // onClose?.();

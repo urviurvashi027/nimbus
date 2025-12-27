@@ -3,13 +3,13 @@ import { View, Text, StyleSheet, Pressable, Dimensions } from "react-native";
 import { StyledButton } from "@/components/common/ThemedComponent/StyledButton"; // reuse your styled button
 import { router, useNavigation } from "expo-router";
 import ThemeContext from "@/context/ThemeContext";
-import { ScreenView, ThemeKey } from "@/components/Themed";
+import { ScreenView } from "@/components/Themed";
 
 import RelaxMenIcon from "@/assets/images/logoNew/1.svg";
 
-const OnboardingScreen = () => {
+const LandingScreen = () => {
   const navigation = useNavigation();
-  const { theme, newTheme } = useContext(ThemeContext);
+  const { newTheme } = useContext(ThemeContext);
 
   const { width } = Dimensions.get("window");
 
@@ -19,15 +19,14 @@ const OnboardingScreen = () => {
     });
   }, [navigation]);
 
-  const styles = styling(theme, newTheme);
+  const styles = styling(newTheme);
 
   const firstBtnSegmentBtnClick = () => {
-    router.push("/(auth)/onboarding/QuestionScreen");
-    // router.push("/(public)/register");
+    router.push("/(public)/register");
   };
 
   const secondBtnSegmentBtnClick = () => {
-    router.push("/(public)/signIn");
+    router.push("/(public)/sign-in");
   };
 
   return (
@@ -76,7 +75,7 @@ const OnboardingScreen = () => {
   );
 };
 
-const styling = (theme: ThemeKey, newTheme: any) =>
+const styling = (newTheme: any) =>
   StyleSheet.create({
     container: {
       backgroundColor: newTheme.background,
@@ -150,4 +149,4 @@ const styling = (theme: ThemeKey, newTheme: any) =>
     },
   });
 
-export default OnboardingScreen;
+export default LandingScreen;

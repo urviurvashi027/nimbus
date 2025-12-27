@@ -1,79 +1,70 @@
-// app/(auth)/OnBoarding/WelcomeKickoffScreen.tsx
-import React, { useContext, useEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  ScrollView,
-  TouchableOpacity,
-} from "react-native";
+// app/(auth)/onboarding/welcomeKickoff.tsx
+import React, { useContext, useMemo } from "react";
+import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { router, useNavigation } from "expo-router";
-import { ScreenView } from "@/components/Themed";
+import { useRouter } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 import ThemeContext from "@/context/ThemeContext";
 import { StyledButton } from "@/components/common/ThemedComponent/StyledButton";
 
-type Props = {
-  username?: string;
-};
+type Props = { username?: string };
 
-const WelcomeKickoffScreen: React.FC<Props> = ({ username = "You" }) => {
+export default function WelcomeKickoff({ username = "You" }: Props) {
   const { newTheme } = useContext(ThemeContext);
-  const s = styles(newTheme);
+  const insets = useSafeAreaInsets();
+  const router = useRouter();
 
-  const navigation = useNavigation();
-
-  useEffect(() => {
-    navigation.setOptions({
-      headerShown: false,
-    });
-  }, [navigation]);
+  const s = useMemo(() => styles(newTheme, insets.top), [newTheme, insets.top]);
 
   return (
-    <ScreenView style={s.container}>
-      {/* Header / Congrats strip */}
+    <ScrollView
+      style={s.screen}
+      contentContainerStyle={s.content}
+      showsVerticalScrollIndicator={false}
+    >
+      {/* Banner */}
       <View style={s.banner}>
         <Ionicons
           name="sparkles-outline"
-          size={20}
+          size={18}
           color={newTheme.background}
         />
         <Text style={s.bannerText}>All set! Your plan is ready ✨</Text>
       </View>
 
       {/* Hero */}
-      <View style={s.heroWrap}>
-        {/* If you have an illustration asset, swap this Image out. */}
-        {/* <Image source={require("@/assets/images/onboarding/hero-meditate.png")} style={s.hero} resizeMode="contain" /> */}
-        <View style={s.heroPlaceholder}>
+      <View style={s.hero}>
+        <View style={s.heroCard}>
           <Ionicons
             name="person-circle-outline"
-            size={96}
+            size={110}
             color={newTheme.accent}
           />
         </View>
       </View>
 
-      {/* Headline */}
-      <View style={s.headerBlock}>
-        <Text style={s.title}>Welcome, {username} 👋</Text>
-        <Text style={s.subtitle}>
-          You’re ready to start strong. Build routines, track habits, and grow a
-          calmer, healthier you — one day at a time.
-        </Text>
-      </View>
+      {/* Copy */}
+      <Text style={s.title}>Welcome, {username} 👋</Text>
+      <Text style={s.subtitle}>
+        You’re ready to start strong. Build routines, track habits, and grow a
+        calmer, healthier you — one day at a time.
+      </Text>
 
       {/* Primary CTA */}
       <StyledButton
         label="Start my first routine"
-        onPress={() => router.push("/habit/create")} // ⬅️ adjust if your route differs
         style={s.primaryBtn}
+        onPress={() => {
+          // ✅ Update this to the EXACT route file you have
+          // Example if you have: app/(auth)/habit/CreateHabitScreen.tsx
+          router.push("/(auth)/habit/CreateHabitScreen");
+        }}
       />
 
-      {/* Secondary quick actions */}
-      <View style={s.secondaryBlock}>
-        <TouchableOpacity
+      {/* Secondary actions */}
+      <View style={s.secondaryRow}>
+        <Pressable
           style={s.secondaryBtn}
           onPress={() => router.push("/(auth)/CoachScreen/CoachScreen")}
         >
@@ -83,11 +74,11 @@ const WelcomeKickoffScreen: React.FC<Props> = ({ username = "You" }) => {
             color={newTheme.textPrimary}
           />
           <Text style={s.secondaryText}>Ask Nimbus Coach</Text>
-        </TouchableOpacity>
+        </Pressable>
 
-        <TouchableOpacity
+        <Pressable
           style={s.secondaryBtn}
-          onPress={() => console.log("Explore Tools pressed")} // ⬅️ replace with actual navigation
+          onPress={() => router.push("/(auth)/(tabs)/tools")}
         >
           <Ionicons
             name="construct-outline"
@@ -95,49 +86,45 @@ const WelcomeKickoffScreen: React.FC<Props> = ({ username = "You" }) => {
             color={newTheme.textPrimary}
           />
           <Text style={s.secondaryText}>Explore Tools</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
-      {/* Quick start cards */}
+      {/* Quick start */}
       <Text style={s.sectionTitle}>Quick start</Text>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 4 }}
-      >
+      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <QuickCard
+          theme={newTheme}
           icon="water-outline"
           title="Track water"
           caption="Set your daily goal"
           onPress={() => router.push("/(auth)/dailyCheckIn/WaterCheckIn")}
-          theme={newTheme}
         />
         <QuickCard
+          theme={newTheme}
           icon="bed-outline"
           title="Sleep schedule"
           caption="Set bedtime & alarm"
           onPress={() => router.push("/(auth)/dailyCheckIn/SleepCheckIn")}
-          theme={newTheme}
         />
         <QuickCard
+          theme={newTheme}
           icon="leaf-outline"
           title="Meditation"
           caption="Start a 5-min session"
           onPress={() => router.push("/(auth)/dailyCheckIn/MeditationCheckIn")}
-          theme={newTheme}
         />
       </ScrollView>
 
-      {/* Skip / later */}
-      <TouchableOpacity
+      {/* Skip */}
+      <Pressable
         style={s.skip}
-        onPress={() => router.replace("/(auth)/(tabs)") /* Home route */}
+        onPress={() => router.replace("/(auth)/(tabs)")}
       >
         <Text style={s.skipText}>I’ll explore later</Text>
-      </TouchableOpacity>
-    </ScreenView>
+      </Pressable>
+    </ScrollView>
   );
-};
+}
 
 function QuickCard({
   icon,
@@ -153,128 +140,125 @@ function QuickCard({
   theme: any;
 }) {
   return (
-    <TouchableOpacity
-      style={[cardStyles.card, { backgroundColor: theme.surface }]}
+    <Pressable
+      style={[card.card, { backgroundColor: theme.surface }]}
       onPress={onPress}
     >
       <View
         style={[
-          cardStyles.iconWrap,
-          { backgroundColor: theme.surfaceMuted ?? "#2a2f37" },
+          card.iconWrap,
+          { backgroundColor: theme.surfaceMuted ?? theme.cardRaised },
         ]}
       >
         <Ionicons name={icon} size={20} color={theme.accent} />
       </View>
-      <Text style={[cardStyles.title, { color: theme.textPrimary }]}>
-        {title}
-      </Text>
-      <Text style={[cardStyles.caption, { color: theme.textSecondary }]}>
+      <Text style={[card.title, { color: theme.textPrimary }]}>{title}</Text>
+      <Text style={[card.caption, { color: theme.textSecondary }]}>
         {caption}
       </Text>
-    </TouchableOpacity>
+    </Pressable>
   );
 }
 
-const styles = (t: any) =>
+const styles = (t: any, safeTop: number) =>
   StyleSheet.create({
-    container: {
-      paddingTop: 56,
+    screen: { flex: 1, backgroundColor: t.background },
+    content: {
+      paddingTop: safeTop + 16,
       paddingHorizontal: 20,
-      backgroundColor: t.background,
-      flex: 1,
+      paddingBottom: 28,
     },
+
     banner: {
       alignSelf: "center",
       backgroundColor: t.accent,
-      paddingHorizontal: 12,
-      paddingVertical: 6,
+      paddingHorizontal: 14,
+      paddingVertical: 8,
       borderRadius: 999,
       flexDirection: "row",
       alignItems: "center",
       gap: 8,
-      marginBottom: 14,
+      marginBottom: 16,
     },
-    bannerText: { color: t.background, fontWeight: "700" },
-    heroWrap: {
-      alignItems: "center",
-      justifyContent: "center",
-      marginTop: 8,
-      marginBottom: 12,
-    },
-    hero: { width: "86%", height: 180 },
-    heroPlaceholder: {
-      width: "86%",
-      height: 180,
-      borderRadius: 24,
+    bannerText: { color: t.background, fontWeight: "800" },
+
+    hero: { alignItems: "center", marginBottom: 16 },
+    heroCard: {
+      width: "100%",
+      height: 190,
+      borderRadius: 22,
       backgroundColor: t.surface,
       alignItems: "center",
       justifyContent: "center",
+      borderWidth: 1,
+      borderColor: t.borderMuted ?? t.border,
     },
-    headerBlock: {
-      alignItems: "center",
-      marginTop: 8,
-      marginBottom: 20,
-      paddingHorizontal: 6,
-    },
+
     title: {
-      fontSize: 28,
-      fontWeight: "800",
+      fontSize: 30,
+      fontWeight: "900",
       color: t.textPrimary,
       textAlign: "center",
-      marginBottom: 8,
+      marginTop: 4,
     },
     subtitle: {
       fontSize: 15,
       lineHeight: 22,
       color: t.textSecondary,
       textAlign: "center",
+      marginTop: 10,
+      marginBottom: 18,
     },
-    primaryBtn: { marginTop: 8 },
-    secondaryBlock: {
-      marginTop: 14,
+
+    primaryBtn: { borderRadius: 16 },
+
+    secondaryRow: {
       flexDirection: "row",
       gap: 12,
-      justifyContent: "center",
+      marginTop: 12,
     },
     secondaryBtn: {
+      flex: 1,
       flexDirection: "row",
       alignItems: "center",
+      justifyContent: "center",
       gap: 8,
       backgroundColor: t.surface,
-      paddingHorizontal: 14,
-      paddingVertical: 10,
-      borderRadius: 12,
+      borderRadius: 14,
+      paddingVertical: 12,
+      borderWidth: 1,
+      borderColor: t.borderMuted ?? t.border,
     },
-    secondaryText: { color: t.textPrimary, fontWeight: "600" },
+    secondaryText: { color: t.textPrimary, fontWeight: "700" },
+
     sectionTitle: {
+      marginTop: 18,
+      marginBottom: 10,
       color: t.textPrimary,
       fontSize: 16,
-      fontWeight: "700",
-      marginTop: 22,
-      marginBottom: 10,
-      paddingLeft: 4,
+      fontWeight: "800",
     },
-    skip: { alignSelf: "center", marginTop: 14 },
+
+    skip: { alignSelf: "center", marginTop: 14, paddingVertical: 10 },
     skipText: { color: t.textSecondary, textDecorationLine: "underline" },
   });
 
-const cardStyles = StyleSheet.create({
+const card = StyleSheet.create({
   card: {
     width: 180,
     padding: 14,
     borderRadius: 16,
     marginRight: 12,
+    borderWidth: 1,
   },
   iconWrap: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
+    width: 38,
+    height: 38,
+    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 12,
   },
-  title: { fontSize: 16, fontWeight: "700", marginBottom: 4 },
-  caption: { fontSize: 13 },
+  title: { fontSize: 16, fontWeight: "800", marginBottom: 4 },
+  caption: { fontSize: 13, fontWeight: "600" },
 });
-
-export default WelcomeKickoffScreen;

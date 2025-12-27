@@ -1,8 +1,7 @@
 import React, { useMemo, useState } from "react";
-import { TouchableOpacity, StyleSheet } from "react-native";
+import { TouchableOpacity, StyleSheet, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/context/ThemeContext";
-import { Text } from "@/components/Themed";
 import DatePickerSheet from "@/components/common/picker/DatePickerSheet";
 import { format } from "date-fns";
 

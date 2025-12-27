@@ -1,46 +1,33 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { ThemeProvider } from "@/context/ThemeContext";
-import { useFonts } from "expo-font";
+// app/_layout.tsx
+import React, { useEffect } from "react";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import React, { useEffect, useState } from "react";
-import Toast from "react-native-toast-message";
+import { useFonts } from "expo-font";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 
-import HabitContext from "@/context/HabitContext";
-import { useColorScheme } from "@/components/UseColorScheme";
 import AuthProvider from "@/context/AuthContext";
+import { ThemeProvider } from "@/context/ThemeContext";
+import HabitContext from "@/context/HabitContext";
 import { HabitCreateRequest } from "@/types/habitTypes";
-import { OnboardingProvider } from "@/context/OnBoardingContext";
-// import { ReminderProvider } from "@/context/ReminderContext";
+import { NimbusAlertProvider } from "@/components/common/alert/NimbusAlertProvider";
+import { NimbusToastHost } from "@/components/common/toast/NimbusToast";
 
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from "expo-router";
-
-export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  // initialRouteName: "/landing",
-  initialRouteName: "/landingScreen",
-};
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
-  const [loaded, error] = useFonts({
-    ...FontAwesome.font,
-  });
+// ✅ Force cold start to (public)
+export const unstable_settings = {
+  initialRouteName: "(public)",
+};
 
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
+export default function RootLayout() {
+  const [loaded, error] = useFonts({ ...FontAwesome.font });
+
   useEffect(() => {
     if (error) throw error;
   }, [error]);
 
   useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
+    if (loaded) SplashScreen.hideAsync();
   }, [loaded]);
 
   if (!loaded) return null;
@@ -49,52 +36,33 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-  const [habitData, setHabitData] = useState<HabitCreateRequest>(habitInfo);
-  const colorScheme = useColorScheme();
+  const [habitData, setHabitData] = React.useState<HabitCreateRequest>({
+    name: "",
+    habit_type_id: 0,
+    color: "",
+    tags: [],
+    habit_metric: { unit: "", count: 0 },
+    habit_duration: { all_day: true },
+    habit_frequency: { frequency_type: "", interval: 0, start_date: "" },
+    remind_at: { ten_min_before: true },
+    subtasks: [],
+  });
 
   return (
     <AuthProvider>
       <ThemeProvider>
-        <HabitContext.Provider value={{ habitData, setHabitData }}>
-          {/* <ReminderProvider> */}
-          {/* <OnboardingProvider> */}
-          <Stack>
-            <Stack.Screen
-              name="(auth)/(tabs)"
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="(public)/landingScreen"
-              options={{ headerShown: false }}
-            />
-          </Stack>
-          <Toast />
-          {/* </OnboardingProvider> */}
-          {/* </ReminderProvider> */}
-        </HabitContext.Provider>
+        <NimbusAlertProvider>
+          <HabitContext.Provider value={{ habitData, setHabitData }}>
+            <Stack screenOptions={{ headerShown: false }}>
+              {/* ✅ explicitly declare groups */}
+              <Stack.Screen name="(public)" />
+              <Stack.Screen name="(auth)" />
+            </Stack>
+
+            <NimbusToastHost />
+          </HabitContext.Provider>
+        </NimbusAlertProvider>
       </ThemeProvider>
     </AuthProvider>
   );
 }
-
-export const habitInfo = {
-  name: "",
-  habit_type_id: 0,
-  color: "",
-  tags: [],
-  habit_metric: {
-    unit: "",
-    count: 0,
-  },
-  habit_duration: {
-    // default case
-    all_day: true,
-  },
-  habit_frequency: {
-    frequency_type: "",
-    interval: 0,
-    start_date: "",
-  },
-  remind_at: { ten_min_before: true },
-  subtasks: [],
-};

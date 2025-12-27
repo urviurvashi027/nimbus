@@ -17,7 +17,6 @@ import {
 } from "@/constant/data/toolsButton";
 
 import { ScreenView } from "@/components/Themed";
-import { ThemeKey } from "@/components/Themed";
 import TrendingCardCarousel from "@/components/common/TrendingCardCarousel";
 import MoodTrackerModal from "../toolsScreen/MoodTracker/MoodTracker";
 import VideoScroller from "@/components/tools/videoScroller/VideoScroller";
@@ -48,9 +47,9 @@ const Tools: React.FC = () => {
   >();
   const [routineFitness, setRoutineFitnessList] = useState<any[] | undefined>();
 
-  const { theme, newTheme, spacing, typography } = useContext(ThemeContext);
+  const { newTheme, spacing, typography } = useContext(ThemeContext);
 
-  const styles = styling(theme, newTheme);
+  const styles = styling(newTheme);
 
   // ------------------------------- API CALLS ---------------------------------------
 
@@ -164,7 +163,7 @@ const Tools: React.FC = () => {
 
   const handleCardPress = (id: string, type: string) => {
     router.push({
-      pathname: "/(auth)/toolsScreen/Details/Details",
+      pathname: "/(auth)/toolsScreen/ContentDetailsScreen",
       params: { id: id, type: type },
     });
   };
@@ -299,7 +298,7 @@ const Tools: React.FC = () => {
   );
 };
 
-const styling = (theme: ThemeKey, newTheme: any) =>
+const styling = (newTheme: any) =>
   StyleSheet.create({
     container: {
       flex: 1,

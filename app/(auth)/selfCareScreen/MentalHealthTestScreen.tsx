@@ -3,7 +3,7 @@ import React, { useContext, useEffect } from "react";
 import { View, FlatList, Platform, StyleSheet, Text } from "react-native";
 import { router, useNavigation } from "expo-router";
 
-import { ScreenView, ThemeKey } from "@/components/Themed";
+import { ScreenView } from "@/components/Themed";
 import ThemeContext from "@/context/ThemeContext";
 import { medTests } from "@/constant/data/medicalTest";
 
@@ -15,7 +15,7 @@ import MentalHealthTestItem, {
 const MentalHealthTestScreen = () => {
   const navigation = useNavigation();
   const { theme, newTheme, spacing, typography } = useContext(ThemeContext);
-  const styles = styling(theme, newTheme, spacing, typography);
+  const styles = styling(newTheme, spacing, typography);
 
   useEffect(() => {
     navigation.setOptions({ headerShown: false });
@@ -67,12 +67,7 @@ const MentalHealthTestScreen = () => {
 
 export default MentalHealthTestScreen;
 
-const styling = (
-  theme: ThemeKey,
-  newTheme: any,
-  spacing: any,
-  typography: any
-) =>
+const styling = (newTheme: any, spacing: any, typography: any) =>
   StyleSheet.create({
     container: {
       flex: 1,

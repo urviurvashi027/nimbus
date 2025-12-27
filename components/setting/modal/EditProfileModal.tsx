@@ -34,6 +34,7 @@ import AvatarFitnessFemale from "@/assets/images/avatar/fitnessfemale.svg";
 import AvatarFinanceGuy from "@/assets/images/avatar/financeguy.svg";
 import AvatarDeveloperGuy from "@/assets/images/avatar/developerguy.svg";
 import AvatarFemale from "@/assets/images/avatar/female.svg";
+import { useNimbusToast } from "@/components/common/toast/useNimbusToast";
 
 const BUILTIN_SVGS = [
   AvatarBusy,
@@ -84,6 +85,8 @@ export default function EditProfileModal({ visible, onClose, onSaved }: Props) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const { loadUserFromStorage, updateProfile } = useAuth();
 
+  const toast = useNimbusToast();
+
   // const { get, save } = useReminder();
 
   useEffect(() => {
@@ -92,6 +95,7 @@ export default function EditProfileModal({ visible, onClose, onSaved }: Props) {
     setLoading(true);
     (async () => {
       const cached = await loadUserFromStorage?.(); // ← safe call
+      console.log(cached, "cached");
       const profile = cached.profile;
       const p = {
         id: cached?.id,
@@ -136,7 +140,7 @@ export default function EditProfileModal({ visible, onClose, onSaved }: Props) {
       );
       setLoading(false);
     })();
-  }, [loadUserFromStorage]); // include in deps
+  }, []); // include in deps
 
   // isDirty should consider all editable fields
   const isDirty = () => {
@@ -227,13 +231,11 @@ export default function EditProfileModal({ visible, onClose, onSaved }: Props) {
 
       const { success, message, data } = saved;
       if (success && "email" in data) {
-        console.log("coming here");
-        Toast.show({
-          type: "success",
-          text1: "Profile Updated",
-          position: "bottom",
+        toast.show({
+          variant: "success",
+          title: "Profile Updated",
+          message: "Successfully updated the profile",
         });
-
         // ✅ merge latest edits into local state
         setProfile((prev: any) => ({
           ...prev,
