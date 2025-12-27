@@ -6,16 +6,10 @@ import {
   TouchableOpacity,
   ScrollView,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
 import ThemeContext from "@/context/ThemeContext";
-// import { themeColors } from "@/constant/theme/Colors";
 
 export default function NewUserScreen() {
   // const navigation = useNavigation();
-
-  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
 
   const styles = styling();
 

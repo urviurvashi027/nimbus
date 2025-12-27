@@ -10,7 +10,6 @@
 // };
 
 // const WarningBanner = ({ message, ctaText, onPress }: WarningBannerProps) => {
-//   const { theme } = useContext(ThemeContext);
 
 //   const styles = styling(theme);
 //   return (

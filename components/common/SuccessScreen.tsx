@@ -9,7 +9,6 @@
 //   StyleSheet,
 //   ActivityIndicator,
 // } from "react-native";
-// import { themeColors } from "@/constant/theme/Colors";
 // import { ThemeKey } from "../Themed";
 // import { Ionicons } from "@expo/vector-icons";
 
@@ -24,7 +23,6 @@
 //   isSuccess: boolean;
 //   isLoading: boolean;
 // }) => {
-//   const { theme } = useContext(ThemeContext);
 //   const styles = styling(theme);
 
 //   return (

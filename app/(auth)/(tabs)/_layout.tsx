@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import Colors, { theme as newThemeKit } from "@/constant/theme/Colors";
+import { theme as newThemeKit } from "@/constant/theme/Colors";
 import { useColorScheme } from "@/components/UseColorScheme";
 import ThemeContext from "@/context/ThemeContext";
 
@@ -15,8 +15,7 @@ import ThemeContext from "@/context/ThemeContext";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  const { theme, toggleTheme, newTheme, useSystemTheme } =
-    useContext(ThemeContext);
+  const { toggleTheme, newTheme, useSystemTheme } = useContext(ThemeContext);
 
   // const styles = styling(theme);
 

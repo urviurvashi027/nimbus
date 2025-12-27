@@ -31,7 +31,7 @@ const BottomPlayer: React.FC<BottomPlayerProps> = ({
   onPlayPause,
   onClose,
 }) => {
-  const { theme, newTheme, spacing, typography } = useContext(ThemeContext);
+  const { newTheme, spacing, typography } = useContext(ThemeContext);
   const styles = styling(newTheme, spacing, typography);
 
   return (

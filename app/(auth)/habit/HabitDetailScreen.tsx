@@ -23,7 +23,7 @@ import HabitDetailsSkeleton from "@/components/habitDetails/HabitDetailsSkeleton
 const HabitDetails = () => {
   const router = useRouter();
   const navigation = useNavigation();
-  const { theme, newTheme, spacing, typography } = useContext(ThemeContext);
+  const { newTheme, spacing, typography } = useContext(ThemeContext);
 
   const { id, date } = useLocalSearchParams<{
     id: string | string[];

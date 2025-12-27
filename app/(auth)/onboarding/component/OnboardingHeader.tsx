@@ -20,7 +20,7 @@ const OnboardingHeader: React.FC<OnboardingHeaderProps> = ({
 
   const progress = (step / totalSteps) * 100;
 
-  const { theme, newTheme } = useContext(ThemeContext);
+  const { newTheme } = useContext(ThemeContext);
 
   const styles = styling(newTheme);
 

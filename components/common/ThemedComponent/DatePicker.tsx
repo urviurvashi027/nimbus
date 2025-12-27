@@ -35,8 +35,6 @@
 //   const [isVisible, setIsVisible] = useState(false);
 //   const [selectedDate, setSelectedDate] = useState<Date>(selectedDateValue);
 
-//   const { theme, newTheme } = useContext(ThemeContext);
-
 //   useEffect(() => {
 //     setSelectedDate(selectedDateValue);
 //   }, [selectedDateValue]);

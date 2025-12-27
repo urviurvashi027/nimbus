@@ -25,7 +25,7 @@ const MasterclassCard: React.FC<VideoClassCardType> = ({
   courses = 9,
   tag = "ADHD",
 }) => {
-  const { theme, newTheme, spacing, typography } = useContext(ThemeContext);
+  const { newTheme, spacing, typography } = useContext(ThemeContext);
 
   return (
     <View

@@ -8,7 +8,6 @@ import {
 } from "react-native";
 import React, { useContext } from "react";
 import { Ionicons } from "@expo/vector-icons";
-// import { themeColors } from "@/constant/theme/Colors";
 import ThemeContext from "@/context/ThemeContext";
 
 interface DeleteHabitModalProps {
@@ -36,7 +35,6 @@ const DeleteHabitModal: React.FC<DeleteHabitModalProps> = ({
     primaryBtnClick();
   };
 
-  // const { theme } = useContext(ThemeContext);
   const styles = styling();
 
   return (
