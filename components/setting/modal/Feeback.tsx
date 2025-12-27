@@ -16,7 +16,7 @@ import {
 import ThemeContext from "@/context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import StyledButton from "../../common/themeComponents/StyledButton";
-import InputField from "../../common/ThemedComponent/StyledInput";
+import InputField from "@/components/common/themeComponents/StyledInputOld";
 import { logFeedback } from "@/services/settingService";
 
 export default function ReportFeedbackModal({ visible, onClose }: any) {

@@ -12,7 +12,7 @@ import ThemeContext from "@/context/ThemeContext";
 
 import NotificationListModal from "@/components/setting/modal/NotificationListModal";
 // import RoutineSettingModal from "@/components/setting/RoutineSetting";
-import ReportBugModal from "@/components/setting/modal/ReportBug";
+import ContactUsModal from "@/components/setting/modal/ContactUsModal";
 import FeedbackModal from "@/components/setting/modal/Feeback";
 import PrivacyPolicyModal from "@/components/setting/modal/PrivacyPoilcy";
 import TermsModal from "@/components/setting/modal/TermsAndService";
@@ -194,12 +194,12 @@ export default function profile() {
       case "Profile Info":
         setEditProfile(true);
         break;
-      case "Report Bug":
+      case "Contact Us":
         setShowReportBugModal(true);
         break;
-      case "Feedback":
-        setShowFeedbackModal(true);
-        break;
+      // case "Feedback":
+      //   setShowFeedbackModal(true);
+      //   break;
       case "Privacy Policy":
         setShowPrivatePrivacyModal(true);
         break;
@@ -325,7 +325,7 @@ export default function profile() {
             }}
           />
 
-          <ReportBugModal
+          <ContactUsModal
             visible={showReportBugModal}
             onClose={() => setShowReportBugModal(false)}
           />

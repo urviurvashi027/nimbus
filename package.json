@@ -80,7 +80,8 @@
     "recharts": "^2.15.1",
     "rn-emoji-keyboard": "^1.7.0",
     "expo-device": "~7.0.3",
-    "expo-application": "~6.0.2"
+    "expo-application": "~6.0.2",
+    "expo-document-picker": "~13.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

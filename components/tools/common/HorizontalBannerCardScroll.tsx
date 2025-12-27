@@ -20,7 +20,6 @@
 
 // const HorizontalBannerCardScroll: React.FC<PropType> = (props) => {
 //   const { backgroundColor, title, description, itemList } = props;
-//   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
 
 //   const styles = styling(theme);
 //   return (

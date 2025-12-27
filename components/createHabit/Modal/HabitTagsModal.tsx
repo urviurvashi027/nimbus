@@ -13,7 +13,7 @@ import ThemeContext from "@/context/ThemeContext";
 import { findIdBName, addObjectAtEnd } from "@/utils/helper";
 import { HabitTag } from "@/types/habitTypes";
 import { selectedTag } from "../HabitTagsInput";
-import InputField from "@/components/common/ThemedComponent/StyledInput";
+import InputField from "@/components/common/themeComponents/StyledInputOld";
 // import styling from "../style/HabitTagModalStyle";
 
 type ThemeKey = "basic" | "light" | "dark";

@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, Pressable } from "react-native";
 import Svg, { Path } from "react-native-svg";
 
 const ChoiceItem = ({ choice, selected, onPress }: any) => {
-  const { theme, newTheme } = useContext(ThemeContext);
+  const { newTheme } = useContext(ThemeContext);
 
   const styles = styling(newTheme);
   return (

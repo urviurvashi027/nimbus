@@ -13,8 +13,6 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 
-// import Colors, { themeColors } from "@/constant/theme/Colors";
-// import { theme } from "@/constant/theme/Colors";
 // import { useColorScheme } from "./UseColorScheme";
 import { useContext } from "react";
 import ThemeContext from "@/context/ThemeContext";
@@ -49,7 +47,6 @@ export type ThemeKey = "basic" | "light" | "dark";
 //   const { style, lightColor, darkColor, ...otherProps } = props;
 //   const color = useThemeColor({ light: lightColor, dark: darkColor }, "text");
 
-//   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
 //   const styles = textStyling(theme);
 
 //   return <DefaultText style={[styles.textStyle, style]} {...otherProps} />;
@@ -126,7 +123,6 @@ const screenViewStyling = (
 
 // export function TextInput(props: TextInputProps) {
 //   const { style, ...otherProps } = props;
-//   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
 //   const styles = inputStyling(theme);
 
 //   return <DefaultTextInput style={styles.input} {...otherProps} />;
@@ -158,7 +154,6 @@ const screenViewStyling = (
 
 // export const FormInput = (props: TextInputProps) => {
 //   const { style, ...otherProps } = props;
-//   const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
 //   const styles = formInputStyling(theme);
 
 //   return <DefaultTextInput style={styles.input} {...otherProps} />;
@@ -186,7 +181,6 @@ export const StyledInput = ({
   isPassword = false,
   style,
 }: any) => {
-  // const { theme,toggleTheme, useSystemTheme } =
   //   useContext(ThemeContext);
   // State to track if the input is focused to change border color
   const [isFocused, setIsFocused] = useState(false);
@@ -198,16 +192,10 @@ export const StyledInput = ({
   // Set focused state to false when input is blurred
   const handleBlur = () => setIsFocused(false);
 
-  const { theme, toggleTheme, spacing, typography, newTheme, useSystemTheme } =
+  const { toggleTheme, spacing, typography, newTheme, useSystemTheme } =
     useContext(ThemeContext);
 
-  const styles = styledInputStyling(
-    theme,
-    newTheme,
-    isFocused,
-    spacing,
-    typography
-  );
+  const styles = styledInputStyling(newTheme, isFocused, spacing, typography);
 
   // Styles are now JS objects for inline styling
   return (
@@ -260,7 +248,6 @@ export const StyledInput = ({
 };
 
 const styledInputStyling = (
-  theme: ThemeKey,
   newTheme: any,
   isFocused: boolean,
   spacing: Spacing,

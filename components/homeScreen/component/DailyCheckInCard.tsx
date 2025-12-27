@@ -52,7 +52,7 @@ const DailyCheckInCard: React.FC<DailyCheckInCardProps> = ({
   const progress = Math.min(completedQuantity / goalQuantity, 1);
   const strokeDashoffset = CIRCUMFERENCE - CIRCUMFERENCE * progress;
 
-  const { theme, newTheme } = useContext(ThemeContext);
+  const { newTheme } = useContext(ThemeContext);
   const styles = styling(newTheme);
 
   const router = useRouter();

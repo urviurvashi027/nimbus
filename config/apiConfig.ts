@@ -1,5 +1,6 @@
 // apiConfig.ts
 
+import { contactUs } from "@/services/contactService";
 import { logFeedback } from "@/services/settingService";
 
 // Define base URLs for different environments
@@ -65,6 +66,7 @@ export const API_ENDPOINTS = {
 
   personaQuestion: `${BASE_URL}/profile/persona-questions/`,
   submitPersonaAnswers: `${BASE_URL}/profile/persona-answers/`,
+  contactUs: `${BASE_URL}/support/tickets/`,
 
   markHabitDone: (habitId: number) =>
     `${BASE_URL}/api/habits/${habitId}/mark_complete/`,

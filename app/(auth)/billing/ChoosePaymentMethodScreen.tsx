@@ -18,7 +18,7 @@ import PaymentMethodCard from "@/components/payment/PaymentMethodCard";
 import NimbusPrimaryButton from "@/components/common/ThemedComponent/PrimaryButton";
 
 const ChoosePaymentMethodScreen = () => {
-  const { theme, newTheme } = useContext(ThemeContext);
+  const { newTheme } = useContext(ThemeContext);
   const styles = styling(newTheme);
   const navigation = useNavigation();
   const router = useRouter();

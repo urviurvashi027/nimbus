@@ -1,20 +1,5 @@
 // Account Setting::
 
-// Notification - Morning Check-in, nightly review, log your mood, streak save
-// Routine Setting - sorting, week start on, move completed task down,
-// sound effect
-
-// Help and feedback::
-// help center - Faq
-// feedback  -- modal -- input box, button
-// privacy policy -- modal, privacyPolicy
-// term of servcie -- modal, term of service
-
-// social media ::
-// discord group -- link, details
-// instgram -- link, details
-// facebbok -- link, details
-
 export const Section: any[] = [
   {
     header: "Achievements & Statistics",
@@ -137,19 +122,19 @@ export const Section: any[] = [
         label: "Help Center",
       },
       {
-        id: "bug",
+        id: "contactUs",
         icon: "bug-outline",
         color: "#dfd9f9",
         type: "modal",
-        label: "Report Bug",
+        label: "Contact Us",
       },
-      {
-        id: "feedback",
-        icon: "mail",
-        color: "#dfd9f9",
-        type: "modal",
-        label: "Feedback",
-      },
+      // {
+      //   id: "feedback",
+      //   icon: "mail",
+      //   color: "#dfd9f9",
+      //   type: "modal",
+      //   label: "Feedback",
+      // },
       {
         id: "privacyPolicy",
         icon: "contract",

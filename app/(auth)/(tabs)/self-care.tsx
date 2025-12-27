@@ -67,7 +67,7 @@ const SelfCare: React.FC = () => {
   const [showThingsToDoTagsModal, setShowThingsToDoTagsModal] = useState(false);
   const [routineList, setRoutineList] = useState<any[] | undefined>();
 
-  const { theme, newTheme, spacing, typography } = useContext(ThemeContext);
+  const { newTheme, spacing, typography } = useContext(ThemeContext);
 
   const styles = styling(newTheme);
 
