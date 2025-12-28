@@ -19,7 +19,7 @@ import ThemeContext from "@/context/ThemeContext";
 import { StyledButton } from "@/components/common/ThemedComponent/StyledButton";
 // If you do not use expo-image-picker, the optional upload will be disabled
 import * as ImagePicker from "expo-image-picker";
-import InputField from "@/components/common/ThemedComponent/StyledInput";
+import InputField from "@/components/common/themeComponents/StyledInputOld";
 import { router, useNavigation } from "expo-router";
 
 type Ingredient = { id: string; item: string; quantity: string };

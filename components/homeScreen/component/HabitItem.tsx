@@ -21,6 +21,7 @@ interface HabitItemProps {
   frequency: string;
   color?: string;
   actual_count: any;
+  // onHabitDelete:() => {};
   onToggle: (id: string, actual_count: any) => void;
 }
 
@@ -36,6 +37,7 @@ const HabitItemCard: React.FC<HabitItemProps> = ({
   actual_count,
   color,
   onToggle,
+  // onHabitDelete,
 }) => {
   const { newTheme, spacing, typography } = React.useContext(ThemeContext);
   const styles = useMemo(
@@ -54,6 +56,10 @@ const HabitItemCard: React.FC<HabitItemProps> = ({
       params: { id, date: selectedDate },
     });
   };
+
+  // const onHabitDeleteHandler = () => {
+  //   onHabitDelete();
+  // };
 
   // line below title: “Every day • 8:00 AM”
   const subtitle = time ? `${frequency} • ${time}` : frequency;

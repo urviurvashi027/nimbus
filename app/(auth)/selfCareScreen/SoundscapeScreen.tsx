@@ -37,7 +37,7 @@ const Soundscape = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const navigation = useNavigation();
-  const { theme, newTheme, spacing, typography } = useContext(ThemeContext);
+  const { newTheme, spacing, typography } = useContext(ThemeContext);
   const styles = styling(newTheme, spacing, typography);
 
   // soft pastel palette for featured cards

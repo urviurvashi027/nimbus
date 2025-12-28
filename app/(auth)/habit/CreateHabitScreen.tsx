@@ -16,7 +16,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 
-import HabitContext from "@/context/HabitContext";
+// import HabitContext from "@/context/HabitContext";
 import ThemeContext from "@/context/ThemeContext";
 
 import HabitTypeInput from "@/components/createHabit/HabitTypeInput";
@@ -72,8 +72,8 @@ export default function HabitBasic() {
   const [isLoading, setIsLoading] = useState(false);
 
   // context
-  const { setHabitData } = useContext(HabitContext);
-  const { theme, newTheme, spacing, typography } = useContext(ThemeContext);
+  // const { setHabitData } = useContext(HabitContext);
+  const { newTheme, spacing, typography } = useContext(ThemeContext);
   const styles = styling(newTheme, spacing, typography);
 
   // navigation & safe area

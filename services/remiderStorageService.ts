@@ -1,7 +1,7 @@
 // services/reminderStorage.ts
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
-import { saveNotificationChange } from "./settingService";
+// import { saveNotificationChange } from "./settingService";
 
 type DayShort = "sun" | "mon" | "tue" | "wed" | "thu" | "fri" | "sat";
 
@@ -143,27 +143,27 @@ export const getUserProfileInfo = async () => {
  * saveReminder / removeReminder maintained for local persistence/back-compat.
  * Consider implementing server API calls if saving must update backend user's profile.
  */
-export const saveReminder = async (payload: any) => {
-  try {
-    // const now = new Date().toISOString();
-    // const toSave = { ...payload, lastUpdated: now };
-    // await AsyncStorage.setItem(storageKey(type), JSON.stringify(toSave));
-    const result = await saveNotificationChange(payload);
+// export const saveReminder = async (payload: any) => {
+//   try {
+//     // const now = new Date().toISOString();
+//     // const toSave = { ...payload, lastUpdated: now };
+//     // await AsyncStorage.setItem(storageKey(type), JSON.stringify(toSave));
+//     const result = await saveNotificationChange(payload);
 
-    if (result && result.success) {
-      return result;
-    }
+//     if (result && result.success) {
+//       return result;
+//     }
 
-    if (result && result.error_code) {
-      return result;
-    }
+//     if (result && result.error_code) {
+//       return result;
+//     }
 
-    // return toSave;
-  } catch (e) {
-    console.warn("saveReminder error", e);
-    throw e;
-  }
-};
+//     // return toSave;
+//   } catch (e) {
+//     console.warn("saveReminder error", e);
+//     throw e;
+//   }
+// };
 
 export const removeReminder = async (type: string) => {
   try {

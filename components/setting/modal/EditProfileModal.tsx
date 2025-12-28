@@ -19,7 +19,7 @@ import Toast from "react-native-toast-message";
 import ThemeContext from "@/context/ThemeContext";
 import { useAuth } from "@/context/AuthContext";
 
-import InputField from "@/components/common/ThemedComponent/StyledInput";
+import InputField from "@/components/common/themeComponents/StyledInputOld";
 import StyledButton from "@/components/common/themeComponents/StyledButton";
 
 import AvatarPickerModal from "./AvatarPickerModal";

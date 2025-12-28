@@ -11,7 +11,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 import ThemeContext from "@/context/ThemeContext";
 
-import InputField from "@/components/common/ThemedComponent/StyledInput";
+import InputField from "@/components/common/themeComponents/StyledInputOld";
 
 import StyledButton from "../../common/themeComponents/StyledButton";
 // import { StyledButton } from "../common/ThemedComponent/StyledButton";
@@ -60,7 +60,6 @@ export default function ChangePasswordModal({
   const submitPassword = async () => {
     if (!validate()) return;
     // validation
-
 
     try {
       setLoading(true);

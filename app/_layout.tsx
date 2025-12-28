@@ -7,7 +7,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 import AuthProvider from "@/context/AuthContext";
 import { ThemeProvider } from "@/context/ThemeContext";
-import HabitContext from "@/context/HabitContext";
+// import HabitContext from "@/context/HabitContext";
 import { HabitCreateRequest } from "@/types/habitTypes";
 import { NimbusAlertProvider } from "@/components/common/alert/NimbusAlertProvider";
 import { NimbusToastHost } from "@/components/common/toast/NimbusToast";
@@ -52,15 +52,15 @@ function RootLayoutNav() {
     <AuthProvider>
       <ThemeProvider>
         <NimbusAlertProvider>
-          <HabitContext.Provider value={{ habitData, setHabitData }}>
-            <Stack screenOptions={{ headerShown: false }}>
-              {/* ✅ explicitly declare groups */}
-              <Stack.Screen name="(public)" />
-              <Stack.Screen name="(auth)" />
-            </Stack>
+          {/* <HabitContext.Provider value={{ habitData, setHabitData }}> */}
+          <Stack screenOptions={{ headerShown: false }}>
+            {/* ✅ explicitly declare groups */}
+            <Stack.Screen name="(public)" />
+            <Stack.Screen name="(auth)" />
+          </Stack>
 
-            <NimbusToastHost />
-          </HabitContext.Provider>
+          <NimbusToastHost />
+          {/* </HabitContext.Provider> */}
         </NimbusAlertProvider>
       </ThemeProvider>
     </AuthProvider>

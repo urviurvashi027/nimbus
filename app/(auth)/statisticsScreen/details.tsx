@@ -9,8 +9,7 @@ import { ScreenView } from "@/components/Themed";
 import StatsDetails from "@/components/habitStatistics/StatsDetails";
 
 const StatsScreen = () => {
-  const { theme, newTheme, toggleTheme, useSystemTheme } =
-    useContext(ThemeContext);
+  const { newTheme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
 
   const styles = styling(newTheme);
   const navigation = useNavigation();

@@ -14,7 +14,7 @@ import MentalHealthTestItem, {
 
 const MentalHealthTestScreen = () => {
   const navigation = useNavigation();
-  const { theme, newTheme, spacing, typography } = useContext(ThemeContext);
+  const { newTheme, spacing, typography } = useContext(ThemeContext);
   const styles = styling(newTheme, spacing, typography);
 
   useEffect(() => {

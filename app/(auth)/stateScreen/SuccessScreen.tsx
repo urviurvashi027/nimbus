@@ -38,28 +38,28 @@ const successConfig: Record<
     title: "Welcome to Nimbus 🎉",
     subtitle: "Your growth journey starts now.",
     buttonLabel: "Go to Dashboard",
-    route: "/(public)/signIn",
+    route: "/(public)/sign-in",
   },
   finishedForgotPassword: {
     image: <ForgotPasswordIcon width={120} height={120} />,
     title: "Check Your Email 📧",
     subtitle: "We’ve sent you a link to reset your password.",
     buttonLabel: "Back to Login",
-    route: "/(public)/signIn",
+    route: "/(public)/sign-in",
   },
   finishedRegister: {
     image: <RegisterIcon width={120} height={120} />,
     title: "Account Created ✅",
     subtitle: "You’re ready to explore Nimbus.",
     buttonLabel: "Start Exploring",
-    route: "/(public)/signIn",
+    route: "/(public)/sign-in",
   },
   finishedResetPassword: {
     image: <ResetPasswordIcon width={120} height={120} />,
     title: "You’re All Set!",
     subtitle: "Your password has been successfully updated.",
     buttonLabel: "Go to Sign In",
-    route: "/(public)/signIn",
+    route: "/(public)/sign-in",
   },
 };
 
