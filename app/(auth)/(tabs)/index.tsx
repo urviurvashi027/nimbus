@@ -19,7 +19,14 @@ import { router, useFocusEffect } from "expo-router";
 import Toast from "react-native-toast-message";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
-import { format, isToday, isTomorrow, isYesterday, startOfDay } from "date-fns";
+import {
+  format,
+  isAfter,
+  isToday,
+  isTomorrow,
+  isYesterday,
+  startOfDay,
+} from "date-fns";
 
 import { ScreenView } from "@/components/Themed";
 import ThemeContext from "@/context/ThemeContext";
@@ -78,7 +85,7 @@ export default function TabOneScreen() {
     return data.map((item: any, idx: number) => ({
       ...item,
       done: item.completed,
-      color: HABIT_COLORS[idx % HABIT_COLORS.length],
+      color: item.color ? item.color : HABIT_COLORS[idx % HABIT_COLORS.length],
       icon: HABIT_ICONS[idx % HABIT_ICONS.length],
     }));
   }, []);
@@ -92,6 +99,7 @@ export default function TabOneScreen() {
 
         if (res?.success && Array.isArray(res.data)) {
           const formatted = decorateHabits(res.data);
+          console.log("Formatted habits:", formatted);
           setHabitList(formatted);
           setCompletedHabit(res.data.filter((h: any) => h.completed).length);
         } else {
@@ -129,6 +137,17 @@ export default function TabOneScreen() {
 
   const handleHabitDoneClick = async (id: string, count: any) => {
     const currentIsoDate = format(startOfDay(selectedDate), "yyyy-MM-dd");
+    const day = startOfDay(selectedDate);
+    const today = startOfDay(new Date());
+
+    if (isAfter(day, today)) {
+      toast.show({
+        variant: "warning",
+        title: "Not yet",
+        message: "You can mark a habit once that day arrives.",
+      });
+      return;
+    }
 
     try {
       const payload = { date: currentIsoDate };
@@ -212,12 +231,6 @@ export default function TabOneScreen() {
                 // centerSelected
               />
 
-              {/* First-time user path */}
-              {/* {isFirstTimeUser ? (
-                <View style={styles.taskListContainer}>
-                  <NewUserScreen />
-                </View>
-              ) : ( */}
               <>
                 {/* Daily check-in */}
                 <View style={styles.checkInContainer}>
@@ -229,9 +242,6 @@ export default function TabOneScreen() {
                   <View style={styles.sectionHeader}>
                     <View>
                       <Text style={styles.sectionTitle}>{sectionTitle}</Text>
-                      <Text style={styles.sectionSubtitle}>
-                        {sectionSubtitle}
-                      </Text>
                     </View>
                     <ProgressPill
                       label={`${completedHabit}/${habitList.length}`}
@@ -239,7 +249,6 @@ export default function TabOneScreen() {
                   </View>
                 )}
               </>
-              {/* )} */}
             </>
           }
           renderItem={({ item }) => (

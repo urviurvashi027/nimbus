@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import {
   View,
   TouchableOpacity,
@@ -112,10 +112,10 @@ export default function HabitBasic() {
 
   const handleFrequencySelect = (v: any) => setFrequency(v);
 
-  const handleReminderSelect = (v: any) => {
+  const handleReminderSelect = useCallback((v: any) => {
     setReminderAt(v);
     console.log(v, "selected reminder details");
-  };
+  }, []);
 
   const getFrequencyDetail = () => {
     if (frequency?.frequency_type || date?.start_date)
@@ -192,7 +192,7 @@ export default function HabitBasic() {
     if (!ok) {
       toast.show({
         variant: "error",
-        title: "Somthing went wrong",
+        title: "Validation Error",
         message: msg,
       });
       return;

@@ -263,8 +263,8 @@ const makeStyles = (t: any, spacing: any) =>
       marginRight: 12,
     },
     titleText: {
-      fontSize: 16,
-      fontWeight: "600",
+      fontSize: 15,
+      fontWeight: "500",
       color: t.textPrimary,
     },
     subtitleText: {

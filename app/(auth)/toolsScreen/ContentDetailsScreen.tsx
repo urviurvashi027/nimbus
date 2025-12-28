@@ -398,7 +398,7 @@ const ContentDetailsScreen: React.FC = () => {
               </TouchableOpacity>
 
               {/* Recipe bookmark shortcut */}
-              {(params as any)?.type === "recipe" && (
+              {/* {(params as any)?.type === "recipe" && (
                 <TouchableOpacity
                   onPress={openRecipeScreen}
                   style={styles.iconBtn}
@@ -410,7 +410,7 @@ const ContentDetailsScreen: React.FC = () => {
                     color={newTheme.textPrimary}
                   />
                 </TouchableOpacity>
-              )}
+              )} */}
             </View>
           </View>
         </Animated.View>

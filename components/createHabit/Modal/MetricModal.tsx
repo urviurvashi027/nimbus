@@ -162,7 +162,7 @@ export default function HabitMetricModal({
                 label="Daily goal"
                 value={target}
                 onChangeText={setTarget}
-                placeholder="Enter your goal"
+                placeholder="What’s your daily target"
               />
 
               <View style={{ height: 18 }} />

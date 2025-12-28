@@ -64,7 +64,7 @@ const HorizontalListCardScroll: React.FC<PropType> = (props) => {
         break;
       case "Medical Test":
         router.push({
-          pathname: "/(auth)/selfCareScreen/test/getStared",
+          pathname: "/(auth)/selfCareScreen/MentalHealthTestScreen",
           params: { id: entry.id },
         });
         break;
@@ -80,6 +80,21 @@ const HorizontalListCardScroll: React.FC<PropType> = (props) => {
         }
       : undefined;
   }, [sound]);
+
+  const stopAudio = async () => {
+    try {
+      if (sound) {
+        await sound.stopAsync();
+        await sound.unloadAsync();
+      }
+    } catch (e) {
+      console.warn("Failed to stop audio", e);
+    } finally {
+      setSound(null);
+      setCurrentTrack(null);
+      setIsPlaying(false);
+    }
+  };
 
   const handlePlayPause = async (track: any) => {
     try {
@@ -109,18 +124,27 @@ const HorizontalListCardScroll: React.FC<PropType> = (props) => {
     }
   };
 
+  // const onCloseModal = async () => {
+  //   if (isPlaying) {
+  //     await sound?.pauseAsync();
+  //   }
+  //   setCurrentTrack(null);
+  // };
+
   const onCloseModal = async () => {
-    if (isPlaying) {
-      await sound?.pauseAsync();
-    }
-    setCurrentTrack(null);
+    await stopAudio();
   };
 
   return (
     <View style={[styles.card, { backgroundColor: outerBg }]}>
       <View style={styles.headerRow}>
         <Text style={styles.cardTitle}>{title}</Text>
-        <TouchableOpacity onPress={onClickOfAll}>
+        <TouchableOpacity
+          onPress={async () => {
+            await stopAudio();
+            onClickOfAll();
+          }}
+        >
           <Text style={styles.allButton}>All ›</Text>
         </TouchableOpacity>
       </View>
