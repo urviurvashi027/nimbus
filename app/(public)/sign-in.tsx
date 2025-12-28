@@ -106,7 +106,7 @@ export default function SignIn() {
           label="Username"
           value={username}
           onChangeText={setUsername}
-          placeholder="yourname"
+          placeholder="John Cena"
           autoCapitalize="none"
           returnKeyType="next"
         />

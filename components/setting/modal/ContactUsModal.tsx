@@ -30,6 +30,14 @@ const CATEGORIES: { key: ContactCategory; label: string; icon: string }[] = [
   { key: "CONTACT", label: "Message Us", icon: "🐞" },
 ];
 
+const MAX_MB = 3.3;
+const MAX_BYTES = Math.floor(MAX_MB * 1024 * 1024);
+
+function formatBytes(bytes: number) {
+  const mb = bytes / (1024 * 1024);
+  return `${mb.toFixed(2)} MB`;
+}
+
 export default function ContactUsModal({ visible, onClose }: any) {
   const { newTheme } = useContext(ThemeContext);
   const styles = useMemo(() => styling(newTheme), [newTheme]);
@@ -54,11 +62,17 @@ export default function ContactUsModal({ visible, onClose }: any) {
     onClose();
   };
 
+  const tooLarge = !!attachment?.size && attachment.size > MAX_BYTES;
+
   const canSubmit =
-    subject.trim().length > 0 && body.trim().length > 0 && !loading;
+    subject.trim().length > 0 &&
+    body.trim().length > 0 &&
+    !loading &&
+    !tooLarge;
 
   const pickAttachment = async () => {
     setErrMsg("");
+
     const res = await DocumentPicker.getDocumentAsync({
       copyToCacheDirectory: true,
       multiple: false,
@@ -69,6 +83,15 @@ export default function ContactUsModal({ visible, onClose }: any) {
 
     const f = res.assets?.[0];
     if (!f?.uri) return;
+
+    const size = f.size ?? 0; // bytes (may be undefined on some Android cases)
+    if (size && size > MAX_BYTES) {
+      setAttachment(null);
+      setErrMsg(
+        `File too large. Max ${MAX_MB} MB. Selected: ${formatBytes(size)}.`
+      );
+      return;
+    }
 
     setAttachment({
       uri: f.uri,

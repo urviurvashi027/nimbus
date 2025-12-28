@@ -1,10 +1,19 @@
 import axios, { AxiosResponse } from "axios";
+// import * as Mime from "mime";
 import { API_ENDPOINTS } from "@/config/apiConfig";
 import {
   ContactCategory,
   ContactAttachment,
   ContactUsResponse,
 } from "@/types/contactTypes";
+
+function guessImageTypeFromName(name?: string) {
+  const n = (name ?? "").toLowerCase();
+  if (n.endsWith(".png")) return "image/png";
+  if (n.endsWith(".jpg") || n.endsWith(".jpeg")) return "image/jpeg";
+  if (n.endsWith(".heic")) return "image/heic";
+  return "image/jpeg";
+}
 
 export type ContactUsRequest = {
   category: ContactCategory;
@@ -27,18 +36,29 @@ export async function contactUs(
     if (payload.device) form.append("device", payload.device);
     if (payload.os) form.append("os", payload.os);
 
+    console.log("File size (bytes):", payload.screenshot?.size);
+
     if (payload.screenshot?.uri) {
-      form.append("attachment", {
+      const name = payload.screenshot.name || "screenshot.jpg";
+      const type = payload.screenshot.mimeType || guessImageTypeFromName(name);
+
+      form.append("screenshot", {
         uri: payload.screenshot.uri,
-        name: payload.screenshot.name,
-        type: payload.screenshot.mimeType || "application/octet-stream",
+        name,
+        type,
       } as any);
     }
-
+    console.log(form, "formdata");
     const res: AxiosResponse<ContactUsResponse> = await axios.post(
       API_ENDPOINTS.contactUs, // ✅ add this endpoint
       form,
-      { headers: { "Content-Type": "multipart/form-data" } }
+      {
+        // ✅ let axios set boundary; don't set Content-Type manually
+        headers: {
+          Accept: "application/json",
+        },
+      }
+      // { headers: { "Content-Type": "multipart/form-data" } }
     );
 
     return res.data;
