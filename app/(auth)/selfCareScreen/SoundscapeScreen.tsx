@@ -42,11 +42,20 @@ const Soundscape = () => {
 
   // soft pastel palette for featured cards
   const colorPalette = [
-    { bgColor: "#FADBD8", color: "#F19C94" },
-    { bgColor: "#D5F5E3", color: "#ACEBC8" },
-    { bgColor: "#F8E187", color: "#FBEDB7" },
-    { bgColor: "#D6EAF8", color: "#95C9ED" },
-    { bgColor: "#E8DAEF", color: "#C7A5D8" },
+    // Rosewood (warm calm)
+    { bgColor: "rgba(233, 168, 160, 0.14)", color: "#E0A39B" },
+
+    // Sage (signature Nimbus)
+    { bgColor: "rgba(167, 201, 180, 0.14)", color: "#A7C9B4" },
+
+    // Sand / Gold (premium highlight)
+    { bgColor: "rgba(224, 199, 129, 0.14)", color: "#E0C781" },
+
+    // Mist / Sky (clean + modern)
+    { bgColor: "rgba(152, 190, 214, 0.14)", color: "#98BED6" },
+
+    // Mauve (soft luxury)
+    { bgColor: "rgba(192, 167, 207, 0.14)", color: "#C0A7CF" },
   ];
 
   const getSoundscapeListData = async () => {

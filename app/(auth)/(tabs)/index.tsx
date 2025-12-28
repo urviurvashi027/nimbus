@@ -86,7 +86,7 @@ export default function TabOneScreen() {
       ...item,
       done: item.completed,
       color: item.color ? item.color : HABIT_COLORS[idx % HABIT_COLORS.length],
-      icon: HABIT_ICONS[idx % HABIT_ICONS.length],
+      icon: item.icon ? item.icon : HABIT_ICONS[idx % HABIT_ICONS.length],
     }));
   }, []);
 

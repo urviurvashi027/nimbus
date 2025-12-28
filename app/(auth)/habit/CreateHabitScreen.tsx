@@ -151,6 +151,8 @@ export default function HabitBasic() {
       icon: emoji,
     };
 
+    console.log(payload, "final payload");
+
     if (reminderAt?.time || reminderAt?.ten_min_before)
       payload.remind_at = reminderAt;
     return { ok: true, payload };

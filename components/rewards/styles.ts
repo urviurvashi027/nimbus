@@ -12,7 +12,7 @@ const cardShadow = Platform.select({
 
 export const styles = (t: any) =>
   StyleSheet.create({
-    screen: { flex: 1, backgroundColor: t.background, marginTop: 30 },
+    screen: { flex: 1, backgroundColor: t.background },
     header: {
       height: 64,
       paddingHorizontal: 12,

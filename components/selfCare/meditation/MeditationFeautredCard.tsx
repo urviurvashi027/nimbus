@@ -3,6 +3,7 @@
 import React from "react";
 import NimbusPastelFeaturedCard from "@/components/common/PastelFeaturedCard";
 import { EnrichedMeditation } from "@/app/(auth)/selfCareScreen/MeditationScreen";
+import NimbusUltraFeaturedCard from "@/components/common/NimbusUltraFeaturedCard";
 
 interface MeditationFeaturedCardProps {
   data: EnrichedMeditation;
@@ -25,14 +26,24 @@ const MeditationFeaturedCard: React.FC<MeditationFeaturedCardProps> = ({
     (category ? category : "Calming ambience · Best with headphones");
 
   return (
-    <NimbusPastelFeaturedCard
+    <NimbusUltraFeaturedCard
       title={title}
       subtitle={`${duration || "3"} min · Reflection`}
       description={descText}
       image={image}
-      colors={{ bg: cardColor.bgColor, footer: cardColor.color }}
+      badge={category || "For you"} // or "Relaxing" etc
+      tint={cardColor.bgColor} // keep your palette, but as a glow
+      accent={cardColor.color} // used for dot + accent bar
       onPress={() => onPress(data)}
     />
+    // <NimbusPastelFeaturedCard
+    //   title={title}
+    //   subtitle={`${duration || "3"} min · Reflection`}
+    //   description={descText}
+    //   image={image}
+    //   colors={{ bg: cardColor.bgColor, footer: cardColor.color }}
+    //   onPress={() => onPress(data)}
+    // />
   );
 };
 

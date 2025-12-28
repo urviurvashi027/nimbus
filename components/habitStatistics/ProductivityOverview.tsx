@@ -18,6 +18,22 @@ export default function ProductivityOverview() {
   const { newTheme } = useContext(ThemeContext);
   const styles = styling(newTheme);
 
+  const isLocked = true;
+
+  if (isLocked) {
+    return (
+      <View style={styles.cardComingSoon}>
+        <Text style={styles.title}>Productivity Overview</Text>
+        <Text style={styles.subtitle}>Unlocking soon ✨</Text>
+        <Text style={styles.helper}>
+          A personalised productivity overview is on the way — insights into
+          focus, routines, and energy patterns designed for sustainable
+          progress.
+        </Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.card}>
       <Text style={styles.chartTitle}>Total Activities</Text>
@@ -65,5 +81,29 @@ const styling = (newTheme: any) =>
       fontSize: 14,
       fontWeight: "600",
       color: newTheme.background,
+    },
+    cardComingSoon: {
+      backgroundColor: newTheme.surface,
+      borderRadius: 20,
+      padding: 16,
+      marginBottom: 20,
+      borderWidth: 1,
+      borderColor: newTheme.divider,
+    },
+    title: {
+      fontSize: 18,
+      fontWeight: "700",
+      color: newTheme.textPrimary,
+      marginBottom: 4,
+    },
+    subtitle: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: newTheme.accent,
+      marginBottom: 8,
+    },
+    helper: {
+      fontSize: 13,
+      color: newTheme.textSecondary,
     },
   });

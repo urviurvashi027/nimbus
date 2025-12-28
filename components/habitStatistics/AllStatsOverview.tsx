@@ -25,6 +25,21 @@ export default function AllStatsOverview() {
     { label: "Dec", value: 88 },
   ];
 
+  const isLocked = true;
+
+  if (isLocked) {
+    return (
+      <View style={styles.cardComingSoon}>
+        <Text style={styles.title}>Overview</Text>
+        <Text style={styles.subtitle}>In progress</Text>
+        <Text style={styles.helper}>
+          Soon you’ll see your rhythm at a glance — cycle trends, mood shifts,
+          and energy peaks, all in one place.
+        </Text>
+      </View>
+    );
+  }
+
   return (
     <View>
       {/* 1st row */}
@@ -129,4 +144,28 @@ const styling = (newTheme: any) =>
       //   marginTop: 5,
     },
     trendCardContainer: { marginTop: 8 },
+    cardComingSoon: {
+      backgroundColor: newTheme.surface,
+      borderRadius: 20,
+      padding: 16,
+      marginBottom: 20,
+      borderWidth: 1,
+      borderColor: newTheme.divider,
+    },
+    title: {
+      fontSize: 18,
+      fontWeight: "700",
+      color: newTheme.textPrimary,
+      marginBottom: 4,
+    },
+    subtitle: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: newTheme.accent,
+      marginBottom: 8,
+    },
+    helper: {
+      fontSize: 13,
+      color: newTheme.textSecondary,
+    },
   });

@@ -10,10 +10,10 @@ export default function PhysicalHealthOverview() {
   return (
     <View style={styles.card}>
       <Text style={styles.title}>Physical Health Overview</Text>
-      <Text style={styles.subtitle}>Coming soon 🚀</Text>
+      <Text style={styles.subtitle}>Unlocking soon ✨</Text>
       <Text style={styles.helper}>
-        We&apos;re working on visualising hormone trends with cycles, mood and
-        energy so you get deeper body awareness.
+        A deeper physical health overview is coming — personalised insights
+        based on your body rhythms, energy, and cycle trends.
       </Text>
     </View>
   );
