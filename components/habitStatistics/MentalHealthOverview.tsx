@@ -10,10 +10,10 @@ export default function MentalHealthOverview() {
   return (
     <View style={styles.card}>
       <Text style={styles.title}>Mental Health Overview</Text>
-      <Text style={styles.subtitle}>Coming soon 🚀</Text>
+      <Text style={styles.subtitle}>Unlocking soon ✨</Text>
       <Text style={styles.helper}>
-        We&apos;re working on visualising hormone trends with cycles, mood and
-        energy so you get deeper body awareness.
+        A deeper look into your mental health — personalized insights from mood,
+        energy, and cycle trends, designed to guide your days.
       </Text>
     </View>
   );

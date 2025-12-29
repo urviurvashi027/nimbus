@@ -1,21 +1,12 @@
 // app/achievements.tsx
 import React, { useContext } from "react";
-import {
-  ActivityIndicator,
-  View,
-  Text,
-  TouchableOpacity,
-  Platform,
-  SafeAreaView,
-  ScrollView,
-} from "react-native";
+import { ActivityIndicator, View, Text, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import ThemeContext from "@/context/ThemeContext";
 import { useAchievements } from "@/hooks/useAchievements";
 import RewardDetails from "@/components/rewards/RewardDetails";
-import { ScreenView } from "@/components/Themed";
 
-export default function AchievementsRoute() {
+export default function RewardsRoute() {
   const router = useRouter();
   const { newTheme } = useContext(ThemeContext);
   const { data, loading, error, refresh } = useAchievements();
@@ -59,7 +50,7 @@ export default function AchievementsRoute() {
           Something went wrong
         </Text>
         <Text style={{ color: newTheme.textSecondary, marginBottom: 12 }}>
-          {String(error.message ?? error)}
+          {String((error as any)?.message ?? error)}
         </Text>
         <TouchableOpacity
           onPress={refresh}
@@ -70,29 +61,17 @@ export default function AchievementsRoute() {
             borderRadius: 10,
           }}
         >
-          <Text style={{ color: newTheme.background, fontWeight: "700" }}>
-            Retry
-          </Text>
+          <Text style={{ color: "#0B0B0C", fontWeight: "800" }}>Retry</Text>
         </TouchableOpacity>
       </View>
     );
   }
 
   return (
-    <ScreenView
-      style={{
-        paddingTop: Platform.OS === "ios" ? 40 : 20,
-      }}
-    >
-      <SafeAreaView>
-        <ScrollView>
-          <RewardDetails
-            onBack={() => router.back()}
-            achievements={data?.achievements ?? []}
-            badges={data?.badges ?? []}
-          />
-        </ScrollView>
-      </SafeAreaView>
-    </ScreenView>
+    <RewardDetails
+      onBack={() => router.back()}
+      achievements={data?.achievements ?? []}
+      badges={data?.badges ?? []}
+    />
   );
 }

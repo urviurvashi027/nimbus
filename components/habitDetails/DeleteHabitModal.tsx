@@ -20,6 +20,7 @@ import { HabitItem } from "@/types/habitTypes";
 type Props = {
   visible: boolean;
   habit: HabitItem | null;
+  selectedDate?: string; // in case needed for future use
   onClose: () => void;
   onDeleted?: (habitId: string) => void; // e.g. navigate back + refresh list
 };
@@ -28,6 +29,7 @@ export function DeleteHabitModal({
   visible,
   habit,
   onClose,
+  selectedDate,
   onDeleted,
 }: Props) {
   const { newTheme } = useContext(ThemeContext); // adapt to your actual ThemeContext
@@ -61,7 +63,9 @@ export function DeleteHabitModal({
         ).catch(() => {});
       }
 
-      await deleteHabit(Number(habit.id));
+      console.log("Deleting habit:", habit.id, selectedDate);
+
+      await deleteHabit(Number(habit.id), selectedDate);
 
       toast.show({
         variant: "success",
@@ -122,11 +126,12 @@ export function DeleteHabitModal({
             Delete habit?
           </Text>
           <Text style={[styles.subtitle, { color: newTheme.textSecondary }]}>
-            This will remove{" "}
+            This will stop{" "}
             <Text style={{ color: newTheme.textPrimary, fontWeight: "700" }}>
               {habit.name}
-            </Text>
-            .{"\n"}Your history may be lost if your backend does a hard delete.
+            </Text>{" "}
+            going forward.{"\n"}
+            Your past check-ins and history will stay in your timeline.
           </Text>
 
           {needsHardConfirm ? (
@@ -217,7 +222,7 @@ export function DeleteHabitModal({
           </View>
 
           <Text style={[styles.footnote, { color: "rgba(255,255,255,0.45)" }]}>
-            Tip: If you want “premium safety”, offer Archive instead of Delete.
+            Tip: Want to hide it instead? Archive is available for Premium.
           </Text>
         </View>
       </View>

@@ -76,7 +76,7 @@ const HabitDurationInput: React.FC<HabitDurationInputProps> = ({
             size={20}
             color={newTheme.textSecondary}
           />
-          <Text style={styles.rowLabel}>How long it lasts</Text>
+          <Text style={styles.rowLabel}>When it happens</Text>
         </View>
 
         <View style={styles.rowRight}>

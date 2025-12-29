@@ -72,6 +72,8 @@ const HabitReminderInput: React.FC<HabitReminderInputProps> = ({
     }
   }, [isEditMode, onSelect]);
 
+  console.log("HabitReminderInput rendered", isAllDayEnabled);
+
   // ✅ consistent UI time across app
   const userDisplay = useMemo(() => {
     return formatReminderDisplay(reminderAt, { fallback: "Select the preset" });
@@ -91,6 +93,13 @@ const HabitReminderInput: React.FC<HabitReminderInputProps> = ({
     if (reminderAt.thirty_min_before) return { thirty_min_before: true };
     return null;
   }, [reminderAt]);
+
+  useEffect(() => {
+    if (isAllDayEnabled) {
+      setReminderAt({});
+      onSelect({}); // clear reminder in parent
+    }
+  }, [isAllDayEnabled, onSelect]);
 
   return (
     <>

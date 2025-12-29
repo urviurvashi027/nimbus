@@ -140,12 +140,12 @@ export default function FavoritesRecipesScreen() {
 
       <View style={styles.actions}>
         <TouchableOpacity
-          onPress={() =>
-            router.push({
-              pathname: "/(auth)/Tools/Details/ContentDetailsScreen",
-              params: { id: item.id },
-            })
-          }
+          // onPress={() =>
+          //   // router.push({
+          //   //   pathname: "/(auth)/Tools/Details/ContentDetailsScreen",
+          //   //   params: { id: item.id },
+          //   // })
+          // }
           style={styles.iconBtn}
           accessibilityLabel="Open recipe"
         >
@@ -178,21 +178,7 @@ export default function FavoritesRecipesScreen() {
           <Ionicons name="arrow-back" size={22} color={newTheme.textPrimary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Saved Recipes</Text>
-
-        {/* <TouchableOpacity
-          onPress={() => seedMockRecipes()}
-          style={styles.seed}
-          accessibilityLabel="seed sample"
-        >
-          <Text style={styles.seedText}>Seed</Text>
-        </TouchableOpacity> */}
       </View>
-      {/* // inside render (just below header) */}
-      {/* <SegmentedTabs
-        tabs={["Saved Recipes", "Your Recipes"]}
-        activeIndex={activeTab}
-        onChange={(i) => setActiveTab(i)}
-      /> */}
       <View style={styles.body}>
         {activeTab === 0 ? (
           // Saved Recipes list
@@ -223,35 +209,11 @@ export default function FavoritesRecipesScreen() {
             </TouchableOpacity>
           </View>
         )}
-
-        {/* {recipes.length === 0 && !loading ? (
-          <View style={styles.empty}>
-            <Text style={styles.emptyTitle}>No recipes yet</Text>
-            <Text style={styles.emptySub}>
-              Tap the + button to add your first recipe.
-            </Text>
-
-            <TouchableOpacity
-              style={styles.primaryBtn}
-              onPress={() => setShowAdd(true)}
-            >
-              <Text style={styles.primaryBtnText}>Add recipe</Text>
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <FlatList
-            data={recipes}
-            renderItem={renderItem}
-            keyExtractor={(i) => i.id}
-            contentContainerStyle={{ padding: 12, paddingBottom: 140 }}
-            ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
-          />
-        )} */}
       </View>
       {/* Floating add button */}
       <TouchableOpacity
         style={[styles.fab, { backgroundColor: newTheme.accent }]}
-        onPress={() => router.push("/(auth)/Tools/Recipe/AddRecipe")}
+        // onPress={() => router.push("/(auth)/Tools/Recipe/AddRecipe")}
         accessibilityLabel="Add recipe"
       >
         <Ionicons name="add" size={28} color={newTheme.background} />

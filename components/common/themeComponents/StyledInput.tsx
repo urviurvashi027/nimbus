@@ -395,7 +395,7 @@ const styling = (newTheme: any) =>
     },
     input: {
       flex: 1,
-      fontSize: 16,
+      fontSize: 13,
       includeFontPadding: false,
       paddingVertical: 6,
     },

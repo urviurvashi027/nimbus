@@ -97,7 +97,7 @@ export const getHabitDetailsById = async (
 ): Promise<HabitDetailResponse> => {
   try {
     const response: AxiosResponse<HabitDetailResponse> = await axios.get(
-      `${API_ENDPOINTS.habitDetailsById}${id}/?${date}&is_daily_checkin=false`
+      `${API_ENDPOINTS.habitDetailsById}${id}/?date=${date}&is_daily_checkin=false`
     );
     return response.data; // Return the list data
   } catch (error: any) {
@@ -106,10 +106,13 @@ export const getHabitDetailsById = async (
 };
 
 // delete habit request
-export const deleteHabit = async (id: number): Promise<HabitDeleteResponse> => {
+export const deleteHabit = async (
+  id: number,
+  date?: string
+): Promise<HabitDeleteResponse> => {
   try {
     const response: AxiosResponse<HabitDeleteResponse> = await axios.delete(
-      `${API_ENDPOINTS.habitDetailsById}${id}/`
+      `${API_ENDPOINTS.habitDetailsById}${id}/?date=${date}`
     );
     let obj = { success: false, message: "", data: null };
     if (response.status == 204) {

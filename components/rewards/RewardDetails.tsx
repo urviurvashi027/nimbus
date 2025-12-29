@@ -1,10 +1,11 @@
+// src/components/rewards/RewardDetails.tsx
 import React, { useContext, useEffect } from "react";
 import {
-  SafeAreaView,
   View,
   Text,
   TouchableOpacity,
   ScrollView,
+  Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/context/ThemeContext";
@@ -13,67 +14,88 @@ import AchievementCard from "@/components/rewards/AchievementCard";
 import BadgeHex from "@/components/rewards/BadgeHex";
 import type { ScreenProps } from "@/components/rewards/types";
 import { useNavigation } from "expo-router";
+import RewardsPlaceholder from "./RewardsPlaceholder";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function RewardDetails({
   title = "Badges & Achievements",
   onBack,
-  achievements = [], // 👈 default
-  badges = [], // 👈 default
+  achievements = [],
+  badges = [],
 }: ScreenProps) {
-  const { newTheme } = useContext(ThemeContext);
+  const { newTheme, spacing } = useContext(ThemeContext);
   const s = styles(newTheme);
-
   const navigation = useNavigation();
 
+  const FEATURE_REWARDS_ENABLED = false; // until backend ready
+  const isPremium = false;
+
   useEffect(() => {
-    navigation.setOptions({
-      headerShown: false,
-    });
+    navigation.setOptions({ headerShown: false });
   }, [navigation]);
 
+  const PAGE_TOP = Platform.OS === "ios" ? 40 : 20;
+
   return (
-    <View style={s.screen}>
-      <View style={{ marginBottom: 10 }}>
-        <TouchableOpacity
-          // style={styles.backButton}
-          onPress={() => navigation.goBack()}
+    <View
+      style={[
+        s.screen,
+        { paddingTop: PAGE_TOP, paddingHorizontal: spacing.xs },
+      ]}
+    >
+      <SafeAreaView style={{ flex: 1 }} edges={["bottom"]}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: spacing.xl }}
         >
-          <Ionicons
-            name="arrow-back"
-            size={24}
-            color={newTheme.textSecondary}
-          />
-        </TouchableOpacity>
-      </View>
+          {/* Back */}
+          <View style={{ marginBottom: spacing.md }}>
+            <TouchableOpacity
+              onPress={() => (onBack ? onBack() : navigation.goBack())}
+            >
+              <Ionicons
+                name="arrow-back"
+                size={24}
+                color={newTheme.textSecondary}
+              />
+            </TouchableOpacity>
+          </View>
 
-      <View style={s.rewardHeader}>
-        <Text style={s.rewardTitle}>{title}</Text>
-        <Text style={s.rewardSubtitle}>{title}</Text>
-      </View>
+          {/* Header */}
+          <View style={s.rewardHeader}>
+            <Text style={s.rewardTitle}>{title}</Text>
+            <Text style={s.rewardSubtitle}>
+              {FEATURE_REWARDS_ENABLED ? title : "Coming soon"}
+            </Text>
+          </View>
 
-      {/* Header */}
-      {/* <View style={s.header}>
-        <Text style={s.headerTitle}>{title}</Text>
-        <View style={{ width: 40 }} />
-      </View> */}
+          {!FEATURE_REWARDS_ENABLED ? (
+            <RewardsPlaceholder
+              isPremium={isPremium}
+              onUpgrade={() => console.log("Open paywall")}
+              onPreview={() => console.log("Show preview modal")}
+            />
+          ) : (
+            <>
+              <Text style={s.sectionTitle}>My Achievements</Text>
+              <View style={s.achievementsGrid}>
+                {achievements.map((a) => (
+                  <AchievementCard key={a.id} item={a} />
+                ))}
+              </View>
 
-      {/* <ScrollView contentContainerStyle={{ paddingBottom: 28 }} style={s.body}> */}
-      {/* My Achievements */}
-      <Text style={s.sectionTitle}>My Achievements</Text>
-      <View style={s.achievementsGrid}>
-        {achievements.map((a) => (
-          <AchievementCard key={a.id} item={a} />
-        ))}
-      </View>
-
-      {/* Badges */}
-      <Text style={[s.sectionTitle, { marginTop: 18 }]}>My Badges</Text>
-      <View style={s.badgesGrid}>
-        {badges.map((b) => (
-          <BadgeHex key={b.id} badge={b} />
-        ))}
-      </View>
-      {/* </ScrollView> */}
+              <Text style={[s.sectionTitle, { marginTop: spacing.lg }]}>
+                My Badges
+              </Text>
+              <View style={s.badgesGrid}>
+                {badges.map((b) => (
+                  <BadgeHex key={b.id} badge={b} />
+                ))}
+              </View>
+            </>
+          )}
+        </ScrollView>
+      </SafeAreaView>
     </View>
   );
 }

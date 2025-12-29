@@ -2,6 +2,7 @@
 
 import React from "react";
 import NimbusPastelFeaturedCard from "@/components/common/PastelFeaturedCard";
+import NimbusUltraFeaturedCard from "@/components/common/NimbusUltraFeaturedCard";
 
 interface ItemDetails {
   id: string;
@@ -35,12 +36,14 @@ const SoundscapeFeaturedCard: React.FC<SoundscapeFeaturedCardProps> = ({
     (category ? category : "Calming ambience · Best with headphones");
 
   return (
-    <NimbusPastelFeaturedCard
+    <NimbusUltraFeaturedCard
       title={title}
-      subtitle={`${duration || "3"} min · Soundscape`}
+      subtitle={`${duration || "3"} min · Reflection`}
       description={descText}
       image={image}
-      colors={{ bg: cardColor.bgColor, footer: cardColor.color }}
+      badge={category || "For you"} // or "Relaxing" etc
+      tint={cardColor.bgColor} // keep your palette, but as a glow
+      accent={cardColor.color} // used for dot + accent bar
       onPress={() => onPress(data)}
     />
   );

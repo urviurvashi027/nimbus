@@ -49,7 +49,10 @@ const ReflectionForYouSection: React.FC<Props> = ({
         snapToAlignment="start"
         snapToInterval={width * 0.8 + spacing.sm}
         decelerationRate="fast"
-        contentContainerStyle={{ paddingRight: spacing.md }}
+        contentContainerStyle={{
+          paddingRight: spacing.md,
+          paddingVertical: spacing.md,
+        }}
         style={styles.featuredList}
       />
     </View>
@@ -71,7 +74,7 @@ const styling = (newTheme: any, spacing: any, typography: any) =>
       color: newTheme.textPrimary,
     },
     featuredList: {
-      height: 180, // to comfortably fit the cards
+      // height: 180, // to comfortably fit the cards
     },
   });
 

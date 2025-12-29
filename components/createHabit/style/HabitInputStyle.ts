@@ -35,23 +35,51 @@ const styling = (newTheme: any, spacing: any) =>
 
     // new style
 
-    rowItem: {
-      paddingVertical: spacing.md + 2, // ↑ more breathing space
-      paddingHorizontal: spacing.md, // consistent left/right
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      borderBottomWidth: 1,
-      borderBottomColor: "rgba(255,255,255,0.06)",
-    },
-    rowLeft: { flexDirection: "row", alignItems: "center", gap: 12 },
+    // rowItem: {
+    //   paddingVertical: spacing.md + 2, // ↑ more breathing space
+    //   paddingHorizontal: spacing.md, // consistent left/right
+    //   flexDirection: "row",
+    //   alignItems: "center",
+    //   justifyContent: "space-between",
+    //   borderBottomWidth: 1,
+    //   borderBottomColor: "rgba(255,255,255,0.06)",
+    // },
+    // rowLeft: { flexDirection: "row", alignItems: "center", gap: 12 },
     rowLabel: {
       marginLeft: 8,
       color: newTheme.textSecondary || "red",
       fontSize: 15,
     },
-    rowRight: { flexDirection: "row", alignItems: "center", gap: 8 },
-    rowValue: { color: newTheme.textPrimary, fontSize: 15, fontWeight: "600" },
+    // rowRight: { flexDirection: "row", alignItems: "center", gap: 8 },
+    // rowValue: { color: newTheme.textPrimary, fontSize: 15, fontWeight: "600" },
+    rowItem: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
+
+    rowLeft: {
+      flexDirection: "row",
+      alignItems: "center",
+      flexShrink: 0, // left label stays stable
+    },
+
+    rowRight: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "flex-end",
+      flexShrink: 1, // allow right side to shrink
+      maxWidth: "55%", // tweak: 50–65% depending on your UI
+    },
+
+    rowValue: {
+      flexShrink: 1, // IMPORTANT: text must shrink
+      textAlign: "right",
+      marginRight: 8, // space before chevron
+      color: newTheme.textPrimary,
+      fontSize: 15,
+      fontWeight: "600",
+    },
   });
 
 export default styling;

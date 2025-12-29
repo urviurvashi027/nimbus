@@ -11,7 +11,7 @@ import AdviceList from "./AdviceList";
 import PrimaryButton from "./PrimaryButton";
 import type { CoachData, Topic, Advice } from "./types";
 
-export default function CoachScreen({
+export default function CoachLive({
   data,
   onBack,
   onTopic,

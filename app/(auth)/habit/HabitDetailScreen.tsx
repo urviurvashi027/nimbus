@@ -16,7 +16,7 @@ import HabitDetailsPanel from "@/components/habitDetails/HabitDetailsPanel";
 import HeaderPanel from "@/components/habitDetails/HeaderPanel";
 import MonthlyOverviewPanel from "@/components/habitDetails/MonthlyOverviewPanel";
 import AppHeader from "@/components/common/AppHeader";
-import { format, startOfDay } from "date-fns";
+import { format, isBefore, parseISO, startOfDay } from "date-fns";
 import { formatReminderTime } from "@/utils/dates";
 import HabitDetailsSkeleton from "@/components/habitDetails/HabitDetailsSkeleton";
 import { DeleteHabitModal } from "@/components/habitDetails/DeleteHabitModal";
@@ -122,6 +122,15 @@ const HabitDetails = () => {
     );
   }
 
+  const selectedDateStr = Array.isArray(date) ? date?.[0] : date;
+  const selectedDay = startOfDay(
+    selectedDateStr ? parseISO(selectedDateStr) : new Date()
+  );
+  const today = startOfDay(new Date());
+
+  // show for today + future
+  const showRightAction = !isBefore(selectedDay, today);
+
   return (
     <ScreenView
       style={{
@@ -150,11 +159,15 @@ const HabitDetails = () => {
                   : "Review your streaks and progress."
               }
               onBack={() => router.back()}
-              rightAction={{
-                icon: "ellipsis-horizontal",
-                onPress: () => setDeleteOpen(true),
-                accessibilityLabel: "Habit options",
-              }}
+              rightAction={
+                showRightAction
+                  ? {
+                      icon: "ellipsis-horizontal",
+                      onPress: () => setDeleteOpen(true),
+                      accessibilityLabel: "Habit options",
+                    }
+                  : undefined
+              }
             />
 
             {/* Top details card */}
@@ -215,6 +228,7 @@ const HabitDetails = () => {
       {/* Delete Modal */}
       <DeleteHabitModal
         visible={deleteOpen}
+        selectedDate={Array.isArray(date) ? date?.[0] : date}
         habit={{
           id: habitId,
           name: habit?.name ?? "Habit",
