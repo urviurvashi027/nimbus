@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/context/ThemeContext";
+import CoachHeroCard from "@/components/coach/CoachHeroCard";
 
 type Props = {
   onBack?: () => void;
@@ -19,32 +20,29 @@ type Props = {
   onUpgrade?: () => void;
 };
 
-const TopicTile = ({
+function TopicTile({
   title,
   icon,
   locked = true,
-  onPress,
 }: {
   title: string;
   icon: keyof typeof Ionicons.glyphMap;
   locked?: boolean;
-  onPress?: () => void;
-}) => {
+}) {
   const { newTheme, spacing, typography } = useContext(ThemeContext);
   const s = tileStyles(newTheme, spacing, typography);
 
   return (
-    <Pressable onPress={onPress} style={s.tile}>
+    <View style={s.tile}>
       <View style={s.topRow}>
-        <View style={s.chip}>
+        <View style={s.lockChip}>
           <Ionicons
             name={locked ? "lock-closed" : "sparkles-outline"}
             size={12}
             color="rgba(255,255,255,0.75)"
           />
-          <Text style={s.chipText}>{locked ? "Locked" : "Ready"}</Text>
+          <Text style={s.lockText}>{locked ? "Locked" : "Ready"}</Text>
         </View>
-
         <Ionicons name={icon} size={18} color={newTheme.accent} />
       </View>
 
@@ -52,9 +50,9 @@ const TopicTile = ({
         {title}
       </Text>
       <Text style={s.meta}>Unlocks automatically</Text>
-    </Pressable>
+    </View>
   );
-};
+}
 
 export default function CoachPlaceholder({
   onBack,
@@ -69,18 +67,17 @@ export default function CoachPlaceholder({
   const summary = useMemo(() => {
     const days = stats?.daysTracked ?? 0;
     const habits = stats?.habitsActive ?? 0;
-
     if (days > 0 && habits > 0)
-      return `Tracking ${habits} habits · ${days} days of signals`;
+      return `Tracking ${habits} habits · ${days} days`;
     if (days > 0) return `${days} days of signals captured`;
-    return "Building your personal guidance";
+    return "Building your personal guidance ✨";
   }, [stats]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: newTheme.background }}>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={s.scrollContent}
+        contentContainerStyle={{ paddingBottom: spacing.xl * 2 }}
       >
         <View style={s.screen}>
           {/* Header */}
@@ -94,89 +91,16 @@ export default function CoachPlaceholder({
             </Pressable>
 
             <Text style={s.headerTitle}>Coach</Text>
-
-            <View style={{ width: 34 }} />
+            <View style={{ width: 36 }} />
           </View>
 
-          {/* HERO — Ultra glass */}
-          <View style={s.heroCard}>
-            {/* glow + overlays (premium depth) */}
-            <View style={s.heroGlow} />
-            <View style={s.heroFogTop} />
-            <View style={s.heroFogBottom} />
-            <View style={s.heroAccentBar} />
-
-            <View style={s.heroInnerStroke} pointerEvents="none" />
-
-            {/* hero content */}
-            <View style={s.heroTopRow}>
-              <View style={s.heroIconPill}>
-                <Ionicons
-                  name="sparkles-outline"
-                  size={18}
-                  color={newTheme.accent}
-                />
-              </View>
-
-              {/* ✅ Text column (chip + title + body) */}
-              <View style={s.heroTextCol}>
-                <View style={s.heroChip}>
-                  <View style={s.heroChipDot} />
-                  <Text style={s.heroChipText}>Nimbus Coach</Text>
-                </View>
-
-                <Text style={s.heroTitle} numberOfLines={2}>
-                  Coach is learning your rhythm
-                </Text>
-
-                <Text style={s.heroSubtitle}>
-                  We’re quietly observing your habits, focus patterns, and
-                  consistency — so your guidance feels timely, personal, and
-                  supportive.
-                </Text>
-
-                <View style={s.metaRow}>
-                  <Ionicons
-                    name="pulse-outline"
-                    size={14}
-                    color="rgba(255,255,255,0.65)"
-                  />
-                  <Text style={s.heroMeta}>{summary} ✨</Text>
-                </View>
-              </View>
-            </View>
-
-            {/* Insight block (premium) */}
-            <View style={s.insightWrap}>
-              <View style={s.insightAccent} />
-              <View style={s.insightHeader}>
-                <Text style={s.insightLabel}>Coach Insight</Text>
-                <View style={s.insightPill}>
-                  <View style={s.insightDot} />
-                  <Text style={s.insightPillText}>Preview</Text>
-                </View>
-              </View>
-
-              <Text style={s.insightText}>
-                Coach will soon suggest lighter days, better routines, and habit
-                tweaks — based on when you usually struggle or succeed.
-              </Text>
-            </View>
-            <View style={s.heroDivider} />
-            {/* CTA row */}
-            <View style={s.ctaRow}>
-              <Pressable style={s.primaryBtn} onPress={onAsk}>
-                <Text style={s.primaryText}>Ask Coach</Text>
-                <Text style={s.primarySubText}>anything</Text>
-              </Pressable>
-
-              <Pressable style={s.secondaryBtn} onPress={onUpgrade}>
-                <Text style={s.secondaryText}>
-                  {isPremium ? "Notify me" : "Get Premium"}
-                </Text>
-              </Pressable>
-            </View>
-          </View>
+          {/* Premium hero */}
+          <CoachHeroCard
+            summary={summary}
+            isPremium={isPremium}
+            onAsk={onAsk}
+            onUpgrade={onUpgrade}
+          />
 
           {/* Topics */}
           <View style={s.sectionHeader}>
@@ -227,18 +151,10 @@ export default function CoachPlaceholder({
 const styles = (newTheme: any, spacing: any, typography: any) =>
   StyleSheet.create({
     screen: {
-      paddingHorizontal: spacing.md,
+      paddingHorizontal: spacing.xs,
       paddingTop: spacing.lg,
     },
-    scrollContent: {
-      paddingBottom: spacing.xl * 2,
-    },
-    heroInnerStroke: {
-      ...StyleSheet.absoluteFillObject,
-      borderRadius: 28,
-      borderWidth: 1,
-      borderColor: "rgba(255,255,255,0.06)",
-    },
+
     headerRow: {
       flexDirection: "row",
       alignItems: "center",
@@ -262,226 +178,6 @@ const styles = (newTheme: any, spacing: any, typography: any) =>
       letterSpacing: 0.2,
     },
 
-    heroCard: {
-      borderRadius: 28,
-      padding: spacing.lg,
-      backgroundColor: "rgba(255,255,255,0.05)",
-      borderWidth: 1,
-      borderColor: "rgba(255,255,255,0.08)",
-      overflow: "hidden",
-      shadowColor: "#000",
-      shadowOpacity: 0.42,
-      shadowRadius: 22,
-      shadowOffset: { width: 0, height: 14 },
-      elevation: 12,
-    },
-    heroDivider: {
-      height: 1,
-      backgroundColor: "rgba(255,255,255,0.06)",
-      marginTop: spacing.md,
-    },
-
-    // layered depth
-    heroGlow: {
-      position: "absolute",
-      top: -90,
-      left: -90,
-      right: -90,
-      height: 190,
-      borderRadius: 999,
-      backgroundColor: "rgba(167, 201, 180, 0.18)", // Nimbus sage glow
-    },
-    heroFogTop: {
-      position: "absolute",
-      top: 0,
-      left: 0,
-      right: 0,
-      height: 54,
-      backgroundColor: "rgba(255,255,255,0.03)",
-    },
-    heroAccentBar: {
-      position: "absolute",
-      top: 0,
-      left: 0,
-      right: 0,
-      height: 2,
-      backgroundColor: "rgba(167, 201, 180, 0.40)",
-    },
-    heroFogBottom: {
-      position: "absolute",
-      bottom: -40,
-      left: -40,
-      right: -40,
-      height: 110,
-      borderRadius: 999,
-      backgroundColor: "rgba(0,0,0,0.18)",
-    },
-    // heroAccentBar: {
-    //   position: "absolute",
-    //   top: 0,
-    //   left: 0,
-    //   right: 0,
-    //   height: 3,
-    //   backgroundColor: "rgba(167, 201, 180, 0.55)",
-    // },
-
-    heroTopRow: {
-      flexDirection: "row",
-      alignItems: "center", // ✅ was flex-start
-      gap: spacing.md,
-    },
-
-    heroTextCol: {
-      flex: 1,
-      minWidth: 0, // ✅ IMPORTANT for proper text wrapping in RN
-    },
-
-    heroTitle: {
-      ...typography.h2,
-      color: newTheme.textPrimary,
-      fontWeight: "900",
-      lineHeight: 34, // ✅ helps avoid awkward breaks
-    },
-    heroIconPill: {
-      width: 46,
-      height: 46,
-      borderRadius: 18,
-      alignItems: "center",
-      justifyContent: "center",
-      backgroundColor: "rgba(0,0,0,0.18)",
-      borderWidth: 1,
-      borderColor: "rgba(255,255,255,0.10)",
-      shadowColor: "#000",
-      shadowOpacity: 0.25,
-      shadowRadius: 10,
-      shadowOffset: { width: 0, height: 6 },
-      elevation: 6,
-    },
-    // heroTitle: {
-    //   ...typography.h2,
-    //   color: newTheme.textPrimary,
-    //   fontWeight: "900",
-    // },
-    heroSubtitle: {
-      ...typography.body,
-      color: "rgba(255,255,255,0.70)",
-      marginTop: 10,
-      lineHeight: 20,
-    },
-    metaRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 8,
-      marginTop: spacing.sm,
-    },
-    heroMeta: {
-      ...typography.caption,
-      color: "rgba(255,255,255,0.62)",
-      fontWeight: "700",
-    },
-    insightAccent: {
-      position: "absolute",
-      left: 10,
-      top: 14,
-      bottom: 14,
-      width: 3,
-      borderRadius: 99,
-      backgroundColor: "rgba(167, 201, 180, 0.45)",
-    },
-    insightWrap: {
-      marginTop: spacing.md,
-      padding: spacing.md,
-      borderRadius: 20,
-      backgroundColor: "rgba(255,255,255,0.03)", // lighter than before
-      borderWidth: 1,
-      borderColor: "rgba(255,255,255,0.07)",
-    },
-    insightHeader: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      marginBottom: 10,
-    },
-    insightLabel: {
-      ...typography.caption,
-      color: "rgba(255,255,255,0.70)",
-      fontWeight: "800",
-      letterSpacing: 0.4,
-      textTransform: "uppercase",
-    },
-    insightPill: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 8,
-      paddingHorizontal: 10,
-      paddingVertical: 6,
-      borderRadius: 999,
-      backgroundColor: "rgba(255,255,255,0.06)",
-      borderWidth: 1,
-      borderColor: "rgba(255,255,255,0.10)",
-    },
-    insightDot: {
-      width: 8,
-      height: 8,
-      borderRadius: 99,
-      backgroundColor: newTheme.accent,
-      opacity: 0.8,
-    },
-    insightPillText: {
-      ...typography.caption,
-      color: "rgba(255,255,255,0.75)",
-      fontWeight: "800",
-    },
-    insightText: {
-      ...typography.body,
-      color: "rgba(255,255,255,0.78)",
-      lineHeight: 20,
-      paddingLeft: 10,
-    },
-
-    ctaRow: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      marginTop: spacing.md,
-      gap: 12,
-    },
-    primaryBtn: {
-      flex: 1,
-      borderRadius: 18,
-      paddingVertical: 14,
-      alignItems: "center",
-      justifyContent: "center",
-      backgroundColor: newTheme.accent,
-    },
-    primaryText: {
-      ...typography.body,
-      color: "#0B0B0C",
-      fontWeight: "900",
-      lineHeight: 18,
-    },
-    primarySubText: {
-      ...typography.caption,
-      color: "#0B0B0C",
-      fontWeight: "900",
-      opacity: 0.9,
-      marginTop: 2,
-    },
-    secondaryBtn: {
-      flex: 1,
-      borderRadius: 18,
-      paddingVertical: 14,
-      alignItems: "center",
-      justifyContent: "center",
-      backgroundColor: "rgba(0,0,0,0.16)",
-      borderWidth: 1,
-      borderColor: "rgba(255,255,255,0.10)",
-    },
-    secondaryText: {
-      ...typography.body,
-      color: "rgba(255,255,255,0.88)",
-      fontWeight: "900",
-    },
-
     sectionHeader: {
       marginTop: spacing.xl,
       marginBottom: spacing.md,
@@ -503,9 +199,7 @@ const styles = (newTheme: any, spacing: any, typography: any) =>
       justifyContent: "space-between",
     },
 
-    adviceStack: {
-      gap: spacing.sm,
-    },
+    adviceStack: { gap: spacing.sm },
     adviceRow: {
       borderRadius: 18,
       paddingHorizontal: spacing.md,
@@ -536,31 +230,6 @@ const styles = (newTheme: any, spacing: any, typography: any) =>
       color: "rgba(255,255,255,0.55)",
       textAlign: "center",
     },
-    heroChip: {
-      alignSelf: "flex-start",
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 8,
-      paddingHorizontal: 12,
-      paddingVertical: 6,
-      borderRadius: 999,
-      backgroundColor: "rgba(255,255,255,0.05)",
-      borderWidth: 1,
-      borderColor: "rgba(255,255,255,0.08)",
-      marginBottom: 8, // ✅ smaller
-    },
-    heroChipDot: {
-      width: 8,
-      height: 8,
-      borderRadius: 99,
-      backgroundColor: "rgba(167, 201, 180, 0.85)",
-    },
-    heroChipText: {
-      ...typography.caption,
-      color: "rgba(255,255,255,0.70)",
-      fontWeight: "800",
-      letterSpacing: 0.4,
-    },
   });
 
 const tileStyles = (newTheme: any, spacing: any, typography: any) =>
@@ -581,7 +250,7 @@ const tileStyles = (newTheme: any, spacing: any, typography: any) =>
       justifyContent: "space-between",
       marginBottom: 10,
     },
-    chip: {
+    lockChip: {
       flexDirection: "row",
       alignItems: "center",
       gap: 6,
@@ -592,7 +261,7 @@ const tileStyles = (newTheme: any, spacing: any, typography: any) =>
       borderWidth: 1,
       borderColor: "rgba(255,255,255,0.10)",
     },
-    chipText: {
+    lockText: {
       ...typography.caption,
       color: "rgba(255,255,255,0.70)",
       fontWeight: "800",
