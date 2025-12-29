@@ -482,7 +482,8 @@ const ContentDetailsScreen: React.FC = () => {
                       index + (details.section_data?.length || 0)
                     ] = el)
                   }
-                  title={section.step}
+                  title={`Step: ${section.step}`}
+                  // title={section.step}
                   content={section.instruction}
                 />
               ))}

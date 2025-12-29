@@ -161,9 +161,9 @@ const RoutineScreen = () => {
           renderItem={({ item }) => (
             <ContentPosterCard
               image={item.image}
-              tag={item.tag}
               height={item.height}
-              // title={item.title} // optional, if you want text
+              tag={item.category}
+              title={item.title} // optional, if you want text
               onPress={() => handleItemClick(item)}
             />
           )}
