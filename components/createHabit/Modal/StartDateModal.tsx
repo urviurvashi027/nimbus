@@ -180,6 +180,34 @@ export default function StartDateModal({
       prev.includes(n) ? prev.filter((p) => p !== n) : [...prev, n]
     );
 
+  const switchFrequency = (next: UIFreq) => {
+    setSelectedFrequency(next);
+    setError("");
+
+    // Reset OTHER mode selections so UI never carries over
+    if (next === "Daily") {
+      setWeeklyDays([]);
+      setMonthlyDates([]);
+      // optional: reset intervals if you want
+      // setWeeklyInterval("1");
+      // setMonthlyInterval("1");
+      return;
+    }
+
+    if (next === "Weekly") {
+      setMonthlyDates([]);
+      // optional: reset interval for monthly
+      // setMonthlyInterval("1");
+      return;
+    }
+
+    if (next === "Monthly") {
+      setWeeklyDays([]);
+      // optional: reset interval for weekly
+      // setWeeklyInterval("1");
+      return;
+    }
+  };
   // validation and conversion (LOGIC UNCHANGED)
   const convertToHabitDate = (): HabitDateType | null => {
     const daily = Math.max(1, Number(dailyCount || 1));
@@ -334,12 +362,12 @@ export default function StartDateModal({
                           setSelectedFrequency("");
                           setWeeklyDays([]);
                           setMonthlyDates([]);
+                          setError("");
                           return next;
                         }
 
-                        // ✅ only set Daily if nothing selected yet
-                        setSelectedFrequency((cur) => (cur ? cur : "Daily"));
-                        setError("");
+                        // default to Daily but reset others properly
+                        switchFrequency("Daily");
                         return next;
                       });
                     }}
@@ -360,10 +388,11 @@ export default function StartDateModal({
                               styles.pill,
                               selected && styles.pillSelected,
                             ]}
-                            onPress={() => {
-                              setSelectedFrequency(p);
-                              setError("");
-                            }}
+                            onPress={() => switchFrequency(p)}
+                            // onPress={() => {
+                            //   setSelectedFrequency(p);
+                            //   setError("");
+                            // }}
                             activeOpacity={0.9}
                           >
                             <Text
