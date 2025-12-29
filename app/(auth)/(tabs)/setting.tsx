@@ -26,12 +26,52 @@ import UpgradeBanner from "@/components/common/UpgradeBanner";
 import { router } from "expo-router";
 import ProfileHeader from "@/components/setting/ProfileHeader";
 import StyledSwitch from "@/components/common/themeComponents/StyledSwitch";
+import { SvgUri } from "react-native-svg";
 
 type FormState = {
   darkMode: boolean;
   wifi: boolean;
   showCollaborators: boolean;
 };
+
+export function Avatar({ uri, size = 82 }: { uri?: string; size?: number }) {
+  if (!uri)
+    return (
+      <View
+        style={[
+          stylesf.fallback,
+          { width: size, height: size, borderRadius: size / 2 },
+        ]}
+      />
+    );
+
+  const isSvg = uri.toLowerCase().includes(".svg");
+
+  if (isSvg) {
+    return <SvgUri uri={uri} width={size} height={size} />;
+  }
+
+  return (
+    <Image
+      source={{ uri }}
+      style={{ width: size, height: size, borderRadius: size / 2 }}
+    />
+  );
+}
+
+const stylesf = StyleSheet.create({
+  fallback: { backgroundColor: "rgba(255,255,255,0.08)" },
+});
+
+const styles = StyleSheet.create({
+  avatar: { width: 82, height: 82, borderRadius: 9999 },
+  fallback: {
+    width: 82,
+    height: 82,
+    borderRadius: 9999,
+    backgroundColor: "#333",
+  },
+});
 
 export default function profile() {
   // modal states
@@ -224,7 +264,6 @@ export default function profile() {
         break;
     }
   };
-  const handleOnSaveNotification = () => {};
 
   return (
     <GestureHandlerRootView style={styles.gestureContainer}>
@@ -236,7 +275,7 @@ export default function profile() {
               userProfile?.email || "Grow a calmer, healthier you 🌿"
             }
             planLabel={"Nimbus Free"}
-            avatarSource={require("../../../assets/images/loginLatest.png")}
+            avatarUrl={userProfile?.avatar || null} // ✅ URL string
             onPressManagePlan={() => router.push("/(auth)/upgradePlan")}
           />
           <View style={{ paddingVertical: 20 }}>
