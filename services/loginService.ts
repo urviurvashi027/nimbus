@@ -27,6 +27,7 @@ type UserProfile = {
   email: string;
   first_name: string | null;
   last_name: string | null;
+  avatar: string | null;
   profile: {
     phone_number: string | null;
     height: number | string | null;

@@ -1,43 +1,59 @@
-// components/setting/NimbusProfileHeader.tsx
-import React, { useContext } from "react";
+// components/setting/ProfileHeader.tsx
+import React, { useContext, useMemo, useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   Image,
   TouchableOpacity,
-  ImageSourcePropType,
+  ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/context/ThemeContext";
+import { SvgUri } from "react-native-svg";
 
 type Props = {
   username: string;
   emailOrTagline?: string;
-  planLabel?: string; // e.g. "Nimbus Free", "Nimbus Plus"
-  avatarSource?: ImageSourcePropType;
+  planLabel?: string;
+  avatarUrl?: string | null; // ✅ backend string URL
   onPressEditProfile?: () => void;
   onPressManagePlan?: () => void;
 };
+
+function isSvgUrl(url: string) {
+  // handles: ...avatar.svg?X-Amz-...
+  const clean = url.split("?")[0].toLowerCase();
+  return clean.endsWith(".svg") || clean.includes(".svg/");
+}
 
 const ProfileHeader: React.FC<Props> = ({
   username,
   emailOrTagline = "Grow a calmer, healthier you 🌿",
   planLabel = "Nimbus Free",
-  avatarSource,
+  avatarUrl,
   onPressEditProfile,
   onPressManagePlan,
 }) => {
   const { newTheme } = useContext(ThemeContext);
   const styles = styling(newTheme);
 
-  const initials =
-    username
-      ?.trim()
-      .split(/\s+/)
-      .map((p) => p[0]?.toUpperCase())
-      .slice(0, 2)
-      .join("") || "NM";
+  const initials = useMemo(() => {
+    return (
+      username
+        ?.trim()
+        .split(/\s+/)
+        .map((p) => p[0]?.toUpperCase())
+        .slice(0, 2)
+        .join("") || "NM"
+    );
+  }, [username]);
+
+  const [imgFailed, setImgFailed] = useState(false);
+  const [svgFailed, setSvgFailed] = useState(false);
+  const [imgLoading, setImgLoading] = useState(false);
+
+  const shouldShowAvatar = !!avatarUrl && !imgFailed && !svgFailed;
 
   return (
     <View style={styles.wrapper}>
@@ -50,22 +66,42 @@ const ProfileHeader: React.FC<Props> = ({
         >
           <View style={styles.avatarRing} />
           <View style={styles.avatarInner}>
-            {avatarSource ? (
-              <Image
-                source={avatarSource}
-                style={styles.avatarImage}
-                resizeMode="cover"
-              />
+            {shouldShowAvatar ? (
+              isSvgUrl(avatarUrl!) ? (
+                <SvgUri
+                  uri={avatarUrl!}
+                  width="100%"
+                  height="100%"
+                  // Some versions support onError; if TS complains, remove it.
+                  // @ts-ignore
+                  onError={() => setSvgFailed(true)}
+                />
+              ) : (
+                <>
+                  {imgLoading ? <ActivityIndicator /> : null}
+                  <Image
+                    source={{ uri: avatarUrl! }}
+                    style={styles.avatarImage}
+                    resizeMode="cover"
+                    onLoadStart={() => setImgLoading(true)}
+                    onLoadEnd={() => setImgLoading(false)}
+                    onError={() => {
+                      setImgLoading(false);
+                      setImgFailed(true);
+                    }}
+                  />
+                </>
+              )
             ) : (
               <Text style={styles.initials}>{initials}</Text>
             )}
           </View>
 
-          {onPressEditProfile && (
+          {onPressEditProfile ? (
             <View style={styles.editDot}>
               <Ionicons name="pencil" size={12} color={newTheme.background} />
             </View>
-          )}
+          ) : null}
         </TouchableOpacity>
 
         {/* Text block */}
@@ -88,11 +124,11 @@ const ProfileHeader: React.FC<Props> = ({
               <Text style={styles.planChipText}>{planLabel}</Text>
             </View>
 
-            {onPressManagePlan && (
+            {onPressManagePlan ? (
               <TouchableOpacity onPress={onPressManagePlan} hitSlop={6}>
                 <Text style={styles.linkText}>Manage</Text>
               </TouchableOpacity>
-            )}
+            ) : null}
           </View>
         </View>
       </View>
@@ -107,7 +143,7 @@ const styling = (t: any) =>
     wrapper: {
       paddingTop: 12,
       paddingBottom: 4,
-      paddingHorizontal: 16, // ✅ matches UpgradeBanner margin
+      paddingHorizontal: 16,
     },
     card: {
       flexDirection: "row",
@@ -137,7 +173,7 @@ const styling = (t: any) =>
       height: 64,
       borderRadius: 32,
       borderWidth: 2,
-      borderColor: t.accent, // subtle premium ring
+      borderColor: t.accent,
       opacity: 0.9,
     },
     avatarInner: {

@@ -1,5 +1,5 @@
 // components/EditProfileModal.tsx
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -14,15 +14,15 @@ import {
   ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import Toast from "react-native-toast-message";
+import { Asset } from "expo-asset";
 
 import ThemeContext from "@/context/ThemeContext";
 import { useAuth } from "@/context/AuthContext";
 
 import InputField from "@/components/common/themeComponents/StyledInputOld";
 import StyledButton from "@/components/common/themeComponents/StyledButton";
-
 import AvatarPickerModal from "./AvatarPickerModal";
+import { useNimbusToast } from "@/components/common/toast/useNimbusToast";
 
 /* import your BUILTIN_SVGS if you want preview of svg selection */
 import AvatarBusy from "@/assets/images/avatar/busyguy.svg";
@@ -34,7 +34,8 @@ import AvatarFitnessFemale from "@/assets/images/avatar/fitnessfemale.svg";
 import AvatarFinanceGuy from "@/assets/images/avatar/financeguy.svg";
 import AvatarDeveloperGuy from "@/assets/images/avatar/developerguy.svg";
 import AvatarFemale from "@/assets/images/avatar/female.svg";
-import { useNimbusToast } from "@/components/common/toast/useNimbusToast";
+import { svgIndexToFileUri } from "@/constant/builtinAvatars";
+import { SvgUri } from "react-native-svg";
 
 const BUILTIN_SVGS = [
   AvatarBusy,
@@ -48,108 +49,147 @@ const BUILTIN_SVGS = [
   AvatarFemale,
 ];
 
+export const BUILTIN_AVATAR_FILES: Record<number, any> = {
+  0: require("@/assets/images/avatar/busyguy.svg"),
+  1: require("@/assets/images/avatar/coolfemale.svg"),
+  2: require("@/assets/images/avatar/coolguy.svg"),
+  3: require("@/assets/images/avatar/youngguy.svg"),
+  4: require("@/assets/images/avatar/seriousfemale.svg"),
+  5: require("@/assets/images/avatar/fitnessfemale.svg"),
+  6: require("@/assets/images/avatar/financeguy.svg"),
+  7: require("@/assets/images/avatar/developerguy.svg"),
+  8: require("@/assets/images/avatar/female.svg"),
+};
+
+type AvatarKey = string | null;
+
 type Props = {
   visible: boolean;
   onClose: () => void;
   onSaved?: (updatedUser?: any) => void;
 };
 
+async function buildProfileFormData(payload: any, avatarKey: AvatarKey) {
+  const fd = new FormData();
+
+  Object.entries(payload || {}).forEach(([k, v]) => {
+    if (v === undefined || v === null) return;
+    fd.append(k, typeof v === "object" ? JSON.stringify(v) : String(v));
+  });
+
+  if (avatarKey?.startsWith("svg:")) {
+    const idx = Number(avatarKey.split(":")[1]);
+    const uri = await svgIndexToFileUri(idx);
+
+    fd.append("avatar", {
+      uri,
+      name: `avatar-${idx}.svg`,
+      type: "image/svg+xml",
+    } as any);
+  } else if (avatarKey?.startsWith("uri:")) {
+    const uri = avatarKey.slice(4);
+
+    fd.append("avatar", {
+      uri,
+      name: "avatar.jpg",
+      type: "image/jpeg",
+    } as any);
+  }
+
+  console.log(fd, "fdfdfdffdf");
+
+  return fd;
+}
+
+// ---------- component ----------
 export default function EditProfileModal({ visible, onClose, onSaved }: Props) {
   const { newTheme } = useContext(ThemeContext);
   const styles = styling(newTheme);
 
-  let auth: any = null;
-  try {
-    auth = useAuth();
-  } catch (e) {
-    auth = null;
-  }
+  const { loadUserFromStorage, updateProfile } = useAuth();
+  const toast = useNimbusToast();
 
-  const [initializing, setInitializing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [profile, setProfile] = useState<any>(null);
 
-  // editable fields
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [avatarKey, setAvatarKey] = useState<string | null>(null);
 
-  // profile nested fields (editable)
   const [age, setAge] = useState<number | null>(null);
   const [height, setHeight] = useState<number | null>(null);
   const [weight, setWeight] = useState<number | null>(null);
 
-  const [heightUnit, setHeightUnit] = useState<string>("");
-  const [weightUnit, setWeightUnit] = useState<string>("");
+  const [heightUnit, setHeightUnit] = useState<string>("cm");
+  const [weightUnit, setWeightUnit] = useState<string>("kg");
 
   const [pickerOpen, setPickerOpen] = useState(false);
-  const { loadUserFromStorage, updateProfile } = useAuth();
-
-  const toast = useNimbusToast();
-
-  // const { get, save } = useReminder();
 
   useEffect(() => {
     if (!visible) return;
-    // console.log("coming here useefect", loadUserFromStorage);
+
     setLoading(true);
     (async () => {
-      const cached = await loadUserFromStorage?.(); // ← safe call
-      console.log(cached, "cached");
-      const profile = cached.profile;
-      const p = {
-        id: cached?.id,
-        username: cached?.username ?? "",
-        email: cached?.email ?? "",
-        first_name: cached?.first_name ?? "",
-        last_name: cached?.last_name ?? "",
-        profile: cached?.profile ?? {},
-        avatar: cached?.avatar ?? null,
-        setting: cached?.settings ?? {},
-      };
-      console.log("Loaded from storage: EditProfile", p);
-      setProfile(p);
-      setFirstName(p.first_name);
-      setLastName(p.last_name);
-      setHeight(p.profile?.height);
-      setWeight(p.profile?.weight);
-      setAge(p.profile?.age);
-      setAvatarKey(p.avatar);
-      const backendSettings = p?.setting ?? {};
-      setHeightUnit(backendSettings.height_unit ?? "cm");
-      setWeightUnit(backendSettings.weight_unit ?? "kg");
-      const rawAge = p.profile?.age;
-      const rawHeight = p.profile?.height;
-      const rawWeight = p.profile?.weight;
-      setAge(
-        typeof rawAge === "number" ? rawAge : rawAge ? Number(rawAge) : null
-      );
-      setHeight(
-        typeof rawHeight === "number"
-          ? rawHeight
-          : rawHeight
-          ? Number(rawHeight)
-          : null
-      );
-      setWeight(
-        typeof rawWeight === "number"
-          ? rawWeight
-          : rawWeight
-          ? Number(rawWeight)
-          : null
-      );
-      setLoading(false);
-    })();
-  }, []); // include in deps
+      try {
+        const cached = await loadUserFromStorage?.();
+        if (!cached) return;
 
-  // isDirty should consider all editable fields
-  const isDirty = () => {
+        console.log("loaded cached user for edit profile", cached);
+
+        const p = {
+          id: cached?.id,
+          username: cached?.username ?? "",
+          email: cached?.email ?? "",
+          first_name: cached?.first_name ?? "",
+          last_name: cached?.last_name ?? "",
+          profile: cached?.profile ?? {},
+          avatar: cached?.avatar ?? null,
+          setting: cached?.settings ?? {}, // keeping your naming
+        };
+
+        setProfile(p);
+        setFirstName(p.first_name);
+        setLastName(p.last_name);
+        setAvatarKey(p.avatar);
+
+        const backendSettings = p.setting ?? {};
+        setHeightUnit(backendSettings.height_unit ?? "cm");
+        setWeightUnit(backendSettings.weight_unit ?? "kg");
+
+        const rawAge = p.profile?.age;
+        const rawHeight = p.profile?.height;
+        const rawWeight = p.profile?.weight;
+
+        setAge(
+          typeof rawAge === "number" ? rawAge : rawAge ? Number(rawAge) : null
+        );
+        setHeight(
+          typeof rawHeight === "number"
+            ? rawHeight
+            : rawHeight
+            ? Number(rawHeight)
+            : null
+        );
+        setWeight(
+          typeof rawWeight === "number"
+            ? rawWeight
+            : rawWeight
+            ? Number(rawWeight)
+            : null
+        );
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [visible, loadUserFromStorage]);
+
+  const isDirty = useCallback(() => {
     if (!profile) return false;
+
     const firstChanged = (profile.first_name ?? "") !== (firstName ?? "");
     const lastChanged = (profile.last_name ?? "") !== (lastName ?? "");
     const avatarChanged = (profile.avatar ?? null) !== (avatarKey ?? null);
 
-    // profile nested changes
     const origAge = profile.profile?.age ?? null;
     const origHeight = profile.profile?.height ?? null;
     const origWeight = profile.profile?.weight ?? null;
@@ -166,97 +206,71 @@ export default function EditProfileModal({ visible, onClose, onSaved }: Props) {
       heightChanged ||
       weightChanged
     );
-  };
+  }, [profile, firstName, lastName, avatarKey, age, height, weight]);
 
-  const buildPayload = () => {
-    if (!profile) return null;
+  const buildPayload = useCallback(() => {
+    if (!profile) return {};
 
     const payload: any = {};
 
-    // --- Top-level fields ---
-    if ((profile.first_name ?? "") !== (firstName ?? "")) {
+    if ((profile.first_name ?? "") !== (firstName ?? ""))
       payload.first_name = firstName;
-    }
-    if ((profile.last_name ?? "") !== (lastName ?? "")) {
+    if ((profile.last_name ?? "") !== (lastName ?? ""))
       payload.last_name = lastName;
-    }
-    if ((profile.avatar ?? null) !== (avatarKey ?? null)) {
-      payload.avatar = avatarKey ?? null;
-    }
 
-    // --- Profile nested fields ---
+    // send profile nested if changed
     const nestedProfile: any = {};
     const orig = profile.profile ?? {};
-
     if ((orig.age ?? null) !== (age ?? null)) nestedProfile.age = age ?? null;
     if ((orig.height ?? null) !== (height ?? null))
       nestedProfile.height = height ?? null;
     if ((orig.weight ?? null) !== (weight ?? null))
       nestedProfile.weight = weight ?? null;
-
-    if (Object.keys(nestedProfile).length > 0) {
+    if (Object.keys(nestedProfile).length)
       payload.profile = { ...(profile.profile ?? {}), ...nestedProfile };
-    }
 
-    // --- Settings fields ---
+    // settings if needed
     const nestedSettings: any = {};
-    const origSettings = profile.settings ?? {};
-
-    if ((origSettings.height_unit ?? "cm") !== heightUnit) {
+    const origSettings = profile.setting ?? {};
+    if ((origSettings.height_unit ?? "cm") !== heightUnit)
       nestedSettings.height_unit = heightUnit;
-    }
-    if ((origSettings.weight_unit ?? "kg") !== weightUnit) {
+    if ((origSettings.weight_unit ?? "kg") !== weightUnit)
       nestedSettings.weight_unit = weightUnit;
-    }
+    if (Object.keys(nestedSettings).length)
+      payload.settings = { ...(profile.setting ?? {}), ...nestedSettings };
 
-    if (Object.keys(nestedSettings).length > 0) {
-      payload.settings = { ...(profile.settings ?? {}), ...nestedSettings };
-    }
-
-    // return only if something changed
-    return Object.keys(payload).length > 0 ? payload : null;
-  };
+    return payload;
+  }, [
+    profile,
+    firstName,
+    lastName,
+    age,
+    height,
+    weight,
+    heightUnit,
+    weightUnit,
+  ]);
 
   const handleSave = async () => {
     if (!profile) return;
+
     setLoading(true);
     try {
-      const payload = buildPayload();
-      if (!payload) {
-        Alert.alert("Nothing to save", "No changes detected.");
-        setLoading(false);
-        return;
-      }
-      const saved = await updateProfile?.(payload);
-
-      const { success, message, data } = saved;
-      if (success && "email" in data) {
+      const payload = {}; // build your normal payload here (first_name, last_name, profile, settings, etc.)
+      const fd = await buildProfileFormData(payload, avatarKey);
+      const saved = await updateProfile?.(fd);
+      console.log("saved profile", saved, fd);
+      if (saved?.success) {
         toast.show({
           variant: "success",
           title: "Profile Updated",
           message: "Successfully updated the profile",
         });
-        // ✅ merge latest edits into local state
-        setProfile((prev: any) => ({
-          ...prev,
-          first_name: firstName,
-          last_name: lastName,
-          avatar: avatarKey,
-          profile: {
-            ...(prev.profile ?? {}),
-            age,
-            height,
-            weight,
-          },
-          settings: {
-            ...(prev.settings ?? {}),
-            height_unit: heightUnit,
-            weight_unit: weightUnit,
-          },
-        }));
+        onClose();
+        onSaved?.(saved?.data);
+      } else {
+        Alert.alert("Update failed", saved?.message ?? "Try again.");
       }
-
-      onClose();
     } catch (e) {
       console.warn("save profile", e);
       Alert.alert("Error", "Unable to save profile. Try again.");
@@ -283,20 +297,25 @@ export default function EditProfileModal({ visible, onClose, onSaved }: Props) {
   const phone = profile?.profile?.phone_number ?? "";
   const username = profile?.username ?? "";
 
-  // Avatar preview helper — renders svg or uri
+  const isSvgUrl = (u: string) => {
+    const clean = u.split("?")[0].toLowerCase();
+    return clean.endsWith(".svg");
+  };
+
   const AvatarPreview = () => {
-    if (!avatarKey)
+    if (!avatarKey) {
       return (
         <View style={styles.avatarPlaceholder}>
           <Text style={{ color: newTheme.textSecondary }}>No avatar</Text>
         </View>
       );
+    }
 
-    if (typeof avatarKey === "string" && avatarKey.startsWith("svg:")) {
+    // ✅ local built-in selection: "svg:4"
+    if (avatarKey.startsWith("svg:")) {
       const idx = Number(avatarKey.split(":")[1]);
       const SvgComp = BUILTIN_SVGS[idx];
       if (SvgComp) {
-        // @ts-ignore
         return (
           <View style={[styles.avatarPlaceholder, { overflow: "hidden" }]}>
             {/* @ts-ignore */}
@@ -306,23 +325,20 @@ export default function EditProfileModal({ visible, onClose, onSaved }: Props) {
       }
     }
 
-    const maybeUri =
-      typeof avatarKey === "string" && avatarKey.startsWith("uri:")
-        ? avatarKey.slice(4)
-        : avatarKey;
+    // ✅ uploaded image selection: "uri:file://...."
+    const maybeUri = avatarKey.startsWith("uri:")
+      ? avatarKey.slice(4)
+      : avatarKey;
 
-    if (typeof maybeUri === "string") {
-      return <Image source={{ uri: maybeUri }} style={styles.avatarImage} />;
+    // ✅ backend URL is SVG -> render with SvgUri (NOT Image)
+    if (typeof maybeUri === "string" && isSvgUrl(maybeUri)) {
+      return <SvgUri uri={maybeUri} width="100%" height="100%" />;
     }
 
-    return (
-      <View style={styles.avatarPlaceholder}>
-        <Text style={{ color: newTheme.textSecondary }}>Avatar</Text>
-      </View>
-    );
+    // ✅ normal image
+    return <Image source={{ uri: maybeUri }} style={styles.avatarImage} />;
   };
 
-  // handlers for numeric fields: keep them nullable numbers
   const onChangeAge = (txt: string) => {
     const n = txt === "" ? null : Number(txt);
     setAge(Number.isNaN(n) ? null : n);
@@ -387,6 +403,7 @@ export default function EditProfileModal({ visible, onClose, onSaved }: Props) {
 
               <View style={{ height: 12 }} />
               <Text style={styles.sectionLabel}>Personal</Text>
+
               <InputField
                 label="First name"
                 value={firstName}
@@ -456,40 +473,9 @@ export default function EditProfileModal({ visible, onClose, onSaved }: Props) {
                 />
               </View>
             </View>
-
-            {/* <View style={styles.fixedFooterContainer}>
-              <View style={styles.footerInner}>
-                <TouchableOpacity
-                  style={styles.cancelBtn}
-                  onPress={handleCancel}
-                  disabled={loading}
-                >
-                  <Text
-                    style={{ color: newTheme.textPrimary, fontWeight: "700" }}
-                  >
-                    Cancel
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={[styles.saveBtn, !isDirty() && { opacity: 0.5 }]}
-                  onPress={handleSave}
-                  disabled={!isDirty() || loading}
-                >
-                  {loading ? (
-                    <ActivityIndicator color={newTheme.background} />
-                  ) : (
-                    <Text
-                      style={{ color: newTheme.background, fontWeight: "800" }}
-                    >
-                      Save
-                    </Text>
-                  )}
-                </TouchableOpacity>
-              </View>
-            </View> */}
           </KeyboardAvoidingView>
         </SafeAreaView>
+
         <AvatarPickerModal
           visible={pickerOpen}
           initial={avatarKey}
@@ -559,18 +545,7 @@ const styling = (theme: any) =>
     },
     readLabel: { color: theme.textSecondary },
     readValue: { color: theme.textPrimary, fontWeight: "700" },
-
-    // helper row for age/height
     rowInputs: { flexDirection: "row", alignItems: "flex-start" },
-
-    // fixedFooterContainer: {
-    //   position: "absolute",
-    //   left: 0,
-    //   right: 0,
-    //   bottom: 0,
-    //   paddingBottom: Platform.OS === "ios" ? 24 : 12,
-    //   // backgroundColor: "transparent",
-    // } as any,
     fixedFooterContainer: {
       position: "absolute",
       left: 0,

@@ -90,52 +90,6 @@ export default function AvatarPickerModal({
     if (visible) setSelectedId(initial ?? null);
   }, [visible, initial]);
 
-  const pickImage = async () => {
-    try {
-      if (ImagePicker.requestMediaLibraryPermissionsAsync) {
-        const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (perm.status !== "granted") {
-          Alert.alert(
-            "Permission required",
-            "Please allow photo access to upload avatar."
-          );
-          return;
-        }
-      }
-
-      const res = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 0.8,
-      });
-
-      const cancelled =
-        (res as any).canceled ?? (res as any).cancelled ?? false;
-      if (cancelled) return;
-
-      const assets = (res as any).assets;
-      let uri: string | undefined;
-      if (Array.isArray(assets) && assets.length > 0 && assets[0].uri)
-        uri = assets[0].uri;
-      else uri = (res as any).uri ?? undefined;
-
-      if (uri) {
-        const id = `uri:${uri}`;
-        // if this uri already in items, keep it; otherwise insert at front so user sees it
-        setItems((prev) => {
-          if (prev.some((it) => it.kind === "uri" && it.uri === uri))
-            return prev;
-          return [{ id, kind: "uri", uri }, ...prev];
-        });
-        setSelectedId(id);
-      }
-    } catch (e) {
-      console.warn("AvatarPicker pickImage error", e);
-      Alert.alert("Upload failed", "Could not pick image.");
-    }
-  };
-
   const handleReset = () => {
     setSelectedId(null);
   };

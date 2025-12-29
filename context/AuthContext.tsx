@@ -36,6 +36,7 @@ type UserProfile = {
   full_name?: string | null;
   phone_number?: string | null;
   id: number;
+  avatar?: string | null;
   username: string | null;
   email: string | null;
   first_name: string | null;
@@ -398,11 +399,13 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
           last_name,
           profile,
           settings,
+          avatar,
           notifications,
           ...tokens
         } = data;
         const usr = {
           id: id,
+          avatar: data.avatar || null,
           username: username,
           email: email,
           first_name: first_name,
@@ -447,6 +450,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
             id: id,
             username: username,
             email: email,
+            avatar: profile?.avatar || null,
             first_name: first_name,
             last_name: last_name,
             profile: profile,
