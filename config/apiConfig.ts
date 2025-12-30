@@ -61,6 +61,8 @@ export const API_ENDPOINTS = {
   getMentalTestList: `${BASE_URL}/assesment/assessments/`,
   getWorkouts: `${BASE_URL}/workouts/`,
   getWorkoutDetails: (id: number | string) => `${BASE_URL}/workouts/${id}/`,
+  scribbles: `${BASE_URL}/scribbles/`,
+  recentScribbleTags: `${BASE_URL}/scribbles/recent_tags/`,
   calorieCalculator: `${BASE_URL}/calculators/calories/`,
   proteinIntakeCalculator: `${BASE_URL}/calculators/protein/`,
   bodyShapeCalculator: `${BASE_URL}/calculators/body_shape/`,

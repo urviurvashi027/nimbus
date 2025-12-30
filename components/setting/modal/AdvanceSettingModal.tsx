@@ -11,7 +11,6 @@ import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/context/ThemeContext";
 import SettingDetail from "./PreferenceDetailModal";
 import { useAuth } from "@/context/AuthContext";
-import Toast from "react-native-toast-message";
 import { useNimbusToast } from "@/components/common/toast/useNimbusToast";
 // import { useReminder } from "@/context/ReminderContext";
 

@@ -50,7 +50,7 @@ const Tools: React.FC = () => {
 
   const { newTheme, spacing, typography } = useContext(ThemeContext);
 
-  const styles = styling(newTheme);
+  const styles = styling(newTheme, spacing, typography);
 
   // ------------------------------- API CALLS ---------------------------------------
 
@@ -63,16 +63,15 @@ const Tools: React.FC = () => {
       // TEMP: Handle current direct array vs future object structure
       let dataToProcess: any[] = [];
 
-      if (Array.isArray(result)) {
-        // Current format
-        dataToProcess = result;
-      }
-      /* 
+      // if (Array.isArray(result)) {
+      //   // Current format
+      //   dataToProcess = result;
+      // }
+
       // FUTURE: Handle { success, message, data } format
-      else if (result && result.success && Array.isArray(result.data)) {
+      if (result && result.success && Array.isArray(result.data)) {
         dataToProcess = result.data;
-      } 
-      */
+      }
 
       if (dataToProcess.length > 0) {
         const processedRecipes = dataToProcess.map((article: any) => {
@@ -103,16 +102,15 @@ const Tools: React.FC = () => {
       // TEMP: Handle current direct array vs future object structure
       let dataToProcess: any[] = [];
 
-      if (Array.isArray(result)) {
-        // Current format
-        dataToProcess = result;
-      }
-      /* 
+      // if (Array.isArray(result)) {
+      //   // Current format
+      //   dataToProcess = result;
+      // }
+
       // FUTURE: Handle { success, message, data } format
-      else if (result && result.success && Array.isArray(result.data)) {
+      if (result && result.success && Array.isArray(result.data)) {
         dataToProcess = result.data;
-      } 
-      */
+      }
 
       if (dataToProcess.length > 0) {
         const processedArticles = dataToProcess.map((article: any) => {
@@ -151,9 +149,11 @@ const Tools: React.FC = () => {
         });
         if (category === FILTER_MAP.Beauty) {
           setRoutineSkincareList(processedArticles);
-        } else if (category === FILTER_MAP.Wellness) {
+        }
+        else if (category === FILTER_MAP.Wellness) {
           setRoutineWellnessList(processedArticles);
-        } else if (category === FILTER_MAP.Chores) {
+        }
+        else if (category === FILTER_MAP.Chores) {
           setRoutineChoresList(processedArticles);
         }
       } else {
@@ -176,7 +176,8 @@ const Tools: React.FC = () => {
   const handleNavigationButtonPress = (button: any) => {
     if (button.action === "navigate") {
       router.push(button.screen);
-    } else if (button.action === "modal") {
+    }
+    else if (button.action === "modal") {
       getModalInfo(button.screen);
     }
   };
@@ -272,7 +273,7 @@ const Tools: React.FC = () => {
           {/* Wellness Routine Template */}
           <TrendingCardCarousel
             type="routine"
-            title="Wellness Routine"
+            title="Mindful Rituals"
             data={routineWellness ?? []}
             onPress={handleCardPress}
             onClickOfAll={onClickOfRoutineAll}
@@ -280,7 +281,7 @@ const Tools: React.FC = () => {
 
           {/* Article Template */}
           <TrendingCardCarousel
-            title="Article"
+            title="Daily Insights"
             type="article"
             data={articleList ?? []}
             onPress={handleCardPress}
@@ -289,7 +290,7 @@ const Tools: React.FC = () => {
           {/* Recipe Template */}
           <TrendingCardCarousel
             type="recipe"
-            title="Quick Recipe"
+            title="Holistic Nourishment"
             data={recipeList ?? []}
             onPress={handleCardPress}
             onClickOfAll={onClickOfRecipeAll}
@@ -298,7 +299,7 @@ const Tools: React.FC = () => {
           {/* Skin Care Routine Template */}
           <TrendingCardCarousel
             type="routine"
-            title="Hello Beautiful"
+            title="Glow & Radiance"
             data={routineSkincare ?? []}
             onPress={handleCardPress}
             onClickOfAll={onClickOfSkincareRoutineAll}
@@ -307,7 +308,7 @@ const Tools: React.FC = () => {
           {/* Fitness Routine Template */}
           <TrendingCardCarousel
             type="routine"
-            title="Life Hacks You Can't Miss"
+            title="Essential Living"
             data={routineChores ?? []}
             onPress={handleCardPress}
             onClickOfAll={onClickOfHacksRoutineAll}
@@ -326,33 +327,31 @@ const Tools: React.FC = () => {
   );
 };
 
-const styling = (newTheme: any) =>
+const styling = (newTheme: any, spacing: any, typography: any) =>
   StyleSheet.create({
     container: {
       flex: 1,
       padding: 0,
     },
     screenTitle: {
-      marginBottom: 30,
+      marginBottom: spacing.xl,
     },
     screenTitleText: {
-      fontSize: 30,
-      fontWeight: "bold",
+      ...typography.h1,
       color: newTheme.textPrimary,
     },
     header: {
-      fontSize: 22,
-      fontWeight: "bold",
-      marginLeft: 20,
-      marginBottom: 10,
-      marginTop: 10,
+      ...typography.h3,
+      marginLeft: spacing.lg,
+      marginBottom: spacing.sm,
+      marginTop: spacing.sm,
     },
     navigationScrollView: {
-      marginBottom: 20,
+      marginBottom: spacing.md,
     },
     navigationButtonContainer: {
       alignItems: "center",
-      marginBottom: 30,
+      marginBottom: spacing.xl,
     },
     content: {
       padding: 0,
@@ -360,16 +359,16 @@ const styling = (newTheme: any) =>
     button: {
       width: 60,
       height: 60,
-      borderRadius: 25, // Makes the button rounded
-      marginHorizontal: 8, // Space between buttons
+      borderRadius: 25,
+      marginHorizontal: spacing.xs,
     },
     buttonIcon: {
       width: 60,
       height: 60,
-      borderRadius: 25, // Makes the button rounded
+      borderRadius: 25,
     },
     buttonLabel: {
-      paddingTop: 10,
+      paddingTop: spacing.xs,
       color: newTheme.textPrimary,
       fontSize: 10,
     },

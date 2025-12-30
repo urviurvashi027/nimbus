@@ -1,7 +1,6 @@
 import React, { useContext, useMemo, useState } from "react";
 import { View, Text, StyleSheet, Alert } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
-import Toast from "react-native-toast-message";
 
 import ThemeContext from "@/context/ThemeContext";
 import { ScreenView } from "@/components/Themed";
