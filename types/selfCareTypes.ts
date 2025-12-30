@@ -124,6 +124,7 @@ export type MentalTestItem = {
 
 export interface MentalTestListResponse {
   data: MentalTestItem[];
+  success: boolean;
 }
 
 export interface WorkoutListItem {
@@ -138,6 +139,7 @@ export interface WorkoutListItem {
 }
 
 export interface WorkoutVideoListResponse {
+  success: boolean;
   data: WorkoutListItem[];
 }
 
@@ -154,4 +156,5 @@ export interface MeditationListItem {
 
 export interface MeditationVideoListResponse {
   data: MeditationListItem[];
+  success: boolean;
 }

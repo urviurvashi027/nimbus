@@ -98,6 +98,7 @@ export interface SoundscapeListItem {
 
 export interface SoundscapeListResponse {
   data: SoundscapeListItem[];
+  success?: boolean;
 }
 
 export interface ShortVideoItem {
@@ -144,16 +145,24 @@ export interface RecipeListResponse {
 
 export interface RoutineItem {
   id: number;
-  title: string;
-  image: string;
+  name: string;
+  image: string | null;
   category: string;
-  duration: number;
   description: string;
-  source: string;
+  blueprints?: any[];
+  sections?: any[];
 }
 
 export interface RoutineListResponse {
+  success: boolean;
+  message: string;
   data: RoutineItem[];
+}
+
+export interface RoutineDataDetails {
+  success: boolean;
+  message: string;
+  data: RoutineItem;
 }
 
 export interface calorieCalculatorRequest {
