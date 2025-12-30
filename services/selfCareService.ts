@@ -47,17 +47,17 @@ export const getJournalEntry = async (): Promise<JournalEntryListResponse> => {
 };
 
 // TODO ADD API FOR DETAILS, SUBMIT, RESULT
-export const getMentalTestList = async (): Promise<MentalTestListResponse> => {
-  try {
-    const response: AxiosResponse<MentalTestListResponse> = await axios.get(
-      API_ENDPOINTS.getMentalTestList
-    );
-    console.log(response, "medical test");
-    return response; // Return the list data
-  } catch (error: any) {
-    throw error.response ? error.response.data : error.message;
-  }
-};
+// export const getMentalTestList = async (): Promise<MentalTestListResponse> => {
+//   try {
+//     const response: AxiosResponse<MentalTestListResponse> = await axios.get(
+//       API_ENDPOINTS.getMentalTestList
+//     );
+//     console.log(response, "medical test");
+//     return response; // Return the list data
+//   } catch (error: any) {
+//     throw error.response ? error.response.data : error.message;
+//   }
+// };
 
 export const getWorkoutVideo = async (): Promise<WorkoutVideoListResponse> => {
   try {

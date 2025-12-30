@@ -32,6 +32,7 @@ const FILTERS = [
   "Soup",
   "Dessert",
   "Sauce",
+  "NonVeg",
 ] as const;
 
 type FilterLabel = (typeof FILTERS)[number];
@@ -39,14 +40,15 @@ type FilterLabel = (typeof FILTERS)[number];
 // Map UI label → backend slug (except All)
 const FILTER_MAP: Record<FilterLabel, string | undefined> = {
   All: undefined,
-  Breakfast: "breakfast",
-  Lunch: "lunch",
-  Dinner: "dinner",
-  Beverages: "bevrages", // backend spelling
-  Snacks: "snacks",
-  Soup: "soup",
-  Dessert: "dessert",
-  Sauce: "sauce",
+  Breakfast: "Breakfast",
+  Lunch: "Lunch",
+  Dinner: "Dinner",
+  Beverages: "Drink", // backend spelling
+  Snacks: "Snack",
+  Soup: "Soup",
+  Dessert: "Dessert",
+  NonVeg: "Non-Veg",
+  Sauce: "Sauce",
 };
 
 const RecipeScreen: React.FC = () => {
@@ -176,8 +178,9 @@ const RecipeScreen: React.FC = () => {
           columnWrapperStyle={styles.columnWrapper}
           renderItem={({ item }) => (
             <ContentPosterCard
+              title={item.title}
               image={item.image}
-              tag={item.tag}
+              tag={item.category}
               height={item.height}
               onPress={() => handleItemClick(item)}
             />

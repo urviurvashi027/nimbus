@@ -23,7 +23,7 @@ export type ReminderAt = {
 };
 
 type HabitMetric = {
-  unit: string;
+  unit: string | number;
   count: number;
 };
 
@@ -75,9 +75,10 @@ export interface HabitItem {
 export interface HabitCreateRequest {
   name: string;
   description?: string;
+  icon?: string;
   habit_type_id: number;
   color: string;
-  tags: string[];
+  tags?: string[];
   habit_metric: HabitMetric;
   habit_duration: AtLeastOne<HabitDuration>;
   habit_frequency: HabitFrequency;

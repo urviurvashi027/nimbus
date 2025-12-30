@@ -25,21 +25,23 @@ import EmptyState from "@/components/tools/common/EmptyState";
 
 const FILTERS = [
   "All",
+  "Ayurveda",
+  "Chores",
   "Fitness",
-  "Skincare",
   "Wellness",
-  "Parenting",
+  "Beauty",
   "Hacks",
 ];
 
 // Map UI filter → backend category
-const FILTER_MAP: Record<string, string | undefined> = {
+export const FILTER_MAP: Record<string, string | undefined> = {
   All: undefined,
-  Fitness: "fitness",
-  Skincare: "skincare",
-  Wellness: "wellness",
-  Parenting: "parenting",
-  Hacks: "hacks",
+  Ayurveda: "Ayurveda",
+  Chores: "Daily Chores",
+  Fitness: "Fitness",
+  Wellness: "Wellness",
+  Beauty: "Beauty Wellness",
+  Hacks: "Life Hacks",
 };
 
 const RoutineScreen = () => {
@@ -61,18 +63,19 @@ const RoutineScreen = () => {
       const backendCategory = FILTER_MAP[filterKey];
       const result = await getRoutineList(backendCategory);
 
-      if (result && Array.isArray(result)) {
+      if (result && result.success && Array.isArray(result.data)) {
         const heights = [250, 280, 220, 270, 230, 240];
 
-        const processed = result.map((item: any) => ({
+        const processed = result.data.map((item: any) => ({
           ...item,
+          title: item.name, // API returns 'name'
           height: heights[Math.floor(Math.random() * heights.length)],
-          image: { uri: item.image },
+          image: item.image ? { uri: item.image } : null,
         }));
 
         setRoutines(processed);
       } else {
-        console.error("Routine API did not return array:", result);
+        console.error("Routine API error or invalid data:", result);
         setRoutines([]);
       }
     } catch (err) {
@@ -161,9 +164,9 @@ const RoutineScreen = () => {
           renderItem={({ item }) => (
             <ContentPosterCard
               image={item.image}
-              tag={item.tag}
               height={item.height}
-              // title={item.title} // optional, if you want text
+              tag={item.category}
+              title={item.title} // optional, if you want text
               onPress={() => handleItemClick(item)}
             />
           )}

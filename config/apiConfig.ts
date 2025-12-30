@@ -34,6 +34,8 @@ export const API_ENDPOINTS = {
   changePassword: `${BASE_URL}/auth/reset-password/`,
 
   createHabit: `${BASE_URL}/api/habits/`,
+  bulkCreateHabit: `${BASE_URL}/api/habits/bulk_create/`,
+  activateHabitTemplate: (id: number | string) => `${BASE_URL}/api/habit-templates/${id}/activate/`,
   habitTypeList: `${BASE_URL}/api/habit-types/`,
   habitTagList: `${BASE_URL}/api/tags/`,
   habitDetailsById: `${BASE_URL}/api/habits/`,
@@ -50,7 +52,7 @@ export const API_ENDPOINTS = {
   getJournalEntry: `${BASE_URL}/assesment/journal-entries/`,
   getWorkoutVideoList: `${BASE_URL}/media/media-assets/?type=video`,
   getRecipeList: `${BASE_URL}/media/media-assets/?type=recipe`,
-  getRoutineTemplate: `${BASE_URL}/media/media-assets/?type=routineTemplate`,
+  getRoutineTemplate: `${BASE_URL}/api/habit-templates/`,
   //TODO: category Data fix
   getShortVideoList: `${BASE_URL}/media/media-assets/?type=shortVideo`,
   getAudioBookList: `${BASE_URL}/media/media-assets/?type=meditation&category=audioBook`,

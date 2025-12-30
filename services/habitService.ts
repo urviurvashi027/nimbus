@@ -37,6 +37,22 @@ export const createHabit = async (
   }
 };
 
+// create bulk habit API request
+export const createBulkHabit = async (
+  id: number | string,
+  data: HabitCreateRequest[]
+): Promise<HabitCreateResponse[]> => {
+  try {
+    const response: AxiosResponse<HabitCreateResponse[]> = await axios.post(
+      API_ENDPOINTS.activateHabitTemplate(id),
+      data
+    );
+    return response.data;
+  } catch (error: any) {
+    throw error.response ? error.response.data : error.message;
+  }
+};
+
 // get habit list
 export const getHabitList = async (
   data?: string

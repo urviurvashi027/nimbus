@@ -28,7 +28,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import ArticleSection from "@/components/tools/contentDetails/ArticleSection";
 import NutritionInfo from "@/components/tools/contentDetails/NutritionInfo";
 
-import { getArticleDetails } from "@/services/toolService";
+import { getArticleDetails, getRoutineDetails } from "@/services/toolService";
 import ThemeContext from "@/context/ThemeContext";
 import { TitleHeader } from "@/components/tools/contentDetails/TitleHeader";
 import { CatalogCard } from "@/components/tools/contentDetails/Catalog";
@@ -116,7 +116,10 @@ const ContentDetailsScreen: React.FC = () => {
         const numericId = parseInt(idParam, 10);
         if (Number.isNaN(numericId)) throw new Error("Invalid article id");
 
-        const res = await getArticleDetails(numericId);
+        const isRoutine = (params as any)?.type === "routine";
+        const res = isRoutine
+          ? await getRoutineDetails(numericId)
+          : await getArticleDetails(numericId);
 
         const apiArticle: any =
           res && typeof res === "object" && "data" in res ? res.data : res;
@@ -129,11 +132,14 @@ const ContentDetailsScreen: React.FC = () => {
 
         const transformed: ArticleDetails = {
           ...apiArticle,
+          title: isRoutine ? apiArticle.name : apiArticle.title,
+          section_data: isRoutine
+            ? apiArticle.sections
+            : apiArticle.section_data,
           imageUri,
-          action_button:
-            (params as any)?.type === "routine"
-              ? "Add to routine"
-              : apiArticle.action_button ?? null,
+          action_button: isRoutine
+            ? "Add to routine"
+            : apiArticle.action_button ?? null,
           web_url: apiArticle.web_url ?? apiArticle.source ?? null,
         };
 
@@ -214,13 +220,13 @@ const ContentDetailsScreen: React.FC = () => {
 
   const onPrimaryButtonClick = () => {
     if (!details) return;
-    console.log(details.routine_items, "routine items");
+    console.log(details.blueprints, "rutine items");
     router.push({
       pathname: "/(auth)/toolsScreen/AddToRoutineScreen",
       params: {
         id: String(details.id),
         type: "routine",
-        data: JSON.stringify(details.routine_items || []),
+        data: JSON.stringify(details.blueprints || []),
       },
     });
   };
@@ -448,7 +454,7 @@ const ContentDetailsScreen: React.FC = () => {
           />
 
           {/* Catalog / TOC */}
-          {Array.isArray(details.section_data) &&
+          {/* {Array.isArray(details.section_data) &&
             details.section_data.length > 0 && (
               <CatalogCard
                 sections={details.section_data}
@@ -459,7 +465,7 @@ const ContentDetailsScreen: React.FC = () => {
                   // TODO: wire up scrollToSection here when ready
                 }}
               />
-            )}
+            )} */}
 
           {/* Article sections */}
           <View style={styles.sections}>
@@ -482,7 +488,8 @@ const ContentDetailsScreen: React.FC = () => {
                       index + (details.section_data?.length || 0)
                     ] = el)
                   }
-                  title={section.step}
+                  title={`Step: ${section.step}`}
+                  // title={section.step}
                   content={section.instruction}
                 />
               ))}
