@@ -57,6 +57,7 @@ const styling = (newTheme: any, spacing: any, typography: any) =>
       flexDirection: "row",
       alignItems: "center",
       marginTop: spacing.lg,
+      marginBottom: spacing.lg,
     },
     iconCircle: {
       width: 36,

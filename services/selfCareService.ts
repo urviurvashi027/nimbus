@@ -47,17 +47,17 @@ export const getJournalEntry = async (): Promise<JournalEntryListResponse> => {
 };
 
 // TODO ADD API FOR DETAILS, SUBMIT, RESULT
-export const getMentalTestList = async (): Promise<MentalTestListResponse> => {
-  try {
-    const response: AxiosResponse<MentalTestListResponse> = await axios.get(
-      API_ENDPOINTS.getMentalTestList
-    );
-    console.log(response, "medical test");
-    return response; // Return the list data
-  } catch (error: any) {
-    throw error.response ? error.response.data : error.message;
-  }
-};
+// export const getMentalTestList = async (): Promise<MentalTestListResponse> => {
+//   try {
+//     const response: AxiosResponse<MentalTestListResponse> = await axios.get(
+//       API_ENDPOINTS.getMentalTestList
+//     );
+//     console.log(response, "medical test");
+//     return response; // Return the list data
+//   } catch (error: any) {
+//     throw error.response ? error.response.data : error.message;
+//   }
+// };
 
 export const getWorkoutVideo = async (): Promise<WorkoutVideoListResponse> => {
   try {
@@ -65,6 +65,28 @@ export const getWorkoutVideo = async (): Promise<WorkoutVideoListResponse> => {
       API_ENDPOINTS.getWorkoutVideoList
     );
     return response.data; // Return the list data
+  } catch (error: any) {
+    throw error.response ? error.response.data : error.message;
+  }
+};
+
+export const getWorkouts = async (params?: {
+  category?: string;
+  search?: string;
+  ordering?: string;
+}): Promise<any> => {
+  try {
+    const response = await axios.get(API_ENDPOINTS.getWorkouts, { params });
+    return response.data;
+  } catch (error: any) {
+    throw error.response ? error.response.data : error.message;
+  }
+};
+
+export const getWorkoutDetails = async (id: number | string): Promise<any> => {
+  try {
+    const response = await axios.get(API_ENDPOINTS.getWorkoutDetails(id));
+    return response.data;
   } catch (error: any) {
     throw error.response ? error.response.data : error.message;
   }

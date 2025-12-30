@@ -60,16 +60,16 @@ const WorkoutCard: FC<WorkoutCardProps> = ({
           <Text style={styles.title} numberOfLines={2}>
             {title}
           </Text>
-
+          {/* 
           <View style={[styles.diffPill, { backgroundColor: diff.bg }]}>
             <Text style={[styles.diffPillText, { color: diff.text }]}>
               {difficulty[0].toUpperCase() + difficulty.slice(1)}
             </Text>
-          </View>
+          </View> */}
         </View>
 
         {/* Metrics Row */}
-        <View style={styles.metricsRow}>
+        {/* <View style={styles.metricsRow}>
           <View style={styles.metricItem}>
             <Ionicons name="time-outline" size={15} color={diff.bg} />
             <Text style={styles.metricText}>{durationLabel}</Text>
@@ -79,7 +79,7 @@ const WorkoutCard: FC<WorkoutCardProps> = ({
             <Ionicons name="repeat-outline" size={15} color={diff.bg} />
             <Text style={styles.metricText}>{reps} reps</Text>
           </View>
-        </View>
+        </View> */}
 
         {/* Start Button */}
         <TouchableOpacity
@@ -88,7 +88,11 @@ const WorkoutCard: FC<WorkoutCardProps> = ({
           style={styles.startBtn}
         >
           <Text style={styles.startText}>Start</Text>
-          <Ionicons name="chevron-forward" size={18} color={diff.bg} />
+          <Ionicons
+            name="chevron-forward"
+            size={18}
+            color={newTheme.textPrimary}
+          />
         </TouchableOpacity>
       </View>
     </View>

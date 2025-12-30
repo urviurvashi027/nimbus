@@ -57,6 +57,8 @@ export const API_ENDPOINTS = {
   getMeditationList: `${BASE_URL}/media/media-assets/?type=meditation&category=breathwork`,
 
   getMentalTestList: `${BASE_URL}/assesment/assessments/`,
+  getWorkouts: `${BASE_URL}/workouts/`,
+  getWorkoutDetails: (id: number | string) => `${BASE_URL}/workouts/${id}/`,
   calorieCalculator: `${BASE_URL}/calculators/calories/`,
   proteinIntakeCalculator: `${BASE_URL}/calculators/protein/`,
   bodyShapeCalculator: `${BASE_URL}/calculators/body_shape/`,

@@ -31,7 +31,7 @@ import ThingsToDoModal from "../selfCareScreen/ThingsToDoScreen";
 
 import {
   getMeditationAudioList,
-  getMentalTestList,
+  // getMentalTestList,
   getWorkoutVideo,
 } from "@/services/selfCareService";
 import { getRoutineList, getSoundscapeList } from "@/services/toolService";
@@ -230,22 +230,22 @@ const SelfCare: React.FC = () => {
   };
 
   // TODO ADD MEDTEST API DATA
-  const getMentalListData = async () => {
-    // need to add filters functionality and category param changes
-    try {
-      const result = await getMentalTestList();
-      // Check if 'result' and 'result.data' exist and is an array
-      if (result && Array.isArray(result)) {
-        console.log(result, "medialTestk");
-        setMedicalListData(result);
-      } else {
-        // Handle the case where the data is not in the expected format
-        console.error("API response data is not an array:", typeof result);
-      }
-    } catch (error: any) {
-      console.log(error, "API Error Response");
-    }
-  };
+  // const getMentalListData = async () => {
+  //   // need to add filters functionality and category param changes
+  //   try {
+  //     const result = await getMentalTestList();
+  //     // Check if 'result' and 'result.data' exist and is an array
+  //     if (result && Array.isArray(result)) {
+  //       console.log(result, "medialTestk");
+  //       setMedicalListData(result);
+  //     } else {
+  //       // Handle the case where the data is not in the expected format
+  //       console.error("API response data is not an array:", typeof result);
+  //     }
+  //   } catch (error: any) {
+  //     console.log(error, "API Error Response");
+  //   }
+  // };
 
   useEffect(() => {
     setSelectedButton("");
@@ -320,7 +320,7 @@ const SelfCare: React.FC = () => {
           {/* AudioBook List Section */}
           <TrendingCardCarousel
             type="rotuine"
-            title="New and Trendingsj"
+            title="New and Trendings Routines"
             data={routineList ?? []}
             onClickOfAll={() => onClickOfAll("routine")}
             onPress={handleCardPress}
