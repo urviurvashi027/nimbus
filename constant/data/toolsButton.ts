@@ -11,65 +11,72 @@ export type NavigationButtonType = {
 export const buttons: NavigationButtonType[] = [
   {
     id: 1,
-    label: "Routine",
+    label: "Rituals",
     action: "navigate",
     screen: "/(auth)/toolsScreen/RoutineScreen",
-    iconName: "calendar-check", // perfect for routine
+    iconName: "calendar-check",
   },
   {
     id: 2,
-    label: "Recipe",
+    label: "Nourish",
     action: "navigate",
     screen: "/(auth)/toolsScreen/RecipeScreen",
-    iconName: "silverware-fork-knife", // clear recipe/cooking icon
+    iconName: "silverware-fork-knife",
   },
   {
     id: 3,
-    label: "Article",
+    label: "Insights",
     action: "navigate",
     screen: "/(auth)/toolsScreen/ArticleScreen",
-    iconName: "newspaper-variant-outline", // article/news-style
+    iconName: "newspaper-variant-outline",
   },
   {
     id: 4,
-    label: "Calorie Cal",
+    label: "Energy",
     action: "navigate",
     screen: "/(auth)/toolsScreen/CalorieCalculatorScreen",
-    iconName: "fire", // calorie-burning icon
+    iconName: "fire",
   },
   {
     id: 5,
-    label: "Protein Cal",
+    label: "Fuel",
     action: "navigate",
     screen: "/(auth)/toolsScreen/ProteinCalculatorScreen",
-    iconName: "food-steak", // protein-rich food
+    iconName: "food-steak",
   },
   {
     id: 6,
-    label: "Bodyshape",
+    label: "Vitals",
     action: "navigate",
     screen: "/(auth)/toolsScreen/BodyShapeCalculatorScreen",
-    iconName: "tape-measure", // body measurement
+    iconName: "tape-measure",
   },
   {
     id: 7,
-    label: "Therapy",
+    label: "Mindset",
     action: "navigate",
     screen: "/(auth)/toolsScreen/AItherapyScreen",
-    iconName: "head-heart-outline", // therapy / mental wellbeing
+    iconName: "head-heart-outline",
   },
   {
     id: 8,
-    label: "Products",
+    label: "Shop",
     action: "navigate",
     screen: "/(auth)/toolsScreen/ProductListScreen",
-    iconName: "shopping-outline", // products/shop icon
+    iconName: "shopping-outline",
   },
   {
     id: 9,
     label: "Ask Nimbus",
     action: "navigate",
     screen: "/(auth)/CoachScreen/CoachScreen",
-    iconName: "chat-processing-outline", // AI chat assistant
+    iconName: "chat-processing-outline",
+  },
+  {
+    id: 10,
+    label: "Scribble",
+    action: "navigate",
+    screen: "/(auth)/toolsScreen/ScribbleListScreen",
+    iconName: "pencil-outline",
   },
 ];

@@ -69,7 +69,7 @@ const SelfCare: React.FC = () => {
 
   const { newTheme, spacing, typography } = useContext(ThemeContext);
 
-  const styles = styling(newTheme);
+  const styles = styling(newTheme, spacing, typography);
 
   // Funstion called on click of navigation button clicked
   const handleNavigationButtonPress = (button: NavigationButtonType) => {
@@ -116,16 +116,15 @@ const SelfCare: React.FC = () => {
       // TEMP: Handle current direct array vs future object structure
       let dataToProcess: any[] = [];
 
-      if (Array.isArray(result)) {
-        // Current format
-        dataToProcess = result;
-      }
-      /* 
+      // if (Array.isArray(result)) {
+      //   // Current format
+      //   dataToProcess = result;
+      // }
+
       // FUTURE: Handle { success, message, data } format
-      else if (result && result.success && Array.isArray(result.data)) {
+      if (result && result.success && Array.isArray(result.data)) {
         dataToProcess = result.data;
-      } 
-      */
+      }
 
       if (dataToProcess.length > 0) {
         const processedAudio = dataToProcess.map((item: any) => {
@@ -155,16 +154,15 @@ const SelfCare: React.FC = () => {
       // TEMP: Handle current direct array vs future object structure
       let dataToProcess: any[] = [];
 
-      if (Array.isArray(result)) {
-        // Current format
-        dataToProcess = result;
-      }
-      /* 
+      // if (Array.isArray(result)) {
+      //   // Current format
+      //   dataToProcess = result;
+      // }
+
       // FUTURE: Handle { success, message, data } format
-      else if (result && result.success && Array.isArray(result.data)) {
+      if (result && result.success && Array.isArray(result.data)) {
         dataToProcess = result.data;
-      } 
-      */
+      }
 
       if (dataToProcess.length > 0) {
         const processedArticles = dataToProcess.map((tracks: any) => {
@@ -256,7 +254,6 @@ const SelfCare: React.FC = () => {
     }
   };
 
-
   useEffect(() => {
     setSelectedButton("");
     // getWorkoutVideoList();
@@ -283,7 +280,7 @@ const SelfCare: React.FC = () => {
           horizontal
           showsHorizontalScrollIndicator={false}
           style={styles.navigationScrollView}
-          contentContainerStyle={{ paddingHorizontal: 0, paddingBottom: 20 }}
+          contentContainerStyle={{ paddingHorizontal: 0, paddingBottom: 30 }}
         >
           {NavigationButton.map((button: NavigationButtonType) => (
             <NavigationIconButton
@@ -302,10 +299,10 @@ const SelfCare: React.FC = () => {
 
         <ScrollView showsVerticalScrollIndicator={false}>
           {/* Workout Video List Section */}
-          <ScrollView
+          {/* <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            style={{ paddingTop: 20, paddingLeft: 0, paddingBottom: 20 }}
+            style={{ paddingTop: 0, paddingLeft: 0, paddingBottom: 20 }}
           >
             {workoutVideoList.map((card) => (
               <VideoClassCard
@@ -316,11 +313,11 @@ const SelfCare: React.FC = () => {
                 onPress={() => handleWorkoutVideoClicked(card)}
               />
             ))}
-          </ScrollView>
+          </ScrollView> */}
 
           {/* { Soundscpae List Section} */}
           <HorizontalListCardScroll
-            title="Soundscape"
+            title="Sonic Atmospheres"
             description="The sound of nature gives you better sleep."
             backgroundColor="#fff9d2"
             itemList={soundscapeTrackList}
@@ -330,7 +327,7 @@ const SelfCare: React.FC = () => {
           {/* AudioBook List Section */}
           <TrendingCardCarousel
             type="rotuine"
-            title="New and Trendings Routines"
+            title="Guided Rituals"
             data={routineList ?? []}
             onClickOfAll={() => onClickOfAll("routine")}
             onPress={handleCardPress}
@@ -338,7 +335,7 @@ const SelfCare: React.FC = () => {
 
           {/* Medical Test List Section */}
           <HorizontalListCardScroll
-            title="Medical Test"
+            title="Clinical Assessments"
             description="Mental health is everything"
             backgroundColor="#cbc7f6"
             noOfRows={2}
@@ -350,7 +347,7 @@ const SelfCare: React.FC = () => {
 
           {/* Meditation List Section */}
           <HorizontalListCardScroll
-            title="Meditation"
+            title="Pure Zen"
             description="Now is a great time to be present. Now is good, too. And now"
             backgroundColor="#fadfdd"
             itemList={meditationList}
@@ -386,51 +383,17 @@ const SelfCare: React.FC = () => {
   );
 };
 
-const styling = (newTheme: any) =>
+const styling = (newTheme: any, spacing: any, typography: any) =>
   StyleSheet.create({
     screenTitle: {
-      marginBottom: 30,
+      marginBottom: spacing.xl,
     },
     screenTitleText: {
-      fontSize: 30,
-      fontWeight: "bold",
+      ...typography.h1,
       color: newTheme.textPrimary,
     },
     navigationScrollView: {
-      marginBottom: 20,
-    },
-    header: {
-      fontSize: 22,
-      fontWeight: "bold",
-      marginLeft: 20,
-      marginBottom: 10,
-      marginTop: 10,
-    },
-    navigationButtonContainer: {
-      alignItems: "center",
-      marginBottom: 30,
-    },
-    content: {
-      padding: 0,
-    },
-    button: {
-      width: 60,
-      height: 60,
-      borderRadius: 25, // Makes the button rounded
-      marginRight: 12, // Space between buttons
-    },
-    buttonIcon: {
-      width: 60,
-      height: 60,
-      borderRadius: 25, // Makes the button rounded
-    },
-    buttonLabel: {
-      paddingTop: 10,
-      // alignContent: "center",
-      // justifyContent: "center",
-      alignItems: "center",
-      color: newTheme.textPrimary,
-      fontSize: 10,
+      marginBottom: spacing.md,
     },
   });
 

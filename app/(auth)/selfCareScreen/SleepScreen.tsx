@@ -17,9 +17,12 @@ import { router } from "expo-router";
 import { banners } from "@/constant/data/banner";
 import HorizontalBanner from "@/components/common/HorizontalBanner";
 import { getSoundscapeList } from "@/services/toolService";
+import { useNimbusToast } from "@/components/common/toast/useNimbusToast";
 
 const SleepModal = ({ visible, onClose }: any) => {
   const [libraryTracks, setLibraryTracks] = useState<any>([]);
+  const toast = useNimbusToast();
+
   const onModalClose = () => {
     console.log("modal cloe clicked");
     onClose();
@@ -40,27 +43,32 @@ const SleepModal = ({ visible, onClose }: any) => {
   const getSoundscapeListData = async () => {
     try {
       const result = await getSoundscapeList();
-      // Check if 'result' and 'result.data' exist and is an array
-      if (result && Array.isArray(result)) {
-        const processedArticles = result.map((tracks: any) => {
-          // Assign a random tag from the 'tags' arra
 
-          // Return a new object with the original properties plus the new ones
+      // TEMP: Handle current direct array vs future object structure
+      let dataToProcess: any[] = [];
+
+      if (result && result.success && Array.isArray(result.data)) {
+        dataToProcess = result.data;
+      }
+
+      if (dataToProcess.length > 0) {
+        const processedArticles = dataToProcess.map((tracks: any) => {
           return {
-            ...tracks, // Spread operator to keep original properties
+            ...tracks,
             uri: tracks.image,
           };
         });
-
-        // console.log(processedArticles, "processedArticles sleep");
-        // setShowLibrary(true);
         setLibraryTracks(processedArticles);
       } else {
-        // Handle the case where the data is not in the expected format
-        console.error("API response data is not an array:", result);
+        console.error("API response data is empty or not an array:", result);
       }
     } catch (error: any) {
       console.log(error, "API Error Response");
+      toast.show({
+        variant: "error",
+        title: "Load Error",
+        message: "Unable to load soundscapes. Please try again.",
+      });
     }
   };
 

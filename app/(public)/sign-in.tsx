@@ -9,7 +9,6 @@ import {
   Platform,
 } from "react-native";
 import { Stack, router } from "expo-router";
-import Toast from "react-native-toast-message";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import ThemeContext from "@/context/ThemeContext";

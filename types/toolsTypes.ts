@@ -23,6 +23,9 @@ interface ArticleListItem {
 
 export interface ArticleListResponse {
   data: ArticleListItem[];
+  success: string;
+  message: string;
+  error_code?: string;
 }
 
 // Type for the object inside the 'meta_info' property
@@ -98,7 +101,9 @@ export interface SoundscapeListItem {
 
 export interface SoundscapeListResponse {
   data: SoundscapeListItem[];
-  success?: boolean;
+  success: string;
+  message: string;
+  error_code?: string;
 }
 
 export interface ShortVideoItem {
@@ -113,6 +118,9 @@ export interface ShortVideoItem {
 
 export interface ShortVideoListResponse {
   data: ShortVideoItem[];
+  success: string;
+  message: string;
+  error_code?: string;
 }
 
 export interface AudioBookItem {
@@ -127,6 +135,9 @@ export interface AudioBookItem {
 
 export interface AudioBookListResponse {
   data: AudioBookItem[];
+  success: string;
+  message: string;
+  error_code?: string;
 }
 
 export interface RecipeItem {
@@ -141,6 +152,9 @@ export interface RecipeItem {
 
 export interface RecipeListResponse {
   data: RecipeItem[];
+  success: string;
+  message: string;
+  error_code?: string;
 }
 
 export interface RoutineItem {

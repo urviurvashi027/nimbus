@@ -1,7 +1,6 @@
 import React, { useContext, useState } from "react";
 import { View, Text } from "react-native";
 import { Stack, router } from "expo-router";
-import Toast from "react-native-toast-message";
 
 import ThemeContext from "@/context/ThemeContext";
 import { useAuth } from "@/context/AuthContext";

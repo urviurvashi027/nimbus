@@ -16,7 +16,6 @@ import {
   Text,
 } from "react-native";
 import { router, useFocusEffect } from "expo-router";
-import Toast from "react-native-toast-message";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
 import {

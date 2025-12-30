@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { View, Text, TextInput, Pressable } from "react-native";
-import Toast from "react-native-toast-message";
 import { useLocalSearchParams } from "expo-router";
 
 import ThemeContext from "@/context/ThemeContext";
