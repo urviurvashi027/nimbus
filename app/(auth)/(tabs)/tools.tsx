@@ -28,6 +28,7 @@ import {
   getRoutineList,
 } from "@/services/toolService";
 import NavigationIconButton from "@/components/common/NavigationIconButton";
+import { FILTER_MAP } from "../toolsScreen/RoutineScreen";
 
 const Tools: React.FC = () => {
   const navigation = useNavigation();
@@ -45,7 +46,7 @@ const Tools: React.FC = () => {
   const [routineWellness, setRoutineWellnessList] = useState<
     any[] | undefined
   >();
-  const [routineFitness, setRoutineFitnessList] = useState<any[] | undefined>();
+  const [routineChores, setRoutineChoresList] = useState<any[] | undefined>();
 
   const { newTheme, spacing, typography } = useContext(ThemeContext);
 
@@ -58,9 +59,23 @@ const Tools: React.FC = () => {
     // need to add filters functionality and category param changes
     try {
       const result = await getRecipeList();
-      // Check if 'result' and 'result.data' exist and is an array
-      if (result && Array.isArray(result)) {
-        const processedRecipes = result.map((article: any) => {
+
+      // TEMP: Handle current direct array vs future object structure
+      let dataToProcess: any[] = [];
+
+      if (Array.isArray(result)) {
+        // Current format
+        dataToProcess = result;
+      }
+      /* 
+      // FUTURE: Handle { success, message, data } format
+      else if (result && result.success && Array.isArray(result.data)) {
+        dataToProcess = result.data;
+      } 
+      */
+
+      if (dataToProcess.length > 0) {
+        const processedRecipes = dataToProcess.map((article: any) => {
           // Return a new object with the original properties plus the new ones
           return {
             ...article, // Spread operator to keep original properties
@@ -84,9 +99,23 @@ const Tools: React.FC = () => {
     // need to add filters functionality and category param changes
     try {
       const result = await getArticleList();
-      // Check if 'result' and 'result.data' exist and is an array
-      if (result && Array.isArray(result)) {
-        const processedArticles = result.map((article: any) => {
+
+      // TEMP: Handle current direct array vs future object structure
+      let dataToProcess: any[] = [];
+
+      if (Array.isArray(result)) {
+        // Current format
+        dataToProcess = result;
+      }
+      /* 
+      // FUTURE: Handle { success, message, data } format
+      else if (result && result.success && Array.isArray(result.data)) {
+        dataToProcess = result.data;
+      } 
+      */
+
+      if (dataToProcess.length > 0) {
+        const processedArticles = dataToProcess.map((article: any) => {
           // Return a new object with the original properties plus the new ones
           return {
             ...article, // Spread operator to keep original properties
@@ -111,22 +140,21 @@ const Tools: React.FC = () => {
     try {
       const result = await getRoutineList(category);
       // Check if 'result' and 'result.data' exist and is an array
-      if (result && Array.isArray(result)) {
-        const processedArticles = result.map((article: any) => {
+      if (result && result.success && Array.isArray(result.data)) {
+        const processedArticles = result.data.map((article: any) => {
           // Return a new object with the original properties plus the new ones
           return {
             ...article, // Spread operator to keep original properties
-            image: {
-              uri: article.image,
-            },
+            title: article.name,
+            image: article.image ? { uri: article.image } : null,
           };
         });
-        if (category === "beauty") {
+        if (category === FILTER_MAP.Beauty) {
           setRoutineSkincareList(processedArticles);
-        } else if (category === "wellness") {
+        } else if (category === FILTER_MAP.Wellness) {
           setRoutineWellnessList(processedArticles);
-        } else if (category === "fitness") {
-          setRoutineFitnessList(processedArticles);
+        } else if (category === FILTER_MAP.Chores) {
+          setRoutineChoresList(processedArticles);
         }
       } else {
         // Handle the case where the data is not in the expected format
@@ -140,9 +168,9 @@ const Tools: React.FC = () => {
   useEffect(() => {
     getArticleListData();
     getRecipeListData();
-    getRoutineData("fitness");
-    getRoutineData("beauty");
-    getRoutineData("wellness");
+    getRoutineData(FILTER_MAP.Chores);
+    getRoutineData(FILTER_MAP.Beauty);
+    getRoutineData(FILTER_MAP.Wellness);
   }, []);
 
   const handleNavigationButtonPress = (button: any) => {
@@ -280,7 +308,7 @@ const Tools: React.FC = () => {
           <TrendingCardCarousel
             type="routine"
             title="Life Hacks You Can't Miss"
-            data={routineFitness ?? []}
+            data={routineChores ?? []}
             onPress={handleCardPress}
             onClickOfAll={onClickOfHacksRoutineAll}
           />

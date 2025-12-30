@@ -31,7 +31,6 @@ import ThingsToDoModal from "../selfCareScreen/ThingsToDoScreen";
 
 import {
   getMeditationAudioList,
-  getMentalTestList,
   getWorkoutVideo,
 } from "@/services/selfCareService";
 import { getRoutineList, getSoundscapeList } from "@/services/toolService";
@@ -86,12 +85,12 @@ const SelfCare: React.FC = () => {
     try {
       const result = await getWorkoutVideo();
       // Check if 'result' and 'result.data' exist and is an array
-      if (result && Array.isArray(result)) {
-        const processedVideo = result.map((item: any) => {
+      if (result && result.success !== false && Array.isArray(result.data)) {
+        const processedVideo = result.data.map((item: any) => {
           return {
             ...item, // Spread operator to keep original properties
             isLocked: false,
-            coachName: "UU",
+            coachName: item.coach_name || "UU",
             image: {
               uri: item.image,
             },
@@ -112,13 +111,27 @@ const SelfCare: React.FC = () => {
     // need to add filters functionality and category param changes
     try {
       const result = await getMeditationAudioList();
-      // Check if 'result' and 'result.data' exist and is an array
-      if (result && Array.isArray(result)) {
-        const processedAudio = result.map((item: any) => {
+
+      // TEMP: Handle current direct array vs future object structure
+      let dataToProcess: any[] = [];
+
+      if (Array.isArray(result)) {
+        // Current format
+        dataToProcess = result;
+      }
+      /* 
+      // FUTURE: Handle { success, message, data } format
+      else if (result && result.success && Array.isArray(result.data)) {
+        dataToProcess = result.data;
+      } 
+      */
+
+      if (dataToProcess.length > 0) {
+        const processedAudio = dataToProcess.map((item: any) => {
           return {
             ...item, // Spread operator to keep original properties
             isLocked: false,
-            coachName: "UU",
+            coachName: item.coach_name || "UU",
             image: {
               uri: item.image,
             },
@@ -137,9 +150,23 @@ const SelfCare: React.FC = () => {
   const getSoundscapeTrackList = async () => {
     try {
       const result = await getSoundscapeList();
-      // Check if 'result' and 'result.data' exist and is an array
-      if (result && Array.isArray(result)) {
-        const processedArticles = result.map((tracks: any) => {
+
+      // TEMP: Handle current direct array vs future object structure
+      let dataToProcess: any[] = [];
+
+      if (Array.isArray(result)) {
+        // Current format
+        dataToProcess = result;
+      }
+      /* 
+      // FUTURE: Handle { success, message, data } format
+      else if (result && result.success && Array.isArray(result.data)) {
+        dataToProcess = result.data;
+      } 
+      */
+
+      if (dataToProcess.length > 0) {
+        const processedArticles = dataToProcess.map((tracks: any) => {
           return {
             ...tracks, // Spread operator to keep original properties
             duration: tracks.duration || "3",
@@ -209,14 +236,13 @@ const SelfCare: React.FC = () => {
     try {
       const result = await getRoutineList(category);
       // Check if 'result' and 'result.data' exist and is an array
-      if (result && Array.isArray(result)) {
-        const processedArticles = result.map((article: any) => {
+      if (result && result.success && Array.isArray(result.data)) {
+        const processedArticles = result.data.map((article: any) => {
           // Return a new object with the original properties plus the new ones
           return {
             ...article, // Spread operator to keep original properties
-            image: {
-              uri: article.image,
-            },
+            title: article.name,
+            image: article.image ? { uri: article.image } : null,
           };
         });
         setRoutineList(processedArticles);
@@ -230,26 +256,26 @@ const SelfCare: React.FC = () => {
   };
 
   // TODO ADD MEDTEST API DATA
-  const getMentalListData = async () => {
-    // need to add filters functionality and category param changes
-    try {
-      const result = await getMentalTestList();
-      // Check if 'result' and 'result.data' exist and is an array
-      if (result && Array.isArray(result)) {
-        console.log(result, "medialTestk");
-        setMedicalListData(result);
-      } else {
-        // Handle the case where the data is not in the expected format
-        console.error("API response data is not an array:", typeof result);
-      }
-    } catch (error: any) {
-      console.log(error, "API Error Response");
-    }
-  };
+  // const getMentalListData = async () => {
+  //   // need to add filters functionality and category param changes
+  //   try {
+  //     const result = await getMentalTestList();
+  //     // Check if 'result' and 'result.data' exist and is an array
+  //     if (result && result.data && result.data.success && Array.isArray(result.data.data)) {
+  //       console.log(result.data.data, "medialTestk");
+  //       setMedicalListData(result.data.data);
+  //     } else {
+  //       // Handle the case where the data is not in the expected format
+  //       console.error("API response data is not an array:", typeof result);
+  //     }
+  //   } catch (error: any) {
+  //     console.log(error, "API Error Response");
+  //   }
+  // };
 
   useEffect(() => {
     setSelectedButton("");
-    getWorkoutVideoList();
+    // getWorkoutVideoList();
     getMeditationTrackList();
     getSoundscapeTrackList();
     getRoutineData();
@@ -320,7 +346,7 @@ const SelfCare: React.FC = () => {
           {/* AudioBook List Section */}
           <TrendingCardCarousel
             type="rotuine"
-            title="New and Trendingsj"
+            title="New and Trending Routines"
             data={routineList ?? []}
             onClickOfAll={() => onClickOfAll("routine")}
             onPress={handleCardPress}
