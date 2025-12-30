@@ -70,6 +70,28 @@ export const getWorkoutVideo = async (): Promise<WorkoutVideoListResponse> => {
   }
 };
 
+export const getWorkouts = async (params?: {
+  category?: string;
+  search?: string;
+  ordering?: string;
+}): Promise<any> => {
+  try {
+    const response = await axios.get(API_ENDPOINTS.getWorkouts, { params });
+    return response.data;
+  } catch (error: any) {
+    throw error.response ? error.response.data : error.message;
+  }
+};
+
+export const getWorkoutDetails = async (id: number | string): Promise<any> => {
+  try {
+    const response = await axios.get(API_ENDPOINTS.getWorkoutDetails(id));
+    return response.data;
+  } catch (error: any) {
+    throw error.response ? error.response.data : error.message;
+  }
+};
+
 // filteration not working
 // card Color
 export const getMeditationAudioList =

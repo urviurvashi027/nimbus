@@ -21,167 +21,88 @@ import WorkoutCard, {
 import FilterPill from "@/components/selfCare/workout/FilterPill";
 import WorkoutHeader from "@/components/selfCare/workout/WorkoutHeader";
 
-import { getWorkoutVideo } from "@/services/selfCareService";
+import { getWorkoutVideo, getWorkouts } from "@/services/selfCareService";
 
 /* ---------- Types ---------- */
 
-type WorkoutCategory = "cardio" | "strength" | "stretching" | "full_body";
+type WorkoutCategory = "all" | "cardio" | "strength" | "yoga" | "full_body" | "other";
+
+interface RoutineItem {
+  id: number;
+  difficulty: DifficultyLevel;
+  title: string;
+  description: string;
+  reps: string;
+  time: string;
+  tips: string;
+  gif: string | null;
+}
 
 interface WorkoutApiItem {
   id: number;
-  title: string;
-  image: string;
-  coach_name: string;
-  category: string; // "workout", "strength", etc.
-  duration: number; // minutes
+  name: string;
   description: string;
-  source: string;
+  category: string;
+  category_display: string;
+  image: string;
+  is_active: boolean;
+  routines: RoutineItem[];
 }
 
-/* ---------- Demo dataset (same shape as backend) ---------- */
+/* ---------- Demo dataset (New API structure) ---------- */
 
 const DEMO_WORKOUTS: WorkoutApiItem[] = [
   {
-    id: 101,
-    title: "Dumbbell Shoulder Press",
+    id: 1,
+    name: "Squat",
+    description: "A fundamental lower body exercise...",
+    category: "strength",
+    category_display: "Strength",
     image: "https://images.pexels.com/photos/1552242/pexels-photo-1552242.jpeg",
-    coach_name: "Kelly Pahuja",
-    category: "strength",
-    duration: 12,
-    description:
-      "Build upper-body strength and improve shoulder stability using controlled dumbbell movements.",
-    source:
-      "https://nimbus-fe-assets.s3.amazonaws.com/workouts/shoulder_press.mp4",
+    is_active: true,
+    routines: [
+      {
+        id: 101,
+        difficulty: "easy",
+        title: "Air Squat",
+        description: "Perform squats using only bodyweight...",
+        reps: "15",
+        time: "5 min",
+        tips: "Keep your back straight.",
+        gif: null,
+      },
+      {
+        id: 102,
+        difficulty: "medium",
+        title: "Goblet Squat",
+        description: "Hold a weight at chest level...",
+        reps: "12",
+        time: "15 min",
+        tips: "Keep chest up.",
+        gif: null,
+      },
+    ],
   },
   {
-    id: 102,
-    title: "Bench Press Basics",
+    id: 2,
+    name: "Push Up",
+    description: "Foundational upper body pushing movement.",
+    category: "strength",
+    category_display: "Strength",
     image: "https://images.pexels.com/photos/2261485/pexels-photo-2261485.jpeg",
-    coach_name: "Alex Carter",
-    category: "strength",
-    duration: 10,
-    description:
-      "A foundational movement to build chest, triceps, and pushing power.",
-    source:
-      "https://nimbus-fe-assets.s3.amazonaws.com/workouts/bench_press.mp4",
-  },
-  {
-    id: 103,
-    title: "Kettlebell Swing Power",
-    image: "https://images.pexels.com/photos/4164469/pexels-photo-4164469.jpeg",
-    coach_name: "Samira Lopez",
-    category: "strength",
-    duration: 8,
-    description:
-      "Explosive hip hinge movement to build glutes, hamstrings, and total-body power.",
-    source: "https://nimbus-fe-assets.s3.amazonaws.com/workouts/kb_swing.mp4",
-  },
-  {
-    id: 201,
-    title: "HIIT Fat Burner",
-    image: "https://images.pexels.com/photos/4761664/pexels-photo-4761664.jpeg",
-    coach_name: "Mia Johnson",
-    category: "cardio",
-    duration: 15,
-    description:
-      "High-intensity intervals designed to elevate your heart rate and burn calories fast.",
-    source:
-      "https://nimbus-fe-assets.s3.amazonaws.com/workouts/hiit_burner.mp4",
-  },
-  {
-    id: 202,
-    title: "Jump Rope Conditioning",
-    image: "https://images.pexels.com/photos/1552103/pexels-photo-1552103.jpeg",
-    coach_name: "Ryan Hall",
-    category: "cardio",
-    duration: 10,
-    description:
-      "Improve coordination, agility, and cardiovascular endurance with jump rope cycles.",
-    source: "https://nimbus-fe-assets.s3.amazonaws.com/workouts/jump_rope.mp4",
-  },
-  {
-    id: 203,
-    title: "Treadmill Speed Intervals",
-    image: "https://images.pexels.com/photos/1954524/pexels-photo-1954524.jpeg",
-    coach_name: "Katie Brooks",
-    category: "cardio",
-    duration: 12,
-    description:
-      "Push your pace with controlled speed bursts and active recovery.",
-    source:
-      "https://nimbus-fe-assets.s3.amazonaws.com/workouts/speed_intervals.mp4",
-  },
-  {
-    id: 301,
-    title: "Full Body Mobility Flow",
-    image: "https://images.pexels.com/photos/3823039/pexels-photo-3823039.jpeg",
-    coach_name: "Lara Kim",
-    category: "stretching",
-    duration: 14,
-    description:
-      "Gentle mobility movements to restore flexibility and reduce stiffness.",
-    source:
-      "https://nimbus-fe-assets.s3.amazonaws.com/workouts/mobility_flow.mp4",
-  },
-  {
-    id: 302,
-    title: "Lower Back Release",
-    image: "https://images.pexels.com/photos/4325468/pexels-photo-4325468.jpeg",
-    coach_name: "Daniel Wu",
-    category: "stretching",
-    duration: 8,
-    description:
-      "Targeted stretches to ease tension and improve lumbar mobility.",
-    source:
-      "https://nimbus-fe-assets.s3.amazonaws.com/workouts/back_release.mp4",
-  },
-  {
-    id: 303,
-    title: "Hamstring Stretch Routine",
-    image: "https://images.pexels.com/photos/6453399/pexels-photo-6453399.jpeg",
-    coach_name: "Ava Singh",
-    category: "stretching",
-    duration: 6,
-    description:
-      "Improve hamstring flexibility and reduce tightness in your legs.",
-    source:
-      "https://nimbus-fe-assets.s3.amazonaws.com/workouts/hamstring_stretch.mp4",
-  },
-  {
-    id: 401,
-    title: "Full Body Burner",
-    image: "https://images.pexels.com/photos/269977/pexels-photo-269977.jpeg",
-    coach_name: "Mark Jacobs",
-    category: "full_body",
-    duration: 18,
-    description:
-      "An energetic flow mixing strength, cardio, and mobility for a complete workout.",
-    source:
-      "https://nimbus-fe-assets.s3.amazonaws.com/workouts/fullbody_burner.mp4",
-  },
-  {
-    id: 402,
-    title: "Bodyweight Sculpt",
-    image: "https://images.pexels.com/photos/3823063/pexels-photo-3823063.jpeg",
-    coach_name: "Nora Patel",
-    category: "full_body",
-    duration: 20,
-    description:
-      "High-repetition bodyweight movements to tone your entire body with no equipment.",
-    source:
-      "https://nimbus-fe-assets.s3.amazonaws.com/workouts/bodyweight_sculpt.mp4",
-  },
-  {
-    id: 403,
-    title: "Core + Glutes Activation",
-    image: "https://images.pexels.com/photos/6453398/pexels-photo-6453398.jpeg",
-    coach_name: "Leo Martin",
-    category: "full_body",
-    duration: 12,
-    description:
-      "Strengthen your entire midsection with glute and core engagement circuits.",
-    source:
-      "https://nimbus-fe-assets.s3.amazonaws.com/workouts/core_glutes.mp4",
+    is_active: true,
+    routines: [
+      {
+        id: 201,
+        difficulty: "medium",
+        title: "Standard Push Up",
+        description: "Focus on core stability and full range of motion.",
+        reps: "10",
+        time: "3 min",
+        tips: "Don't let your hips sag.",
+        gif: null,
+      },
+    ],
   },
 ];
 
@@ -190,67 +111,47 @@ const DEMO_WORKOUTS: WorkoutApiItem[] = [
 interface WorkoutCardModel {
   id: number;
   title: string;
-  coachName: string;
   imageUri: string;
   durationSeconds: number;
   reps: number;
   difficulty: DifficultyLevel;
   category: WorkoutCategory;
   description: string;
-  source: string;
+  routines: RoutineItem[];
 }
 
 const FILTERS: { id: WorkoutCategory; label: string }[] = [
+  { id: "all", label: "All" },
   { id: "cardio", label: "Cardio" },
   { id: "strength", label: "Strength" },
-  { id: "stretching", label: "Stretching" },
+  { id: "yoga", label: "Yoga" },
   { id: "full_body", label: "Full Body" },
 ];
 
-const CATEGORY_DEFAULTS: Record<
-  WorkoutCategory,
-  { difficulty: DifficultyLevel; durationSeconds: number; reps: number }
-> = {
-  strength: { difficulty: "medium", durationSeconds: 30, reps: 4 },
-  cardio: { difficulty: "easy", durationSeconds: 45, reps: 0 },
-  stretching: { difficulty: "easy", durationSeconds: 40, reps: 0 },
-  full_body: { difficulty: "hard", durationSeconds: 30, reps: 4 },
-};
-
-const mapBackendCategory = (backendCategory: string): WorkoutCategory => {
-  switch (backendCategory.toLowerCase()) {
-    case "cardio":
-      return "cardio";
-    case "stretch":
-    case "stretching":
-      return "stretching";
-    case "full_body":
-    case "full body":
-    case "workout":
-      return "full_body";
-    case "strength":
-    default:
-      return "strength";
+const parseTimeToSeconds = (timeStr?: string): number => {
+  if (!timeStr) return 0;
+  // Handle "5 min", "15 min"
+  const match = timeStr.match(/(\d+)\s*min/i);
+  if (match) {
+    return parseInt(match[1], 10) * 60;
   }
+  return 0;
 };
 
 const mapWorkoutToCardModel = (item: WorkoutApiItem): WorkoutCardModel => {
-  const category = mapBackendCategory(item.category);
-  const defaults = CATEGORY_DEFAULTS[category];
-
+  // Use first routine for card metadata (preview)
+  const firstRoutine = item.routines?.[0];
+  
   return {
     id: item.id,
-    title: item.title,
-    coachName: item.coach_name,
+    title: item.name,
     imageUri: item.image,
-    category,
-    difficulty: defaults.difficulty,
-    durationSeconds: item.duration
-      ? item.duration * 60
-      : defaults.durationSeconds,
-    reps: defaults.reps,
+    category: item.category as WorkoutCategory,
+    difficulty: firstRoutine?.difficulty || "easy",
+    durationSeconds: parseTimeToSeconds(firstRoutine?.time),
+    reps: parseInt(firstRoutine?.reps || "0", 10),
     description: item.description,
-    source: item.source,
+    routines: item.routines || [],
   };
 };
 
@@ -258,7 +159,7 @@ const mapWorkoutToCardModel = (item: WorkoutApiItem): WorkoutCardModel => {
 
 const WorkoutListScreen = () => {
   const [selectedCategory, setSelectedCategory] =
-    useState<WorkoutCategory>("strength");
+    useState<WorkoutCategory>("all");
   const [rawWorkouts, setRawWorkouts] = useState<
     WorkoutApiItem[] | undefined
   >();
@@ -275,20 +176,19 @@ const WorkoutListScreen = () => {
   const fetchWorkouts = async () => {
     try {
       setIsLoading(true);
-      const result = await getWorkoutVideo(); // backend items
+      // Fetch from new endpoint
+      const result = await getWorkouts(); 
 
-      if (result && Array.isArray(result)) {
-        // ✅ MERGE BACKEND + DEMO DATA
-        const merged: WorkoutApiItem[] = [...result, ...DEMO_WORKOUTS];
-        setRawWorkouts(merged);
+      if (result && result.success && Array.isArray(result.data)) {
+        // We can still merge or just use API data
+        // For now, we'll use API data if available, otherwise fallback
+        setRawWorkouts(result.data.length > 0 ? result.data : DEMO_WORKOUTS);
       } else {
-        console.error("Workout API response is not an array:", result);
-        // fallback to demo only
+        console.error("Workout API error or invalid data:", result);
         setRawWorkouts(DEMO_WORKOUTS);
       }
     } catch (err) {
       console.error("Workout API error:", err);
-      // on error, still show demo
       setRawWorkouts(DEMO_WORKOUTS);
     } finally {
       setIsLoading(false);
@@ -305,22 +205,20 @@ const WorkoutListScreen = () => {
   }, [rawWorkouts]);
 
   const filteredWorkouts = useMemo(
-    () => workoutCards.filter((w) => w.category === selectedCategory),
+    () =>
+      selectedCategory === "all"
+        ? workoutCards
+        : workoutCards.filter((w) => w.category === selectedCategory),
     [workoutCards, selectedCategory]
   );
 
   const handleStartWorkout = (workout: WorkoutCardModel) => {
     console.log("Start workout:", workout.id);
-
+    
     router.push({
       pathname: "/(auth)/selfCareScreen/WorkoutSessionScreen",
       params: {
         id: workout.id.toString(),
-        title: workout.title,
-        imageUri: workout.imageUri,
-        description: workout.description,
-        reps: workout.reps.toString(),
-        durationSeconds: workout.durationSeconds.toString(),
       },
     });
   };

@@ -31,6 +31,7 @@ import ThingsToDoModal from "../selfCareScreen/ThingsToDoScreen";
 
 import {
   getMeditationAudioList,
+  // getMentalTestList,
   getWorkoutVideo,
 } from "@/services/selfCareService";
 import { getRoutineList, getSoundscapeList } from "@/services/toolService";
@@ -255,23 +256,6 @@ const SelfCare: React.FC = () => {
     }
   };
 
-  // TODO ADD MEDTEST API DATA
-  // const getMentalListData = async () => {
-  //   // need to add filters functionality and category param changes
-  //   try {
-  //     const result = await getMentalTestList();
-  //     // Check if 'result' and 'result.data' exist and is an array
-  //     if (result && result.data && result.data.success && Array.isArray(result.data.data)) {
-  //       console.log(result.data.data, "medialTestk");
-  //       setMedicalListData(result.data.data);
-  //     } else {
-  //       // Handle the case where the data is not in the expected format
-  //       console.error("API response data is not an array:", typeof result);
-  //     }
-  //   } catch (error: any) {
-  //     console.log(error, "API Error Response");
-  //   }
-  // };
 
   useEffect(() => {
     setSelectedButton("");
@@ -346,7 +330,7 @@ const SelfCare: React.FC = () => {
           {/* AudioBook List Section */}
           <TrendingCardCarousel
             type="rotuine"
-            title="New and Trending Routines"
+            title="New and Trendings Routines"
             data={routineList ?? []}
             onClickOfAll={() => onClickOfAll("routine")}
             onPress={handleCardPress}
