@@ -1,0 +1,952 @@
+import React, { useContext, useState, useMemo, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  SafeAreaView,
+  Platform,
+  TextInput,
+  KeyboardAvoidingView,
+  ActivityIndicator,
+} from "react-native";
+import { router, useLocalSearchParams } from "expo-router";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+
+import ThemeContext from "@/context/ThemeContext";
+import { ScreenView } from "@/components/Themed";
+import StyledButton from "@/components/common/themeComponents/StyledButton";
+import ToolScreenHeader from "@/components/tools/common/ToolScreenHeader";
+import DateInput from "@/components/common/picker/DateInput";
+import TimeInput from "@/components/common/picker/TimeInput";
+import DatePickerSheet from "@/components/common/picker/DatePickerSheet";
+import { FilterPill } from "@/components/selfCare/workout/FilterPill";
+import { getRecipeList } from "@/services/toolService";
+import { addMealItem } from "@/services/mealService";
+import { formatApiDate, formatDay, formatDateRange } from "@/utils/dates";
+
+type MealType = "Breakfast" | "Lunch" | "Dinner" | "Snacks";
+type UnitType = "grams" | "servings" | "cups" | "pieces";
+
+interface MealEntry {
+  foodName: string;
+  calories?: number;
+  recipeId?: number;
+}
+
+interface DayPlan {
+  [key: string]: MealEntry | null;
+}
+
+interface WeeklyPlanStore {
+  [date: string]: DayPlan;
+}
+
+const MealCreationScreen = () => {
+  const { newTheme, spacing, typography } = useContext(ThemeContext);
+  const styles = styling(newTheme, spacing, typography);
+  const params = useLocalSearchParams();
+
+  /* --- UI State --- */
+  const [activeTab, setActiveTab] = useState<"day" | "week">(params.type || params.foodName ? "day" : "day");
+  const [showReview, setShowReview] = useState(false);
+  const [isRangePickerVisible, setIsRangePickerVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  /* --- Day Tab State --- */
+  const [dayDate, setDayDate] = useState(params.date ? new Date(params.date as string) : new Date());
+  const [mealType, setMealType] = useState<MealType>(
+    (params.type as MealType) || "Breakfast"
+  );
+  const [foodSearch, setFoodSearch] = useState((params.foodName as string) || "");
+
+  /* --- Week Tab State --- */
+  const tomorrow = useMemo(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }, []);
+
+  const [startDate, setStartDate] = useState(tomorrow);
+  const [selectedWeekdays, setSelectedWeekdays] = useState<string[]>([]); // Array of ISO dates
+  const [bulkMealType, setBulkMealType] = useState<MealType>("Breakfast");
+  const [bulkFoodSearch, setBulkFoodSearch] = useState("");
+  const [weeklyPlan, setWeeklyPlan] = useState<WeeklyPlanStore>({});
+
+  /* --- Search State --- */
+  const [recipeResults, setRecipeResults] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+
+  // Logic: Exactly 7 days constant week range starting from startDate
+  const { weekDates, rangeString } = useMemo(() => {
+    const dates = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(startDate);
+      d.setDate(d.getDate() + i);
+      dates.push(d);
+    }
+    const lastDate = dates[6];
+    return {
+      weekDates: dates,
+      rangeString: formatDateRange(startDate, lastDate),
+    };
+  }, [startDate]);
+
+  // Actions
+  const handleSave = async () => {
+    try {
+      const selectedRecipe = recipeResults.find(r => r.title === foodSearch);
+      
+      const payload: any = {
+        plan_date: formatApiDate(dayDate),
+        meal_type: mealType.toLowerCase(),
+      };
+
+      if (selectedRecipe) {
+        payload.recipe_id = selectedRecipe.id;
+      } else {
+        payload.name = foodSearch;
+        // Default values for manual entry if not provided
+        payload.calories = 0; 
+        payload.protein = 0;
+      }
+
+      console.log("Saving single day meal:", payload);
+      await addMealItem(payload);
+      router.back();
+    } catch (e) {
+      console.error("Failed to save meal:", e);
+    }
+  };
+
+  const handleSaveFinal = () => {
+    console.log("Submitting final plan to backend:", weeklyPlan);
+    router.back();
+  };
+
+  const handleAddToPlan = () => {
+    if (selectedWeekdays.length === 0 || !bulkFoodSearch) return;
+
+    const newPlan = { ...weeklyPlan };
+    selectedWeekdays.forEach((date) => {
+      if (!newPlan[date]) newPlan[date] = {};
+      newPlan[date][bulkMealType.toLowerCase()] = {
+        foodName: bulkFoodSearch,
+      };
+    });
+    setWeeklyPlan(newPlan);
+
+    // Reset selection for next iteration
+    setBulkFoodSearch("");
+    setSelectedWeekdays([]);
+  };
+
+  const toggleWeekday = (dateStr: string) => {
+    setSelectedWeekdays((prev) =>
+      prev.includes(dateStr)
+        ? prev.filter((d) => d !== dateStr)
+        : [...prev, dateStr]
+    );
+  };
+
+  const handleSelectRecipe = (recipe: any) => {
+    if (activeTab === "day") {
+      setFoodSearch(recipe.title);
+    } else {
+      setBulkFoodSearch(recipe.title);
+    }
+    setRecipeResults([]);
+  };
+
+  // Sync Search
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(async () => {
+      const query = activeTab === "day" ? foodSearch : bulkFoodSearch;
+      if (query) {
+        setIsSearching(true);
+        try {
+          const res = await getRecipeList();
+          const data = Array.isArray(res) ? res : (res as any).data || [];
+          setRecipeResults(data.slice(0, 5));
+        } catch (e) {
+          console.error(e);
+        } finally {
+          setIsSearching(false);
+        }
+      } else {
+        setRecipeResults([]);
+      }
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [foodSearch, bulkFoodSearch, activeTab]);
+
+  /* --- Renders --- */
+
+  const renderTabs = () => (
+    <View style={styles.tabContainer}>
+      <TouchableOpacity
+        onPress={() => setActiveTab("day")}
+        style={[styles.tab, activeTab === "day" && styles.activeTab]}
+      >
+        <Text style={[styles.tabText, activeTab === "day" && styles.activeTabText]}>
+          Day Meal
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => setActiveTab("week")}
+        style={[styles.tab, activeTab === "week" && styles.activeTab]}
+      >
+        <Text style={[styles.tabText, activeTab === "week" && styles.activeTabText]}>
+          Week Plan
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
+
+    const renderSearchDropdown = () => {
+
+      if (isSearching) return <ActivityIndicator style={{ marginTop: 10 }} color={newTheme.accent} />;
+
+      
+
+      const query = activeTab === "day" ? foodSearch : bulkFoodSearch;
+
+      
+
+      // If no results but user typed something, allow manual entry
+
+      if (recipeResults.length === 0 && query.trim().length > 0) {
+
+        return (
+
+          <View style={styles.searchDropdown}>
+
+            <TouchableOpacity 
+
+              style={styles.searchResultItem}
+
+              onPress={() => handleSelectRecipe({ id: 0, title: query })}
+
+            >
+
+              <MaterialCommunityIcons name="pencil-plus" size={16} color={newTheme.textSecondary} />
+
+              <Text style={styles.searchResultText}>Use "{query}"</Text>
+
+            </TouchableOpacity>
+
+          </View>
+
+        );
+
+      }
+
+  
+
+      if (recipeResults.length === 0) return null;
+
+  
+
+      return (
+
+        <View style={styles.searchDropdown}>
+
+          {recipeResults.map((item) => (
+
+            <TouchableOpacity 
+
+              key={item.id} 
+
+              style={styles.searchResultItem}
+
+              onPress={() => handleSelectRecipe(item)}
+
+            >
+
+              <MaterialCommunityIcons name="silverware-fork-knife" size={16} color={newTheme.accent} />
+
+              <Text style={styles.searchResultText}>{item.title}</Text>
+
+            </TouchableOpacity>
+
+          ))}
+
+        </View>
+
+      );
+
+    };
+
+  const renderDayForm = () => (
+    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.formPadding}>
+      <View style={styles.inputGroup}>
+        <Text style={styles.stepLabel}>When?</Text>
+        <DateInput
+          value={dayDate}
+          onChange={setDayDate}
+          label="Select Date"
+          title="Meal Date"
+        />
+      </View>
+
+      <View style={styles.inputGroup}>
+        <Text style={styles.stepLabel}>Meal Type</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipRow}>
+          {(["Breakfast", "Lunch", "Dinner", "Snacks"] as MealType[]).map((type) => (
+            <FilterPill
+              key={type}
+              label={type}
+              isActive={mealType === type}
+              onPress={() => setMealType(type)}
+              style={styles.chip}
+            />
+          ))}
+        </ScrollView>
+      </View>
+
+      <View style={styles.inputGroup}>
+        <Text style={styles.stepLabel}>What are you eating?</Text>
+        <View style={styles.searchBar}>
+          <Ionicons name="search" size={20} color={newTheme.textSecondary} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search or enter recipe name..."
+            placeholderTextColor={newTheme.textSecondary}
+            value={foodSearch}
+            onChangeText={setFoodSearch}
+          />
+        </View>
+                {renderSearchDropdown()}
+              </View>
+            </ScrollView>
+          );
+
+    const renderWeekForm = () => (
+
+      <ScrollView
+
+        showsVerticalScrollIndicator={false}
+
+        contentContainerStyle={styles.formPadding}
+
+      >
+
+              <View style={styles.inputGroup}>
+
+                <Text style={styles.stepLabel}>Step 1: Which days are we planning for?</Text>
+
+                
+
+                {/* Validation Info Banner */}
+
+                <View style={styles.infoBanner}>
+
+                  <Ionicons name="information-circle" size={18} color={newTheme.accent} />
+
+                  <Text style={styles.infoBannerText}>
+
+                    You can set your plan's start date up to 10 days in advance.
+
+                  </Text>
+
+                </View>
+
+        
+
+                {/* Premium Range Selection Panel */}
+
+          <TouchableOpacity 
+
+            style={styles.rangePanel} 
+
+            activeOpacity={0.8}
+
+            onPress={() => setIsRangePickerVisible(true)}
+
+          >
+
+            <View style={styles.rangePanelHeader}>
+
+              <View style={styles.rangeIconCircle}>
+
+                <Ionicons name="calendar" size={20} color={newTheme.accent} />
+
+              </View>
+
+              <View style={styles.rangeTextCol}>
+
+                <Text style={styles.rangeLabel}>Active Window</Text>
+
+                <Text style={styles.rangeValue}>{rangeString}</Text>
+
+              </View>
+
+              <View style={styles.rangeEditBadge}>
+
+                <Text style={styles.rangeEditText}>Change</Text>
+
+              </View>
+
+            </View>
+
+            <Text style={styles.rangeHint}>
+
+              Plan your entire week starting from {startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}.
+
+            </Text>
+
+          </TouchableOpacity>
+
+  
+
+          <DatePickerSheet
+
+            visible={isRangePickerVisible}
+
+            value={startDate}
+
+            title="Select Start Date"
+
+            onClose={() => setIsRangePickerVisible(false)}
+
+            onChange={(d) => {
+
+              setStartDate(d);
+
+              setWeeklyPlan({}); // Reset plan if week changes
+
+              setSelectedWeekdays([]);
+
+            }}
+
+            minimumDate={new Date()}
+
+            maximumDate={new Date(Date.now() + 10 * 24 * 60 * 60 * 1000)}
+
+          />
+
+  
+
+          <View style={styles.weekdayRow}>
+          {weekDates.map((date) => {
+            const dateStr = formatApiDate(date);
+            const isSelected = selectedWeekdays.includes(dateStr);
+            const dayPlan = weeklyPlan[dateStr] || {};
+            const plannedCount = Object.keys(dayPlan).length;
+
+            return (
+              <TouchableOpacity
+                key={dateStr}
+                onPress={() => toggleWeekday(dateStr)}
+                style={[styles.dayTile, isSelected && styles.dayTileActive]}
+              >
+                <Text style={[styles.dayTileNumber, isSelected && styles.dayTileTextActive]}>
+                  {date.getDate()}
+                </Text>
+                <Text style={[styles.dayTileLabel, isSelected && styles.dayTileTextActive]}>
+                  {formatDay(date).charAt(0)}
+                </Text>
+
+                {plannedCount > 0 && !isSelected && (
+                  <View style={styles.plannedIndicators}>
+                    {Array.from({ length: Math.min(plannedCount, 4) }).map((_, i) => (
+                      <View key={i} style={styles.plannedDot} />
+                    ))}
+                  </View>
+                )}
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </View>
+
+      <View style={styles.inputGroup}>
+        <Text style={styles.stepLabel}>Step 2: Which meal is this?</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipRow}>
+          {(["Breakfast", "Lunch", "Dinner", "Snacks"] as MealType[]).map((type) => {
+            const alreadyPlanned = weekDates.filter(
+              (d) => weeklyPlan[formatApiDate(d)]?.[type.toLowerCase()]
+            ).length;
+
+            return (
+              <View key={type} style={{ alignItems: "center" }}>
+                <FilterPill
+                  label={type}
+                  isActive={bulkMealType === type}
+                  onPress={() => setBulkMealType(type)}
+                  style={styles.chip}
+                />
+                {alreadyPlanned > 0 && (
+                  <Text style={styles.plannedCountText}>{alreadyPlanned}/7 days</Text>
+                )}
+              </View>
+            );
+          })}
+        </ScrollView>
+      </View>
+
+      <View style={styles.inputGroup}>
+        <Text style={styles.stepLabel}>Step 3: What are you eating?</Text>
+        <View style={styles.searchBar}>
+          <Ionicons name="search" size={20} color={newTheme.textSecondary} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Choose oatmeal, protein shake..."
+            placeholderTextColor={newTheme.textSecondary}
+            value={bulkFoodSearch}
+            onChangeText={setBulkFoodSearch}
+          />
+        </View>
+        {renderSearchDropdown()}
+      </View>
+
+      {selectedWeekdays.length > 0 && bulkFoodSearch !== "" && (
+        <TouchableOpacity style={styles.summaryCard} onPress={handleAddToPlan}>
+          <View style={styles.summaryInfo}>
+            <Text style={styles.summaryTitle}>📝 Ready to Add</Text>
+            <Text style={styles.summaryText}>
+              {bulkFoodSearch} for {bulkMealType} on {selectedWeekdays.length} days.
+            </Text>
+          </View>
+          <View style={styles.addButtonCircle}>
+            <Ionicons name="add" size={24} color={newTheme.background} />
+          </View>
+        </TouchableOpacity>
+      )}
+    </ScrollView>
+  );
+
+  const renderReviewScreen = () => (
+    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.formPadding}>
+      <Text style={styles.reviewHeader}>Weekly Summary</Text>
+      {weekDates.map((date) => {
+        const dateStr = formatApiDate(date);
+        const dayPlan = weeklyPlan[dateStr] || {};
+        return (
+          <View key={dateStr} style={styles.reviewDayCard}>
+            <View style={styles.reviewDayHeader}>
+              <Text style={styles.reviewDayDate}>
+                {date.toLocaleDateString("en-US", {
+                  weekday: "long",
+                  day: "numeric",
+                  month: "short",
+                })}
+              </Text>
+              <Text style={styles.reviewDayStatus}>{Object.keys(dayPlan).length}/4 meals</Text>
+            </View>
+            {["breakfast", "lunch", "dinner", "snacks"].map((meal) => (
+              <View key={meal} style={styles.reviewMealRow}>
+                <Text style={styles.reviewMealType}>
+                  {meal.charAt(0).toUpperCase() + meal.slice(1)}
+                </Text>
+                <Text
+                  style={[
+                    styles.reviewMealFood,
+                    !dayPlan[meal] && {
+                      fontStyle: "italic",
+                      color: newTheme.textSecondary,
+                    },
+                  ]}
+                >
+                  {dayPlan[meal]?.foodName || "Not planned"}
+                </Text>
+              </View>
+            ))}
+          </View>
+        );
+      })}
+    </ScrollView>
+  );
+
+  return (
+    <ScreenView
+      style={{
+        paddingTop:
+          Platform.OS === "ios" ? spacing["xxl"] + spacing["xxl"] * 0.2 : spacing.xl,
+        paddingHorizontal: spacing.md,
+      }}
+    >
+      <SafeAreaView style={{ flex: 1 }}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          style={{ flex: 1 }}
+        >
+          <ToolScreenHeader
+            title={showReview ? "Review Plan" : "Plan Meal"}
+            subtitle={
+              showReview ? "Check your weekly balance." : "Design your nourishment journey."
+            }
+            onBack={() => (showReview ? setShowReview(false) : router.back())}
+          />
+
+          {!showReview && renderTabs()}
+
+          <View style={{ flex: 1 }}>
+            {showReview ? renderReviewScreen() : activeTab === "day" ? renderDayForm() : renderWeekForm()}
+          </View>
+
+          <View style={styles.footer}>
+            {!showReview && activeTab === "week" && (
+              <StyledButton
+                label="Proceed to Review"
+                variant={Object.keys(weeklyPlan).length > 0 ? "primary" : "secondary"}
+                onPress={() => setShowReview(true)}
+                disabled={Object.keys(weeklyPlan).length === 0}
+                style={{ marginBottom: 12 }}
+              />
+            )}
+            
+            <StyledButton
+              label={showReview ? "Confirm & Sync" : (activeTab === "day" ? "Save Meal" : "Add to Plan")}
+              onPress={() => {
+                if (showReview) handleSaveFinal();
+                else if (activeTab === "day") handleSave();
+                else handleAddToPlan();
+              }}
+              variant="primary"
+              fullWidth
+              disabled={!showReview && activeTab === "week" && !bulkFoodSearch}
+            />
+          </View>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </ScreenView>
+  );
+};
+
+const styling = (theme: any, spacing: any, typography: any) =>
+  StyleSheet.create({
+    tabContainer: {
+      flexDirection: "row",
+      backgroundColor: theme.surfaceMuted,
+      borderRadius: 16,
+      padding: 4,
+      marginBottom: spacing.lg,
+    },
+    tab: {
+      flex: 1,
+      paddingVertical: 12,
+      alignItems: "center",
+      borderRadius: 12,
+    },
+    activeTab: {
+      backgroundColor: theme.surface,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 2,
+    },
+    tabText: {
+      ...typography.body,
+      color: theme.textSecondary,
+      fontWeight: "600",
+    },
+    activeTabText: {
+      color: theme.accent,
+    },
+    formPadding: {
+      paddingHorizontal: 0,
+      paddingBottom: 40,
+    },
+    inputGroup: {
+      marginBottom: spacing.xl,
+    },
+    stepLabel: {
+      ...typography.bodyStrong,
+      color: theme.textPrimary,
+      marginBottom: spacing.md,
+      fontSize: 15,
+    },
+    infoBanner: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: theme.accent + '10',
+      padding: spacing.sm,
+      borderRadius: 12,
+      marginBottom: spacing.md,
+      gap: 8,
+      borderWidth: 1,
+      borderColor: theme.accent + '20',
+    },
+    infoBannerText: {
+      ...typography.caption,
+      color: theme.textPrimary,
+      flex: 1,
+      fontWeight: '600',
+    },
+    chipRow: {
+      flexDirection: "row",
+      marginBottom: spacing.sm,
+    },
+    chip: {
+      marginRight: spacing.sm,
+    },
+    textInput: {
+      backgroundColor: theme.surface,
+      borderRadius: 16,
+      padding: spacing.md,
+      color: theme.textPrimary,
+      fontSize: 16,
+      borderWidth: 1,
+      borderColor: theme.divider,
+      marginTop: spacing.xs,
+    },
+    searchBar: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: theme.surface,
+      borderRadius: 16,
+      paddingHorizontal: spacing.md,
+      height: 56,
+      borderWidth: 1,
+      borderColor: theme.divider,
+    },
+    searchInput: {
+      flex: 1,
+      marginLeft: spacing.sm,
+      color: theme.textPrimary,
+      fontSize: 16,
+    },
+    searchDropdown: {
+      backgroundColor: theme.surface,
+      borderRadius: 16,
+      marginTop: 8,
+      borderWidth: 1,
+      borderColor: theme.divider,
+      padding: spacing.xs,
+    },
+    searchResultItem: {
+      flexDirection: "row",
+      alignItems: "center",
+      padding: spacing.md,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: theme.divider,
+      gap: 10,
+    },
+    searchResultText: {
+      ...typography.body,
+      color: theme.textPrimary,
+    },
+    row: {
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    unitDropdown: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: theme.surfaceMuted,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.md,
+      borderRadius: 16,
+      marginLeft: spacing.sm,
+      borderWidth: 1,
+      borderColor: theme.divider,
+    },
+    unitText: {
+      ...typography.body,
+      color: theme.textPrimary,
+      marginRight: 4,
+    },
+    footer: {
+      paddingVertical: spacing.md,
+      backgroundColor: theme.background,
+      borderTopWidth: 1,
+      borderTopColor: theme.divider,
+    },
+    rangePanel: {
+      backgroundColor: theme.surface,
+      borderRadius: 24,
+      padding: spacing.md,
+      borderWidth: 1,
+      borderColor: theme.divider,
+      marginBottom: spacing.md,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.05,
+      shadowRadius: 10,
+      elevation: 2,
+    },
+    rangePanelHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: spacing.sm,
+    },
+    rangeIconCircle: {
+      width: 40,
+      height: 40,
+      borderRadius: 12,
+      backgroundColor: theme.accent + '15',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: spacing.sm,
+    },
+    rangeTextCol: {
+      flex: 1,
+    },
+    rangeLabel: {
+      ...typography.caption,
+      color: theme.textSecondary,
+      fontWeight: '600',
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
+    },
+    rangeValue: {
+      ...typography.bodyStrong,
+      fontSize: 17,
+      color: theme.textPrimary,
+    },
+    rangeEditBadge: {
+      backgroundColor: theme.surfaceMuted,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 4,
+      borderRadius: 8,
+    },
+    rangeEditText: {
+      ...typography.caption,
+      color: theme.accent,
+      fontWeight: '700',
+    },
+    rangeHint: {
+      ...typography.caption,
+      color: theme.textSecondary,
+      lineHeight: 16,
+      fontStyle: 'italic',
+    },
+    weekdayRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      marginTop: spacing.md,
+    },
+    dayTile: {
+      width: 44,
+      height: 64,
+      borderRadius: 12,
+      backgroundColor: theme.surface,
+      borderWidth: 1,
+      borderColor: theme.divider,
+      justifyContent: "center",
+      alignItems: "center",
+      position: "relative",
+    },
+    dayTileActive: {
+      backgroundColor: theme.accent,
+      borderColor: theme.accent,
+    },
+    dayTileNumber: {
+      ...typography.bodyStrong,
+      fontSize: 14,
+      color: theme.textPrimary,
+    },
+    dayTileLabel: {
+      ...typography.caption,
+      fontSize: 10,
+      color: theme.textSecondary,
+      marginTop: 2,
+    },
+    dayTileTextActive: {
+      color: theme.background,
+    },
+    plannedIndicators: {
+      flexDirection: "row",
+      position: "absolute",
+      bottom: 6,
+      gap: 2,
+    },
+    plannedDot: {
+      width: 4,
+      height: 4,
+      borderRadius: 2,
+      backgroundColor: theme.accent,
+    },
+    plannedCountText: {
+      ...typography.caption,
+      fontSize: 10,
+      color: theme.textSecondary,
+      marginTop: 4,
+    },
+    addButtonCircle: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: theme.accent,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    summaryCard: {
+      backgroundColor: theme.surfaceElevated,
+      borderRadius: 24,
+      padding: spacing.lg,
+      flexDirection: "row",
+      alignItems: "center",
+      borderWidth: 1,
+      borderColor: theme.accent + "40",
+      marginTop: spacing.sm,
+    },
+    summaryInfo: {
+      flex: 1,
+    },
+    summaryTitle: {
+      ...typography.bodyStrong,
+      color: theme.textPrimary,
+      marginBottom: 2,
+    },
+    summaryText: {
+      ...typography.caption,
+      color: theme.textSecondary,
+      lineHeight: 18,
+    },
+    reviewHeader: {
+      ...typography.h3,
+      color: theme.textPrimary,
+      marginBottom: spacing.lg,
+    },
+    reviewDayCard: {
+      backgroundColor: theme.surface,
+      borderRadius: 20,
+      padding: spacing.md,
+      marginBottom: spacing.md,
+      borderWidth: 1,
+      borderColor: theme.divider,
+    },
+    reviewDayHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      borderBottomWidth: 1,
+      borderBottomColor: theme.divider,
+      paddingBottom: 8,
+      marginBottom: 12,
+    },
+    reviewDayDate: {
+      ...typography.bodyStrong,
+      color: theme.accent,
+    },
+    reviewDayStatus: {
+      ...typography.caption,
+      color: theme.textSecondary,
+      fontWeight: "700",
+    },
+    reviewMealRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      marginBottom: 8,
+    },
+    reviewMealType: {
+      ...typography.caption,
+      fontWeight: "700",
+      color: theme.textSecondary,
+      width: 80,
+    },
+    reviewMealFood: {
+      ...typography.body,
+      color: theme.textPrimary,
+      flex: 1,
+      textAlign: "right",
+    },
+  });
+
+export default MealCreationScreen;

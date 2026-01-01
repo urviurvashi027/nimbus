@@ -79,4 +79,11 @@ export const buttons: NavigationButtonType[] = [
     screen: "/(auth)/toolsScreen/ScribbleListScreen",
     iconName: "pencil-outline",
   },
+  {
+    id: 11,
+    label: "Nourish Plan",
+    action: "navigate",
+    screen: "/(auth)/toolsScreen/MealPlannerScreen",
+    iconName: "calendar-heart",
+  },
 ];

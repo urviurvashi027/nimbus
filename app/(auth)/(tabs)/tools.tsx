@@ -27,6 +27,7 @@ import {
   getRecipeList,
   getRoutineList,
 } from "@/services/toolService";
+import HeroFeatureCard from "@/components/tools/common/HeroFeatureCard";
 import NavigationIconButton from "@/components/common/NavigationIconButton";
 import { FILTER_MAP } from "../toolsScreen/RoutineScreen";
 
@@ -149,11 +150,9 @@ const Tools: React.FC = () => {
         });
         if (category === FILTER_MAP.Beauty) {
           setRoutineSkincareList(processedArticles);
-        }
-        else if (category === FILTER_MAP.Wellness) {
+        } else if (category === FILTER_MAP.Wellness) {
           setRoutineWellnessList(processedArticles);
-        }
-        else if (category === FILTER_MAP.Chores) {
+        } else if (category === FILTER_MAP.Chores) {
           setRoutineChoresList(processedArticles);
         }
       } else {
@@ -176,8 +175,7 @@ const Tools: React.FC = () => {
   const handleNavigationButtonPress = (button: any) => {
     if (button.action === "navigate") {
       router.push(button.screen);
-    }
-    else if (button.action === "modal") {
+    } else if (button.action === "modal") {
       getModalInfo(button.screen);
     }
   };
@@ -267,6 +265,28 @@ const Tools: React.FC = () => {
           showsVerticalScrollIndicator={false}
           style={{ paddingTop: 0, paddingLeft: 0, paddingBottom: 20 }}
         >
+          {/* Featured Tools Hero Section moved inside ScrollView */}
+          <View style={styles.heroSection}>
+            <HeroFeatureCard
+              title="Nourish Plan"
+              subtitle="Plan your weekly meals and track nutrition goals."
+              icon="restaurant"
+              colors={["#FF9A9E", "#FECFEF"]}
+              onPress={() =>
+                router.push("/(auth)/toolsScreen/MealPlannerScreen")
+              }
+            />
+            <HeroFeatureCard
+              title="Scribble Journal"
+              subtitle="Capture thoughts, ideas, and daily reflections."
+              icon="pencil"
+              colors={["#a18cd1", "#fbc2eb"]}
+              onPress={() =>
+                router.push("/(auth)/toolsScreen/ScribbleListScreen")
+              }
+            />
+          </View>
+
           <VideoScroller />
           <AudiobookScroller />
 
@@ -351,7 +371,11 @@ const styling = (newTheme: any, spacing: any, typography: any) =>
     },
     navigationButtonContainer: {
       alignItems: "center",
-      marginBottom: spacing.xl,
+      marginBottom: 30,
+    },
+    heroSection: {
+      marginTop: 10,
+      // marginBottom: spacing.lg,
     },
     content: {
       padding: 0,

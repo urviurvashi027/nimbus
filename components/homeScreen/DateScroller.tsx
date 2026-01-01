@@ -12,7 +12,7 @@ import {
   NativeScrollEvent,
   LayoutChangeEvent,
 } from "react-native";
-import { addDays, isSameDay, startOfDay } from "date-fns";
+import { addDays, isSameDay, startOfDay, subDays } from "date-fns";
 import ThemeContext from "@/context/ThemeContext";
 
 type Props = {
@@ -20,7 +20,6 @@ type Props = {
   onChange: (d: Date) => void;
   isLoading?: boolean;
   daysAroundToday?: number;
-  centerSelected?: boolean;
 };
 
 const DEFAULT_DAYS_AROUND = 365;
@@ -31,14 +30,12 @@ export default function DateScroller({
   onChange,
   isLoading = false,
   daysAroundToday = DEFAULT_DAYS_AROUND,
-  centerSelected = true,
 }: Props) {
   const listRef = useRef<FlatList<Date>>(null);
-  const userDraggingRef = useRef(false);
-  const didCenterOnceRef = useRef(false); // <-- NEW: avoid repeated “first center”
+  const didCenterOnceRef = useRef(false);
   const screenWidth = Dimensions.get("window").width;
   const itemWidth = screenWidth / 5;
-  const sidePad = centerSelected ? (screenWidth - itemWidth) / 2 : 0;
+  const sidePad = (screenWidth - itemWidth) / 2;
 
   const { newTheme } = useContext(ThemeContext);
   const styles = styling(newTheme, itemWidth);
@@ -47,9 +44,10 @@ export default function DateScroller({
   const selected = useMemo(() => atMidnight(value), [value]);
 
   const days = useMemo(() => {
+    // Generate range: Today - range ... Today ... Today + range
     const total = 2 * daysAroundToday + 1;
     return Array.from({ length: total }, (_, i) =>
-      atMidnight(addDays(today, i - daysAroundToday))
+      atMidnight(addDays(subDays(today, daysAroundToday), i)) // Start from past
     );
   }, [today, daysAroundToday]);
 
@@ -58,47 +56,31 @@ export default function DateScroller({
     [days, selected]
   );
 
-  const centerSelectedSilently = (animated = false) => {
+  const centerSelected = (animated = false) => {
     if (selectedIdx < 0) return;
-    // Guard so momentum handler won’t emit onChange
-    userDraggingRef.current = false;
     listRef.current?.scrollToIndex({
       index: selectedIdx,
       animated,
-      viewPosition: centerSelected ? 0.5 : 0,
+      viewPosition: 0.5,
     });
   };
 
-  // Center after list is laid out the first time
+  // Center on initial layout
   const handleLayout = (_e: LayoutChangeEvent) => {
     if (didCenterOnceRef.current) return;
-    // Defer to ensure items are measured
-    requestAnimationFrame(() => {
-      centerSelectedSilently(false);
+    setTimeout(() => {
+      centerSelected(false);
       didCenterOnceRef.current = true;
-    });
+    }, 100);
   };
 
-  // Also re-center whenever the *selected index* changes (e.g., parent sets a new date)
+  // Only re-center if the *value* prop changes drastically (e.g. initial load or "Today" button)
+  // We do NOT want to auto-center during user scrolling
   useEffect(() => {
-    if (!didCenterOnceRef.current) return; // first time is handled in onLayout
-    requestAnimationFrame(() => centerSelectedSilently(false));
-  }, [selectedIdx]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const onScrollBeginDrag = () => {
-    userDraggingRef.current = true;
-  };
-
-  const onMomentumScrollEnd = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    if (!userDraggingRef.current) return; // ignore programmatic scrolls
-    userDraggingRef.current = false;
-
-    const raw = e.nativeEvent.contentOffset.x - sidePad;
-    const idx = Math.round(raw / itemWidth);
-    const clamped = Math.max(0, Math.min(days.length - 1, idx));
-    const next = days[clamped];
-    if (next && next.getTime() !== selected.getTime()) onChange(next);
-  };
+    if (!didCenterOnceRef.current) return;
+    // Optional: You can re-enable this if you want to force-snap on prop change
+    // requestAnimationFrame(() => centerSelected(true));
+  }, [selectedIdx]);
 
   return (
     <View onLayout={handleLayout}>
@@ -108,26 +90,23 @@ export default function DateScroller({
         keyExtractor={(d) => d.toISOString()}
         horizontal
         showsHorizontalScrollIndicator={false}
-        snapToInterval={itemWidth}
-        decelerationRate="fast"
-        onScrollBeginDrag={onScrollBeginDrag}
-        onMomentumScrollEnd={onMomentumScrollEnd}
+        // Remove snapToInterval to allow smooth free scrolling
+        // snapToInterval={itemWidth} 
+        decelerationRate="normal"
         getItemLayout={(_, index) => ({
           length: itemWidth,
           offset: itemWidth * index,
           index,
         })}
-        contentContainerStyle={
-          centerSelected ? { paddingHorizontal: sidePad } : undefined
-        }
-        initialNumToRender={20}
+        contentContainerStyle={{ paddingHorizontal: sidePad }}
+        initialNumToRender={15}
         renderItem={({ item }) => {
           const isSelected = isSameDay(item, selected);
           return (
             <TouchableOpacity
-              onPress={() => !isSelected && onChange(item)}
+              onPress={() => onChange(item)} // Immediate selection + API call via parent
               disabled={isLoading && isSelected}
-              activeOpacity={0.85}
+              activeOpacity={0.7}
               style={[styles.dateBox, isSelected && styles.selectedBox]}
             >
               <Text style={[styles.dayText, isSelected && styles.selectedText]}>

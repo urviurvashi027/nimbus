@@ -98,7 +98,7 @@ export default function TabOneScreen() {
 
         if (res?.success && Array.isArray(res.data)) {
           const formatted = decorateHabits(res.data);
-          console.log("Formatted habits:", formatted);
+          // console.log("Formatted habits:", formatted);
           setHabitList(formatted);
           setCompletedHabit(res.data.filter((h: any) => h.completed).length);
         } else {

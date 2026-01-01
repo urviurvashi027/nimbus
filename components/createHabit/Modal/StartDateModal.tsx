@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
+import { addDays, differenceInDays } from "date-fns";
 import {
   View,
   Modal,
@@ -208,6 +209,32 @@ export default function StartDateModal({
       return;
     }
   };
+
+  const getMinimumEndDate = () => {
+    // If complex recurrence (Weekly >= 3 weeks OR Monthly), enforce 30 days
+    const isLongCycle =
+      (selectedFrequency === "Weekly" && Number(weeklyInterval) >= 3) ||
+      selectedFrequency === "Monthly";
+
+    if (isLongCycle) {
+      return addDays(startDate, 30);
+    }
+
+    // Standard Weekly: Minimum 7 days
+    if (selectedFrequency === "Weekly") {
+      return addDays(startDate, 7);
+    }
+
+    return startDate;
+  };
+
+  const minEndDate = getMinimumEndDate();
+  const isLongCycleRestricted = minEndDate > startDate;
+  const restrictionMessage =
+    selectedFrequency === "Weekly" && Number(weeklyInterval) < 3
+      ? "Weekly habits require a minimum 7-day duration."
+      : "Long cycles require a minimum 30-day duration.";
+
   // validation and conversion (LOGIC UNCHANGED)
   const convertToHabitDate = (): HabitDateType | null => {
     const daily = Math.max(1, Number(dailyCount || 1));
@@ -216,6 +243,12 @@ export default function StartDateModal({
 
     if (isEndDateEnabled && endDate < startDate) {
       setError("End date cannot be before start date.");
+      return null;
+    }
+
+    // Check minimum duration constraint
+    if (isEndDateEnabled && endDate < minEndDate) {
+      setError(restrictionMessage);
       return null;
     }
 
@@ -578,14 +611,19 @@ export default function StartDateModal({
                           <DateInput
                             label="End date"
                             title="End date"
-                            value={endDate}
-                            minimumDate={startDate}
+                            value={endDate < minEndDate ? minEndDate : endDate}
+                            minimumDate={minEndDate}
                             onChange={(d: Date) => {
                               setEndDate(d);
                               setError("");
                             }}
                             showYear={true}
                           />
+                          {isLongCycleRestricted && (
+                            <Text style={styles.sectionHint}>
+                              Note: {restrictionMessage}
+                            </Text>
+                          )}
                         </View>
                       )}
                     </View>
