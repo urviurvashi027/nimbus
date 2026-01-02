@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   Platform,
   Dimensions,
+  ActivityIndicator,
 } from "react-native";
 import { router, useNavigation } from "expo-router";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
@@ -18,13 +19,12 @@ import { ScreenView } from "@/components/Themed";
 import ToolScreenHeader from "@/components/tools/common/ToolScreenHeader";
 import {
   getMealDashboard,
-  MealDashboardResponse,
   MealDashboardData,
   getDailyMealPlan,
   DayPlan,
   Meal,
 } from "@/services/mealService";
-import { formatApiDate } from "@/utils/dates";
+import { toApiDate, toFriendlyDate } from "@/utils/dateTime";
 
 const { width } = Dimensions.get("window");
 
@@ -43,24 +43,6 @@ const MOCK_DASHBOARD: MealDashboardData = {
   },
 };
 
-const MOCK_MEALS = {
-  breakfast: {
-    title: "Oatmeal with Berries",
-    calories: 350,
-    time: "08:00 AM",
-    image: "https://images.pexels.com/photos/1099680/pexels-photo-1099680.jpeg",
-  },
-  lunch: null, // Empty State
-  dinner: {
-    title: "Grilled Salmon & Asparagus",
-    calories: 520,
-    time: "07:30 PM",
-    image:
-      "https://images.pexels.com/photos/46239/salmon-dish-food-meal-46239.jpeg",
-  },
-  snacks: [{ title: "Greek Yogurt", calories: 150, time: "04:00 PM" }],
-};
-
 const MealPlannerScreen = () => {
   const navigation = useNavigation();
   const { newTheme, spacing, typography } = useContext(ThemeContext);
@@ -70,6 +52,7 @@ const MealPlannerScreen = () => {
   const [dashboardData, setDashboardData] =
     useState<MealDashboardData>(MOCK_DASHBOARD);
   const [dayPlan, setDayPlan] = useState<DayPlan | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const fetchDashboardData = async () => {
     try {
@@ -90,9 +73,8 @@ const MealPlannerScreen = () => {
 
   const fetchDailyPlan = async (date: Date) => {
     try {
-      const dateStr = formatApiDate(date);
-      console.log(`Fetching daily plan for: ${dateStr}`);
-      const result: any = await getDailyMealPlan(dateStr);
+      setLoading(true);
+      const result: any = await getDailyMealPlan(date);
       console.log("Daily Plan API Response:", JSON.stringify(result, null, 2));
 
       if (
@@ -103,7 +85,6 @@ const MealPlannerScreen = () => {
       ) {
         setDayPlan(result.data[0]);
       } else if (result && result.success && result.data && !Array.isArray(result.data)) {
-        // Handle case where data is a single object instead of array
         setDayPlan(result.data);
       } else {
         setDayPlan(null);
@@ -111,22 +92,20 @@ const MealPlannerScreen = () => {
     } catch (error) {
       console.error("Daily Plan API error:", error);
       setDayPlan(null);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchDashboardData();
+    fetchDailyPlan(new Date());
   }, []);
-
-  // Fetch plan when date changes
-  useEffect(() => {
-    fetchDailyPlan(selectedDate);
-  }, [selectedDate]);
 
   const handleAddMeal = (type: string) => {
     router.push({
       pathname: "/(auth)/toolsScreen/MealCreationScreen",
-      params: { type },
+      params: { type, date: toApiDate(selectedDate) },
     });
   };
 
@@ -310,15 +289,20 @@ const MealPlannerScreen = () => {
 
           <View style={styles.timelineContainer}>
             <View style={styles.timelineVerticalLine} />
-            {renderMealCard("breakfast", dayPlan?.meals?.breakfast)}
-            {renderMealCard("lunch", dayPlan?.meals?.lunch)}
-            {renderMealCard("dinner", dayPlan?.meals?.dinner)}
-            {/* Handle multiple snacks if needed, for now just showing first or the object itself */}
-            {renderMealCard(
-              "snacks",
-              Array.isArray(dayPlan?.meals?.snacks)
-                ? dayPlan?.meals?.snacks[0]
-                : (dayPlan?.meals?.snacks as unknown as Meal)
+            {loading ? (
+              <ActivityIndicator color={newTheme.accent} />
+            ) : (
+              <>
+                {renderMealCard("breakfast", dayPlan?.meals?.breakfast)}
+                {renderMealCard("lunch", dayPlan?.meals?.lunch)}
+                {renderMealCard("dinner", dayPlan?.meals?.dinner)}
+                {renderMealCard(
+                  "snacks",
+                  Array.isArray(dayPlan?.meals?.snacks)
+                    ? dayPlan?.meals?.snacks[0]
+                    : (dayPlan?.meals?.snacks as unknown as Meal)
+                )}
+              </>
             )}
           </View>
         </ScrollView>
