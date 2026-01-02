@@ -9,13 +9,13 @@ export type NavigationButtonType = {
 };
 
 export const buttons: NavigationButtonType[] = [
-  {
-    id: 1,
-    label: "Assess",
-    action: "navigate",
-    screen: "/(auth)/selfCareScreen/MentalHealthTestScreen",
-    iconName: "clipboard-text-outline",
-  },
+  // {
+  //   id: 1,
+  //   label: "Assess",
+  //   action: "navigate",
+  //   screen: "/(auth)/selfCareScreen/MentalHealthTestScreen",
+  //   iconName: "clipboard-text-outline",
+  // },
   {
     id: 2,
     label: "Zen",

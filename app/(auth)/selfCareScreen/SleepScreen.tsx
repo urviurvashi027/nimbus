@@ -42,20 +42,14 @@ const SleepModal = ({ visible, onClose }: any) => {
 
   const getSoundscapeListData = async () => {
     try {
-      const result = await getSoundscapeList();
+      const result: any = await getSoundscapeList();
+      const tracks = result?.data || (Array.isArray(result) ? result : []);
 
-      // TEMP: Handle current direct array vs future object structure
-      let dataToProcess: any[] = [];
-
-      if (result && result.success && Array.isArray(result.data)) {
-        dataToProcess = result.data;
-      }
-
-      if (dataToProcess.length > 0) {
-        const processedArticles = dataToProcess.map((tracks: any) => {
+      if (Array.isArray(tracks) && tracks.length > 0) {
+        const processedArticles = tracks.map((track: any) => {
           return {
-            ...tracks,
-            uri: tracks.image,
+            ...track,
+            uri: track.image,
           };
         });
         setLibraryTracks(processedArticles);
