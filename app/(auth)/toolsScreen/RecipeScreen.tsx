@@ -70,21 +70,24 @@ const RecipeScreen: React.FC = () => {
       setIsLoading(true);
       const categorySlug = FILTER_MAP[filter];
 
-      const result = await getRecipeList(categorySlug);
-      if (result && Array.isArray(result)) {
+      const result: any = await getRecipeList(categorySlug);
+      // Backend returns { success, message, data: [...] }
+      const data = result?.data || (Array.isArray(result) ? result : []);
+
+      if (Array.isArray(data)) {
         const heights = [250, 280, 220, 270, 230, 240];
 
-        const processed = result.map((item: any) => ({
+        const processed = data.map((item: any) => ({
           ...item,
           height: heights[Math.floor(Math.random() * heights.length)],
-          image: { uri: item.image },
+          // Provide a fallback if image is null
+          image: item.image ? { uri: item.image } : require("@/assets/images/mt.jpg"), 
         }));
 
         setRecipes(processed);
-
-        console.log(processed, "recipes fetched for filter:", filter);
+        console.log("Recipes fetched for filter:", filter, processed.length);
       } else {
-        console.error("Recipe API did not return array:", result);
+        console.error("Recipe API did not return data array:", result);
         setRecipes([]);
       }
     } catch (err) {

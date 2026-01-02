@@ -22,9 +22,15 @@ import DateInput from "@/components/common/picker/DateInput";
 import TimeInput from "@/components/common/picker/TimeInput";
 import DatePickerSheet from "@/components/common/picker/DatePickerSheet";
 import { FilterPill } from "@/components/selfCare/workout/FilterPill";
-import { getRecipeList } from "@/services/toolService";
-import { addMealItem } from "@/services/mealService";
+import { getRecipeList, searchRecipes } from "@/services/toolService";
+import {
+  addMealItem,
+  getDailyMealPlan,
+  bulkUpdateMealPlan,
+  BulkMealUpdatePayload,
+} from "@/services/mealService";
 import { formatApiDate, formatDay, formatDateRange } from "@/utils/dates";
+import { useNimbusToast } from "@/components/common/toast/useNimbusToast";
 
 type MealType = "Breakfast" | "Lunch" | "Dinner" | "Snacks";
 type UnitType = "grams" | "servings" | "cups" | "pieces";
@@ -47,19 +53,39 @@ const MealCreationScreen = () => {
   const { newTheme, spacing, typography } = useContext(ThemeContext);
   const styles = styling(newTheme, spacing, typography);
   const params = useLocalSearchParams();
+  const toast = useNimbusToast();
 
   /* --- UI State --- */
-  const [activeTab, setActiveTab] = useState<"day" | "week">(params.type || params.foodName ? "day" : "day");
+  const [activeTab, setActiveTab] = useState<"day" | "week">(
+    params.type || params.foodName ? "day" : "day"
+  );
   const [showReview, setShowReview] = useState(false);
   const [isRangePickerVisible, setIsRangePickerVisible] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   /* --- Day Tab State --- */
-  const [dayDate, setDayDate] = useState(params.date ? new Date(params.date as string) : new Date());
+  const tomorrowAtMidnight = useMemo(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }, []);
+
+  const tenDaysLater = useMemo(() => {
+    const d = new Date(tomorrowAtMidnight);
+    d.setDate(d.getDate() + 10);
+    return d;
+  }, [tomorrowAtMidnight]);
+
+  const [dayDate, setDayDate] = useState(
+    params.date ? new Date(params.date as string) : tomorrowAtMidnight
+  );
   const [mealType, setMealType] = useState<MealType>(
     (params.type as MealType) || "Breakfast"
   );
-  const [foodSearch, setFoodSearch] = useState((params.foodName as string) || "");
+  const [foodSearch, setFoodSearch] = useState(
+    (params.foodName as string) || ""
+  );
+  const [selectedRecipe, setSelectedRecipe] = useState<any>(null);
 
   /* --- Week Tab State --- */
   const tomorrow = useMemo(() => {
@@ -70,9 +96,10 @@ const MealCreationScreen = () => {
   }, []);
 
   const [startDate, setStartDate] = useState(tomorrow);
-  const [selectedWeekdays, setSelectedWeekdays] = useState<string[]>([]); // Array of ISO dates
+  const [selectedWeekdays, setSelectedWeekdays] = useState<string[]>([]);
   const [bulkMealType, setBulkMealType] = useState<MealType>("Breakfast");
   const [bulkFoodSearch, setBulkFoodSearch] = useState("");
+  const [bulkSelectedRecipe, setBulkSelectedRecipe] = useState<any>(null);
   const [weeklyPlan, setWeeklyPlan] = useState<WeeklyPlanStore>({});
 
   /* --- Search State --- */
@@ -97,33 +124,94 @@ const MealCreationScreen = () => {
   // Actions
   const handleSave = async () => {
     try {
-      const selectedRecipe = recipeResults.find(r => r.title === foodSearch);
-      
+      const dateStr = formatApiDate(dayDate);
+
+      // Map "Snacks" -> "snack" for backend
+      const normalizedType =
+        mealType.toLowerCase() === "snacks" ? "snack" : mealType.toLowerCase();
+
       const payload: any = {
-        plan_date: formatApiDate(dayDate),
-        meal_type: mealType.toLowerCase(),
+        date: dateStr,
+        meal_type: normalizedType,
       };
 
-      if (selectedRecipe) {
+      // Use selectedRecipe if its title matches the current foodSearch exactly
+      if (
+        selectedRecipe &&
+        selectedRecipe.id !== 0 &&
+        selectedRecipe.title === foodSearch
+      ) {
         payload.recipe_id = selectedRecipe.id;
       } else {
         payload.name = foodSearch;
-        // Default values for manual entry if not provided
-        payload.calories = 0; 
-        payload.protein = 0;
+        payload.calories = 0;
       }
 
       console.log("Saving single day meal:", payload);
       await addMealItem(payload);
+      toast.show({
+        variant: "success",
+        title: "Nourishment",
+        message: "Your meal has been saved to your plan.",
+      });
       router.back();
     } catch (e) {
       console.error("Failed to save meal:", e);
+      toast.show({
+        variant: "error",
+        title: "Oh no!",
+        message: "We couldn't save your meal right now. Please try again.",
+      });
     }
   };
 
-  const handleSaveFinal = () => {
-    console.log("Submitting final plan to backend:", weeklyPlan);
-    router.back();
+  const handleSaveFinal = async () => {
+    try {
+      const payload: BulkMealUpdatePayload = {};
+
+      Object.entries(weeklyPlan).forEach(([date, meals]) => {
+        payload[date] = {};
+        Object.entries(meals).forEach(([type, entry]) => {
+          // Standardize meal type keys for API (e.g., "snacks" -> "snack")
+          const apiType = type === "snacks" ? "snack" : type;
+
+          if (entry) {
+            if (entry.recipeId) {
+              payload[date][apiType] = {
+                recipe_id: entry.recipeId,
+              };
+            } else {
+              payload[date][apiType] = {
+                name: entry.foodName,
+                calories: entry.calories || 0,
+              };
+            }
+          } else {
+            // Explicitly support clearing slots
+            payload[date][apiType] = null;
+          }
+        });
+      });
+
+      console.log(
+        "Submitting bulk plan to API:",
+        JSON.stringify(payload, null, 2)
+      );
+      await bulkUpdateMealPlan(payload);
+      toast.show({
+        variant: "success",
+        title: "Weekly Plan",
+        message: "Your week is now beautifully planned!",
+      });
+      router.back();
+    } catch (e) {
+      console.error("Failed to bulk update meals:", e);
+      toast.show({
+        variant: "error",
+        title: "Update Failed",
+        message: "Something went wrong while syncing your weekly plan.",
+      });
+    }
   };
 
   const handleAddToPlan = () => {
@@ -132,14 +220,22 @@ const MealCreationScreen = () => {
     const newPlan = { ...weeklyPlan };
     selectedWeekdays.forEach((date) => {
       if (!newPlan[date]) newPlan[date] = {};
-      newPlan[date][bulkMealType.toLowerCase()] = {
+      const typeKey = bulkMealType.toLowerCase(); // "breakfast", "lunch", "dinner", "snacks"
+
+      newPlan[date][typeKey] = {
         foodName: bulkFoodSearch,
+        recipeId:
+          bulkSelectedRecipe?.id &&
+          bulkSelectedRecipe.id !== 0 &&
+          bulkSelectedRecipe.title === bulkFoodSearch
+            ? bulkSelectedRecipe.id
+            : undefined,
+        calories: 0,
       };
     });
     setWeeklyPlan(newPlan);
-
-    // Reset selection for next iteration
     setBulkFoodSearch("");
+    setBulkSelectedRecipe(null);
     setSelectedWeekdays([]);
   };
 
@@ -154,8 +250,10 @@ const MealCreationScreen = () => {
   const handleSelectRecipe = (recipe: any) => {
     if (activeTab === "day") {
       setFoodSearch(recipe.title);
+      setSelectedRecipe(recipe);
     } else {
       setBulkFoodSearch(recipe.title);
+      setBulkSelectedRecipe(recipe);
     }
     setRecipeResults([]);
   };
@@ -164,14 +262,15 @@ const MealCreationScreen = () => {
   useEffect(() => {
     const delayDebounceFn = setTimeout(async () => {
       const query = activeTab === "day" ? foodSearch : bulkFoodSearch;
-      if (query) {
+      if (query && query.length >= 3) {
         setIsSearching(true);
         try {
-          const res = await getRecipeList();
-          const data = Array.isArray(res) ? res : (res as any).data || [];
+          const res = await searchRecipes(query);
+          const data = res?.success && Array.isArray(res.data) ? res.data : [];
           setRecipeResults(data.slice(0, 5));
         } catch (e) {
-          console.error(e);
+          console.error("Search error:", e);
+          setRecipeResults([]);
         } finally {
           setIsSearching(false);
         }
@@ -191,7 +290,9 @@ const MealCreationScreen = () => {
         onPress={() => setActiveTab("day")}
         style={[styles.tab, activeTab === "day" && styles.activeTab]}
       >
-        <Text style={[styles.tabText, activeTab === "day" && styles.activeTabText]}>
+        <Text
+          style={[styles.tabText, activeTab === "day" && styles.activeTabText]}
+        >
           Day Meal
         </Text>
       </TouchableOpacity>
@@ -199,89 +300,79 @@ const MealCreationScreen = () => {
         onPress={() => setActiveTab("week")}
         style={[styles.tab, activeTab === "week" && styles.activeTab]}
       >
-        <Text style={[styles.tabText, activeTab === "week" && styles.activeTabText]}>
+        <Text
+          style={[styles.tabText, activeTab === "week" && styles.activeTabText]}
+        >
           Week Plan
         </Text>
       </TouchableOpacity>
     </View>
   );
 
-    const renderSearchDropdown = () => {
-
-      if (isSearching) return <ActivityIndicator style={{ marginTop: 10 }} color={newTheme.accent} />;
-
-      
-
-      const query = activeTab === "day" ? foodSearch : bulkFoodSearch;
-
-      
-
-      // If no results but user typed something, allow manual entry
-
-      if (recipeResults.length === 0 && query.trim().length > 0) {
-
-        return (
-
-          <View style={styles.searchDropdown}>
-
-            <TouchableOpacity 
-
-              style={styles.searchResultItem}
-
-              onPress={() => handleSelectRecipe({ id: 0, title: query })}
-
-            >
-
-              <MaterialCommunityIcons name="pencil-plus" size={16} color={newTheme.textSecondary} />
-
-              <Text style={styles.searchResultText}>Use "{query}"</Text>
-
-            </TouchableOpacity>
-
-          </View>
-
-        );
-
-      }
-
-  
-
-      if (recipeResults.length === 0) return null;
-
-  
-
+  const renderSearchDropdown = () => {
+    if (isSearching)
       return (
-
-        <View style={styles.searchDropdown}>
-
-          {recipeResults.map((item) => (
-
-            <TouchableOpacity 
-
-              key={item.id} 
-
-              style={styles.searchResultItem}
-
-              onPress={() => handleSelectRecipe(item)}
-
-            >
-
-              <MaterialCommunityIcons name="silverware-fork-knife" size={16} color={newTheme.accent} />
-
-              <Text style={styles.searchResultText}>{item.title}</Text>
-
-            </TouchableOpacity>
-
-          ))}
-
-        </View>
-
+        <ActivityIndicator style={{ marginTop: 10 }} color={newTheme.accent} />
       );
 
-    };
+    const query = activeTab === "day" ? foodSearch : bulkFoodSearch;
+    const isDayRecipeSelected =
+      activeTab === "day" &&
+      selectedRecipe &&
+      selectedRecipe.title === foodSearch;
+    const isWeekRecipeSelected =
+      activeTab === "week" &&
+      bulkSelectedRecipe &&
+      bulkSelectedRecipe.title === bulkFoodSearch;
+
+    // If a recipe is already "locked in" (selected and matches input), don't show dropdown
+    if (isDayRecipeSelected || isWeekRecipeSelected) return null;
+
+    if (recipeResults.length === 0 && query.trim().length >= 3) {
+      return (
+        <View style={styles.searchDropdown}>
+          <TouchableOpacity
+            style={styles.searchResultItem}
+            onPress={() => handleSelectRecipe({ id: 0, title: query })}
+          >
+            <MaterialCommunityIcons
+              name="pencil-plus"
+              size={16}
+              color={newTheme.textSecondary}
+            />
+            <Text style={styles.searchResultText}>Use "{query}"</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+
+    if (recipeResults.length === 0) return null;
+
+    return (
+      <View style={styles.searchDropdown}>
+        {recipeResults.map((item) => (
+          <TouchableOpacity
+            key={item.id}
+            style={styles.searchResultItem}
+            onPress={() => handleSelectRecipe(item)}
+          >
+            <MaterialCommunityIcons
+              name="silverware-fork-knife"
+              size={16}
+              color={newTheme.accent}
+            />
+            <Text style={styles.searchResultText}>{item.title}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+    );
+  };
 
   const renderDayForm = () => (
-    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.formPadding}>
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={styles.formPadding}
+    >
       <View style={styles.inputGroup}>
         <Text style={styles.stepLabel}>When?</Text>
         <DateInput
@@ -289,148 +380,143 @@ const MealCreationScreen = () => {
           onChange={setDayDate}
           label="Select Date"
           title="Meal Date"
+          minimumDate={tomorrowAtMidnight}
+          maximumDate={tenDaysLater}
         />
       </View>
 
       <View style={styles.inputGroup}>
         <Text style={styles.stepLabel}>Meal Type</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipRow}>
-          {(["Breakfast", "Lunch", "Dinner", "Snacks"] as MealType[]).map((type) => (
-            <FilterPill
-              key={type}
-              label={type}
-              isActive={mealType === type}
-              onPress={() => setMealType(type)}
-              style={styles.chip}
-            />
-          ))}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.chipRow}
+        >
+          {(["Breakfast", "Lunch", "Dinner", "Snacks"] as MealType[]).map(
+            (type) => (
+              <FilterPill
+                key={type}
+                label={type}
+                isActive={mealType === type}
+                onPress={() => setMealType(type)}
+                style={styles.chip}
+              />
+            )
+          )}
         </ScrollView>
       </View>
 
       <View style={styles.inputGroup}>
         <Text style={styles.stepLabel}>What are you eating?</Text>
-        <View style={styles.searchBar}>
-          <Ionicons name="search" size={20} color={newTheme.textSecondary} />
+        <View
+          style={[
+            styles.searchBar,
+            selectedRecipe &&
+              selectedRecipe.title === foodSearch &&
+              styles.searchBarSelected,
+          ]}
+        >
+          <Ionicons
+            name={
+              selectedRecipe && selectedRecipe.title === foodSearch
+                ? "checkmark-circle"
+                : "search"
+            }
+            size={20}
+            color={
+              selectedRecipe && selectedRecipe.title === foodSearch
+                ? newTheme.accent
+                : newTheme.textSecondary
+            }
+          />
           <TextInput
             style={styles.searchInput}
             placeholder="Search or enter recipe name..."
             placeholderTextColor={newTheme.textSecondary}
             value={foodSearch}
-            onChangeText={setFoodSearch}
+            onChangeText={(t) => {
+              setFoodSearch(t);
+              if (selectedRecipe && t !== selectedRecipe.title) {
+                setSelectedRecipe(null);
+              }
+            }}
           />
         </View>
-                {renderSearchDropdown()}
-              </View>
-            </ScrollView>
-          );
-
-    const renderWeekForm = () => (
-
-      <ScrollView
-
-        showsVerticalScrollIndicator={false}
-
-        contentContainerStyle={styles.formPadding}
-
-      >
-
-              <View style={styles.inputGroup}>
-
-                <Text style={styles.stepLabel}>Step 1: Which days are we planning for?</Text>
-
-                
-
-                {/* Validation Info Banner */}
-
-                <View style={styles.infoBanner}>
-
-                  <Ionicons name="information-circle" size={18} color={newTheme.accent} />
-
-                  <Text style={styles.infoBannerText}>
-
-                    You can set your plan's start date up to 10 days in advance.
-
-                  </Text>
-
-                </View>
-
-        
-
-                {/* Premium Range Selection Panel */}
-
-          <TouchableOpacity 
-
-            style={styles.rangePanel} 
-
-            activeOpacity={0.8}
-
-            onPress={() => setIsRangePickerVisible(true)}
-
-          >
-
-            <View style={styles.rangePanelHeader}>
-
-              <View style={styles.rangeIconCircle}>
-
-                <Ionicons name="calendar" size={20} color={newTheme.accent} />
-
-              </View>
-
-              <View style={styles.rangeTextCol}>
-
-                <Text style={styles.rangeLabel}>Active Window</Text>
-
-                <Text style={styles.rangeValue}>{rangeString}</Text>
-
-              </View>
-
-              <View style={styles.rangeEditBadge}>
-
-                <Text style={styles.rangeEditText}>Change</Text>
-
-              </View>
-
-            </View>
-
-            <Text style={styles.rangeHint}>
-
-              Plan your entire week starting from {startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}.
-
+        {renderSearchDropdown()}
+        {/* {selectedRecipe && selectedRecipe.title === foodSearch && (
+          <View style={styles.recipeBadge}>
+            <Text style={styles.recipeBadgeText}>
+              Recipe Selected: {selectedRecipe.coach_name || "Nimbus Chef"}
             </Text>
+          </View>
+        )} */}
+      </View>
+    </ScrollView>
+  );
 
-          </TouchableOpacity>
+  const renderWeekForm = () => (
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={styles.formPadding}
+    >
+      <View style={styles.inputGroup}>
+        <Text style={styles.stepLabel}>
+          Step 1: Which days are we planning for?
+        </Text>
 
-  
-
-          <DatePickerSheet
-
-            visible={isRangePickerVisible}
-
-            value={startDate}
-
-            title="Select Start Date"
-
-            onClose={() => setIsRangePickerVisible(false)}
-
-            onChange={(d) => {
-
-              setStartDate(d);
-
-              setWeeklyPlan({}); // Reset plan if week changes
-
-              setSelectedWeekdays([]);
-
-            }}
-
-            minimumDate={new Date()}
-
-            maximumDate={new Date(Date.now() + 10 * 24 * 60 * 60 * 1000)}
-
+        <View style={styles.infoBanner}>
+          <Ionicons
+            name="information-circle"
+            size={18}
+            color={newTheme.accent}
           />
+          <Text style={styles.infoBannerText}>
+            You can set your plan's start date up to 10 days in advance.
+          </Text>
+        </View>
 
-  
+        <TouchableOpacity
+          style={styles.rangePanel}
+          activeOpacity={0.8}
+          onPress={() => setIsRangePickerVisible(true)}
+        >
+          <View style={styles.rangePanelHeader}>
+            <View style={styles.rangeIconCircle}>
+              <Ionicons name="calendar" size={20} color={newTheme.accent} />
+            </View>
+            <View style={styles.rangeTextCol}>
+              <Text style={styles.rangeLabel}>Active Window</Text>
+              <Text style={styles.rangeValue}>{rangeString}</Text>
+            </View>
+            <View style={styles.rangeEditBadge}>
+              <Text style={styles.rangeEditText}>Change</Text>
+            </View>
+          </View>
+          <Text style={styles.rangeHint}>
+            Plan your entire week starting from{" "}
+            {startDate.toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+            })}
+            .
+          </Text>
+        </TouchableOpacity>
 
-          <View style={styles.weekdayRow}>
+        <DatePickerSheet
+          visible={isRangePickerVisible}
+          value={startDate}
+          title="Select Start Date"
+          onClose={() => setIsRangePickerVisible(false)}
+          onChange={(d) => {
+            setStartDate(d);
+            setWeeklyPlan({});
+            setSelectedWeekdays([]);
+          }}
+          minimumDate={new Date()}
+          maximumDate={new Date(Date.now() + 10 * 24 * 60 * 60 * 1000)}
+        />
+
+        <View style={styles.weekdayRow}>
           {weekDates.map((date) => {
             const dateStr = formatApiDate(date);
             const isSelected = selectedWeekdays.includes(dateStr);
@@ -443,18 +529,30 @@ const MealCreationScreen = () => {
                 onPress={() => toggleWeekday(dateStr)}
                 style={[styles.dayTile, isSelected && styles.dayTileActive]}
               >
-                <Text style={[styles.dayTileNumber, isSelected && styles.dayTileTextActive]}>
+                <Text
+                  style={[
+                    styles.dayTileNumber,
+                    isSelected && styles.dayTileTextActive,
+                  ]}
+                >
                   {date.getDate()}
                 </Text>
-                <Text style={[styles.dayTileLabel, isSelected && styles.dayTileTextActive]}>
+                <Text
+                  style={[
+                    styles.dayTileLabel,
+                    isSelected && styles.dayTileTextActive,
+                  ]}
+                >
                   {formatDay(date).charAt(0)}
                 </Text>
 
                 {plannedCount > 0 && !isSelected && (
                   <View style={styles.plannedIndicators}>
-                    {Array.from({ length: Math.min(plannedCount, 4) }).map((_, i) => (
-                      <View key={i} style={styles.plannedDot} />
-                    ))}
+                    {Array.from({ length: Math.min(plannedCount, 4) }).map(
+                      (_, i) => (
+                        <View key={i} style={styles.plannedDot} />
+                      )
+                    )}
                   </View>
                 )}
               </TouchableOpacity>
@@ -465,42 +563,81 @@ const MealCreationScreen = () => {
 
       <View style={styles.inputGroup}>
         <Text style={styles.stepLabel}>Step 2: Which meal is this?</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipRow}>
-          {(["Breakfast", "Lunch", "Dinner", "Snacks"] as MealType[]).map((type) => {
-            const alreadyPlanned = weekDates.filter(
-              (d) => weeklyPlan[formatApiDate(d)]?.[type.toLowerCase()]
-            ).length;
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.chipRow}
+        >
+          {(["Breakfast", "Lunch", "Dinner", "Snacks"] as MealType[]).map(
+            (type) => {
+              const alreadyPlanned = weekDates.filter(
+                (d) => weeklyPlan[formatApiDate(d)]?.[type.toLowerCase()]
+              ).length;
 
-            return (
-              <View key={type} style={{ alignItems: "center" }}>
-                <FilterPill
-                  label={type}
-                  isActive={bulkMealType === type}
-                  onPress={() => setBulkMealType(type)}
-                  style={styles.chip}
-                />
-                {alreadyPlanned > 0 && (
-                  <Text style={styles.plannedCountText}>{alreadyPlanned}/7 days</Text>
-                )}
-              </View>
-            );
-          })}
+              return (
+                <View key={type} style={{ alignItems: "center" }}>
+                  <FilterPill
+                    label={type}
+                    isActive={bulkMealType === type}
+                    onPress={() => setBulkMealType(type)}
+                    style={styles.chip}
+                  />
+                  {alreadyPlanned > 0 && (
+                    <Text style={styles.plannedCountText}>
+                      {alreadyPlanned}/7 days
+                    </Text>
+                  )}
+                </View>
+              );
+            }
+          )}
         </ScrollView>
       </View>
 
       <View style={styles.inputGroup}>
         <Text style={styles.stepLabel}>Step 3: What are you eating?</Text>
-        <View style={styles.searchBar}>
-          <Ionicons name="search" size={20} color={newTheme.textSecondary} />
+        <View
+          style={[
+            styles.searchBar,
+            bulkSelectedRecipe &&
+              bulkSelectedRecipe.title === bulkFoodSearch &&
+              styles.searchBarSelected,
+          ]}
+        >
+          <Ionicons
+            name={
+              bulkSelectedRecipe && bulkSelectedRecipe.title === bulkFoodSearch
+                ? "checkmark-circle"
+                : "search"
+            }
+            size={20}
+            color={
+              bulkSelectedRecipe && bulkSelectedRecipe.title === bulkFoodSearch
+                ? newTheme.accent
+                : newTheme.textSecondary
+            }
+          />
           <TextInput
             style={styles.searchInput}
             placeholder="Choose oatmeal, protein shake..."
             placeholderTextColor={newTheme.textSecondary}
             value={bulkFoodSearch}
-            onChangeText={setBulkFoodSearch}
+            onChangeText={(t) => {
+              setBulkFoodSearch(t);
+              if (bulkSelectedRecipe && t !== bulkSelectedRecipe.title) {
+                setBulkSelectedRecipe(null);
+              }
+            }}
           />
         </View>
         {renderSearchDropdown()}
+        {/* {bulkSelectedRecipe && bulkSelectedRecipe.title === bulkFoodSearch && (
+          <View style={styles.recipeBadge}>
+            <Text style={styles.recipeBadgeText}>
+              Recipe Selected: {bulkSelectedRecipe.coach_name || "Nimbus Chef"}
+            </Text>
+          </View>
+        )} */}
       </View>
 
       {selectedWeekdays.length > 0 && bulkFoodSearch !== "" && (
@@ -508,7 +645,8 @@ const MealCreationScreen = () => {
           <View style={styles.summaryInfo}>
             <Text style={styles.summaryTitle}>📝 Ready to Add</Text>
             <Text style={styles.summaryText}>
-              {bulkFoodSearch} for {bulkMealType} on {selectedWeekdays.length} days.
+              {bulkFoodSearch} for {bulkMealType} on {selectedWeekdays.length}{" "}
+              days.
             </Text>
           </View>
           <View style={styles.addButtonCircle}>
@@ -520,7 +658,10 @@ const MealCreationScreen = () => {
   );
 
   const renderReviewScreen = () => (
-    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.formPadding}>
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={styles.formPadding}
+    >
       <Text style={styles.reviewHeader}>Weekly Summary</Text>
       {weekDates.map((date) => {
         const dateStr = formatApiDate(date);
@@ -535,7 +676,9 @@ const MealCreationScreen = () => {
                   month: "short",
                 })}
               </Text>
-              <Text style={styles.reviewDayStatus}>{Object.keys(dayPlan).length}/4 meals</Text>
+              <Text style={styles.reviewDayStatus}>
+                {Object.keys(dayPlan).length}/4 meals
+              </Text>
             </View>
             {["breakfast", "lunch", "dinner", "snacks"].map((meal) => (
               <View key={meal} style={styles.reviewMealRow}>
@@ -565,7 +708,9 @@ const MealCreationScreen = () => {
     <ScreenView
       style={{
         paddingTop:
-          Platform.OS === "ios" ? spacing["xxl"] + spacing["xxl"] * 0.2 : spacing.xl,
+          Platform.OS === "ios"
+            ? spacing["xxl"] + spacing["xxl"] * 0.2
+            : spacing.xl,
         paddingHorizontal: spacing.md,
       }}
     >
@@ -577,7 +722,9 @@ const MealCreationScreen = () => {
           <ToolScreenHeader
             title={showReview ? "Review Plan" : "Plan Meal"}
             subtitle={
-              showReview ? "Check your weekly balance." : "Design your nourishment journey."
+              showReview
+                ? "Check your weekly balance."
+                : "Design your nourishment journey."
             }
             onBack={() => (showReview ? setShowReview(false) : router.back())}
           />
@@ -585,30 +732,51 @@ const MealCreationScreen = () => {
           {!showReview && renderTabs()}
 
           <View style={{ flex: 1 }}>
-            {showReview ? renderReviewScreen() : activeTab === "day" ? renderDayForm() : renderWeekForm()}
+            {showReview
+              ? renderReviewScreen()
+              : activeTab === "day"
+              ? renderDayForm()
+              : renderWeekForm()}
           </View>
 
           <View style={styles.footer}>
             {!showReview && activeTab === "week" && (
               <StyledButton
                 label="Proceed to Review"
-                variant={Object.keys(weeklyPlan).length > 0 ? "primary" : "secondary"}
+                variant={
+                  Object.keys(weeklyPlan).length > 0 ? "primary" : "secondary"
+                }
                 onPress={() => setShowReview(true)}
                 disabled={Object.keys(weeklyPlan).length === 0}
                 style={{ marginBottom: 12 }}
               />
             )}
-            
+
             <StyledButton
-              label={showReview ? "Confirm & Sync" : (activeTab === "day" ? "Save Meal" : "Add to Plan")}
+              label={
+                showReview
+                  ? "Confirm & Sync"
+                  : activeTab === "day"
+                  ? "Save Meal"
+                  : "Add to Plan"
+              }
               onPress={() => {
-                if (showReview) handleSaveFinal();
-                else if (activeTab === "day") handleSave();
-                else handleAddToPlan();
+                if (showReview) {
+                  handleSaveFinal();
+                } else if (activeTab === "day") {
+                  handleSave();
+                } else {
+                  handleAddToPlan();
+                }
               }}
               variant="primary"
               fullWidth
-              disabled={!showReview && activeTab === "week" && !bulkFoodSearch}
+              disabled={
+                !showReview &&
+                (activeTab === "day"
+                  ? !foodSearch
+                  : selectedWeekdays.length === 0 || !bulkFoodSearch)
+              }
             />
           </View>
         </KeyboardAvoidingView>
@@ -662,21 +830,21 @@ const styling = (theme: any, spacing: any, typography: any) =>
       fontSize: 15,
     },
     infoBanner: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: theme.accent + '10',
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: theme.accent + "10",
       padding: spacing.sm,
       borderRadius: 12,
       marginBottom: spacing.md,
       gap: 8,
       borderWidth: 1,
-      borderColor: theme.accent + '20',
+      borderColor: theme.accent + "20",
     },
     infoBannerText: {
       ...typography.caption,
       color: theme.textPrimary,
       flex: 1,
-      fontWeight: '600',
+      fontWeight: "600",
     },
     chipRow: {
       flexDirection: "row",
@@ -710,6 +878,25 @@ const styling = (theme: any, spacing: any, typography: any) =>
       marginLeft: spacing.sm,
       color: theme.textPrimary,
       fontSize: 16,
+    },
+    searchBarSelected: {
+      borderColor: theme.accent,
+      backgroundColor: theme.accent + "05",
+    },
+    recipeBadge: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginTop: 8,
+      backgroundColor: theme.accent + "15",
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: 8,
+      alignSelf: "flex-start",
+    },
+    recipeBadgeText: {
+      ...typography.caption,
+      color: theme.accent,
+      fontWeight: "700",
     },
     searchDropdown: {
       backgroundColor: theme.surface,
@@ -771,17 +958,17 @@ const styling = (theme: any, spacing: any, typography: any) =>
       elevation: 2,
     },
     rangePanelHeader: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
       marginBottom: spacing.sm,
     },
     rangeIconCircle: {
       width: 40,
       height: 40,
       borderRadius: 12,
-      backgroundColor: theme.accent + '15',
-      justifyContent: 'center',
-      alignItems: 'center',
+      backgroundColor: theme.accent + "15",
+      justifyContent: "center",
+      alignItems: "center",
       marginRight: spacing.sm,
     },
     rangeTextCol: {
@@ -790,8 +977,8 @@ const styling = (theme: any, spacing: any, typography: any) =>
     rangeLabel: {
       ...typography.caption,
       color: theme.textSecondary,
-      fontWeight: '600',
-      textTransform: 'uppercase',
+      fontWeight: "600",
+      textTransform: "uppercase",
       letterSpacing: 0.5,
     },
     rangeValue: {
@@ -808,13 +995,13 @@ const styling = (theme: any, spacing: any, typography: any) =>
     rangeEditText: {
       ...typography.caption,
       color: theme.accent,
-      fontWeight: '700',
+      fontWeight: "700",
     },
     rangeHint: {
       ...typography.caption,
       color: theme.textSecondary,
       lineHeight: 16,
-      fontStyle: 'italic',
+      fontStyle: "italic",
     },
     weekdayRow: {
       flexDirection: "row",

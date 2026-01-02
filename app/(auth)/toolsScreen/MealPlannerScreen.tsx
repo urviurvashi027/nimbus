@@ -16,12 +16,20 @@ import Svg, { Circle } from "react-native-svg";
 import ThemeContext from "@/context/ThemeContext";
 import { ScreenView } from "@/components/Themed";
 import ToolScreenHeader from "@/components/tools/common/ToolScreenHeader";
-import { getMealDashboard, MealDashboardResponse } from "@/services/mealService";
+import {
+  getMealDashboard,
+  MealDashboardResponse,
+  MealDashboardData,
+  getDailyMealPlan,
+  DayPlan,
+  Meal,
+} from "@/services/mealService";
+import { formatApiDate } from "@/utils/dates";
 
 const { width } = Dimensions.get("window");
 
 /* ---------- Mock Data ---------- */
-const MOCK_DASHBOARD: MealDashboardResponse = {
+const MOCK_DASHBOARD: MealDashboardData = {
   period: "Last 30 days",
   days_tracked: 12,
   total_calories_consumed: 15400,
@@ -31,6 +39,7 @@ const MOCK_DASHBOARD: MealDashboardResponse = {
     protein: { consumed: 65, goal: 150, color: "#4C8DFF" },
     carbs: { consumed: 110, goal: 250, color: "#FACC15" },
     fats: { consumed: 35, goal: 70, color: "#FB923C" },
+    fiber: { consumed: 15, goal: 30, color: "#A78BFA" },
   },
 };
 
@@ -46,7 +55,8 @@ const MOCK_MEALS = {
     title: "Grilled Salmon & Asparagus",
     calories: 520,
     time: "07:30 PM",
-    image: "https://images.pexels.com/photos/46239/salmon-dish-food-meal-46239.jpeg",
+    image:
+      "https://images.pexels.com/photos/46239/salmon-dish-food-meal-46239.jpeg",
   },
   snacks: [{ title: "Greek Yogurt", calories: 150, time: "04:00 PM" }],
 };
@@ -56,25 +66,62 @@ const MealPlannerScreen = () => {
   const { newTheme, spacing, typography } = useContext(ThemeContext);
   const styles = styling(newTheme, spacing, typography);
 
-  const [dashboardData, setDashboardData] = useState<MealDashboardResponse>(MOCK_DASHBOARD);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [dashboardData, setDashboardData] =
+    useState<MealDashboardData>(MOCK_DASHBOARD);
+  const [dayPlan, setDayPlan] = useState<DayPlan | null>(null);
 
   const fetchDashboardData = async () => {
     try {
-      const data = await getMealDashboard(30);
-      if (data && data.today_nutrition) {
-        setDashboardData(data);
-      } else {
-        setDashboardData(MOCK_DASHBOARD);
+      const result = await getMealDashboard(30);
+      console.log("Meal Dashboard Response:", JSON.stringify(result, null, 2));
+      if (
+        result &&
+        result.success &&
+        result.data &&
+        result.data.today_nutrition
+      ) {
+        setDashboardData(result.data);
       }
     } catch (error) {
       console.error("Dashboard API error:", error);
-      setDashboardData(MOCK_DASHBOARD);
+    }
+  };
+
+  const fetchDailyPlan = async (date: Date) => {
+    try {
+      const dateStr = formatApiDate(date);
+      console.log(`Fetching daily plan for: ${dateStr}`);
+      const result: any = await getDailyMealPlan(dateStr);
+      console.log("Daily Plan API Response:", JSON.stringify(result, null, 2));
+
+      if (
+        result &&
+        result.success &&
+        Array.isArray(result.data) &&
+        result.data.length > 0
+      ) {
+        setDayPlan(result.data[0]);
+      } else if (result && result.success && result.data && !Array.isArray(result.data)) {
+        // Handle case where data is a single object instead of array
+        setDayPlan(result.data);
+      } else {
+        setDayPlan(null);
+      }
+    } catch (error) {
+      console.error("Daily Plan API error:", error);
+      setDayPlan(null);
     }
   };
 
   useEffect(() => {
     fetchDashboardData();
   }, []);
+
+  // Fetch plan when date changes
+  useEffect(() => {
+    fetchDailyPlan(selectedDate);
+  }, [selectedDate]);
 
   const handleAddMeal = (type: string) => {
     router.push({
@@ -98,7 +145,10 @@ const MealPlannerScreen = () => {
     const center = size / 2;
     const radius = (size - strokeWidth) / 2;
     const circumference = 2 * Math.PI * radius;
-    const progress = Math.min(nutrition.calories.consumed / nutrition.calories.goal, 1);
+    const progress = Math.min(
+      nutrition.calories.consumed / nutrition.calories.goal,
+      1
+    );
     const offset = circumference * (1 - progress);
 
     return (
@@ -136,7 +186,7 @@ const MealPlannerScreen = () => {
         </View>
 
         <View style={styles.macroCol}>
-          {["protein", "carbs", "fats"].map((macro) => {
+          {["protein", "carbs", "fats", "fiber"].map((macro) => {
             const data = (nutrition as any)[macro];
             return (
               <View key={macro} style={styles.macroItem}>
@@ -153,7 +203,10 @@ const MealPlannerScreen = () => {
                     style={[
                       styles.progressBarFill,
                       {
-                        width: `${Math.min((data.consumed / data.goal) * 100, 100)}%`,
+                        width: `${Math.min(
+                          (data.consumed / data.goal) * 100,
+                          100
+                        )}%`,
                         backgroundColor: data.color,
                       },
                     ]}
@@ -167,7 +220,7 @@ const MealPlannerScreen = () => {
     );
   };
 
-  const renderMealCard = (type: string, data: any) => {
+  const renderMealCard = (type: string, data: Meal | undefined | null) => {
     const iconMap: any = {
       breakfast: "coffee",
       lunch: "white-balance-sunny",
@@ -213,10 +266,8 @@ const MealPlannerScreen = () => {
         <TouchableOpacity style={styles.mealCard} activeOpacity={0.9}>
           <View style={styles.mealInfo}>
             <Text style={styles.mealType}>{type.toUpperCase()}</Text>
-            <Text style={styles.mealTitle}>{data.title}</Text>
-            <Text style={styles.mealMeta}>
-              {data.calories} kcal
-            </Text>
+            <Text style={styles.mealTitle}>{data.name}</Text>
+            <Text style={styles.mealMeta}>{data.calories ?? 0} kcal</Text>
           </View>
           {data.image && (
             <View style={styles.mealImagePlaceholder}>
@@ -259,10 +310,16 @@ const MealPlannerScreen = () => {
 
           <View style={styles.timelineContainer}>
             <View style={styles.timelineVerticalLine} />
-            {renderMealCard("breakfast", MOCK_MEALS.breakfast)}
-            {renderMealCard("lunch", MOCK_MEALS.lunch)}
-            {renderMealCard("dinner", MOCK_MEALS.dinner)}
-            {renderMealCard("snacks", MOCK_MEALS.snacks[0])}
+            {renderMealCard("breakfast", dayPlan?.meals?.breakfast)}
+            {renderMealCard("lunch", dayPlan?.meals?.lunch)}
+            {renderMealCard("dinner", dayPlan?.meals?.dinner)}
+            {/* Handle multiple snacks if needed, for now just showing first or the object itself */}
+            {renderMealCard(
+              "snacks",
+              Array.isArray(dayPlan?.meals?.snacks)
+                ? dayPlan?.meals?.snacks[0]
+                : (dayPlan?.meals?.snacks as unknown as Meal)
+            )}
           </View>
         </ScrollView>
 

@@ -69,20 +69,23 @@ const ArticleScreen: React.FC = () => {
       const backendCategory =
         filterKey === "All" ? undefined : FILTER_MAP[filterKey];
 
-      const result = await getArticleList(backendCategory);
+      const result: any = await getArticleList(backendCategory);
+      // Backend returns { success, message, data: [...] }
+      const data = result?.data || (Array.isArray(result) ? result : []);
 
-      if (result && Array.isArray(result)) {
+      if (Array.isArray(data)) {
         const heights = [250, 280, 220, 270, 230, 240];
 
-        const processed = result.map((item: any) => ({
+        const processed = data.map((item: any) => ({
           ...item,
           height: heights[Math.floor(Math.random() * heights.length)],
-          image: { uri: item.image },
+          // Fallback if image is null
+          image: item.image ? { uri: item.image } : require("@/assets/images/mt.jpg"), 
         }));
 
         setArticles(processed);
       } else {
-        console.error("Article API did not return array:", result);
+        console.error("Article API did not return data array:", result);
         setArticles([]);
       }
     } catch (err) {
@@ -191,6 +194,7 @@ const ArticleScreen: React.FC = () => {
           columnWrapperStyle={styles.columnWrapper}
           renderItem={({ item }) => (
             <ContentPosterCard
+              title={item.title}
               image={item.image}
               tag={item.tag}
               height={item.height}

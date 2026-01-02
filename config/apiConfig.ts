@@ -35,7 +35,8 @@ export const API_ENDPOINTS = {
 
   createHabit: `${BASE_URL}/api/habits/`,
   bulkCreateHabit: `${BASE_URL}/api/habits/bulk_create/`,
-  activateHabitTemplate: (id: number | string) => `${BASE_URL}/api/habit-templates/${id}/activate/`,
+  activateHabitTemplate: (id: number | string) =>
+    `${BASE_URL}/api/habit-templates/${id}/activate/`,
   habitTypeList: `${BASE_URL}/api/habit-types/`,
   habitTagList: `${BASE_URL}/api/tags/`,
   habitDetailsById: `${BASE_URL}/api/habits/`,
@@ -52,6 +53,7 @@ export const API_ENDPOINTS = {
   getJournalEntry: `${BASE_URL}/assesment/journal-entries/`,
   getWorkoutVideoList: `${BASE_URL}/media/media-assets/?type=video`,
   getRecipeList: `${BASE_URL}/media/media-assets/?type=recipe`,
+  searchRecipes: (query: string) => `${BASE_URL}/media/media-assets/recipes/?search=${query}`,
   getRoutineTemplate: `${BASE_URL}/api/habit-templates/`,
   //TODO: category Data fix
   getShortVideoList: `${BASE_URL}/media/media-assets/?type=shortVideo`,
@@ -61,10 +63,20 @@ export const API_ENDPOINTS = {
   getMentalTestList: `${BASE_URL}/assesment/assessments/`,
   getWorkouts: `${BASE_URL}/workouts/`,
   getWorkoutDetails: (id: number | string) => `${BASE_URL}/workouts/${id}/`,
-  getWeeklyMealPlan: (startDate: string) => `${BASE_URL}/meals/plans/week/?start_date=${startDate}`,
-  getMealDashboard: (days: number = 30) => `${BASE_URL}/meals/dashboard/?days=${days}`,
-  addMealItem: `${BASE_URL}/meals/items/`,
-  scribbles: `${BASE_URL}/scribbles/`,
+
+    getWeeklyMealPlan: (startDate: string) => `${BASE_URL}/meals/plans/week/?start_date=${startDate}`,
+
+    getMealPlanPdf: (startDate: string, endDate: string) => `${BASE_URL}/meals/plans/pdf/?start_date=${startDate}&end_date=${endDate}`,
+
+    getDailyMealPlan: (date?: string) =>
+    date
+      ? `${BASE_URL}/meals/plans/?date=${date}`
+      : `${BASE_URL}/meals/plans/today/`,
+  getMealDashboard: (days: number = 30) =>
+    `${BASE_URL}/meals/dashboard/?days=${days}`,
+    addMealItem: `${BASE_URL}/meals/items/`,
+    bulkUpdateMealPlan: `${BASE_URL}/meals/plans/bulk_update/`,
+    scribbles: `${BASE_URL}/scribbles/`,
   recentScribbleTags: `${BASE_URL}/scribbles/recent_tags/`,
   calorieCalculator: `${BASE_URL}/calculators/calories/`,
   proteinIntakeCalculator: `${BASE_URL}/calculators/protein/`,
