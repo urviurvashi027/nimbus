@@ -446,7 +446,8 @@ export default function ReminderDetail({
                 <DateTimePicker
                   mode="time"
                   value={new Date(notif.timeISO ?? new Date().toISOString())}
-                  display={Platform.OS === "ios" ? "spinner" : "clock"}
+                  // display={Platform.OS === "ios" ? "spinner" : "clock"}
+                  display={Platform.OS === "ios" ? "spinner" : "default"}
                   onChange={onChangeTime}
                 />
               ) : (

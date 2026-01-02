@@ -68,7 +68,7 @@ export default function InlineTimePicker({
               if (d) onChange(d);
             }}
             minuteInterval={minuteInterval}
-            display="spinner"
+            display={Platform.OS === "ios" ? "spinner" : "default"}
             // NOTE: community picker supports themeVariant on iOS
             // themeVariant={newTheme.isDark ? "dark" : "light"}
             disabled={disabled}
