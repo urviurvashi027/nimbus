@@ -57,19 +57,19 @@ const HorizontalListCardScroll: React.FC<PropType> = (props) => {
   const styles = styling(newTheme, spacing, typography);
 
   const handleItemClick = (title: string, entry: any) => {
-    switch (title) {
-      case "Soundscape":
-      case "Meditation":
-        handlePlayPause(entry);
-        break;
-      case "Medical Test":
-        router.push({
-          pathname: "/(auth)/selfCareScreen/MentalHealthTestScreen",
-          params: { id: entry.id },
-        });
-        break;
-      default:
-        break;
+    const lowerTitle = title.toLowerCase();
+    if (
+      lowerTitle.includes("atmosphere") || 
+      lowerTitle.includes("zen") || 
+      lowerTitle.includes("soundscape") || 
+      lowerTitle.includes("meditation")
+    ) {
+      handlePlayPause(entry);
+    } else if (lowerTitle.includes("medical") || lowerTitle.includes("assessment")) {
+      router.push({
+        pathname: "/(auth)/selfCareScreen/MentalHealthTestScreen",
+        params: { id: entry.id },
+      });
     }
   };
 
@@ -164,12 +164,15 @@ const HorizontalListCardScroll: React.FC<PropType> = (props) => {
                 onPress={() => handleItemClick(title, entry)}
               >
                 <View style={styles.itemRow}>
-                  <Image source={entry.image} style={styles.itemImage} />
+                  <Image 
+                    source={typeof entry.image === 'string' ? { uri: entry.image } : entry.image} 
+                    style={styles.itemImage} 
+                  />
                   <View style={styles.itemInfo}>
-                    <Text style={styles.itemTitle}>{entry.title}</Text>
-                    {!!entry.duration && (
+                    <Text style={styles.itemTitle}>{entry.name || entry.title}</Text>
+                    {(!!entry.duration || !!entry.durationLabel) && (
                       <Text style={styles.itemDuration}>
-                        {entry.duration || "3"} min
+                        {entry.durationLabel || `${entry.duration || "3"} min`}
                       </Text>
                     )}
                   </View>
@@ -188,11 +191,14 @@ const HorizontalListCardScroll: React.FC<PropType> = (props) => {
             { backgroundColor: newTheme.cardRaised },
           ]}
         >
-          <Image source={currentTrack.image} style={styles.playerImage} />
+          <Image 
+            source={typeof currentTrack.image === 'string' ? { uri: currentTrack.image } : currentTrack.image} 
+            style={styles.playerImage} 
+          />
           <View style={styles.playerText}>
-            <Text style={styles.playerTitle}>{currentTrack.title}</Text>
+            <Text style={styles.playerTitle}>{currentTrack.name || currentTrack.title}</Text>
             <Text style={styles.playerDuration}>
-              {currentTrack.duration} · Soundscape
+              {currentTrack.durationLabel || `${currentTrack.duration || "3"} min`} · {title}
             </Text>
           </View>
           <TouchableOpacity onPress={() => handlePlayPause(currentTrack)}>
@@ -219,28 +225,33 @@ const getVariantColors = (
   newTheme: any,
   fallback: string
 ): { outerBg: string; innerBg: string } => {
-  switch (title) {
-    case "Soundscape":
-      return {
-        outerBg: newTheme.cardRaised,
-        innerBg: newTheme.surfaceMuted,
-      };
-    case "Meditation":
-      return {
-        outerBg: "#26262F", // subtle indigo tint
-        innerBg: "#2F3038",
-      };
-    case "Medical Test":
-      return {
-        outerBg: "#262B30", // soft blue-grey
-        innerBg: "#30343A",
-      };
-    default:
-      return {
-        outerBg: newTheme.cardRaised || fallback,
-        innerBg: newTheme.surfaceMuted,
-      };
+  const lowerTitle = title.toLowerCase();
+  
+  if (lowerTitle.includes("atmosphere") || lowerTitle.includes("soundscape")) {
+    return {
+      outerBg: newTheme.cardRaised,
+      innerBg: newTheme.surfaceMuted,
+    };
   }
+  
+  if (lowerTitle.includes("zen") || lowerTitle.includes("meditation")) {
+    return {
+      outerBg: "#26262F", // subtle indigo tint
+      innerBg: "#2F3038",
+    };
+  }
+
+  if (lowerTitle.includes("medical") || lowerTitle.includes("assessment")) {
+    return {
+      outerBg: "#262B30", // soft blue-grey
+      innerBg: "#30343A",
+    };
+  }
+
+  return {
+    outerBg: newTheme.cardRaised || fallback,
+    innerBg: newTheme.surfaceMuted,
+  };
 };
 
 const styling = (newTheme: any, spacing: any, typography: any) =>

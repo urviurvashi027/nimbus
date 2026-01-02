@@ -129,19 +129,20 @@ const Meditation: React.FC = () => {
     setIsLoading(true);
     try {
       const tags = categories;
-      const result = await getMeditationAudioList();
+      const result: any = await getMeditationAudioList();
+      const meditations = result?.data || (Array.isArray(result) ? result : []);
 
-      if (result && Array.isArray(result)) {
-        const processed: EnrichedMeditation[] = result.map((item: any) => {
+      if (Array.isArray(meditations)) {
+        const processed: EnrichedMeditation[] = meditations.map((item: any) => {
           const randomTag =
             tags[Math.floor(Math.random() * tags.length)] ?? "All";
           return {
             ...item,
             tag: randomTag,
             isLocked: false,
-            coachName: "UU",
+            coachName: item.coach_name || "UU",
             durationLabel: `${item.duration ?? 3} min`,
-            image: { uri: item.image },
+            image: item.image ? { uri: item.image } : require("@/assets/images/logo.png"),
           };
         });
 

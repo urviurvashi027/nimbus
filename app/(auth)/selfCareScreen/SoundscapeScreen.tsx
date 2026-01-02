@@ -61,11 +61,13 @@ const Soundscape = () => {
   const getSoundscapeListData = async () => {
     setIsLoading(true);
     try {
-      const result = await getSoundscapeList();
-      if (result && Array.isArray(result)) {
-        const processedTracks = result.map((track: any) => ({
+      const result: any = await getSoundscapeList();
+      const tracks = result?.data || (Array.isArray(result) ? result : []);
+
+      if (Array.isArray(tracks)) {
+        const processedTracks = tracks.map((track: any) => ({
           ...track,
-          image: { uri: track.image },
+          image: track.image ? { uri: track.image } : require("@/assets/images/logo.png"), // use a fallback if null
         }));
 
         setFavTracks(processedTracks.slice(0, 3));

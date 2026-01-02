@@ -334,14 +334,14 @@ const SelfCare: React.FC = () => {
           />
 
           {/* Medical Test List Section */}
-          <HorizontalListCardScroll
+          {/* <HorizontalListCardScroll
             title="Clinical Assessments"
             description="Mental health is everything"
             backgroundColor="#cbc7f6"
             noOfRows={2}
             itemList={medTests}
             onClickOfAll={() => onClickOfAll("medicalTest")}
-          />
+          /> */}
 
           <HorizontalBanner data={banners} onPress={handleBannerPress} />
 

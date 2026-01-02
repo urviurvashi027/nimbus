@@ -1,7 +1,9 @@
 export interface TrackType {
   id: string;
   title: string;
+  name?: string; // Add optional name
   duration: string;
+  durationLabel?: string; // Add optional durationLabel
   description: string;
   image: any; // Replace with actual image
   source: any; // Replace with actual audio file
