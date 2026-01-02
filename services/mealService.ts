@@ -1,10 +1,11 @@
 import axios, { AxiosResponse } from "axios";
 import { API_ENDPOINTS } from "@/config/apiConfig";
+import { toApiDate } from "@/utils/dateTime";
 
 export interface Meal {
   id: number;
-  name: string; // Changed from title
-  calories?: number; // Optional as it might be missing or 0
+  name: string;
+  calories?: number;
   image: string | null;
   is_consumed: boolean;
   plan?: number;
@@ -55,11 +56,12 @@ export interface MealDashboardResponse {
 }
 
 export const getWeeklyMealPlan = async (
-  startDate: string
+  startDate: Date
 ): Promise<DayPlan[]> => {
   try {
+    const formattedDate = toApiDate(startDate);
     const response: AxiosResponse<DayPlan[]> = await axios.get(
-      API_ENDPOINTS.getWeeklyMealPlan(startDate)
+      API_ENDPOINTS.getWeeklyMealPlan(formattedDate)
     );
     return response.data;
   } catch (error: any) {
@@ -67,10 +69,11 @@ export const getWeeklyMealPlan = async (
   }
 };
 
-export const getDailyMealPlan = async (date?: string): Promise<any> => {
+export const getDailyMealPlan = async (date?: Date): Promise<any> => {
   try {
+    const formattedDate = date ? toApiDate(date) : undefined;
     const response = await axios.get(
-      API_ENDPOINTS.getDailyMealPlan(date)
+      API_ENDPOINTS.getDailyMealPlan(formattedDate)
     );
     return response.data;
   } catch (error: any) {
@@ -79,13 +82,14 @@ export const getDailyMealPlan = async (date?: string): Promise<any> => {
 };
 
 export const getMealPlanRange = async (
-  startDate: string,
-  endDate: string
+  startDate: Date,
+  endDate: Date
 ): Promise<any> => {
   try {
-    // Correctly hit the daily list endpoint with range params
+    const start = toApiDate(startDate);
+    const end = toApiDate(endDate);
     const response = await axios.get(
-      `${API_ENDPOINTS.getDailyMealPlan("range").split("?")[0]}?start_date=${startDate}&end_date=${endDate}`
+      `${API_ENDPOINTS.getDailyMealPlan("range").split("?")[0]}?start_date=${start}&end_date=${end}`
     );
     return response.data;
   } catch (error: any) {
@@ -107,8 +111,8 @@ export const getMealDashboard = async (
 };
 
 export interface AddMealRequest {
-  date: string; // "YYYY-MM-DD"
-  meal_type: string; // "breakfast", "lunch", "dinner", "snacks"
+  date: Date;
+  meal_type: string;
   recipe_id?: number | string;
   name?: string;
   calories?: number;
@@ -143,9 +147,13 @@ export const addMealItem = async (
   data: AddMealRequest
 ): Promise<MealItemResponse> => {
   try {
+    const payload = {
+      ...data,
+      date: toApiDate(data.date),
+    };
     const response: AxiosResponse<MealItemResponse> = await axios.post(
       API_ENDPOINTS.addMealItem,
-      data
+      payload
     );
     return response.data;
   } catch (error: any) {

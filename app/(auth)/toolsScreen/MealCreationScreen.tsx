@@ -29,8 +29,14 @@ import {
   bulkUpdateMealPlan,
   BulkMealUpdatePayload,
 } from "@/services/mealService";
-import { formatApiDate, formatDay, formatDateRange } from "@/utils/dates";
+import {
+  formatDay,
+  toApiDate,
+  toFriendlyDate,
+  toFriendlyRange,
+} from "@/utils/dateTime";
 import { useNimbusToast } from "@/components/common/toast/useNimbusToast";
+import { addDays } from "date-fns";
 
 type MealType = "Breakfast" | "Lunch" | "Dinner" | "Snacks";
 type UnitType = "grams" | "servings" | "cups" | "pieces";
@@ -106,32 +112,28 @@ const MealCreationScreen = () => {
   const [recipeResults, setRecipeResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
-  // Logic: Exactly 7 days constant week range starting from startDate
   const { weekDates, rangeString } = useMemo(() => {
     const dates = [];
     for (let i = 0; i < 7; i++) {
-      const d = new Date(startDate);
-      d.setDate(d.getDate() + i);
+      const d = addDays(startDate, i);
       dates.push(d);
     }
     const lastDate = dates[6];
     return {
       weekDates: dates,
-      rangeString: formatDateRange(startDate, lastDate),
+      rangeString: toFriendlyRange(startDate, lastDate),
     };
   }, [startDate]);
 
   // Actions
   const handleSave = async () => {
     try {
-      const dateStr = formatApiDate(dayDate);
-
       // Map "Snacks" -> "snack" for backend
       const normalizedType =
         mealType.toLowerCase() === "snacks" ? "snack" : mealType.toLowerCase();
 
       const payload: any = {
-        date: dateStr,
+        date: dayDate, // Pass Date object, not string
         meal_type: normalizedType,
       };
 
@@ -239,7 +241,8 @@ const MealCreationScreen = () => {
     setSelectedWeekdays([]);
   };
 
-  const toggleWeekday = (dateStr: string) => {
+  const toggleWeekday = (date: Date) => {
+    const dateStr = toApiDate(date);
     setSelectedWeekdays((prev) =>
       prev.includes(dateStr)
         ? prev.filter((d) => d !== dateStr)
@@ -518,7 +521,7 @@ const MealCreationScreen = () => {
 
         <View style={styles.weekdayRow}>
           {weekDates.map((date) => {
-            const dateStr = formatApiDate(date);
+            const dateStr = toApiDate(date);
             const isSelected = selectedWeekdays.includes(dateStr);
             const dayPlan = weeklyPlan[dateStr] || {};
             const plannedCount = Object.keys(dayPlan).length;
@@ -526,7 +529,7 @@ const MealCreationScreen = () => {
             return (
               <TouchableOpacity
                 key={dateStr}
-                onPress={() => toggleWeekday(dateStr)}
+                onPress={() => toggleWeekday(date)}
                 style={[styles.dayTile, isSelected && styles.dayTileActive]}
               >
                 <Text
@@ -571,7 +574,7 @@ const MealCreationScreen = () => {
           {(["Breakfast", "Lunch", "Dinner", "Snacks"] as MealType[]).map(
             (type) => {
               const alreadyPlanned = weekDates.filter(
-                (d) => weeklyPlan[formatApiDate(d)]?.[type.toLowerCase()]
+                (d) => weeklyPlan[toApiDate(d)]?.[type.toLowerCase()]
               ).length;
 
               return (
@@ -664,18 +667,12 @@ const MealCreationScreen = () => {
     >
       <Text style={styles.reviewHeader}>Weekly Summary</Text>
       {weekDates.map((date) => {
-        const dateStr = formatApiDate(date);
+        const dateStr = toApiDate(date);
         const dayPlan = weeklyPlan[dateStr] || {};
         return (
           <View key={dateStr} style={styles.reviewDayCard}>
             <View style={styles.reviewDayHeader}>
-              <Text style={styles.reviewDayDate}>
-                {date.toLocaleDateString("en-US", {
-                  weekday: "long",
-                  day: "numeric",
-                  month: "short",
-                })}
-              </Text>
+              <Text style={styles.reviewDayDate}>{toFriendlyDate(date)}</Text>
               <Text style={styles.reviewDayStatus}>
                 {Object.keys(dayPlan).length}/4 meals
               </Text>

@@ -18,7 +18,7 @@ import { addDays } from "date-fns";
 import ThemeContext from "@/context/ThemeContext";
 import { ScreenView } from "@/components/Themed";
 import ToolScreenHeader from "@/components/tools/common/ToolScreenHeader";
-import { formatDay, formatApiDate } from "@/utils/dates";
+import { formatDay, toApiDate, toFriendlyDate } from "@/utils/dateTime";
 import * as FileSystem from "expo-file-system";
 import {
   getMealPlanRange,
@@ -45,18 +45,18 @@ const MealWeeklyViewScreen = () => {
     return [
       {
         label: "This Week",
-        start: formatApiDate(today),
-        end: formatApiDate(addDays(today, 6)),
+        start: toApiDate(today),
+        end: toApiDate(addDays(today, 6)),
       },
       {
         label: "Next Week",
-        start: formatApiDate(addDays(today, 7)),
-        end: formatApiDate(addDays(today, 13)),
+        start: toApiDate(addDays(today, 7)),
+        end: toApiDate(addDays(today, 13)),
       },
       {
         label: "Following",
-        start: formatApiDate(addDays(today, 14)),
-        end: formatApiDate(addDays(today, 20)),
+        start: toApiDate(addDays(today, 14)),
+        end: toApiDate(addDays(today, 20)),
       },
     ];
   }, []);
@@ -65,7 +65,7 @@ const MealWeeklyViewScreen = () => {
     try {
       setLoading(true);
       const range = weekRanges[weekIdx];
-      const res: any = await getMealPlanRange(range.start, range.end);
+      const res: any = await getMealPlanRange(new Date(range.start), new Date(range.end));
 
       let data = [];
       if (res?.success) {
@@ -96,7 +96,7 @@ const MealWeeklyViewScreen = () => {
   const onSharePlan = async (data: DayPlan) => {
     try {
       setLoading(true);
-      const dateStr = formatApiDate(new Date(data.date));
+      const dateStr = toApiDate(new Date(data.date));
       const pdfUrl = getMealPlanPdfUrl(dateStr, dateStr);
       const fileUri = `${FileSystem.cacheDirectory}NourishPlan_${dateStr}.pdf`;
 
@@ -296,14 +296,12 @@ const MealWeeklyViewScreen = () => {
       }}
     >
       <SafeAreaView style={{ flex: 1 }}>
-        {/* Header */}
         <ToolScreenHeader
           title="Future Plan"
           subtitle="Visualize your upcoming nourishment."
           onBack={() => router.back()}
         />
 
-        {/* Week Chips */}
         <View style={styles.chipContainer}>
           {weekRanges.map((range, idx) => (
             <FilterPill
@@ -312,7 +310,7 @@ const MealWeeklyViewScreen = () => {
               isActive={selectedWeek === idx}
               onPress={() => {
                 setSelectedWeek(idx);
-                setExpandedIndex(0); // Reset accordion to first item
+                setExpandedIndex(0);
               }}
               style={styles.weekChip}
             />
@@ -494,7 +492,6 @@ const styling = (theme: any, spacing: any, typography: any) =>
       color: theme.textPrimary,
       fontSize: 14,
     },
-    // Empty State Styles
     emptyContainer: {
       flex: 1,
       alignItems: "center",
