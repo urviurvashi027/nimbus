@@ -17,6 +17,8 @@ interface ToolScreenHeaderProps {
   subtitle?: string;
   onBack: () => void;
   containerStyle?: ViewStyle;
+  rightIcon?: keyof typeof Ionicons.glyphMap;
+  onRightPress?: () => void;
 }
 
 const ToolScreenHeader: React.FC<ToolScreenHeaderProps> = ({
@@ -24,16 +26,26 @@ const ToolScreenHeader: React.FC<ToolScreenHeaderProps> = ({
   subtitle,
   onBack,
   containerStyle,
+  rightIcon,
+  onRightPress,
 }) => {
   const { newTheme, spacing, typography } = useContext(ThemeContext);
   const styles = styling(newTheme, spacing, typography);
 
   return (
     <View style={[styles.container, containerStyle]}>
-      {/* Back icon */}
-      <TouchableOpacity style={styles.backButton} onPress={onBack}>
-        <Ionicons name="arrow-back" size={24} color={newTheme.textSecondary} />
-      </TouchableOpacity>
+      {/* Top action row */}
+      <View style={styles.topRow}>
+        <TouchableOpacity style={styles.backButton} onPress={onBack}>
+          <Ionicons name="arrow-back" size={24} color={newTheme.textSecondary} />
+        </TouchableOpacity>
+
+        {rightIcon && (
+          <TouchableOpacity style={styles.rightButton} onPress={onRightPress}>
+            <Ionicons name={rightIcon} size={24} color={newTheme.textSecondary} />
+          </TouchableOpacity>
+        )}
+      </View>
 
       {/* Title + subtitle block */}
       <View style={styles.textBlock}>
@@ -49,8 +61,17 @@ const styling = (newTheme: any, spacing: any, typography: any) =>
     container: {
       marginBottom: spacing.lg,
     },
-    backButton: {
+    topRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
       marginBottom: spacing.md,
+    },
+    backButton: {
+      // removed bottom margin as it's now in topRow
+    },
+    rightButton: {
+      // optional: add padding if hit target is small
     },
     textBlock: {},
     title: {

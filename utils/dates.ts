@@ -12,6 +12,12 @@ export const formatDay = (date: Date) => format(date, "EEE"); // Sun, Mon
 export const formatDate = (date: Date) => format(date, "dd"); // 25
 export const formatApiDate = (date: Date) => format(date, "yyyy-MM-dd");
 
+export const formatDateRange = (start: Date, end: Date) => {
+  const startFmt = format(start, "d MMM");
+  const endFmt = format(end, "d MMM");
+  return `${startFmt} — ${endFmt}`;
+};
+
 // small helper
 export const formatReminderTime = (raw: any, fallback = "8:00 AM") => {
   if (!raw) return fallback;

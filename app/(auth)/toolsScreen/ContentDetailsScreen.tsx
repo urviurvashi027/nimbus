@@ -469,6 +469,14 @@ const ContentDetailsScreen: React.FC = () => {
 
           {/* Article sections */}
           <View style={styles.sections}>
+            {/* If it's a simple recipe/item with only a description, show it as a section */}
+            {!details.section_data?.length && !details.instructions?.length && details.description && (
+              <ArticleSection
+                title="Description"
+                content={details.description}
+              />
+            )}
+
             {Array.isArray(details.section_data) &&
               details.section_data.map((section, index) => (
                 <ArticleSection

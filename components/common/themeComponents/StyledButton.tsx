@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import ThemeContext from "@/context/ThemeContext";
 
-type StyledButtonVariant = "primary" | "secondary" | "ghost" | "destructive";
+type StyledButtonVariant = "primary" | "secondary" | "ghost" | "destructive" | "outline";
 type StyledButtonSize = "medium" | "large";
 
 type Props = {
@@ -64,6 +64,14 @@ const StyledButton: React.FC<Props> = ({
       };
       textVariant = { color: newTheme.textPrimary };
       break;
+    case "outline":
+      containerVariant = {
+        backgroundColor: "transparent",
+        borderWidth: 1,
+        borderColor: newTheme.accent,
+      };
+      textVariant = { color: newTheme.accent };
+      break;
     case "ghost":
       containerVariant = {
         backgroundColor: "transparent",
@@ -94,7 +102,7 @@ const StyledButton: React.FC<Props> = ({
         <ActivityIndicator
           size="small"
           color={
-            variant === "secondary" || variant === "ghost"
+            variant === "secondary" || variant === "ghost" || variant === "outline"
               ? newTheme.textPrimary
               : newTheme.background
           }

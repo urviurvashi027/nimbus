@@ -101,6 +101,19 @@ export const getRecipeList = async (
   }
 };
 
+export const searchRecipes = async (
+  query: string
+): Promise<RecipeListResponse> => {
+  try {
+    const response: AxiosResponse<RecipeListResponse> = await axios.get(
+      API_ENDPOINTS.searchRecipes(query)
+    );
+    return response.data;
+  } catch (error: any) {
+    throw error.response ? error.response.data : error.message;
+  }
+};
+
 export const getRoutineList = async (
   category?: string
 ): Promise<RoutineListResponse> => {
