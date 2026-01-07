@@ -17,6 +17,7 @@ import OnboardingHeader from "./component/OnboardingHeader";
 import ChoiceItem from "./component/ChoiceItem";
 import InlineTimePicker from "@/components/ui/InlinedTimePicker";
 import SignaturePad, { SignaturePadRef } from "./component/SignaturePad";
+import LocationSearch from "./component/LocationSearch";
 import { StyledButton } from "@/components/ui/StyledButton";
 import { useAuth } from "@/context/AuthContext";
 
@@ -31,6 +32,15 @@ import {
 import { serializePersonaAnswers } from "@/features/onboarding/services/onboardingService";
 
 const SIGNATURE_LOCAL_ID = -999; // local-only id (we will NOT send this to backend)
+const LOCATION_LOCAL_ID = -998;
+
+const makeLocationQuestion = (): PersonaQuestion => ({
+  id: LOCATION_LOCAL_ID,
+  title: "Where are you located? 🌍",
+  subtitle: "We use your location to provide local insights and relevant suggestions.",
+  type: "location",
+  choices: [],
+});
 
 const makeSignatureQuestion = (): PersonaQuestion => ({
   id: SIGNATURE_LOCAL_ID,
@@ -79,7 +89,7 @@ export default function OnboardingFlow() {
 
         // Contract: { success, message, data: PersonaQuestion[] }
         if (res?.success && Array.isArray(res?.data)) {
-          const list = [...res.data, makeSignatureQuestion()];
+          const list = [...res.data, makeLocationQuestion(), makeSignatureQuestion()];
           setQuestions(list);
           setStep(0);
           return;
@@ -136,6 +146,10 @@ export default function OnboardingFlow() {
 
     if (question.type === "time") {
       if (!(v instanceof Date)) return "Please select a time.";
+    }
+
+    if (question.type === "location") {
+      if (!v || typeof v !== "string" || v.trim().length === 0) return "Please select a location.";
     }
 
     if (question.type === "signature") {
@@ -229,7 +243,7 @@ export default function OnboardingFlow() {
       setErrMsg("");
 
       const payload = serializePersonaAnswers(answers, {
-        skipIds: [SIGNATURE_LOCAL_ID],
+        skipIds: [SIGNATURE_LOCAL_ID, LOCATION_LOCAL_ID],
       });
       const res = await submitPersonaAnswers(payload);
 
@@ -347,7 +361,7 @@ export default function OnboardingFlow() {
           </Text>
         )}
 
-        {question.type !== "time" && question.type !== "signature" && (
+        {question.type !== "time" && question.type !== "signature" && question.type !== "location" && (
           <View style={{ marginTop: 10 }}>
             {question.choices?.map((c) => (
               <ChoiceItem
@@ -383,6 +397,18 @@ export default function OnboardingFlow() {
               }}
             />
           </View>
+        )}
+
+        {question.type === "location" && (
+          <LocationSearch
+            onSelect={(data, _details) => {
+              setAnswers((prev: any) => ({ ...prev, [question.id]: data.description }));
+              setErrMsg("");
+            }}
+            initialValue={
+              typeof answers[question.id] === "string" ? answers[question.id] : ""
+            }
+          />
         )}
 
         {question.type === "signature" && (

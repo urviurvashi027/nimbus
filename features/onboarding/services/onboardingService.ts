@@ -1,7 +1,7 @@
 import axios, { AxiosResponse } from "axios";
 import { API_ENDPOINTS } from "@/config/apiConfig";
 
-export type PersonaQuestionType = "single" | "multiple" | "time" | "signature";
+export type PersonaQuestionType = "single" | "multiple" | "time" | "signature" | "location";
 
 export interface PersonaChoice {
   id: string;
