@@ -3,7 +3,7 @@ import { View, Text, FlatList, StyleSheet, Dimensions } from "react-native";
 
 import ThemeContext from "@/context/ThemeContext";
 import MeditationFeaturedCard from "@/features/self-care/components/meditation/MeditationFeautredCard";
-import { EnrichedMeditation } from "@/app/(auth)/self-care/MeditationScreen";
+import { EnrichedMeditation } from "../../types/selfCareTypes";
 
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = width * 0.8;

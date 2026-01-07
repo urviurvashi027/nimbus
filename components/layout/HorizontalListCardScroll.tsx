@@ -1,11 +1,11 @@
 import {
   View,
   Text,
-  Image,
   FlatList,
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
+import { Image } from "expo-image";
 import React, { useContext, useEffect, useState } from "react";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -59,15 +59,18 @@ const HorizontalListCardScroll: React.FC<PropType> = (props) => {
   const handleItemClick = (title: string, entry: any) => {
     const lowerTitle = title.toLowerCase();
     if (
-      lowerTitle.includes("atmosphere") || 
-      lowerTitle.includes("zen") || 
-      lowerTitle.includes("soundscape") || 
+      lowerTitle.includes("atmosphere") ||
+      lowerTitle.includes("zen") ||
+      lowerTitle.includes("soundscape") ||
       lowerTitle.includes("meditation")
     ) {
       handlePlayPause(entry);
-    } else if (lowerTitle.includes("medical") || lowerTitle.includes("assessment")) {
+    } else if (
+      lowerTitle.includes("medical") ||
+      lowerTitle.includes("assessment")
+    ) {
       router.push({
-        pathname: "/(auth)/self-care/MentalHealthTestScreen",
+        pathname: "/(auth)/self-care/mentalHealthTest",
         params: { id: entry.id },
       });
     }
@@ -164,12 +167,20 @@ const HorizontalListCardScroll: React.FC<PropType> = (props) => {
                 onPress={() => handleItemClick(title, entry)}
               >
                 <View style={styles.itemRow}>
-                  <Image 
-                    source={typeof entry.image === 'string' ? { uri: entry.image } : entry.image} 
-                    style={styles.itemImage} 
+                  <Image
+                    source={
+                      typeof entry.image === "string"
+                        ? { uri: entry.image }
+                        : entry.image
+                    }
+                    style={styles.itemImage}
+                    contentFit="cover"
+                    transition={200}
                   />
                   <View style={styles.itemInfo}>
-                    <Text style={styles.itemTitle}>{entry.name || entry.title}</Text>
+                    <Text style={styles.itemTitle}>
+                      {entry.name || entry.title}
+                    </Text>
                     {(!!entry.duration || !!entry.durationLabel) && (
                       <Text style={styles.itemDuration}>
                         {entry.durationLabel || `${entry.duration || "3"} min`}
@@ -191,14 +202,24 @@ const HorizontalListCardScroll: React.FC<PropType> = (props) => {
             { backgroundColor: newTheme.cardRaised },
           ]}
         >
-          <Image 
-            source={typeof currentTrack.image === 'string' ? { uri: currentTrack.image } : currentTrack.image} 
-            style={styles.playerImage} 
+          <Image
+            source={
+              typeof currentTrack.image === "string"
+                ? { uri: currentTrack.image }
+                : currentTrack.image
+            }
+            style={styles.playerImage}
+            contentFit="cover"
+            transition={200}
           />
           <View style={styles.playerText}>
-            <Text style={styles.playerTitle}>{currentTrack.name || currentTrack.title}</Text>
+            <Text style={styles.playerTitle}>
+              {currentTrack.name || currentTrack.title}
+            </Text>
             <Text style={styles.playerDuration}>
-              {currentTrack.durationLabel || `${currentTrack.duration || "3"} min`} · {title}
+              {currentTrack.durationLabel ||
+                `${currentTrack.duration || "3"} min`}{" "}
+              · {title}
             </Text>
           </View>
           <TouchableOpacity onPress={() => handlePlayPause(currentTrack)}>
@@ -226,14 +247,14 @@ const getVariantColors = (
   fallback: string
 ): { outerBg: string; innerBg: string } => {
   const lowerTitle = title.toLowerCase();
-  
+
   if (lowerTitle.includes("atmosphere") || lowerTitle.includes("soundscape")) {
     return {
       outerBg: newTheme.cardRaised,
       innerBg: newTheme.surfaceMuted,
     };
   }
-  
+
   if (lowerTitle.includes("zen") || lowerTitle.includes("meditation")) {
     return {
       outerBg: "#26262F", // subtle indigo tint

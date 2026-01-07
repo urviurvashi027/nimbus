@@ -1,4 +1,5 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { Image } from "expo-image";
 import React, { useContext, useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -55,6 +56,8 @@ export function Avatar({ uri, size = 82 }: { uri?: string; size?: number }) {
     <Image
       source={{ uri }}
       style={{ width: size, height: size, borderRadius: size / 2 }}
+      contentFit="cover"
+      transition={200}
     />
   );
 }

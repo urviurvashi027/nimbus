@@ -1,5 +1,7 @@
 // UI Types for Self-Care Module
 
+import { Meditations } from "@/features/tools/types/toolsTypes";
+
 export interface WorkoutVideoListItem {
   id: number;
   title: string;
@@ -158,3 +160,11 @@ export interface MeditationVideoListResponse {
   data: MeditationListItem[];
   success: boolean;
 }
+
+export type EnrichedMeditation = Meditations & {
+  tag: string;
+  isLocked: boolean;
+  coachName: string;
+  durationLabel: string;
+  image: any;
+};

@@ -1,6 +1,7 @@
 // components/selfCare/meditation/MeditationListItem.tsx
 import React, { useContext } from "react";
-import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
 
 import ThemeContext from "@/context/ThemeContext";
@@ -28,7 +29,12 @@ const MeditationListItem: React.FC<Props> = ({
       activeOpacity={0.8}
       onPress={onPress}
     >
-      <Image source={item.image} style={styles.image} />
+      <Image
+        source={item.image}
+        style={styles.image}
+        contentFit="cover"
+        transition={200}
+      />
       <View style={styles.textContainer}>
         <Text style={styles.title} numberOfLines={1}>
           {item.title}

@@ -6,11 +6,11 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  ImageBackground,
   Animated,
   ActivityIndicator,
   ImageSourcePropType,
 } from "react-native";
+import { Image } from "expo-image";
 
 export interface ContentPosterCardProps {
   title?: string;
@@ -57,12 +57,14 @@ const ContentPosterCard: React.FC<ContentPosterCardProps> = ({
         activeOpacity={0.9}
         onPress={onPress}
       >
-        <ImageBackground
-          source={image}
-          style={styles.image}
-          imageStyle={styles.imageRadius}
-          onLoadEnd={() => setImageLoaded(true)}
-        >
+        <View style={styles.image}>
+          <Image
+            source={image}
+            style={[StyleSheet.absoluteFill, styles.imageRadius]}
+            contentFit="cover"
+            transition={200}
+            onLoadEnd={() => setImageLoaded(true)}
+          />
           {/* Soft overlay so text is legible on busy images */}
           <View style={styles.overlay} />
 
@@ -91,7 +93,7 @@ const ContentPosterCard: React.FC<ContentPosterCardProps> = ({
               <ActivityIndicator size="small" color="#E5F5D8" />
             </View>
           )}
-        </ImageBackground>
+        </View>
       </TouchableOpacity>
     </Animated.View>
   );

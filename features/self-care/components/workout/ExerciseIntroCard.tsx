@@ -1,5 +1,6 @@
 import React, { useContext, useState } from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/context/ThemeContext";
 import WorkoutVideoPlayerModal from "./WorkoutVideoPlayerModal";
@@ -30,7 +31,12 @@ const ExerciseIntroCard: React.FC<Props> = ({
         onPress={() => videoSource && setShowPlayer(true)}
         style={styles.imageWrapper}
       >
-        <Image source={{ uri: imageUri }} style={styles.image} />
+        <Image
+          source={{ uri: imageUri }}
+          style={styles.image}
+          contentFit="cover"
+          transition={200}
+        />
         {videoSource && (
           <View style={styles.playIconOverlay}>
             <Ionicons name="play" size={24} color="#FFF" />

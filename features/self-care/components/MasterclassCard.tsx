@@ -3,10 +3,10 @@ import React, { useContext } from "react";
 import {
   View,
   Text,
-  ImageBackground,
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
+import { Image } from "expo-image";
 
 type VideoClassCardType = {
   title: string;
@@ -37,14 +37,19 @@ const MasterclassCard: React.FC<VideoClassCardType> = ({
         },
       ]}
     >
-      <ImageBackground
-        source={thumbnail}
-        style={styles.image}
-        imageStyle={{
-          borderTopLeftRadius: 16,
-          borderTopRightRadius: 16,
-        }}
-      >
+      <View style={styles.image}>
+        <Image
+          source={thumbnail}
+          style={[
+            StyleSheet.absoluteFill,
+            {
+              borderTopLeftRadius: 16,
+              borderTopRightRadius: 16,
+            },
+          ]}
+          contentFit="cover"
+          transition={200}
+        />
         {/* Gradient Overlay */}
         <View
           style={[styles.overlay, { backgroundColor: newTheme.overlayStrong }]}
@@ -64,7 +69,7 @@ const MasterclassCard: React.FC<VideoClassCardType> = ({
             {tag}
           </Text>
         </View>
-      </ImageBackground>
+      </View>
 
       {/* Content */}
       <View style={{ padding: spacing.md }}>

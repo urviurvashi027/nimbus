@@ -4,11 +4,11 @@ import {
   View,
   Text,
   FlatList,
-  ImageBackground,
   StyleSheet,
   TouchableOpacity,
   Dimensions,
 } from "react-native";
+import { Image } from "expo-image";
 
 interface CardData {
   id: string;
@@ -63,11 +63,13 @@ const TrendingCardCarousel: React.FC<TrendingCardCarouselProps> = ({
             activeOpacity={0.9}
           >
             <View style={styles.cardOuter}>
-              <ImageBackground
+              <Image
                 source={item.image}
-                style={styles.card}
-                imageStyle={styles.cardImage}
-              >
+                style={[StyleSheet.absoluteFill, styles.cardImage]}
+                contentFit="cover"
+                transition={200}
+              />
+              <View style={styles.card}>
                 {/* soft dark overlay to unify artwork */}
                 <View
                   style={[
@@ -83,7 +85,7 @@ const TrendingCardCarousel: React.FC<TrendingCardCarouselProps> = ({
                     </Text>
                   </View>
                 )}
-              </ImageBackground>
+              </View>
             </View>
           </TouchableOpacity>
         )}

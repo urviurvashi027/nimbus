@@ -1,7 +1,8 @@
 // components/AuthorCard.js
 import ThemeContext from "@/context/ThemeContext";
 import React, { useContext } from "react";
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
+import { Image } from "expo-image";
 
 interface AuthorCardType {
   author: any;

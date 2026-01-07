@@ -13,7 +13,7 @@ export const buttons: NavigationButtonType[] = [
     id: 1,
     label: "Rituals",
     action: "navigate",
-    screen: "/(auth)/tools/RoutineScreen",
+    screen: "/(auth)/tools/routineTemplate",
     iconName: "calendar-check",
   },
   {

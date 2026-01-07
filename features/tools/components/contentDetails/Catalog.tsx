@@ -1,4 +1,4 @@
-import { Animated, Image, Text, View, StyleSheet } from "react-native";
+import { Animated, Text, View, StyleSheet } from "react-native";
 
 import CatalogList from "@/features/tools/components/contentDetails/CatalogList";
 import { SectionData } from "../../types/toolsTypes";

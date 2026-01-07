@@ -4,7 +4,6 @@ import {
   View,
   Text,
   FlatList,
-  Image,
   TouchableOpacity,
   StyleSheet,
   Platform,
@@ -28,16 +27,9 @@ import {
   MeditationFeaturedSkeleton,
   MeditationListSkeleton,
 } from "@/features/self-care/components/meditation/MeditationSkeletonSections";
+import { EnrichedMeditation } from "@/features/self-care/types/selfCareTypes";
 
 const categories = ["All", "Stress & Anxiety", "Self-Care", "Beginner"];
-
-export type EnrichedMeditation = Meditations & {
-  tag: string;
-  isLocked: boolean;
-  coachName: string;
-  durationLabel: string;
-  image: any;
-};
 
 const Meditation: React.FC = () => {
   const [currentCategory, setCurrentCategory] = useState("All");

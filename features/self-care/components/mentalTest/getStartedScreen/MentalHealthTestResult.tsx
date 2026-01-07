@@ -1,7 +1,8 @@
 // components/selfCare/mentalTest/MentalHealthTestResult.tsx
 
 import React, { useContext, useEffect, useState, useMemo } from "react";
-import { View, Text, StyleSheet, Image, ScrollView } from "react-native";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { Image } from "expo-image";
 import { useNavigation } from "expo-router";
 
 import ThemeContext from "@/context/ThemeContext";
@@ -68,8 +69,9 @@ const MentalHealthTestResult: React.FC<Props> = ({ data }) => {
             <View style={styles.illustrationCard}>
               <Image
                 source={illustration}
-                resizeMode="contain"
+                contentFit="contain"
                 style={styles.illustration}
+                transition={200}
               />
             </View>
           </View>

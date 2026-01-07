@@ -1,4 +1,5 @@
-import { Animated, Image } from "react-native";
+import { Animated } from "react-native";
+import { Image } from "expo-image";
 import HeaderTipsGrid from "@/features/tools/components/contentDetails/HeaderTipsGrid";
 
 type HeroBannerProps = {
@@ -38,7 +39,8 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
         <Image
           source={{ uri: imageUri }}
           style={{ width: "100%", height: 220 }}
-          resizeMode="cover"
+          contentFit="cover"
+          transition={200}
         />
       ) : (
         <HeaderTipsGrid tips={tips} />

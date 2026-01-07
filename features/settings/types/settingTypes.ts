@@ -46,3 +46,9 @@ export interface FeedbackResponse {
   };
   error_code?: string;
 }
+
+export type BackendEntry = {
+  enabled?: boolean;
+  time?: string; // "HH:mm:ss"
+  days_of_week?: string[]; // ["mon","thu"]
+};

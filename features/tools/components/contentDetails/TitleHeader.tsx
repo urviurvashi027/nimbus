@@ -1,4 +1,4 @@
-import { Animated, Image, Text, View } from "react-native";
+import { Animated, Text, View } from "react-native";
 import MetaInfo from "@/features/tools/components/contentDetails/MetaInfo";
 import AuthorCard from "@/features/tools/components/contentDetails/AuthorCard";
 

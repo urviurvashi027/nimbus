@@ -1,4 +1,5 @@
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
+import { Image } from "expo-image";
 import React from "react";
 
 interface HeaderTipsGridType {
@@ -11,7 +12,12 @@ const HeaderTipsGrid: React.FC<HeaderTipsGridType> = ({ tips }) => {
     <View style={styles.grid}>
       {/* {tips.map((tip: any, index: number) => ( */}
       <View style={styles.item}>
-        <Image source={tips.image} style={styles.icon} />
+        <Image
+          source={tips.image}
+          style={styles.icon}
+          contentFit="cover"
+          transition={200}
+        />
         {/* <Text style={styles.label}>{tips.label}</Text> */}
       </View>
       {/* ))} */}

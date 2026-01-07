@@ -1,7 +1,8 @@
 // src/app/(auth)/Tools/BodyShapeCal/BodyShapeCalculator.tsx
 
 import React, { useState, useEffect, useContext } from "react";
-import { View, Text, StyleSheet, Alert, Platform, Image } from "react-native";
+import { View, Text, StyleSheet, Alert, Platform } from "react-native";
+import { Image } from "expo-image";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ScreenView } from "@/components/ui/Themed";
 import ThemeContext from "@/context/ThemeContext";
@@ -198,7 +199,14 @@ const BodyShapeCalculator = () => {
           <View style={styles.resultCard}>
             <View style={styles.resultHeaderRow}>
               <Text style={styles.resultLabel}>Your body shape</Text>
-              {icon && <Image source={icon} style={styles.icon} />}
+              {icon && (
+                <Image
+                  source={icon}
+                  style={styles.icon}
+                  contentFit="contain"
+                  transition={200}
+                />
+              )}
             </View>
 
             {result && <Text style={styles.resultShape}>{result}</Text>}

@@ -22,11 +22,6 @@ import {
 import { NotificationType } from "@/types/notificationType";
 import { NOTIFICATION_TYPES } from "@/constant/data/notificationType";
 
-export type BackendEntry = {
-  enabled?: boolean;
-  time?: string; // "HH:mm:ss"
-  days_of_week?: string[]; // ["mon","thu"]
-};
 export default function NotificationListModal({
   visible,
   onClose,

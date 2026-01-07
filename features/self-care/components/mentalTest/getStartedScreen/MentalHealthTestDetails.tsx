@@ -1,7 +1,8 @@
 // components/selfCare/mentalTest/MentalHealthTestDetails.tsx
 
 import React, { useContext, useMemo } from "react";
-import { View, Text, StyleSheet, Image, ScrollView } from "react-native";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { Image } from "expo-image";
 import StyledButton from "@/components/ui/themeComponents/StyledButton";
 import ThemeContext from "@/context/ThemeContext";
 import { medicalTestData } from "@/constant/data/medicalTest";
@@ -39,7 +40,8 @@ const MentalHealthTestDetails: React.FC<Props> = ({
             <Image
               source={illustration}
               style={styles.illustration}
-              resizeMode="cover"
+              contentFit="cover"
+              transition={200}
             />
           </View>
         </View>

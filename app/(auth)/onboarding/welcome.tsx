@@ -58,7 +58,7 @@ export default function WelcomeKickoff({ username = "You" }: Props) {
         onPress={() => {
           // ✅ Update this to the EXACT route file you have
           // Example if you have: app/(auth)/habit/CreateHabitScreen.tsx
-          router.push("/(auth)/habit/CreateHabitScreen");
+          router.push("/(auth)/habit/createHabit");
         }}
       />
 

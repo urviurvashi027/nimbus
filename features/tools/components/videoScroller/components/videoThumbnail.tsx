@@ -6,10 +6,10 @@ import {
   StyleSheet,
   View,
   Text,
-  ImageBackground,
   Pressable,
   Platform,
 } from "react-native";
+import { Image } from "expo-image";
 import ThemeContext from "@/context/ThemeContext";
 // import { VideoData } from "../../VideoScroller"; // adjust if you want to import the type
 
@@ -37,11 +37,13 @@ const VideoThumbnail: React.FC<VideoThumbnailProps> = ({ video, onPress }) => {
       onPress={onPress}
       style={({ pressed }) => [styles.container, pressed && styles.pressed]}
     >
-      <ImageBackground
+      <Image
         source={{ uri: video.image }}
-        style={styles.imageBackground}
-        imageStyle={styles.imageStyle}
-      >
+        style={[StyleSheet.absoluteFill, styles.imageStyle]}
+        contentFit="cover"
+        transition={200}
+      />
+      <View style={styles.imageBackground}>
         {/* global soft overlay for readability */}
         <View style={styles.overlay} />
 
@@ -67,7 +69,7 @@ const VideoThumbnail: React.FC<VideoThumbnailProps> = ({ video, onPress }) => {
             ) : null}
           </View>
         </View>
-      </ImageBackground>
+      </View>
     </Pressable>
   );
 };

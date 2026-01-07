@@ -5,8 +5,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   Dimensions,
-  ImageBackground,
 } from "react-native";
+import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import ThemeContext from "@/context/ThemeContext";
@@ -42,10 +42,11 @@ const HeroFeatureCard: React.FC<HeroFeatureCardProps> = ({
       <View style={styles.cardInner}>
         {/* Background Image (Optional) */}
         {bgImage && (
-          <ImageBackground
+          <Image
             source={bgImage}
-            style={StyleSheet.absoluteFill}
-            imageStyle={styles.bgImage}
+            style={[StyleSheet.absoluteFill, styles.bgImage]}
+            contentFit="cover"
+            transition={200}
           />
         )}
 

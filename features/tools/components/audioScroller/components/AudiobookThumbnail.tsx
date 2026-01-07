@@ -5,10 +5,10 @@ import {
   StyleSheet,
   View,
   Text,
-  ImageBackground,
   Pressable,
   Platform,
 } from "react-native";
+import { Image } from "expo-image";
 import ThemeContext from "@/context/ThemeContext";
 import { AudiobookData } from "../AudioScroller"; // adjust path if needed
 
@@ -29,11 +29,13 @@ const AudiobookThumbnail: React.FC<AudiobookThumbnailProps> = ({
       onPress={onPress}
       style={({ pressed }) => [styles.container, pressed && styles.pressed]}
     >
-      <ImageBackground
+      <Image
         source={{ uri: audiobook.coverImageUrl }}
-        style={styles.imageBackground}
-        imageStyle={styles.imageStyle}
-      >
+        style={[StyleSheet.absoluteFill, styles.imageStyle]}
+        contentFit="cover"
+        transition={200}
+      />
+      <View style={styles.imageBackground}>
         {/* soft overlay for readability */}
         <View style={styles.overlay} />
 
@@ -48,7 +50,7 @@ const AudiobookThumbnail: React.FC<AudiobookThumbnailProps> = ({
             </Text>
           </View>
         </View>
-      </ImageBackground>
+      </View>
     </Pressable>
   );
 };

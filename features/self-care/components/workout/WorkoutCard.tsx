@@ -2,11 +2,11 @@ import React, { FC, useContext } from "react";
 import {
   View,
   Text,
-  Image,
   StyleSheet,
   TouchableOpacity,
   ImageSourcePropType,
 } from "react-native";
+import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/context/ThemeContext";
 
@@ -51,6 +51,8 @@ const WorkoutCard: FC<WorkoutCardProps> = ({
       <Image
         source={typeof imageUri === "string" ? { uri: imageUri } : imageUri}
         style={styles.thumbnail}
+        contentFit="cover"
+        transition={200}
       />
 
       {/* Right Block */}

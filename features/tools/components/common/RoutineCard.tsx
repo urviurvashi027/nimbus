@@ -5,9 +5,9 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  ImageBackground,
   Animated,
 } from "react-native";
+import { Image } from "expo-image";
 
 interface RoutineCardProps {
   title?: string;
@@ -39,11 +39,13 @@ const ArticleCard: React.FC<RoutineCardProps> = ({
   return (
     <Animated.View style={[styles.card, { height, opacity: fadeAnim }]}>
       <TouchableOpacity style={{ flex: 1 }} onPress={onPress}>
-        <ImageBackground
-          source={image}
-          style={styles.image}
-          imageStyle={{ borderRadius: 15 }}
-        >
+        <View style={styles.image}>
+          <Image
+            source={image}
+            style={[StyleSheet.absoluteFill, { borderRadius: 15 }]}
+            contentFit="cover"
+            transition={200}
+          />
           {tag && (
             <View style={styles.tag}>
               <Text style={styles.tagText}>{tag}</Text>
@@ -53,7 +55,7 @@ const ArticleCard: React.FC<RoutineCardProps> = ({
             <Text style={styles.title}>{title}</Text>
             {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
           </View>
-        </ImageBackground>
+        </View>
       </TouchableOpacity>
     </Animated.View>
   );
