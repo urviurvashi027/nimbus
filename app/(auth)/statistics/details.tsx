@@ -1,7 +1,6 @@
 import { View, Text, StyleSheet, Platform, Button } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { ScrollView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ThemeContext from "@/context/ThemeContext";
@@ -26,13 +25,13 @@ const StatsScreen = () => {
         paddingTop: Platform.OS === "ios" ? 40 : 20,
       }}
     >
-      <GestureHandlerRootView style={styles.gestureContainer}>
+      <View style={styles.gestureContainer}>
         <SafeAreaView>
           <ScrollView>
             <StatsDetails />
           </ScrollView>
         </SafeAreaView>
-      </GestureHandlerRootView>
+      </View>
     </ScreenView>
   );
 };

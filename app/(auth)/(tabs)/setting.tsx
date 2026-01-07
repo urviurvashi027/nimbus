@@ -3,7 +3,6 @@ import { Image } from "expo-image";
 import React, { useContext, useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { ScrollView, Switch } from "react-native-gesture-handler";
 import * as Location from "expo-location";
 
@@ -269,7 +268,7 @@ export default function profile() {
   };
 
   return (
-    <GestureHandlerRootView style={styles.gestureContainer}>
+    <View style={styles.gestureContainer}>
       <SafeAreaView style={styles.gestureContainer}>
         <ScrollView>
           <ProfileHeader
@@ -408,7 +407,7 @@ export default function profile() {
           />
         </ScrollView>
       </SafeAreaView>
-    </GestureHandlerRootView>
+    </View>
   );
 }
 const styling = (newTheme: any) =>

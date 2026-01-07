@@ -2,7 +2,6 @@ import { View, Text, StyleSheet, Platform } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import {
-  GestureHandlerRootView,
   ScrollView,
 } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -108,7 +107,7 @@ const HabitDetails = () => {
           paddingHorizontal: spacing.md,
         }}
       >
-        <GestureHandlerRootView style={styles.gestureContainer}>
+        <View style={styles.gestureContainer}>
           <SafeAreaView style={styles.safeArea}>
             <ScrollView
               showsVerticalScrollIndicator={false}
@@ -117,7 +116,7 @@ const HabitDetails = () => {
               <HabitDetailsSkeleton spacing={spacing} />
             </ScrollView>
           </SafeAreaView>
-        </GestureHandlerRootView>
+        </View>
       </ScreenView>
     );
   }
@@ -142,7 +141,7 @@ const HabitDetails = () => {
         paddingHorizontal: spacing.md,
       }}
     >
-      <GestureHandlerRootView style={styles.gestureContainer}>
+      <View style={styles.gestureContainer}>
         <SafeAreaView style={styles.safeArea}>
           <ScrollView
             showsVerticalScrollIndicator={false}
@@ -224,7 +223,7 @@ const HabitDetails = () => {
             )}
           </ScrollView>
         </SafeAreaView>
-      </GestureHandlerRootView>
+      </View>
       {/* Delete Modal */}
       <DeleteHabitModal
         visible={deleteOpen}

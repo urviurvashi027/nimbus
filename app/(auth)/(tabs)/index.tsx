@@ -16,7 +16,6 @@ import {
   Text,
 } from "react-native";
 import { router, useFocusEffect } from "expo-router";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
 import {
   format,
@@ -194,7 +193,7 @@ export default function TabOneScreen() {
         paddingHorizontal: spacing.md,
       }}
     >
-      <GestureHandlerRootView style={styles.gestureContainer}>
+      <View style={styles.gestureContainer}>
         <FlatList
           data={isFirstTimeUser ? [] : habitList}
           keyExtractor={(item) => item.id.toString()}
@@ -281,7 +280,7 @@ export default function TabOneScreen() {
             ) : null
           }
         />
-      </GestureHandlerRootView>
+      </View>
 
       {/* Floating add button */}
       <TouchableOpacity style={styles.floatingButton} onPress={onCreateClick}>

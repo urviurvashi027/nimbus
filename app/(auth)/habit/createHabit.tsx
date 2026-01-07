@@ -12,7 +12,6 @@ import {
   Platform,
 } from "react-native";
 import { router, useNavigation } from "expo-router";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -236,7 +235,7 @@ export default function HabitBasic() {
   };
 
   return (
-    <GestureHandlerRootView
+    <View
       style={[
         styles.gestureContainer,
         { backgroundColor: newTheme.background },
@@ -376,7 +375,7 @@ export default function HabitBasic() {
           />
         </View>
       </SafeAreaView>
-    </GestureHandlerRootView>
+    </View>
   );
 }
 
