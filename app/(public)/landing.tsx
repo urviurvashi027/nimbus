@@ -1,9 +1,9 @@
 import React, { useContext, useEffect } from "react";
 import { View, Text, StyleSheet, Pressable, Dimensions } from "react-native";
-import { StyledButton } from "@/components/common/ThemedComponent/StyledButton"; // reuse your styled button
+import { StyledButton } from "@/components/ui/StyledButton"; // reuse your styled button
 import { router, useNavigation } from "expo-router";
 import ThemeContext from "@/context/ThemeContext";
-import { ScreenView } from "@/components/Themed";
+import { ScreenView } from "@/components/ui/Themed";
 
 import RelaxMenIcon from "@/assets/images/logoNew/1.svg";
 

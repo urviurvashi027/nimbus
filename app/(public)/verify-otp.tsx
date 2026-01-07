@@ -3,8 +3,8 @@ import { View, Text, StyleSheet } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 
 import ThemeContext from "@/context/ThemeContext";
-import { ScreenView } from "@/components/Themed";
-import NimbusOtpVerifyStep from "@/components/public/NimbusOtpVerifyStep"; // adjust path
+import { ScreenView } from "@/components/ui/Themed";
+import NimbusOtpVerifyStep from "@/features/auth/components/NimbusOtpVerifyStep"; // adjust path
 
 export default function OtpVerificationScreen() {
   const { newTheme } = useContext(ThemeContext);

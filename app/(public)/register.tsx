@@ -5,13 +5,13 @@ import { Stack, router } from "expo-router";
 import ThemeContext from "@/context/ThemeContext";
 import { useAuth } from "@/context/AuthContext";
 
-import { NimbusAuthLayout } from "@/components/public/NimbusAuthLayout";
-import { NimbusInput } from "@/components/common/themeComponents/NimbusInput";
-import { NimbusButton } from "@/components/common/themeComponents/NimbusButton";
+import { NimbusAuthLayout } from "@/features/auth/components/NimbusAuthLayout";
+import { NimbusInput } from "@/components/ui/themeComponents/NimbusInput";
+import { NimbusButton } from "@/components/ui/themeComponents/NimbusButton";
 
-import NimbusOtpVerifyStep from "@/components/public/NimbusOtpVerifyStep";
-import NimbusPasswordStep from "@/components/public/NimbusPasswordStep";
-import { useNimbusToast } from "@/components/common/toast/useNimbusToast";
+import NimbusOtpVerifyStep from "@/features/auth/components/NimbusOtpVerifyStep";
+import NimbusPasswordStep from "@/features/auth/components/NimbusPasswordStep";
+import { useNimbusToast } from "@/components/ui/toast/useNimbusToast";
 
 const TOTAL_STEPS = 4;
 type Step = 1 | 2 | 3 | 4;
@@ -121,7 +121,7 @@ function RegistrationFlowInner() {
           message: "Account created sucessfull",
         });
         console.log("coming here succsess page");
-        // router.replace("/(auth)/onboarding/QuestionScreen");
+        // router.replace("/(auth)/onboarding/questions");
         return;
       }
 

@@ -16,20 +16,20 @@ import {
   NavigationButtonType,
 } from "@/constant/data/toolsButton";
 
-import { ScreenView } from "@/components/Themed";
-import TrendingCardCarousel from "@/components/common/TrendingCardCarousel";
-import MoodTrackerModal from "../toolsScreen/MoodTracker/MoodTracker";
-import VideoScroller from "@/components/tools/videoScroller/VideoScroller";
-import AudiobookScroller from "@/components/tools/audioScroller/AudioScroller";
+import { ScreenView } from "@/components/ui/Themed";
+import TrendingCardCarousel from "@/components/layout/TrendingCardCarousel";
+import MoodTrackerModal from "../tools/dump/MoodTracker/MoodTracker";
+import VideoScroller from "@/features/tools/components/videoScroller/VideoScroller";
+import AudiobookScroller from "@/features/tools/components/audioScroller/AudioScroller";
 
 import {
   getArticleList,
   getRecipeList,
   getRoutineList,
-} from "@/services/toolService";
-import HeroFeatureCard from "@/components/tools/common/HeroFeatureCard";
-import NavigationIconButton from "@/components/common/NavigationIconButton";
-import { FILTER_MAP } from "../toolsScreen/RoutineScreen";
+} from "@/features/tools/services/toolService";
+import HeroFeatureCard from "@/features/tools/components/common/HeroFeatureCard";
+import NavigationIconButton from "@/components/ui/NavigationIconButton";
+import { FILTER_MAP } from "../tools/routineTemplate";
 
 const Tools: React.FC = () => {
   const navigation = useNavigation();
@@ -190,7 +190,7 @@ const Tools: React.FC = () => {
 
   const handleCardPress = (id: string, type: string) => {
     router.push({
-      pathname: "/(auth)/toolsScreen/ContentDetailsScreen",
+      pathname: "/(auth)/tools/contentDetails",
       params: { id: id, type: type },
     });
   };
@@ -200,27 +200,27 @@ const Tools: React.FC = () => {
   };
 
   const onClickOfArticleAll = () => {
-    router.push("/(auth)/toolsScreen/ArticleScreen");
+    router.push("/(auth)/tools/articleList");
   };
 
   const onClickOfRoutineAll = () => {
-    router.push("/(auth)/toolsScreen/RoutineScreen");
+    router.push("/(auth)/tools/routineTemplate");
   };
 
   const onClickOfRecipeAll = () => {
-    router.push("/(auth)/toolsScreen/RecipeScreen");
+    router.push("/(auth)/tools/recipe");
   };
 
   const onClickOfSkincareRoutineAll = () => {
     router.push({
-      pathname: "/(auth)/toolsScreen/RoutineScreen",
+      pathname: "/(auth)/tools/routineTemplate",
       params: { filter: "Skincare" },
     });
   };
 
   const onClickOfHacksRoutineAll = () => {
     router.push({
-      pathname: "/(auth)/toolsScreen/RoutineScreen",
+      pathname: "/(auth)/tools/routineTemplate",
       params: { filter: "Hacks" },
     });
   };
@@ -272,18 +272,14 @@ const Tools: React.FC = () => {
               subtitle="Plan your weekly meals and track nutrition goals."
               icon="restaurant"
               colors={["#FF9A9E", "#FECFEF"]}
-              onPress={() =>
-                router.push("/(auth)/toolsScreen/MealPlannerScreen")
-              }
+              onPress={() => router.push("/(auth)/tools/mealPlanner")}
             />
             <HeroFeatureCard
               title="Scribble Journal"
               subtitle="Capture thoughts, ideas, and daily reflections."
               icon="pencil"
               colors={["#a18cd1", "#fbc2eb"]}
-              onPress={() =>
-                router.push("/(auth)/toolsScreen/ScribbleListScreen")
-              }
+              onPress={() => router.push("/(auth)/tools/scribbleList")}
             />
           </View>
 

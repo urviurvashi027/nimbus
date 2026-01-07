@@ -10,22 +10,22 @@ import { useAuth } from "@/context/AuthContext";
 import { Section } from "@/constant/data/settingsList";
 import ThemeContext from "@/context/ThemeContext";
 
-import NotificationListModal from "@/components/setting/modal/NotificationListModal";
-// import RoutineSettingModal from "@/components/setting/RoutineSetting";
-import ContactUsModal from "@/components/setting/modal/ContactUsModal";
-import FeedbackModal from "@/components/setting/modal/Feeback";
-import PrivacyPolicyModal from "@/components/setting/modal/PrivacyPoilcy";
-import TermsModal from "@/components/setting/modal/TermsAndService";
-import FAQModal from "@/components/setting/modal/HelpCenter";
-import ChangePasswordModal from "@/components/setting/modal/ChangePassword";
-import LogoutModal from "@/components/setting/modal/LogoutModal";
-import SocialActionModal from "@/components/setting/modal/SocialActionModal";
-import AdvancedSettingsModal from "@/components/setting/modal/AdvanceSettingModal";
-import EditProfileModal from "@/components/setting/modal/EditProfileModal";
-import UpgradeBanner from "@/components/common/UpgradeBanner";
+import NotificationListModal from "@/features/settings/components/modal/NotificationListModal";
+// import RoutineSettingModal from "@/features/settings/components/RoutineSetting";
+import ContactUsModal from "@/features/settings/components/modal/ContactUsModal";
+import FeedbackModal from "@/features/settings/components/modal/Feeback";
+import PrivacyPolicyModal from "@/features/settings/components/modal/PrivacyPoilcy";
+import TermsModal from "@/features/settings/components/modal/TermsAndService";
+import FAQModal from "@/features/settings/components/modal/HelpCenter";
+import ChangePasswordModal from "@/features/settings/components/modal/ChangePassword";
+import LogoutModal from "@/features/settings/components/modal/LogoutModal";
+import SocialActionModal from "@/features/settings/components/modal/SocialActionModal";
+import AdvancedSettingsModal from "@/features/settings/components/modal/AdvanceSettingModal";
+import EditProfileModal from "@/features/settings/components/modal/EditProfileModal";
+import UpgradeBanner from "@/components/ui/UpgradeBanner";
 import { router } from "expo-router";
-import ProfileHeader from "@/components/setting/ProfileHeader";
-import StyledSwitch from "@/components/common/themeComponents/StyledSwitch";
+import ProfileHeader from "@/features/settings/components/ProfileHeader";
+import StyledSwitch from "@/components/ui/themeComponents/StyledSwitch";
 import { SvgUri } from "react-native-svg";
 
 type FormState = {
@@ -205,8 +205,8 @@ export default function profile() {
       handleModalVisibilty(label);
     }
     if (type === "screen") {
-      if (label === "Overview") router.push("/(auth)/statisticsScreen/details");
-      if (label === "Badges") router.push("/(auth)/rewardScreen");
+      if (label === "Overview") router.push("/(auth)/statistics/details");
+      if (label === "Badges") router.push("/(auth)/rewards");
     }
   };
 
@@ -276,10 +276,10 @@ export default function profile() {
             }
             planLabel={"Nimbus Free"}
             avatarUrl={userProfile?.avatar || null} // ✅ URL string
-            onPressManagePlan={() => router.push("/(auth)/upgradePlan")}
+            onPressManagePlan={() => router.push("/(auth)/upgrade")}
           />
           <View style={{ paddingVertical: 20 }}>
-            <UpgradeBanner onPress={() => router.push("/(auth)/upgradePlan")} />
+            <UpgradeBanner onPress={() => router.push("/(auth)/upgrade")} />
           </View>
 
           {Section.map(({ header, items }) => (

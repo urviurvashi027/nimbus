@@ -8,9 +8,9 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import AuthProvider from "@/context/AuthContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 // import HabitContext from "@/context/HabitContext";
-import { HabitCreateRequest } from "@/types/habitTypes";
-import { NimbusAlertProvider } from "@/components/common/alert/NimbusAlertProvider";
-import { NimbusToastHost } from "@/components/common/toast/NimbusToast";
+import { HabitCreateRequest } from "@/features/habit/types/habitTypes";
+import { NimbusAlertProvider } from "@/components/ui/alert/NimbusAlertProvider";
+import { NimbusToastHost } from "@/components/ui/toast/NimbusToast";
 
 SplashScreen.preventAutoHideAsync();
 

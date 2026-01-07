@@ -17,7 +17,7 @@ import {
   logout,
   getUserDetails,
   saveUpdateUser,
-} from "@/services/loginService";
+} from "@/features/auth/services/loginService";
 import { setStoredUser, User, getStoredUser } from "@/services/storageSerives";
 import { storageKey } from "@/services/remiderStorageService";
 
@@ -116,7 +116,7 @@ function useProtectedRoute(
     // authed but onboarding not done -> must be in onboarding
     if (isAuthed && onboardingDone === false) {
       const inOnboarding = root === "(auth)" && child === "onboarding";
-      if (!inOnboarding) router.replace("/(auth)/onboarding/QuestionScreen");
+      if (!inOnboarding) router.replace("/(auth)/onboarding/questions");
       return;
     }
 

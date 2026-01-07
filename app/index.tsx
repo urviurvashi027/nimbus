@@ -9,7 +9,7 @@ const ONBOARDING_DONE_KEY = StoreKey.ONBOARDING_DONE_KEY;
 
 type Href =
   | "/(public)/landing"
-  | "/(auth)/onboarding/QuestionScreen"
+  | "/(auth)/onboarding/questions"
   | "/(auth)/(tabs)";
 
 export default function Index() {
@@ -29,7 +29,7 @@ export default function Index() {
       const done =
         (await SecureStore.getItemAsync(ONBOARDING_DONE_KEY)) === "true";
 
-      setHref(done ? "/(auth)/(tabs)" : "/(auth)/onboarding/QuestionScreen");
+      setHref(done ? "/(auth)/(tabs)" : "/(auth)/onboarding/questions");
     })();
   }, []);
 

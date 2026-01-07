@@ -14,12 +14,12 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ThemeContext from "@/context/ThemeContext";
 import { useAuth } from "@/context/AuthContext";
 
-import { ScreenView } from "@/components/Themed";
-import { NimbusInput } from "@/components/common/themeComponents/NimbusInput";
-import { NimbusButton } from "@/components/common/themeComponents/NimbusButton";
-import { NimbusOAuthButtons } from "@/components/public/NimbusOAuthButtons";
-import { StyledCheckbox } from "@/components/common/ThemedComponent/StyledCheckbox";
-import { useNimbusToast } from "@/components/common/toast/useNimbusToast";
+import { ScreenView } from "@/components/ui/Themed";
+import { NimbusInput } from "@/components/ui/themeComponents/NimbusInput";
+import { NimbusButton } from "@/components/ui/themeComponents/NimbusButton";
+import { NimbusOAuthButtons } from "@/features/auth/components/NimbusOAuthButtons";
+import { StyledCheckbox } from "@/components/ui/StyledCheckbox";
+import { useNimbusToast } from "@/components/ui/toast/useNimbusToast";
 
 export default function SignIn() {
   const { newTheme } = useContext(ThemeContext);

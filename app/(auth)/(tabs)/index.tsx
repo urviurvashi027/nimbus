@@ -27,19 +27,22 @@ import {
   startOfDay,
 } from "date-fns";
 
-import { ScreenView } from "@/components/Themed";
+import { ScreenView } from "@/components/ui/Themed";
 import ThemeContext from "@/context/ThemeContext";
 import { useAuth } from "@/context/AuthContext";
-import { getHabitList, markHabitDone } from "@/services/habitService";
-import { HabitItem } from "@/types/habitTypes";
+import {
+  getHabitList,
+  markHabitDone,
+} from "@/features/habit/services/habitService";
+import { HabitItem } from "@/features/habit/types/habitTypes";
 
-import DateScroller from "@/components/homeScreen/DateScroller";
-import DailyCheckInPanel from "@/components/homeScreen/DailyCheckInPanel";
-import HabitItemCard from "@/components/homeScreen/component/HabitItem";
-import TopBadge from "@/components/homeScreen/TopBadge";
-import NewUserScreen from "../FirstTimeUser/NewUserScreen";
-import ProgressPill from "@/components/homeScreen/component/ProgressPill";
-import { useNimbusToast } from "@/components/common/toast/useNimbusToast";
+import DateScroller from "@/features/home/components/DateScroller";
+import DailyCheckInPanel from "@/features/home/components/DailyCheckInPanel";
+import HabitItemCard from "@/features/home/components/component/HabitItem";
+import TopBadge from "@/features/home/components/TopBadge";
+import NewUserScreen from "../new-user";
+import ProgressPill from "@/features/home/components/component/ProgressPill";
+import { useNimbusToast } from "@/components/ui/toast/useNimbusToast";
 
 // ---------- Nimbus visual helpers ----------
 const HABIT_ICONS = ["🍰", "🌱", "🏃‍♂️", "🧘", "📚", "💧"];
@@ -132,7 +135,7 @@ export default function TabOneScreen() {
   //   loadHabits(isoDate);
   // }, [isoDate, loadHabits]);
 
-  const onCreateClick = () => router.push("/(auth)/habit/CreateHabitScreen");
+  const onCreateClick = () => router.push("/(auth)/habit/createHabit");
 
   const handleHabitDoneClick = async (id: string, count: any) => {
     const currentIsoDate = format(startOfDay(selectedDate), "yyyy-MM-dd");
@@ -215,9 +218,7 @@ export default function TabOneScreen() {
                   <TopBadge
                     iconName="star"
                     variant="pill"
-                    onPress={() =>
-                      router.push("/(auth)/CoachScreen/CoachScreen")
-                    }
+                    onPress={() => router.push("/(auth)/coach")}
                   />
                 </View>
               )}

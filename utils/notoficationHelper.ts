@@ -2,7 +2,7 @@ import {
   BackendEntry,
   ReminderSettings,
   ReminderType,
-} from "@/components/setting/NotificationTypeModal";
+} from "@/features/settings/components/NotificationTypeModal";
 import { parse, format, isValid } from "date-fns";
 
 /** Accept "HH:mm:ss" or "HH:mm" and return "7:30 AM" / "7:30 PM". Return fallback if invalid. */

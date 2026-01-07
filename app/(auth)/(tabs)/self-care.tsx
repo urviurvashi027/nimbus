@@ -19,28 +19,31 @@ import {
 import { banners } from "@/constant/data/banner";
 import { medTests } from "@/constant/data/medicalTest";
 
-import { ScreenView } from "@/components/Themed";
-import TrendingCardCarousel from "@/components/common/TrendingCardCarousel";
-import HorizontalListCardScroll from "@/components/common/HorizontalListCardScroll";
-import VideoClassCard from "@/components/selfCare/MasterclassCard";
-import HorizontalBanner from "@/components/common/HorizontalBanner";
-import PricingModal from "@/components/common/PricingModal";
-import NavigationIconButton from "@/components/common/NavigationIconButton";
-import SleepModal from "../selfCareScreen/SleepScreen";
-import ThingsToDoModal from "../selfCareScreen/ThingsToDoScreen";
+import { ScreenView } from "@/components/ui/Themed";
+import TrendingCardCarousel from "@/components/layout/TrendingCardCarousel";
+import HorizontalListCardScroll from "@/components/layout/HorizontalListCardScroll";
+import VideoClassCard from "@/features/self-care/components/MasterclassCard";
+import HorizontalBanner from "@/components/layout/HorizontalBanner";
+import PricingModal from "@/components/ui/PricingModal";
+import NavigationIconButton from "@/components/ui/NavigationIconButton";
+import SleepModal from "../self-care/sleepModal";
+import ThingsToDoModal from "../self-care/ThingsToDoScreen";
 
 import {
   getMeditationAudioList,
   // getMentalTestList,
   getWorkoutVideo,
-} from "@/services/selfCareService";
-import { getRoutineList, getSoundscapeList } from "@/services/toolService";
+} from "@/features/self-care/services/selfCareService";
+import {
+  getRoutineList,
+  getSoundscapeList,
+} from "@/features/tools/services/toolService";
 
 import {
   MeditationAudioListItem,
   WorkoutVideoListItem,
-} from "@/types/selfCareTypes";
-import { SoundscapeTrackListItem } from "@/types/toolsTypes";
+} from "@/features/self-care/types/selfCareTypes";
+import { SoundscapeTrackListItem } from "@/features/tools/types/toolsTypes";
 
 const SelfCare: React.FC = () => {
   const navigation = useNavigation();
@@ -204,16 +207,16 @@ const SelfCare: React.FC = () => {
   const onClickOfAll = (title: string) => {
     switch (title) {
       case "medicalTest":
-        router.push("/(auth)/selfCareScreen/MentalHealthTestScreen");
+        router.push("/(auth)/self-care/mentalHealthTest");
         break;
       case "soundscape":
-        router.push("/(auth)/selfCareScreen/SoundscapeScreen");
+        router.push("/(auth)/self-care/soundscape");
         break;
       case "meditation":
-        router.push("/(auth)/selfCareScreen/MeditationScreen");
+        router.push("/(auth)/self-care/meditation");
         break;
       case "routine":
-        router.push("/(auth)/toolsScreen/RoutineScreen");
+        router.push("/(auth)/tools/routineTemplate");
         break;
     }
   };
