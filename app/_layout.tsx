@@ -5,6 +5,15 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import * as SplashScreen from "expo-splash-screen";
 import { useFonts } from "expo-font";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import {
+  Outfit_300Light,
+  Outfit_400Regular,
+  Outfit_600SemiBold,
+} from "@expo-google-fonts/outfit";
+import {
+  Urbanist_600SemiBold,
+  Urbanist_700Bold,
+} from "@expo-google-fonts/urbanist";
 
 import AuthProvider from "@/context/AuthContext";
 import { ThemeProvider } from "@/context/ThemeContext";
@@ -21,7 +30,14 @@ export const unstable_settings = {
 };
 
 export default function RootLayout() {
-  const [loaded, error] = useFonts({ ...FontAwesome.font });
+  const [loaded, error] = useFonts({
+    ...FontAwesome.font,
+    Outfit_300Light,
+    Outfit_400Regular,
+    Outfit_600SemiBold,
+    Urbanist_600SemiBold,
+    Urbanist_700Bold,
+  });
 
   useEffect(() => {
     if (error) throw error;

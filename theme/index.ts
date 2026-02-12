@@ -14,12 +14,41 @@ export const spacing: Spacing = {
 };
 
 export const typography: Typography = {
-  h1: { fontSize: 32, fontWeight: "800", lineHeight: 40 },
-  h2: { fontSize: 24, fontWeight: "800", lineHeight: 32 },
-  h3: { fontSize: 20, fontWeight: "700", lineHeight: 28 },
-  body: { fontSize: 16, fontWeight: "400", lineHeight: 24 },
-  caption: { fontSize: 12, fontWeight: "400", lineHeight: 16 },
-  button: { fontSize: 16, fontWeight: "700" },
+  h1: {
+    fontFamily: "Urbanist_700Bold",
+    fontSize: 32,
+    fontWeight: "700",
+    lineHeight: 40,
+  },
+  h2: {
+    fontFamily: "Urbanist_700Bold",
+    fontSize: 24,
+    fontWeight: "700",
+    lineHeight: 32,
+  },
+  h3: {
+    fontFamily: "Urbanist_600SemiBold",
+    fontSize: 20,
+    fontWeight: "600",
+    lineHeight: 28,
+  },
+  body: {
+    fontFamily: "Outfit_400Regular",
+    fontSize: 16,
+    fontWeight: "400",
+    lineHeight: 24,
+  },
+  caption: {
+    fontFamily: "Outfit_400Regular",
+    fontSize: 12,
+    fontWeight: "400",
+    lineHeight: 16,
+  },
+  button: {
+    fontFamily: "Outfit_600SemiBold",
+    fontSize: 16,
+    fontWeight: "600",
+  },
 };
 
 const themes = {

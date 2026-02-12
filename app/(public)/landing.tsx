@@ -1,15 +1,15 @@
 import React, { useContext, useEffect } from "react";
 import { View, Text, StyleSheet, Pressable, Dimensions } from "react-native";
-import { StyledButton } from "@/components/ui/StyledButton"; // reuse your styled button
 import { router, useNavigation } from "expo-router";
 import ThemeContext from "@/context/ThemeContext";
 import { ScreenView } from "@/components/ui/Themed";
+import { NimbusButton } from "@/components/ui/themeComponents/NimbusButton";
 
 import RelaxMenIcon from "@/assets/images/logoNew/1.svg";
 
 const LandingScreen = () => {
   const navigation = useNavigation();
-  const { newTheme } = useContext(ThemeContext);
+  const { newTheme, tokens, typography, spacing } = useContext(ThemeContext);
 
   const { width } = Dimensions.get("window");
 
@@ -19,7 +19,7 @@ const LandingScreen = () => {
     });
   }, [navigation]);
 
-  const styles = styling(newTheme);
+  const styles = styling(newTheme, tokens, typography, spacing);
 
   const firstBtnSegmentBtnClick = () => {
     router.push("/(public)/register");
@@ -30,7 +30,7 @@ const LandingScreen = () => {
   };
 
   return (
-    <ScreenView style={{ padding: 10, marginTop: 0 }}>
+    <ScreenView>
       <View style={styles.container}>
         {/* Top Illustrations */}
         <View style={styles.illustrationWrapper}>
@@ -55,96 +55,63 @@ const LandingScreen = () => {
           of yourself — one step at a time.
         </Text>
 
-        <View style={{ marginTop: 40 }} />
+        <View style={{ marginTop: spacing.xl }} />
 
         {/* Buttons */}
 
-        <StyledButton
+        <NimbusButton
           label="I’m new to Nimbus"
-          style={{ borderRadius: 12 }}
+          variant="primary"
           onPress={firstBtnSegmentBtnClick}
         />
 
         <Pressable onPress={secondBtnSegmentBtnClick}>
-          <Text style={styles.secondaryButton}>
-            I’m already have an account
-          </Text>
+          <Text style={styles.secondaryButton}>I already have an account</Text>
         </Pressable>
       </View>
     </ScreenView>
   );
 };
 
-const styling = (newTheme: any) =>
+const styling = (newTheme: any, tokens: any, typography: any, spacing: any) =>
   StyleSheet.create({
     container: {
       backgroundColor: newTheme.background,
       justifyContent: "flex-start",
     },
     imageContainer: {
-      borderRadius: 40,
-      padding: 20,
+      borderRadius: tokens.radius.card,
+      padding: spacing.md,
       backgroundColor: newTheme.background,
     },
     illustrationWrapper: {
-      marginTop: 70,
       alignItems: "center",
     },
-    illustrationItem: {
-      width: 100,
-      height: 100,
-    },
-    label: {
-      position: "absolute",
-      backgroundColor: newTheme.textPrimary,
-      borderRadius: 20,
-      paddingHorizontal: 12,
-      paddingVertical: 6,
-    },
-    labelText: {
-      fontSize: 12,
-      fontWeight: "600",
-      color: newTheme.textSecondary,
-    },
-    title: {
-      marginTop: 30,
-      textAlign: "center",
-    },
-    subtitle: {
-      color: newTheme.textPrimary,
-      fontSize: 16,
-      fontWeight: "600",
-      marginTop: 12,
-      textAlign: "center",
-    },
-
     helper: {
+      ...typography.body,
       color: newTheme.textSecondary,
-      fontSize: 14,
-      marginTop: 6,
+      marginTop: spacing.sm,
       textAlign: "center",
     },
     secondaryButton: {
-      marginTop: 16,
+      ...typography.button,
+      marginTop: spacing.md,
       color: newTheme.textPrimary,
-      fontSize: 14,
       textAlign: "center",
-      fontWeight: "600",
     },
     tagline: {
-      marginTop: 30,
+      ...typography.caption,
+      marginTop: spacing.xl,
       textAlign: "center",
-      fontSize: 14,
-      fontWeight: "700",
-      color: newTheme.accent, // accent green
+      color: newTheme.accent,
+      textTransform: "uppercase",
+      letterSpacing: 1,
     },
-
     headline: {
+      ...typography.h2,
       color: newTheme.textPrimary,
-      fontSize: 28,
-      fontWeight: "700",
-      marginTop: 12,
-      marginBottom: 8,
+      marginTop: spacing.sm,
+      marginBottom: spacing.xs,
       textAlign: "center",
     },
   });

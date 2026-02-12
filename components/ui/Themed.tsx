@@ -12,6 +12,7 @@ import {
   Platform,
 } from "react-native";
 import React, { useState } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // import { useColorScheme } from "./UseColorScheme";
 import { useContext } from "react";
@@ -30,45 +31,6 @@ export type TextInputProps = ThemeProps & DefaultTextInput["props"];
 
 export type ThemeKey = "basic" | "light" | "dark";
 
-// export function useThemeColor(
-//   props: { light?: string; dark?: string },
-//   colorName: keyof typeof Colors.light & keyof typeof Colors.dark
-// ) {
-//   const theme = useColorScheme() ?? "light";
-//   const colorFromProps = props[theme];
-//   if (colorFromProps) {
-//     return colorFromProps;
-//   } else {
-//     return Colors[theme][colorName];
-//   }
-// }
-
-// export function Text(props: TextProps) {
-//   const { style, lightColor, darkColor, ...otherProps } = props;
-//   const color = useThemeColor({ light: lightColor, dark: darkColor }, "text");
-
-//   const styles = textStyling(theme);
-
-//   return <DefaultText style={[styles.textStyle, style]} {...otherProps} />;
-// }
-
-// const textStyling = (theme: ThemeKey) =>
-//   StyleSheet.create({
-//     textStyle: {
-//       color: themeColors[theme].text,
-//     },
-//   });
-
-// export function View(props: ViewProps) {
-//   const { style, lightColor, darkColor, ...otherProps } = props;
-//   // const backgroundColor = useThemeColor(
-//   //   { light: lightColor, dark: darkColor },
-//   //   "background"
-//   // );
-
-//   return <DefaultView style={[{ backgroundColor }, style]} {...otherProps} />;
-// }
-
 export const Button = ({
   title,
   onPress,
@@ -80,8 +42,8 @@ export const Button = ({
   style?: any;
   textStyle?: any;
 }) => {
-  const { theme, toggleTheme, useSystemTheme } = useContext(ThemeContext);
-  const styles = btnStyling(theme);
+  const { newTheme } = useContext(ThemeContext);
+  const styles = btnStyling(newTheme);
 
   return (
     <TouchableOpacity onPress={onPress} style={[style]}>
@@ -90,86 +52,31 @@ export const Button = ({
   );
 };
 
-const btnStyling = (theme: ThemeKey) => StyleSheet.create({});
-
-export function LargeButton() {}
+const btnStyling = (theme: any) => StyleSheet.create({});
 
 export function ScreenView(
-  props: ViewProps & { bgColor?: string; padding?: number }
+  props: ViewProps & {
+    bgColor?: string;
+    padding?: number;
+    useSafeTop?: boolean;
+  }
 ) {
-  const { style, bgColor, padding, ...otherProps } = props;
-  const { theme, newTheme, toggleTheme, useSystemTheme } =
-    useContext(ThemeContext);
-  const styles = screenViewStyling(theme, newTheme, bgColor, padding);
-  // console.log("NewTheme[theme].background,");
-  return <DefaultView style={[style, styles.container]} {...otherProps} />;
+  const { style, bgColor, padding, useSafeTop = true, ...otherProps } = props;
+  const { newTheme, tokens, spacing } = useContext(ThemeContext);
+  const insets = useSafeAreaInsets();
+  console.log("ScreenView insets:", insets, spacing.md);
+
+  const standardStyle = {
+    backgroundColor: bgColor || newTheme.background,
+    paddingHorizontal: padding !== undefined ? padding : tokens.layout.screenX,
+    paddingTop: useSafeTop ? insets.top + spacing.md : padding ?? spacing.md,
+    flex: 1,
+  };
+
+  console.log("ScreenView rendered with bgColor:", standardStyle);
+
+  return <DefaultView style={[standardStyle, style]} {...otherProps} />;
 }
-
-const screenViewStyling = (
-  theme: ThemeKey,
-  newTheme: any,
-  bgColor?: string,
-  padding?: number
-) =>
-  StyleSheet.create({
-    container: {
-      backgroundColor: bgColor || newTheme.background,
-      // backgroundColor: themeColors[theme].background,
-      padding: padding || 15,
-      height: "100%",
-      // paddingTop: Platform.OS === "ios" ? 50 : 20,
-    },
-  });
-
-// export function TextInput(props: TextInputProps) {
-//   const { style, ...otherProps } = props;
-//   const styles = inputStyling(theme);
-
-//   return <DefaultTextInput style={styles.input} {...otherProps} />;
-// }
-
-// const inputStyling = (theme: ThemeKey) =>
-//   StyleSheet.create({
-//     input: {
-//       backgroundColor: themeColors[theme].background,
-//       color: themeColors[theme].text,
-//       borderColor: themeColors[theme].inpurBorderColor,
-//       padding: 19,
-//       borderWidth: 1,
-//       borderRadius: 10,
-
-//       // Shadow for iOS
-//       shadowColor: themeColors[theme].boxShadowColor,
-//       shadowOffset: {
-//         width: -2,
-//         height: 4, // vertical shadow
-//       },
-//       shadowOpacity: 0.2, // shadow transparency
-//       shadowRadius: 3, // shadow blur
-
-//       // Shadow for Android
-//       elevation: 15, // Creates shadow on Android
-//     },
-//   });
-
-// export const FormInput = (props: TextInputProps) => {
-//   const { style, ...otherProps } = props;
-//   const styles = formInputStyling(theme);
-
-//   return <DefaultTextInput style={styles.input} {...otherProps} />;
-// };
-
-// const formInputStyling = (theme: ThemeKey) =>
-//   StyleSheet.create({
-//     input: {
-//       backgroundColor: themeColors[theme].background,
-//       color: themeColors[theme].text,
-//       borderColor: themeColors[theme].inpurBorderColor,
-//       padding: 15,
-//       borderWidth: 1,
-//       borderRadius: 10,
-//     },
-//   });
 
 // new component input
 export const StyledInput = ({

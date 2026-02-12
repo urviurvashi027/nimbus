@@ -1,28 +1,40 @@
 import React, { useContext, useMemo, useState } from "react";
-import { View, Text, StyleSheet, Alert } from "react-native";
-import { router } from "expo-router";
+import { View, Text, StyleSheet } from "react-native";
+import { router, useNavigation } from "expo-router";
 
 import ThemeContext from "@/context/ThemeContext";
-import { ScreenView } from "@/components/ui/Themed";
+
+import { ScreenView } from "@/components/ui/themeComponents/ScreenView";
 import { NimbusInput } from "@/components/ui/themeComponents/NimbusInput";
 import { NimbusButton } from "@/components/ui/themeComponents/NimbusButton";
-
 import { useNimbusAlert } from "@/components/ui/alert/useNimbusAlert";
+import { useNimbusToast } from "@/components/ui/toast/useNimbusToast";
+import AppHeader from "@/components/layout/AppHeader";
 
 import { forgotPassword } from "@/features/auth/services/loginService";
-import { useNimbusToast } from "@/components/ui/toast/useNimbusToast";
 
 export default function ForgotPasswordScreen() {
-  const { newTheme } = useContext(ThemeContext);
-  const s = useMemo(() => styles(newTheme), [newTheme]);
+  const { newTheme, spacing, typography } = useContext(ThemeContext);
+  const styles = useMemo(
+    () => styling(newTheme, spacing, typography),
+    [newTheme, spacing, typography]
+  );
 
   const [email, setEmail] = useState("");
   const [errMsg, setErrMsg] = useState<string>("");
   const [loading, setLoading] = useState(false);
 
   const toast = useNimbusToast();
-
   const alert = useNimbusAlert();
+  const navigation = useNavigation();
+
+  // Hide the native header
+  React.useEffect(() => {
+    navigation.setOptions({
+      headerShown: false,
+    });
+  }, [navigation]);
+
   const validate = (value: string) => {
     const v = value.trim();
     const emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
@@ -91,16 +103,14 @@ export default function ForgotPasswordScreen() {
   };
 
   return (
-    <ScreenView style={s.container} bgColor={newTheme.background}>
-      <View style={s.header}>
-        <Text style={s.title}>Forgot password</Text>
-        <Text style={s.subtitle}>
-          Enter your email and we’ll send a one-time code to reset your
-          password.
-        </Text>
-      </View>
+    <ScreenView>
+      <AppHeader
+        title="Forgot password"
+        subtitle="Enter your email and we’ll send a one-time code to reset your password."
+        onBack={() => router.back()}
+      />
 
-      <View style={{ height: 18 }} />
+      <View style={{ marginTop: spacing.md }} />
 
       <NimbusInput
         label="Email"
@@ -113,61 +123,40 @@ export default function ForgotPasswordScreen() {
       />
 
       {!!errMsg && (
-        <Text style={[s.errorText, { color: newTheme.error }]}>{errMsg}</Text>
+        <Text style={[styles.errorText, { color: newTheme.error }]}>
+          {errMsg}
+        </Text>
       )}
 
-      <View style={{ height: 18 }} />
+      <View style={{ marginTop: spacing.lg }} />
 
       <NimbusButton
         label={loading ? "Sending secure code…" : "Send secure code"}
-        // label={loading ? "Sending OTP..." : "Get OTP"}
         onPress={submit}
         disabled={loading}
-        style={{ borderRadius: 16 }}
       />
 
-      <View style={{ height: 12 }} />
+      <View style={{ marginTop: spacing.sm }} />
 
-      <Text style={s.helper}>
+      <Text style={styles.helper}>
         If you don’t see the email, check your spam folder.
       </Text>
     </ScreenView>
   );
 }
 
-const styles = (t: any) =>
+const styling = (t: any, spacing: any, typography: any) =>
   StyleSheet.create({
-    container: {
-      paddingTop: 86, // gives breathing room from top/back button area
-      paddingHorizontal: 20,
-      flex: 1,
-    },
-    header: {
-      marginTop: 24, // 👈 THIS creates space below back arrow
-      marginBottom: 28, // 👈 Separates header from form
-    },
-    title: {
-      color: t.textPrimary,
-      fontSize: 30,
-      fontWeight: "800", // reduced from 900 -> more premium
-      letterSpacing: -0.2,
-    },
-    subtitle: {
-      marginTop: 10,
-      color: t.textSecondary,
-      fontSize: 15,
-      lineHeight: 22,
-      fontWeight: "600",
-    },
     errorText: {
-      marginTop: 10,
+      marginTop: spacing.xs,
       fontWeight: "700",
+      ...typography.caption,
     },
     helper: {
-      marginTop: 6,
+      marginTop: spacing.xs,
       textAlign: "center",
       color: t.textSecondary,
-      fontSize: 13,
       fontWeight: "600",
+      ...typography.caption,
     },
   });
