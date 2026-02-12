@@ -3,17 +3,17 @@ import { View, Text, StyleSheet, Alert } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 
 import ThemeContext from "@/context/ThemeContext";
-import { ScreenView } from "@/components/Themed";
-import { NimbusInput } from "@/components/common/themeComponents/NimbusInput";
-import { NimbusButton } from "@/components/common/themeComponents/NimbusButton";
-import { useNimbusAlert } from "@/components/common/alert/useNimbusAlert";
-import { setPassword as resetPassword } from "@/services/loginService";
-import { useNimbusToast } from "@/components/common/toast/useNimbusToast";
+import { ScreenView } from "@/components/ui/Themed";
+import { NimbusInput } from "@/components/ui/themeComponents/NimbusInput";
+import { NimbusButton } from "@/components/ui/themeComponents/NimbusButton";
+import { useNimbusAlert } from "@/components/ui/alert/useNimbusAlert";
+import { setPassword as resetPassword } from "@/features/auth/services/loginService";
+import { useNimbusToast } from "@/components/ui/toast/useNimbusToast";
 
 // import { normalizeApiError } from "@/utils/normalizeApiError";
 
 // ✅ Replace with your real service function name
-// import { resetPassword } from "@/services/loginService";
+// import { resetPassword } from "@/features/auth/services/loginService";
 
 export default function ResetPasswordScreen() {
   const { newTheme } = useContext(ThemeContext);

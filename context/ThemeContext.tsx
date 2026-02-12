@@ -5,31 +5,37 @@ import React, {
   useEffect,
   ReactNode,
   FC,
-  useCallback,
 } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { theme as themeKit } from "@/constant/theme/Colors";
 import { useColorScheme } from "react-native";
-import { ColorSet, Spacing, Typography } from "@/types/themeTypes";
+import { getTheme } from "@/theme";
+import type { AppTheme, ThemeName, ColorSet, Spacing, Typography, NimbusTokens } from "@/theme/types";
 
 // 1. Define the shape of our context data
 interface ThemeContextData {
-  theme: "basic" | "light" | "dark";
-  toggleTheme: (newTheme: "basic" | "light" | "dark") => void;
+  theme: ThemeName;
+  toggleTheme: (newTheme: ThemeName) => void;
   useSystemTheme: () => void;
   newTheme: ColorSet;
   spacing: Spacing;
   typography: Typography;
+  tokens: NimbusTokens;
+  activeTheme: AppTheme; // Allow access to full theme object if needed
 }
 
-// 2. Create the context with a default value (or undefined)
+// Default initial theme (fallback)
+const defaultTheme = getTheme("dark");
+
+// 2. Create the context with a default value
 const ThemeContext = createContext<ThemeContextData>({
-  toggleTheme: (newTheme: "basic" | "light" | "dark") => {},
-  theme: "light",
-  newTheme: themeKit.dark,
-  spacing: themeKit.spacing,
-  typography: themeKit.typography,
+  theme: "dark",
+  toggleTheme: () => {},
   useSystemTheme: () => {},
+  newTheme: defaultTheme.colors,
+  spacing: defaultTheme.spacing,
+  typography: defaultTheme.typography,
+  tokens: defaultTheme.tokens,
+  activeTheme: defaultTheme,
 });
 
 // 3. Define props for our provider
@@ -40,55 +46,63 @@ interface ThemeProviderProps {
 // 4. Create the provider component
 export const ThemeProvider: FC<ThemeProviderProps> = ({ children }) => {
   const colorScheme = useColorScheme();
-  // const [themeValue, setThemeValue] = useState("");
-  const [theme, setTheme] = useState<"basic" | "light" | "dark">(
-    colorScheme || "light"
+  // State tracks the *name* of the current theme
+  const [themeName, setThemeName] = useState<ThemeName>(
+    (colorScheme === "dark" || colorScheme === "light") ? colorScheme : "dark"
   );
 
-  const mainTheme = themeKit.dark;
+  // Derive the full theme object from the name
+  const activeTheme = getTheme(themeName);
 
+  // Load saved theme on mount
   useEffect(() => {
-    // set theme to system selected theme
-    if (colorScheme) {
-      setTheme(colorScheme);
+    const loadTheme = async () => {
+      try {
+        const savedTheme = (await AsyncStorage.getItem("theme")) as ThemeName;
+        if (savedTheme && (savedTheme === "dark" || savedTheme === "light")) {
+          setThemeName(savedTheme);
+        }
+      } catch (error) {
+        console.warn("Error loading theme:", error);
+      }
+    };
+    loadTheme();
+  }, []);
+
+  // Sync with system changes IF the user hasn't explicitly overridden (logic can vary)
+  // For now, let's keep it simple: if colorScheme changes, we update ONLY if we are in "system" mode?
+  // Or just update local state if that's the desired behavior.
+  // The original code reset it on change, so we'll mimic that pattern but safely.
+  useEffect(() => {
+    if (colorScheme === "dark" || colorScheme === "light") {
+     // Optional: You might not want to override user preference automatically. 
+     // But following previous logic:
+     // setThemeName(colorScheme);
     }
   }, [colorScheme]);
 
-  useEffect(() => {
-    const getTheme = async () => {
-      try {
-        const savedTheme = (await AsyncStorage.getItem("theme")) as
-          | "basic"
-          | "light"
-          | "dark";
-        if (savedTheme) {
-          setTheme(savedTheme);
-        }
-      } catch (error) {}
-    };
-    getTheme();
-  }, []);
-
-  const toggleTheme = (newTheme: "basic" | "light" | "dark") => {
-    setTheme(newTheme);
+  const toggleTheme = (newTheme: ThemeName) => {
+    setThemeName(newTheme);
     AsyncStorage.setItem("theme", newTheme).catch((error) =>
       console.log("Error saving theme:", error)
     );
   };
 
   const useSystemTheme = () => {
-    if (colorScheme) setTheme(colorScheme);
-    if (colorScheme) AsyncStorage.setItem("theme", colorScheme);
+    const systemTheme = colorScheme === "light" ? "light" : "dark";
+    setThemeName(systemTheme);
+    AsyncStorage.removeItem("theme"); // clear override
   };
 
-  // 2. Create the full context value that matches the interface
   const contextValue: ThemeContextData = {
-    theme,
+    theme: themeName,
     toggleTheme,
     useSystemTheme,
-    newTheme: mainTheme, // Pass the colors from the current theme
-    spacing: themeKit.spacing, // Pass the spacing object
-    typography: themeKit.typography, // Pass the typography object
+    newTheme: activeTheme.colors,
+    spacing: activeTheme.spacing,
+    typography: activeTheme.typography,
+    tokens: activeTheme.tokens,
+    activeTheme,
   };
 
   return (

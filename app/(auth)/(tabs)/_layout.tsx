@@ -3,7 +3,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { theme as newThemeKit } from "@/constant/theme/Colors";
-import { useColorScheme } from "@/components/UseColorScheme";
+import { useColorScheme } from "@/hooks/useColorScheme";
 import ThemeContext from "@/context/ThemeContext";
 
 // function TabBarIcon(props: {

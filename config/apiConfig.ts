@@ -1,7 +1,7 @@
 // apiConfig.ts
 
 import { contactUs } from "@/services/contactService";
-import { logFeedback } from "@/services/settingService";
+import { logFeedback } from "@/features/settings/services/settingService";
 
 // Define base URLs for different environments
 const ENV = process.env.NODE_ENV as "development" | "staging" | "production";

@@ -1,6 +1,7 @@
 export type ThemeName = "dark" | "light"; // add "basic" later only if needed
 
 export interface FontSet {
+  fontFamily: string;
   fontSize: number;
   fontWeight:
     | "normal"

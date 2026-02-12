@@ -1,8 +1,5 @@
-import {
-  BackendEntry,
-  ReminderSettings,
-  ReminderType,
-} from "@/components/setting/NotificationTypeModal";
+import { BackendEntry } from "@/features/settings/types/settingTypes";
+import { ReminderSettings } from "@/types/notificationType";
 import { parse, format, isValid } from "date-fns";
 
 /** Accept "HH:mm:ss" or "HH:mm" and return "7:30 AM" / "7:30 PM". Return fallback if invalid. */
@@ -36,7 +33,7 @@ export const repeatLabelFromDays = (entry?: BackendEntry) => {
 
 // ⚡ Generic merge function
 export function mergeReminders(
-  frontendList: ReminderType[],
+  frontendList: any[],
   backendList: ReminderSettings[]
 ) {
   return frontendList.map((item) => {

@@ -1,32 +1,37 @@
-// app/(public)/signIn.tsx (or wherever your route is)
+// app/(public)/signIn.tsx
 import React, { useContext, useMemo, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  Alert,
-  Platform,
-} from "react-native";
-import { Stack, router } from "expo-router";
+import { View, Text, StyleSheet, Pressable, Alert } from "react-native";
+import { Stack, router, useNavigation } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import ThemeContext from "@/context/ThemeContext";
+
+import { ScreenView } from "@/components/ui/themeComponents/ScreenView";
+import { NimbusInput } from "@/components/ui/themeComponents/NimbusInput";
+import { NimbusButton } from "@/components/ui/themeComponents/NimbusButton";
+import { StyledCheckbox } from "@/components/ui/StyledCheckbox";
+import { useNimbusToast } from "@/components/ui/toast/useNimbusToast";
+import AppHeader from "@/components/layout/AppHeader";
 import { useAuth } from "@/context/AuthContext";
 
-import { ScreenView } from "@/components/Themed";
-import { NimbusInput } from "@/components/common/themeComponents/NimbusInput";
-import { NimbusButton } from "@/components/common/themeComponents/NimbusButton";
-import { NimbusOAuthButtons } from "@/components/public/NimbusOAuthButtons";
-import { StyledCheckbox } from "@/components/common/ThemedComponent/StyledCheckbox";
-import { useNimbusToast } from "@/components/common/toast/useNimbusToast";
-
 export default function SignIn() {
-  const { newTheme } = useContext(ThemeContext);
+  const { newTheme, tokens, typography, spacing } = useContext(ThemeContext);
   const { onLogin } = useAuth();
-  const insets = useSafeAreaInsets();
+  const navigation = useNavigation();
+  // const insets = useSafeAreaInsets(); // Not needed anymore
 
-  const s = useMemo(() => styles(newTheme), [newTheme]);
+  // Hide the native header
+  React.useEffect(() => {
+    navigation.setOptions({
+      headerShown: false,
+    });
+  }, [navigation]);
+
+  // Pass all theme objects to styling function
+  const styles = useMemo(
+    () => styling(newTheme, tokens, typography, spacing),
+    [newTheme, tokens, typography, spacing]
+  );
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -34,9 +39,6 @@ export default function SignIn() {
   const [loading, setLoading] = useState(false);
 
   const toast = useNimbusToast();
-
-  // ✅ No useHeaderHeight — just give consistent breathing room below transparent header
-  const topPad = insets.top + 56; // tweak 52–64 if you want a bit more/less
 
   const submit = async () => {
     if (!username.trim() || !password.trim()) {
@@ -76,143 +78,100 @@ export default function SignIn() {
   };
 
   return (
-    <>
-      <Stack.Screen
-        options={{
-          headerShown: true,
-          headerTransparent: true,
-          headerTitle: "",
-          headerBackButtonDisplayMode: "minimal",
-          headerTintColor: newTheme.textPrimary,
-        }}
+    <ScreenView>
+      {/* Nimbus Shared Header */}
+      <AppHeader
+        title="Welcome back"
+        subtitle="Sign in to continue your Nimbus journey."
+        onBack={() => router.back()}
       />
 
-      <ScreenView
-        style={[s.container, { paddingTop: topPad }]}
-        bgColor={newTheme.background}
-      >
-        {/* Title */}
-        <View style={s.header}>
-          <Text style={s.title}>Welcome back</Text>
-          <Text style={s.subtitle}>
-            Sign in to continue your Nimbus journey.
-          </Text>
-        </View>
+      <View style={{ marginTop: spacing.md }} />
 
-        <View style={{ height: 18 }} />
+      <NimbusInput
+        label="Username"
+        value={username}
+        onChangeText={setUsername}
+        placeholder="John Cena"
+        autoCapitalize="none"
+        returnKeyType="next"
+      />
 
-        <NimbusInput
-          label="Username"
-          value={username}
-          onChangeText={setUsername}
-          placeholder="John Cena"
-          autoCapitalize="none"
-          returnKeyType="next"
+      <View style={{ marginTop: spacing.md }} />
+
+      <NimbusInput
+        label="Password"
+        preset="password"
+        value={password}
+        onChangeText={setPassword}
+        placeholder="••••••••"
+        enablePasswordToggle
+        returnKeyType="done"
+        onSubmitEditing={submit}
+      />
+
+      <View style={{ marginTop: spacing.md }} />
+
+      <View style={styles.row}>
+        <StyledCheckbox
+          checked={rememberMe}
+          onToggle={() => setRememberMe((v) => !v)}
+          label={<Text style={styles.rememberText}>Remember me</Text>}
         />
 
-        <View style={{ height: 14 }} />
-
-        <NimbusInput
-          label="Password"
-          preset="password"
-          value={password}
-          onChangeText={setPassword}
-          placeholder="••••••••"
-          enablePasswordToggle
-          returnKeyType="done"
-          onSubmitEditing={submit}
-        />
-
-        <View style={{ height: 14 }} />
-
-        <View style={s.row}>
-          <StyledCheckbox
-            checked={rememberMe}
-            onToggle={() => setRememberMe((v) => !v)}
-            label={<Text style={s.rememberText}>Remember me</Text>}
-          />
-
-          <Pressable
-            onPress={() => router.push("/(public)/forgot-password")}
-            hitSlop={10}
-          >
-            <Text style={s.link}>Forgot password?</Text>
-          </Pressable>
-        </View>
-
-        <View style={{ height: 18 }} />
-
-        <NimbusButton
-          label={loading ? "Signing in..." : "Sign in"}
-          onPress={submit}
-          disabled={loading}
-        />
-
-        <View style={{ height: 22 }} />
-
-        <Pressable onPress={() => router.push("/(public)/register")}>
-          <Text style={s.footerText}>
-            Don’t have an account?{" "}
-            <Text style={s.footerStrong}>Create one</Text>
-          </Text>
+        <Pressable
+          onPress={() => router.push("/(public)/forgot-password")}
+          hitSlop={10}
+        >
+          <Text style={styles.link}>Forgot password?</Text>
         </Pressable>
+      </View>
 
-        <View style={{ height: 26 }} />
-        {/* 
-        <NimbusOAuthButtons
-          onGoogle={() => console.log("TODO: Google OAuth")}
-          onApple={() => console.log("TODO: Apple OAuth")}
-          hideApple={Platform.OS !== "ios"}
-        /> */}
-      </ScreenView>
-    </>
+      <View style={{ marginTop: spacing.lg }} />
+
+      <NimbusButton
+        label={loading ? "Signing in..." : "Sign in"}
+        onPress={submit}
+        disabled={loading}
+      />
+
+      <View style={{ marginTop: spacing.xl }} />
+
+      <Pressable onPress={() => router.push("/(public)/register")}>
+        <Text style={styles.footerText}>
+          Don’t have an account?{" "}
+          <Text style={styles.footerStrong}>Create one</Text>
+        </Text>
+      </Pressable>
+    </ScreenView>
   );
 }
 
-const styles = (t: any) =>
+const styling = (t: any, tokens: any, typography: any, spacing: any) =>
   StyleSheet.create({
-    container: {
-      paddingHorizontal: 20,
-      flex: 1,
-    },
-    header: {
-      marginTop: 4,
-    },
-    title: {
-      color: t.textPrimary,
-      fontSize: 30,
-      fontWeight: "800", // ✅ lighter than 900
-      letterSpacing: -0.2,
-    },
-    subtitle: {
-      marginTop: 8,
-      color: t.textSecondary,
-      fontSize: 15,
-      lineHeight: 22,
-      fontWeight: "500",
-    },
-
     row: {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
     },
     rememberText: {
+      ...typography.body,
+      fontSize: 14,
       color: t.textPrimary,
       fontWeight: "600",
     },
     link: {
-      color: t.accent, // ✅ premium (no underline)
-      fontWeight: "700",
+      ...typography.button,
+      fontSize: 14,
+      color: t.accent,
     },
-
     footerText: {
+      ...typography.body,
       color: t.textSecondary,
       textAlign: "center",
-      fontWeight: "600",
     },
     footerStrong: {
+      ...typography.button,
       color: t.textPrimary,
-      fontWeight: "800",
     },
   });

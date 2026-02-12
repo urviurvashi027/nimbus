@@ -1,9 +1,7 @@
 import React, { useContext } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/context/ThemeContext";
-// import { ThemeKey } from "@/components/Themed";
 
 type OnboardingHeaderProps = {
   step: number;

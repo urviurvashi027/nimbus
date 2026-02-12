@@ -4,7 +4,7 @@ export type Choice = {
   icon?: string; // optional emoji / icon
 };
 
-export type QuestionType = "single" | "multiple" | "time" | "signature";
+export type QuestionType = "single" | "multiple" | "time" | "signature" | "location";
 
 export type Question = {
   id: number;
@@ -96,6 +96,12 @@ export const ONBOARDING_QUESTIONS: Question[] = [
       { id: "stress", label: "Manage Stress & Anxiety", icon: "😌" },
       { id: "other", label: "Other (Specify)", icon: "✨" },
     ],
+  },
+  {
+    id: 9,
+    title: "Where are you located? 🌍",
+    subtitle: "We use your location to provide local insights and relevant suggestions.",
+    type: "location",
   },
   {
     id: 8,
