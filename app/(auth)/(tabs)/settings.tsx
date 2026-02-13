@@ -271,7 +271,7 @@ export default function profile() {
   return (
     <View style={styles.gestureContainer}>
       <SafeAreaView style={styles.gestureContainer}>
-        <ScrollView>
+        <ScrollView contentContainerStyle={{ paddingBottom: 130 }}>
           <ProfileHeader
             username={userProfile?.username || "Nimbus Explorer"}
             emailOrTagline={

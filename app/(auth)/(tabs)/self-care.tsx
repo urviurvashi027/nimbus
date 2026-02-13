@@ -301,7 +301,7 @@ const SelfCare: React.FC = () => {
           ))}
         </ScrollView>
 
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
           {/* Workout Video List Section */}
           {/* <ScrollView
             horizontal
@@ -398,6 +398,9 @@ const styling = (newTheme: any, spacing: any, typography: any) =>
     },
     navigationScrollView: {
       marginBottom: spacing.md,
+    },
+    scrollContent: {
+      paddingBottom: 130,
     },
   });
 

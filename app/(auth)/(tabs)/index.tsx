@@ -43,6 +43,17 @@ import TopBadge from "@/features/home/components/TopBadge";
 import NewUserScreen from "../new-user";
 import ProgressPill from "@/features/home/components/component/ProgressPill";
 import { useNimbusToast } from "@/components/ui/toast/useNimbusToast";
+import SyncProgressCard from "@/features/home/components/component/SyncProgressCard";
+import RitualStreakPanel from "@/features/home/components/RitualStreakPanel";
+
+// import DateScroller from "@/components/homeScreen/DateScroller";
+// import RitualStreakPanel from "@/components/homeScreen/RitualStreakPanel";
+// import HabitItemCard from "@/components/homeScreen/component/HabitItem";
+// import SyncProgressCard from "@/components/homeScreen/component/SyncProgressCard";
+// import TopBadge from "@/components/homeScreen/TopBadge";
+// import NewUserScreen from "../FirstTimeUser/NewUserScreen";
+// import ProgressPill from "@/components/homeScreen/component/ProgressPill";
+// import { useNimbusToast } from "@/components/common/toast/useNimbusToast";
 
 // ---------- Nimbus visual helpers ----------
 const HABIT_ICONS = ["🍰", "🌱", "🏃‍♂️", "🧘", "📚", "💧"];
@@ -231,17 +242,26 @@ export default function TabOneScreen() {
                 // centerSelected
               />
 
+              <SyncProgressCard
+                percentage={84}
+                currentPhase="Flow State"
+                nextPhase="Master Healer"
+              />
+
               <>
-                {/* Daily check-in */}
-                <View style={styles.checkInContainer}>
-                  <DailyCheckInPanel date={isoDate} />
-                </View>
+                {/* Ritual Streaks (formerly Daily Check-in) */}
+                <RitualStreakPanel date={isoDate} />
 
                 {/* Habits section header */}
                 {habitList.length > 0 && (
                   <View style={styles.sectionHeader}>
                     <View>
-                      <Text style={styles.sectionTitle}>{sectionTitle}</Text>
+                      <Text
+                        style={styles.sectionTitle}
+                      >{`${sectionTitle}'S PROTOCOLS`}</Text>
+                      {/* {sectionSubtitle && (
+                        <Text style={styles.sectionSubtitle}>{sectionSubtitle}</Text>
+                      )} */}
                     </View>
                     <ProgressPill
                       label={`${completedHabit}/${habitList.length}`}
@@ -284,9 +304,9 @@ export default function TabOneScreen() {
       </View>
 
       {/* Floating add button */}
-      <TouchableOpacity style={styles.floatingButton} onPress={onCreateClick}>
+      {/* <TouchableOpacity style={styles.floatingButton} onPress={onCreateClick}>
         <Ionicons name="add" size={26} color={styles.fabIcon.color} />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </ScreenView>
   );
 }
@@ -306,7 +326,7 @@ const styling = (theme: any, spacing: any, typography: any) =>
       flex: 1,
     },
     listContent: {
-      paddingBottom: spacing.xl * 2, // horizontal padding is on ScreenView
+      paddingBottom: 130, // Increased to accommodate floating tab bar
     },
 
     // Loading
@@ -355,12 +375,20 @@ const styling = (theme: any, spacing: any, typography: any) =>
       marginTop: spacing.xs,
     },
     sectionTitle: {
-      ...typography.subtitle,
-      color: theme.textPrimary,
+      fontSize: 12,
+      fontWeight: "700",
+      letterSpacing: 1.2,
+      color: theme.accent,
+      textTransform: "uppercase",
+      opacity: 0.9,
     },
     sectionSubtitle: {
-      ...typography.caption,
+      fontSize: 10,
+      fontWeight: "600",
+      letterSpacing: 0.8,
       color: theme.textSecondary,
+      textTransform: "uppercase",
+      opacity: 0.5,
       marginTop: 2,
     },
     pill: {

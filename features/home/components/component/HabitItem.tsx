@@ -25,7 +25,10 @@ interface HabitItemProps {
   onToggle: (id: string, actual_count: any) => void;
 }
 
-const HabitItemCard: React.FC<HabitItemProps> = ({
+/**
+ * Legacy HabitItemCard - kept as per user request "do not remove the old one"
+ */
+export const HabitItemCardLegacy: React.FC<HabitItemProps> = ({
   id,
   name,
   selectedDate,
@@ -37,16 +40,15 @@ const HabitItemCard: React.FC<HabitItemProps> = ({
   actual_count,
   color,
   onToggle,
-  // onHabitDelete,
 }) => {
   const { newTheme, spacing, typography } = React.useContext(ThemeContext);
   const styles = useMemo(
-    () => styling(newTheme, spacing, typography),
+    () => legacyStyling(newTheme, spacing, typography),
     [newTheme, spacing, typography]
   );
 
   const handleToggle = (e: GestureResponderEvent) => {
-    e.stopPropagation(); // don’t trigger card navigation
+    e.stopPropagation();
     onToggle(id, actual_count);
   };
 
@@ -57,17 +59,8 @@ const HabitItemCard: React.FC<HabitItemProps> = ({
     });
   };
 
-  // const onHabitDeleteHandler = () => {
-  //   onHabitDelete();
-  // };
-
-  // line below title: “Every day • 8:00 AM”
   const subtitle = time ? `${frequency} • ${time}` : frequency;
-
-  // soft tint for icon background if color is provided
-  const iconBgStyle = color
-    ? { backgroundColor: `${color}33` } // #RRGGBB + 0.2 alpha
-    : null;
+  const iconBgStyle = color ? { backgroundColor: `${color}33` } : null;
   const accentBorderStyle = color ? { borderColor: color } : null;
 
   return (
@@ -76,7 +69,6 @@ const HabitItemCard: React.FC<HabitItemProps> = ({
       onPress={handleHabitClick}
       activeOpacity={0.9}
     >
-      {/* Icon */}
       <View style={[styles.iconContainer, iconBgStyle]}>
         {icon ? (
           <Text style={styles.iconText}>{icon}</Text>
@@ -89,7 +81,6 @@ const HabitItemCard: React.FC<HabitItemProps> = ({
         )}
       </View>
 
-      {/* Text info */}
       <View style={styles.textContainer}>
         <Text style={styles.title} numberOfLines={1}>
           {name}
@@ -106,7 +97,6 @@ const HabitItemCard: React.FC<HabitItemProps> = ({
         )}
       </View>
 
-      {/* Status circle */}
       <TouchableOpacity
         onPress={handleToggle}
         hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
@@ -128,7 +118,215 @@ const HabitItemCard: React.FC<HabitItemProps> = ({
   );
 };
 
-const styling = (theme: any, spacing: any, typography: any) =>
+/**
+ * New HabitItemCard - Fine-tuned to match Nimbus standard and screenshot 1.png
+ */
+const HabitItemCard: React.FC<HabitItemProps> = ({
+  id,
+  name,
+  selectedDate,
+  icon,
+  time,
+  done,
+  frequency,
+  description,
+  actual_count,
+  color,
+  onToggle,
+}) => {
+  const { newTheme, spacing, typography } = React.useContext(ThemeContext);
+  const styles = useMemo(
+    () => nimbusStyling(newTheme, spacing, typography),
+    [newTheme, spacing, typography]
+  );
+
+  const handleToggle = (e: GestureResponderEvent) => {
+    e.stopPropagation();
+    onToggle(id, actual_count);
+  };
+
+  const handleHabitClick = () => {
+    router.push({
+      pathname: "/(auth)/habit/habitDetail",
+      params: { id, date: selectedDate },
+    });
+  };
+
+  // Mock intensity for visual fidelity to screenshot
+  const intensity = "Phase I";
+  const actionLabel = done ? "COMPLETED" : "INITIALIZE";
+
+  const accentColor = color || newTheme.accent;
+
+  return (
+    <TouchableOpacity
+      style={styles.card}
+      onPress={handleHabitClick}
+      activeOpacity={0.9}
+    >
+      {/* Accent Strip */}
+      <View style={[styles.accentStrip, { backgroundColor: accentColor }]} />
+
+      <View style={styles.inner}>
+        {/* Top Content Row */}
+        <View style={styles.topRow}>
+          <View
+            style={[
+              styles.iconWrap,
+              {
+                backgroundColor: `${accentColor}15`,
+                borderColor: `${accentColor}30`,
+              },
+            ]}
+          >
+            {icon && icon.length < 3 ? (
+              <Text style={styles.iconText}>{icon}</Text>
+            ) : (
+              <Ionicons name={icon || "leaf"} size={22} color={accentColor} />
+            )}
+          </View>
+
+          <View style={styles.textWrap}>
+            <Text style={styles.title} numberOfLines={1}>
+              {name}
+            </Text>
+          </View>
+        </View>
+
+        {/* Bottom Row: Goal Metric & Action Button */}
+        <View style={styles.bottomRow}>
+          <View style={styles.metricWrap}>
+            <Text style={styles.metricLabel}>Goal: </Text>
+            <Text style={styles.metricText}>
+              {actual_count?.count || "5"} {actual_count?.unit || "MINS"}
+            </Text>
+          </View>
+
+          <TouchableOpacity
+            style={[
+              styles.actionButton,
+              done && { backgroundColor: accentColor },
+            ]}
+            onPress={handleToggle}
+          >
+            <Text
+              style={[
+                styles.actionButtonText,
+                done && { color: newTheme.surface },
+              ]}
+            >
+              {actionLabel}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+const nimbusStyling = (theme: any, spacing: any, typography: any) =>
+  StyleSheet.create({
+    card: {
+      backgroundColor: theme.cardRaised || "#262A22",
+      borderRadius: 24,
+      marginVertical: spacing.sm,
+      overflow: "hidden",
+      borderWidth: 1,
+      borderColor: "rgba(255,255,255,0.06)",
+      // Elevation for Android / Shadow for iOS
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.2,
+      shadowRadius: 12,
+      elevation: 5,
+    },
+    accentStrip: {
+      position: "absolute",
+      left: 0,
+      top: 0,
+      bottom: 0,
+      width: 4,
+    },
+    inner: {
+      padding: spacing.md,
+      paddingLeft: spacing.md + 4, // offset for accent strip
+    },
+    topRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginBottom: spacing.md,
+    },
+    iconWrap: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      backgroundColor: "rgba(255,255,255,0.05)",
+      justifyContent: "center",
+      alignItems: "center",
+      marginRight: spacing.md,
+      borderWidth: 1,
+      borderColor: "rgba(255,255,255,0.1)",
+    },
+    iconText: {
+      fontSize: 20,
+    },
+    textWrap: {
+      flex: 1,
+    },
+    title: {
+      ...typography.h3,
+      fontSize: 18,
+      fontWeight: "900",
+      color: theme.textPrimary,
+      letterSpacing: 0.2,
+    },
+    subtitle: {
+      ...typography.caption,
+      color: theme.textSecondary,
+      marginTop: 2,
+      opacity: 0.8,
+    },
+    bottomRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      borderTopWidth: 1,
+      borderTopColor: "rgba(255,255,255,0.05)",
+      paddingTop: spacing.sm,
+    },
+    metricWrap: {
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    metricLabel: {
+      fontSize: 12,
+      color: theme.textSecondary,
+      fontWeight: "400",
+      opacity: 0.6,
+    },
+    metricText: {
+      fontSize: 12,
+      color: theme.textSecondary,
+      fontWeight: "700",
+      opacity: 0.9,
+    },
+    actionButton: {
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.sm,
+      borderRadius: 18,
+      backgroundColor: "rgba(255,255,255,0.04)",
+      borderWidth: 1,
+      borderColor: "rgba(255,255,255,0.15)",
+    },
+    actionButtonText: {
+      fontSize: 11,
+      fontWeight: "800",
+      color: theme.textPrimary,
+      letterSpacing: 1,
+    },
+  });
+
+const legacyStyling = (theme: any, spacing: any, typography: any) =>
   StyleSheet.create({
     card: {
       flexDirection: "row",
@@ -138,20 +336,17 @@ const styling = (theme: any, spacing: any, typography: any) =>
       backgroundColor: theme.surface,
       borderRadius: spacing.lg,
       marginVertical: spacing.sm,
-      // subtle lift
       shadowColor: "#000",
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.12,
       shadowRadius: 10,
       elevation: 3,
     },
-
-    // Icon
     iconContainer: {
       width: 40,
       height: 40,
       borderRadius: 20,
-      backgroundColor: theme.surface, // overridden with tint when color passed
+      backgroundColor: theme.surface,
       justifyContent: "center",
       alignItems: "center",
       marginRight: spacing.md,
@@ -160,8 +355,6 @@ const styling = (theme: any, spacing: any, typography: any) =>
       fontSize: 22,
       color: theme.textPrimary,
     },
-
-    // Text
     textContainer: {
       flex: 1,
       justifyContent: "center",
@@ -181,8 +374,6 @@ const styling = (theme: any, spacing: any, typography: any) =>
       color: theme.textMuted ?? theme.textSecondary,
       marginTop: 2,
     },
-
-    // Status
     statusTouchable: {
       marginLeft: spacing.md,
     },

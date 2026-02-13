@@ -15,11 +15,13 @@ export interface SoundscapeTrackListItem {
 // TODO add types
 
 // TODO ADD PROPER TYPE
-interface ArticleListItem {
+export interface ArticleListItem {
   id: number;
   title: string;
   image: string;
 }
+
+export type ArticleData = ArticleListItem;
 
 export interface ArticleListResponse {
   data: ArticleListItem[];
@@ -35,6 +37,12 @@ export interface SoundscapeListResponse {
   error_code?: string;
 }
 
+export interface ShortVideoItem {
+  id: number;
+  title: string;
+  image: string;
+}
+
 export interface ShortVideoListResponse {
   data: ArticleDetails[];
   success: boolean;
@@ -42,11 +50,23 @@ export interface ShortVideoListResponse {
   error_code?: string;
 }
 
+export interface AudioBookItem {
+  id: number;
+  title: string;
+  image: string;
+}
+
 export interface AudioBookListResponse {
   data: ArticleDetails[];
   success: boolean;
   message: string;
   error_code?: string;
+}
+
+export interface RecipeItem {
+  id: number;
+  title: string;
+  image: string;
 }
 
 export interface RecipeListResponse {

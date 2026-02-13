@@ -264,7 +264,8 @@ const Tools: React.FC = () => {
         {/* Verticle Scroll View */}
         <ScrollView
           showsVerticalScrollIndicator={false}
-          style={{ paddingTop: 0, paddingLeft: 0, paddingBottom: 20 }}
+          style={{ paddingTop: 0, paddingLeft: 0, paddingBottom: 0 }}
+          contentContainerStyle={{ paddingBottom: 130 }}
         >
           {/* Featured Tools Hero Section moved inside ScrollView */}
           <View style={styles.heroSection}>
