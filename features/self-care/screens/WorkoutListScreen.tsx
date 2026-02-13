@@ -15,14 +15,19 @@ import ThemeContext from "@/contexts/ThemeContext";
 import { ScreenView } from "@/components/ui/Themed";
 import WorkoutCard, {
   DifficultyLevel,
+  // <<
 } from "@/features/self-care/components/workout/WorkoutCard";
 import FilterPill from "@/features/self-care/components/workout/FilterPill";
 import WorkoutHeader from "@/features/self-care/components/workout/WorkoutHeader";
+// ==
+// } from "@/components/selfCare/workout/WorkoutCard";
+// import FilterPill from "@/components/selfCare/workout/FilterPill";
+// import AppHeader from "@/components/common/AppHeader";
+// >>>
 
-import {
-  getWorkouts,
-} from "@/features/self-care/services/selfCareService";
+import { getWorkouts } from "@/features/self-care/services/selfCareService";
 import { ROUTES } from "@/constants/routes";
+import AppHeader from "@/components/layout/AppHeader";
 
 /* ---------- Types ---------- */
 
@@ -263,12 +268,11 @@ export const WorkoutListScreen = () => {
       >
         <SafeAreaView style={{ flex: 1 }}>
           <View style={styles.container}>
-            <View style={styles.headerRow}>
-              <TouchableOpacity onPress={() => navigation.goBack()}>
-                <Text style={styles.backText}>‹</Text>
-              </TouchableOpacity>
-              <Text style={styles.headerTitle}>Workouts</Text>
-            </View>
+            <AppHeader
+              title="Workouts"
+              subtitle="Build strength, improve flexibility, and feel your best."
+              onBack={() => navigation.goBack()}
+            />
             <Text style={styles.loadingText}>Loading workouts...</Text>
           </View>
         </SafeAreaView>
@@ -289,7 +293,11 @@ export const WorkoutListScreen = () => {
     >
       <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.container}>
-          <WorkoutHeader onBack={() => navigation.goBack()} />
+          <AppHeader
+            title="Workouts"
+            subtitle="Build strength, improve flexibility, and feel your best."
+            onBack={() => navigation.goBack()}
+          />
 
           <FlatList
             data={filteredWorkouts}

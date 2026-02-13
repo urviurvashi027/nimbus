@@ -1,11 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  StyleSheet,
-  Platform,
-} from "react-native";
+import { View, Text, FlatList, StyleSheet, Platform } from "react-native";
 import { Audio } from "expo-av";
 import { useNavigation } from "expo-router";
 
@@ -18,12 +12,20 @@ import MeditationCategoryTabs from "@/features/self-care/components/meditation/M
 import MeditationListItem from "@/features/self-care/components/meditation/MeditationListItem";
 import BottomPlayer from "@/components/layout/BottomPlayer";
 import MeditationFeaturedSection from "@/features/self-care/components/meditation/MeditationFeaturedSection";
-import MeditationHeader from "@/features/self-care/components/meditation/MeditationHeader";
+// import MeditationHeader from "@/features/self-care/components/meditation/MeditationHeader";
+
+// import MeditationCategoryTabs from "@/components/selfCare/meditation/MeditationCategoryTabs";
+// import MeditationListItem from "@/components/selfCare/meditation/MeditationListItem";
+// import BottomPlayer from "@/components/common/BottomPlayer";
+// import MeditationFeaturedSection from "@/components/selfCare/meditation/MeditationFeaturedSection";
+// import AppHeader from "@/components/common/AppHeader";
+// >>
 import {
   MeditationFeaturedSkeleton,
   MeditationListSkeleton,
 } from "@/features/self-care/components/meditation/MeditationSkeletonSections";
 import { EnrichedMeditation } from "@/features/self-care/types/selfCareTypes";
+import AppHeader from "@/components/layout/AppHeader";
 
 const categories = ["All", "Stress & Anxiety", "Self-Care", "Beginner"];
 
@@ -208,7 +210,11 @@ export const MeditationScreen: React.FC = () => {
     >
       <View style={styles.container}>
         {/* 🔝 Non-scrollable header – matches Soundscape */}
-        <MeditationHeader onBack={() => navigation.goBack()} />
+        <AppHeader
+          title="Meditation"
+          subtitle="Immerse yourself in guided sessions that help you slow down, breathe, and reset."
+          onBack={() => navigation.goBack()}
+        />
         {/* Single vertical scroll for featured + library */}
         <FlatList
           data={filteredMeditations}
