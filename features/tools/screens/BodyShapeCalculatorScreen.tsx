@@ -13,9 +13,11 @@ import {
 import { getBodyShapeInfo } from "@/features/tools/services/toolService";
 
 // Nimbus components
+// <<<<<<< HEAD:features/tools/screens/BodyShapeCalculatorScreen.tsx
 import InputField from "@/components/ui/theme-components/StyledInput";
 import StyledButton from "@/components/ui/theme-components/StyledButton";
 import ToolScreenHeader from "@/features/tools/components/common/ToolScreenHeader";
+import AppHeader from "@/components/layout/AppHeader";
 
 type BodyShape =
   | "Hourglass"
@@ -138,7 +140,7 @@ export const BodyShapeCalculatorScreen = () => {
     >
       <View style={styles.container}>
         {/* Shared Nimbus header */}
-        <ToolScreenHeader
+        <AppHeader
           title="Body Shape Calculator"
           subtitle={subtitle}
           onBack={() => navigation.goBack()}

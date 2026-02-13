@@ -11,15 +11,22 @@ import { router, useNavigation } from "expo-router";
 
 import ThemeContext from "@/contexts/ThemeContext";
 
+// <<<<<<< HEAD:features/tools/screens/RoutineTemplateScreen.tsx
 import { ScreenView } from "@/components/ui/Themed";
 import { RoutineSkeletonGrid } from "@/features/tools/components/common/RoutineSkeletonGrid";
 import AnimatedChip from "@/features/tools/components/common/AnimatedChips";
 import ToolScreenHeader from "@/features/tools/components/common/ToolScreenHeader";
+// =======
+// import { ScreenView } from "@/components/Themed";
+// import { RoutineSkeletonGrid } from "@/components/tools/common/RoutineSkeletonGrid";
+// import AnimatedChip from "@/components/tools/common/AnimatedChips";
+// import AppHeader from "@/components/common/AppHeader";
 
 import { getRoutineList } from "@/features/tools/services/toolService";
 import ContentPosterCard from "@/features/tools/components/common/ContentPosterCard";
 import EmptyState from "@/features/tools/components/common/EmptyState";
 import { ROUTES } from "@/constants/routes";
+import AppHeader from "@/components/layout/AppHeader";
 
 const FILTERS = [
   "All",
@@ -103,10 +110,21 @@ export const RoutineTemplateScreen = () => {
   /** ── Header *inside* FlatList so everything scrolls together ── */
   const renderListHeader = () => (
     <View>
-      <ToolScreenHeader
+      <AppHeader
         title="Routine Plan"
         subtitle="Learn the best routine to thrive."
         onBack={() => navigation.goBack()}
+        rightActions={[
+          {
+            icon: "heart-outline",
+            onPress: () => console.log("Favorites pressed"),
+          },
+          {
+            icon: "bag-outline",
+            onPress: () => console.log("Cart pressed"),
+            badge: true,
+          },
+        ]}
       />
 
       <ScrollView

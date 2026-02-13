@@ -3,9 +3,14 @@
 import React, { useContext } from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 
+// <<<<<<< HEAD:features/tools/components/common/ComingSoonFeatureScreen.tsx
 import ThemeContext from "@/contexts/ThemeContext";
 import ToolScreenHeader from "@/features/tools/components/common/ToolScreenHeader";
 import StyledButton from "@/components/ui/theme-components/StyledButton";
+import AppHeader from "@/components/layout/AppHeader";
+// =======
+// import AppHeader from "@/components/common/AppHeader";
+// >>>>>>> 0903e1c (tool screen header replaced by app header):components/tools/common/ComingSoonFeatureScreen.tsx
 
 export type ComingSoonConfig = {
   emoji?: string; // optional emoji before title
@@ -48,7 +53,7 @@ const ComingSoonFeatureScreen: React.FC<ComingSoonFeatureScreenProps> = ({
         showsVerticalScrollIndicator={false}
       >
         {/* Header – same visual language as Routine / Recipe / Article */}
-        <ToolScreenHeader
+        <AppHeader
           title={titleWithEmoji}
           subtitle={config.subtitle}
           onBack={onBack}

@@ -12,14 +12,18 @@ import { router, useNavigation } from "expo-router";
 import { ScreenView } from "@/components/ui/Themed";
 import ThemeContext from "@/contexts/ThemeContext";
 
-import AnimatedChip from "@/features/tools/components/common/AnimatedChips";
+// <<<<<<< HEAD:features/tools/screens/RecipeScreen.tsx
+// import AnimatedChip from "@/features/tools/components/common/AnimatedChips";
 import ToolScreenHeader from "@/features/tools/components/common/ToolScreenHeader";
 import ContentPosterCard from "@/features/tools/components/common/ContentPosterCard";
 import EmptyState from "@/features/tools/components/common/EmptyState";
 import { RoutineSkeletonGrid } from "@/features/tools/components/common/RoutineSkeletonGrid";
+// =======
 
 import { getRecipeList } from "@/features/tools/services/toolService";
 import { ROUTES } from "@/constants/routes";
+import AppHeader from "@/components/layout/AppHeader";
+import AnimatedChip from "../components/common/AnimatedChips";
 
 // ───────────────────────────────── Filters ────────────────────────────────────
 const FILTERS = [
@@ -120,10 +124,21 @@ export const RecipeScreen: React.FC = () => {
   // ─────────────────────── Header inside list ─────────────────────
   const renderListHeader = () => (
     <View>
-      <ToolScreenHeader
+      <AppHeader
         title="Recipe Plan"
         subtitle={subtitle}
         onBack={() => navigation.goBack()}
+        rightActions={[
+          {
+            icon: "heart-outline",
+            onPress: () => console.log("Favorites pressed"),
+          },
+          {
+            icon: "bag-outline",
+            onPress: () => console.log("Cart pressed"),
+            badge: true,
+          },
+        ]}
       />
 
       <ScrollView

@@ -19,6 +19,11 @@ import ThemeContext from "@/contexts/ThemeContext";
 import { ScreenView } from "@/components/ui/Themed";
 import ToolScreenHeader from "@/features/tools/components/common/ToolScreenHeader";
 import { formatDay, toApiDate } from "@/utils/date-time";
+// =======
+// import ThemeContext from "@/context/ThemeContext";
+// import { ScreenView } from "@/components/Themed";
+// import AppHeader from "@/components/common/AppHeader";
+// import { formatDay, toApiDate, toFriendlyDate } from "@/utils/dateTime";
 import * as FileSystem from "expo-file-system";
 import {
   getMealPlanRange,
@@ -29,6 +34,7 @@ import { FilterPill } from "@/features/self-care/components/workout/FilterPill";
 import StyledButton from "@/components/ui/theme-components/StyledButton";
 import { useAuth } from "@/contexts/AuthContext";
 import { ROUTES } from "@/constants/routes";
+import AppHeader from "@/components/layout/AppHeader";
 
 export const MealWeeklyViewScreen = () => {
   const { newTheme, spacing, typography } = useContext(ThemeContext);
@@ -310,7 +316,7 @@ export const MealWeeklyViewScreen = () => {
       }}
     >
       <SafeAreaView style={{ flex: 1 }}>
-        <ToolScreenHeader
+        <AppHeader
           title="Future Plan"
           subtitle="Visualize your upcoming nourishment."
           onBack={() => router.back()}

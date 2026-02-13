@@ -14,6 +14,7 @@ import {
 import { router, useLocalSearchParams } from "expo-router";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
+// <<<<<<<
 import ThemeContext from "@/contexts/ThemeContext";
 import { ScreenView } from "@/components/ui/Themed";
 import StyledButton from "@/components/ui/theme-components/StyledButton";
@@ -21,9 +22,11 @@ import ToolScreenHeader from "@/features/tools/components/common/ToolScreenHeade
 import DateInput from "@/components/ui/picker/DateInput";
 import DatePickerSheet from "@/components/ui/picker/DatePickerSheet";
 import { FilterPill } from "@/features/self-care/components/workout/FilterPill";
-import {
-  searchRecipes,
-} from "@/features/tools/services/toolService";
+import { searchRecipes } from "@/features/tools/services/toolService";
+// =======
+
+// import AppHeader from "@/components/common/AppHeader";
+
 import {
   addMealItem,
   bulkUpdateMealPlan,
@@ -37,6 +40,7 @@ import {
 } from "@/utils/date-time";
 import { useNimbusToast } from "@/components/ui/toast/useNimbusToast";
 import { addDays } from "date-fns";
+import AppHeader from "@/components/layout/AppHeader";
 
 type MealType = "Breakfast" | "Lunch" | "Dinner" | "Snacks";
 
@@ -701,7 +705,7 @@ export const MealCreationScreen = () => {
           behavior={Platform.OS === "ios" ? "padding" : undefined}
           style={{ flex: 1 }}
         >
-          <ToolScreenHeader
+          <AppHeader
             title={showReview ? "Review Plan" : "Plan Meal"}
             subtitle={
               showReview

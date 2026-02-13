@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import {
   View,
   TouchableOpacity,
@@ -10,6 +10,7 @@ import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/contexts/ThemeContext";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { router } from "expo-router";
+import CreateActionModal from "./modal/CreateActionModal";
 
 const { width } = Dimensions.get("window");
 
@@ -19,12 +20,15 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({
   navigation,
 }) => {
   const { newTheme, spacing } = useContext(ThemeContext);
+  const [modalVisible, setModalVisible] = useState(false);
   const styles = styling(newTheme, spacing);
 
   const onPlusPress = () => {
     // Usually opens a "Create" modal or screen
     // For now, we can navigate to habit creation if it exists
     router.push("/(auth)/habit/createHabit");
+    // =======
+    setModalVisible(true);
   };
 
   return (
@@ -90,6 +94,10 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({
           );
         })}
       </View>
+      <CreateActionModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+      />
     </View>
   );
 };

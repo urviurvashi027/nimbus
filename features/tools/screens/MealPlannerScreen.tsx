@@ -16,6 +16,8 @@ import Svg, { Circle } from "react-native-svg";
 import ThemeContext from "@/contexts/ThemeContext";
 import { ScreenView } from "@/components/ui/Themed";
 import ToolScreenHeader from "@/features/tools/components/common/ToolScreenHeader";
+
+// import AppHeader from "@/components/common/AppHeader";
 import {
   getMealDashboard,
   MealDashboardData,
@@ -25,6 +27,7 @@ import {
 } from "@/features/tools/services/mealService";
 import { toApiDate } from "@/utils/date-time";
 import { ROUTES } from "@/constants/routes";
+import AppHeader from "@/components/layout/AppHeader";
 
 /* ---------- Mock Data ---------- */
 const MOCK_DASHBOARD: MealDashboardData = {
@@ -273,12 +276,16 @@ export const MealPlannerScreen = () => {
       }}
     >
       <SafeAreaView style={{ flex: 1 }}>
-        <ToolScreenHeader
+        <AppHeader
           title="Nourish Plan"
           subtitle="Fuel your body with intention."
           onBack={() => router.back()}
-          rightIcon="calendar-outline"
-          onRightPress={handleWeeklyView}
+          rightActions={[
+            {
+              icon: "calendar-outline",
+              onPress: handleWeeklyView,
+            },
+          ]}
         />
 
         <ScrollView
