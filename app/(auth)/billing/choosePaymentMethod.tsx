@@ -16,6 +16,7 @@ import { ScreenView } from "@/components/ui/Themed";
 import { PaymentMethod } from "@/features/billing/types/payment";
 import PaymentMethodCard from "@/features/billing/components/PaymentMethodCard";
 import NimbusPrimaryButton from "@/components/ui/PrimaryButton";
+import { ROUTES } from "@/constants/routes";
 
 const ChoosePaymentMethodScreen = () => {
   const { newTheme } = useContext(ThemeContext);
@@ -74,7 +75,7 @@ const ChoosePaymentMethodScreen = () => {
   const handleContinue = () => {
     if (!selectedMethod) return;
     router.push({
-      pathname: "/(auth)/billing/reviewPaymentSummary",
+      pathname: ROUTES.AUTH.BILLING_PAYMENT_SUMMARY,
       params: {
         methodId: selectedMethod.id,
       },

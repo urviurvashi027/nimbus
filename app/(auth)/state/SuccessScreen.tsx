@@ -10,6 +10,7 @@ import ResetPasswordIcon from "@/assets/images/logoNew/2.svg";
 import { Href, router, useNavigation } from "expo-router";
 import ThemeContext from "@/contexts/ThemeContext";
 import { ScreenView } from "@/components/ui/Themed";
+import { ROUTES } from "@/constants/routes";
 
 type SuccessType =
   | "finishedOnboarding"

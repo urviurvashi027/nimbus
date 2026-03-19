@@ -1,4 +1,5 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { ROUTES } from "../routes";
 
 export type NavigationButtonType = {
   id: number | string;
@@ -13,35 +14,35 @@ export const buttons: NavigationButtonType[] = [
   //   id: 1,
   //   label: "Assess",
   //   action: "navigate",
-  //   screen: "/(auth)/self-care/MentalHealthTestScreen",
+  //   screen: ROUTES.AUTH.SELF_CARE_MENTAL_TEST,
   //   iconName: "clipboard-text-outline",
   // },
   {
     id: 2,
     label: "Zen",
     action: "navigate",
-    screen: "/(auth)/self-care/meditation",
+    screen: ROUTES.AUTH.SELF_CARE_MEDITATION,
     iconName: "meditation",
   },
   {
     id: 3,
     label: "Move",
     action: "navigate",
-    screen: "/(auth)/self-care/workout",
+    screen: ROUTES.AUTH.SELF_CARE_WORKOUT,
     iconName: "dumbbell",
   },
   {
     id: 4,
     label: "Sonic",
     action: "navigate",
-    screen: "/(auth)/self-care/soundscape",
+    screen: ROUTES.AUTH.SELF_CARE_SOUNDSCAPE,
     iconName: "music-circle-outline",
   },
   {
     id: 5,
     label: "Reflect",
     action: "navigate",
-    screen: "/(auth)/self-care/reflection",
+    screen: ROUTES.AUTH.SELF_CARE_REFLECTION,
     iconName: "book-open-variant",
   },
   {

@@ -20,6 +20,7 @@ import SignaturePad, { SignaturePadRef } from "./component/SignaturePad";
 import LocationSearch from "./component/LocationSearch";
 import { StyledButton } from "@/components/ui/StyledButton";
 import { useAuth } from "@/contexts/AuthContext";
+import { ROUTES } from "@/constants/routes";
 
 import {
   PersonaQuestion, // or OnboardingQuestion (use your actual type name)
@@ -268,7 +269,7 @@ export default function OnboardingFlow() {
       // ✅ mark onboarding done AFTER successful submit
       await markOnboardingDone?.();
 
-      router.replace("/(auth)/onboarding/welcome");
+      router.replace(ROUTES.AUTH.ONBOARDING_WELCOME);
     } catch (e: any) {
       setErrMsg(
         typeof e?.message === "string"

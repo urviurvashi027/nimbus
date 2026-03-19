@@ -11,6 +11,7 @@ import { router, useNavigation } from "expo-router";
 
 // application level import
 import ThemeContext from "@/contexts/ThemeContext";
+import { ROUTES } from "@/constants/routes";
 
 import {
   buttons as NavigationButton,
@@ -207,16 +208,16 @@ const SelfCare: React.FC = () => {
   const onClickOfAll = (title: string) => {
     switch (title) {
       case "medicalTest":
-        router.push("/(auth)/self-care/mentalHealthTest");
+        router.push(ROUTES.AUTH.SELF_CARE_MENTAL_TEST);
         break;
       case "soundscape":
-        router.push("/(auth)/self-care/soundscape");
+        router.push(ROUTES.AUTH.SELF_CARE_SOUNDSCAPE);
         break;
       case "meditation":
-        router.push("/(auth)/self-care/meditation");
+        router.push(ROUTES.AUTH.SELF_CARE_MEDITATION);
         break;
       case "routine":
-        router.push("/(auth)/tools/routineTemplate");
+        router.push(ROUTES.AUTH.TOOLS_ROUTINE_TEMPLATE);
         break;
     }
   };

@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import ThemeContext from "@/contexts/ThemeContext";
 import { StyledButton } from "@/components/ui/StyledButton";
+import { ROUTES } from "@/constants/routes";
 
 type Props = { username?: string };
 
@@ -58,7 +59,7 @@ export default function WelcomeKickoff({ username = "You" }: Props) {
         onPress={() => {
           // ✅ Update this to the EXACT route file you have
           // Example if you have: app/(auth)/habit/CreateHabitScreen.tsx
-          router.push("/(auth)/habit/createHabit");
+          router.push(ROUTES.AUTH.CREATE_HABIT);
         }}
       />
 
@@ -66,7 +67,7 @@ export default function WelcomeKickoff({ username = "You" }: Props) {
       <View style={s.secondaryRow}>
         <Pressable
           style={s.secondaryBtn}
-          onPress={() => router.push("/(auth)/coach")}
+          onPress={() => router.push(ROUTES.AUTH.COACH)}
         >
           <Ionicons
             name="chatbubble-ellipses-outline"
@@ -78,7 +79,7 @@ export default function WelcomeKickoff({ username = "You" }: Props) {
 
         <Pressable
           style={s.secondaryBtn}
-          onPress={() => router.push("/(auth)/(tabs)/tools")}
+          onPress={() => router.push(ROUTES.TABS.TOOLS)}
         >
           <Ionicons
             name="construct-outline"
@@ -97,28 +98,28 @@ export default function WelcomeKickoff({ username = "You" }: Props) {
           icon="water-outline"
           title="Track water"
           caption="Set your daily goal"
-          onPress={() => router.push("/(auth)/check-in/water")}
+          onPress={() => router.push(ROUTES.AUTH.CHECK_IN_WATER)}
         />
         <QuickCard
           theme={newTheme}
           icon="bed-outline"
           title="Sleep schedule"
           caption="Set bedtime & alarm"
-          onPress={() => router.push("/(auth)/check-in/sleep")}
+          onPress={() => router.push(ROUTES.AUTH.CHECK_IN_SLEEP)}
         />
         <QuickCard
           theme={newTheme}
           icon="leaf-outline"
           title="Meditation"
           caption="Start a 5-min session"
-          onPress={() => router.push("/(auth)/check-in/meditation")}
+          onPress={() => router.push(ROUTES.AUTH.CHECK_IN_MEDITATION)}
         />
       </ScrollView>
 
       {/* Skip */}
       <Pressable
         style={s.skip}
-        onPress={() => router.replace("/(auth)/(tabs)")}
+        onPress={() => router.replace(ROUTES.TABS.HOME)}
       >
         <Text style={s.skipText}>I’ll explore later</Text>
       </Pressable>

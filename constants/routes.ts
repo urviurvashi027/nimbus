@@ -21,7 +21,7 @@ export const ROUTES = {
    * Main Tab Routes
    */
   TABS: {
-    HOME: "/(auth)/(tabs)/",
+    HOME: "/(auth)/(tabs)",
     SELF_CARE: "/(auth)/(tabs)/self-care",
     TOOLS: "/(auth)/(tabs)/tools",
     SETTINGS: "/(auth)/(tabs)/settings",
@@ -77,12 +77,12 @@ export const ROUTES = {
     // Onboarding & New User
     ONBOARDING_WELCOME: "/(auth)/onboarding/welcome",
     ONBOARDING_QUESTIONS: "/(auth)/onboarding/questions",
-    NEW_USER: "/(auth)/new-user/",
+    NEW_USER: "/(auth)/new-user",
 
     // Others
-    COACH: "/(auth)/coach/",
-    REWARDS: "/(auth)/rewards/",
-    UPGRADE: "/(auth)/upgrade/",
+    COACH: "/(auth)/coach",
+    REWARDS: "/(auth)/rewards",
+    UPGRADE: "/(auth)/upgrade",
     STATISTICS_DETAILS: "/(auth)/statistics/details",
     SUCCESS_STATE: "/(auth)/state/SuccessScreen",
   },
