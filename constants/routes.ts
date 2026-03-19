@@ -1,0 +1,94 @@
+/**
+ * @file routes.ts
+ * @description Centralized navigation paths for the application.
+ * Use these constants to avoid hardcoded strings and ensure type safety.
+ */
+
+export const ROUTES = {
+  /**
+   * Public Routes (Non-Authenticated)
+   */
+  PUBLIC: {
+    LANDING: "/(public)/landing",
+    SIGN_IN: "/(public)/sign-in",
+    REGISTER: "/(public)/register",
+    FORGOT_PASSWORD: "/(public)/forgot-password",
+    RESET_PASSWORD: "/(public)/reset-password",
+    VERIFY_OTP: "/(public)/verify-otp",
+  },
+
+  /**
+   * Main Tab Routes
+   */
+  TABS: {
+    HOME: "/(auth)/(tabs)/",
+    SELF_CARE: "/(auth)/(tabs)/self-care",
+    TOOLS: "/(auth)/(tabs)/tools",
+    SETTINGS: "/(auth)/(tabs)/settings",
+  },
+
+  /**
+   * Feature-Specific Routes (Authenticated)
+   */
+  AUTH: {
+    // Habit
+    CREATE_HABIT: "/(auth)/habit/createHabit",
+    HABIT_DETAIL: "/(auth)/habit/habitDetail",
+
+    // Tools
+    TOOLS_PRODUCT_LIST: "/(auth)/tools/productList",
+    TOOLS_MEAL_WEEKLY: "/(auth)/tools/mealWeeklyView",
+    TOOLS_MEAL_CREATION: "/(auth)/tools/mealCreation",
+    TOOLS_PROTEIN_CALC: "/(auth)/tools/proteinCalculator",
+    TOOLS_AI_THERAPY: "/(auth)/tools/AItherapy",
+    TOOLS_ROUTINE_LIST: "/(auth)/tools/templateRoutineList",
+    TOOLS_ARTICLE_LIST: "/(auth)/tools/articleList",
+    TOOLS_SCRIBBLE_DETAIL: "/(auth)/tools/scribbleDetail",
+    TOOLS_MEAL_PLANNER: "/(auth)/tools/mealPlanner",
+    TOOLS_CREATE_SCRIBBLE: "/(auth)/tools/createScribble",
+    TOOLS_SCRIBBLE_LIST: "/(auth)/tools/scribbleList",
+    TOOLS_BODY_SHAPE_CALC: "/(auth)/tools/bodyShapeCalculator",
+    TOOLS_CALORIE_CALC: "/(auth)/tools/calorieCalculator",
+    TOOLS_ROUTINE_TEMPLATE: "/(auth)/tools/routineTemplate",
+    TOOLS_RECIPE: "/(auth)/tools/recipe",
+    TOOLS_CONTENT_DETAILS: "/(auth)/tools/contentDetails",
+
+    // Self Care
+    SELF_CARE_THINGS_TO_DO: "/(auth)/self-care/ThingsToDoScreen",
+    SELF_CARE_GET_STARTED: "/(auth)/self-care/MentalHealthGetStartedScreen",
+    SELF_CARE_SLEEP_MODAL: "/(auth)/self-care/sleepModal",
+    SELF_CARE_REFLECTION: "/(auth)/self-care/reflection",
+    SELF_CARE_MEDITATION: "/(auth)/self-care/meditation",
+    SELF_CARE_MENTAL_TEST: "/(auth)/self-care/mentalHealthTest",
+    SELF_CARE_SOUNDSCAPE: "/(auth)/self-care/soundscape",
+    SELF_CARE_WORKOUT_SESSION: "/(auth)/self-care/workoutSession",
+    SELF_CARE_WORKOUT: "/(auth)/self-care/workout",
+
+    // Check-in
+    CHECK_IN_SLEEP: "/(auth)/check-in/sleep",
+    CHECK_IN_MEDITATION: "/(auth)/check-in/meditation",
+    CHECK_IN_WATER: "/(auth)/check-in/water",
+    CHECK_IN_READING: "/(auth)/check-in/reading",
+
+    // Billing
+    BILLING_PAYMENT_METHOD: "/(auth)/billing/choosePaymentMethod",
+    BILLING_PAYMENT_SUMMARY: "/(auth)/billing/reviewPaymentSummary",
+
+    // Onboarding & New User
+    ONBOARDING_WELCOME: "/(auth)/onboarding/welcome",
+    ONBOARDING_QUESTIONS: "/(auth)/onboarding/questions",
+    NEW_USER: "/(auth)/new-user/",
+
+    // Others
+    COACH: "/(auth)/coach/",
+    REWARDS: "/(auth)/rewards/",
+    UPGRADE: "/(auth)/upgrade/",
+    STATISTICS_DETAILS: "/(auth)/statistics/details",
+    SUCCESS_STATE: "/(auth)/state/SuccessScreen",
+  },
+} as const;
+
+/**
+ * Type helper for Route constants
+ */
+export type RoutePath = typeof ROUTES[keyof typeof ROUTES];

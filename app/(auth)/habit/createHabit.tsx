@@ -16,19 +16,19 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 
 // import HabitContext from "@/context/HabitContext";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 
-import HabitTypeInput from "@/features/habit/components/createHabit/HabitTypeInput";
+import HabitTypeInput from "@/features/habit/components/create-habit/HabitTypeInput";
 import HabitTagsInput, {
   selectedTag,
-} from "@/features/habit/components/createHabit/HabitTagsInput";
+} from "@/features/habit/components/create-habit/HabitTagsInput";
 import { ScreenView } from "@/components/ui/Themed";
 
-import HabitMetricInput from "@/features/habit/components/createHabit/HabitMetricInput";
-import HabitDurationInput from "@/features/habit/components/createHabit/HabitDurationInput";
-import HabitDateInput from "@/features/habit/components/createHabit/HabitDateInput";
-import HabitReminderInput from "@/features/habit/components/createHabit/HabitReminderInput";
-import EmojiSelector from "@/features/habit/components/createHabit/EmojiSelectorModal";
+import HabitMetricInput from "@/features/habit/components/create-habit/HabitMetricInput";
+import HabitDurationInput from "@/features/habit/components/create-habit/HabitDurationInput";
+import HabitDateInput from "@/features/habit/components/create-habit/HabitDateInput";
+import HabitReminderInput from "@/features/habit/components/create-habit/HabitReminderInput";
+import EmojiSelector from "@/features/habit/components/create-habit/EmojiSelectorModal";
 import AppHeader from "@/components/layout/AppHeader";
 
 import { createHabit } from "@/features/habit/services/habitService";
@@ -40,7 +40,7 @@ import {
   Duration,
   HabitDateType,
 } from "@/features/habit/types/habitTypes";
-import StyledButton from "@/components/ui/themeComponents/StyledButton";
+import StyledButton from "@/components/ui/theme-components/StyledButton";
 import { useNimbusToast } from "@/components/ui/toast/useNimbusToast";
 
 const COLOR_OPTIONS = [

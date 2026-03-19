@@ -1,7 +1,7 @@
 // src/components/coach/coach.tsx
 import React, { useContext, useMemo } from "react";
 import { Platform, View } from "react-native";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import CoachPlaceholder from "@/features/coach/components/CoachPlaceholder";
 import { ScreenView } from "@/components/ui/Themed";
 import { router } from "expo-router";

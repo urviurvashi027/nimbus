@@ -11,8 +11,8 @@ import {
 import { Audio } from "expo-av";
 import { useNavigation } from "expo-router";
 
-import { TrackType } from "@/constant/data/soundtrack";
-import ThemeContext from "@/context/ThemeContext";
+import { TrackType } from "@/constants/data/soundtrack";
+import ThemeContext from "@/contexts/ThemeContext";
 import { ScreenView } from "@/components/ui/Themed";
 import { getSoundscapeList } from "@/features/tools/services/toolService";
 import BottomPlayer from "@/components/layout/BottomPlayer";
@@ -67,7 +67,9 @@ const Soundscape = () => {
       if (Array.isArray(tracks)) {
         const processedTracks = tracks.map((track: any) => ({
           ...track,
-          image: track.image ? { uri: track.image } : require("@/assets/images/logo.png"), // use a fallback if null
+          image: track.image
+            ? { uri: track.image }
+            : require("@/assets/images/logo.png"), // use a fallback if null
         }));
 
         setFavTracks(processedTracks.slice(0, 3));

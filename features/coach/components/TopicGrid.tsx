@@ -2,7 +2,7 @@ import React from "react";
 import { View } from "react-native";
 import TopicCard from "./TopicCard";
 import { styles } from "./styles";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import { useContext } from "react";
 import type { Topic } from "../types";
 

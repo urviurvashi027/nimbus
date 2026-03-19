@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { router, useNavigation } from "expo-router";
 
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import { ScreenView } from "@/components/ui/Themed";
 
 import ToolScreenHeader from "@/features/tools/components/common/ToolScreenHeader";

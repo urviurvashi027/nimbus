@@ -2,7 +2,7 @@
 import React, { useContext } from "react";
 import { ActivityIndicator, View, Text, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import { useAchievements } from "@/features/rewards/hooks/useAchievements";
 import RewardDetails from "@/features/rewards/components/RewardDetails";
 

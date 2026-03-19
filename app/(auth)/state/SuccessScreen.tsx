@@ -8,7 +8,7 @@ import ForgotPasswordIcon from "@/assets/images/logoNew/2.svg";
 import RegisterIcon from "@/assets/images/logoNew/2.svg";
 import ResetPasswordIcon from "@/assets/images/logoNew/2.svg";
 import { Href, router, useNavigation } from "expo-router";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import { ScreenView } from "@/components/ui/Themed";
 
 type SuccessType =

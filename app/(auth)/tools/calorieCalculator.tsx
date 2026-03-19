@@ -3,11 +3,11 @@ import { View, Platform, StyleSheet, ScrollView, Text } from "react-native";
 import { useNavigation } from "expo-router";
 
 import { ScreenView } from "@/components/ui/Themed";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 
-import StyledInput from "@/components/ui/themeComponents/StyledInput";
-import StyledButton from "@/components/ui/themeComponents/StyledButton";
-import NimbusDropdown from "@/components/ui/themeComponents/NimbusDropdown";
+import StyledInput from "@/components/ui/theme-components/StyledInput";
+import StyledButton from "@/components/ui/theme-components/StyledButton";
+import NimbusDropdown from "@/components/ui/theme-components/NimbusDropdown";
 import ToolScreenHeader from "@/features/tools/components/common/ToolScreenHeader";
 
 import { getCalorieIntakeInfo } from "@/features/tools/services/toolService";
@@ -15,7 +15,7 @@ import {
   calorieCalculatorRequest,
   calorieCalculatorResponse,
 } from "@/features/tools/types/toolsTypes";
-import { activityLevelList, genderList } from "@/constant/data/tools";
+import { activityLevelList, genderList } from "@/constants/data/tools";
 
 const CalorieCalculator = () => {
   const navigation = useNavigation();

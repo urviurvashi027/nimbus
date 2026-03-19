@@ -4,13 +4,13 @@ import { View, FlatList, Platform, StyleSheet, Text } from "react-native";
 import { router, useNavigation } from "expo-router";
 
 import { ScreenView } from "@/components/ui/Themed";
-import ThemeContext from "@/context/ThemeContext";
-import { medTests } from "@/constant/data/medicalTest";
+import ThemeContext from "@/contexts/ThemeContext";
+import { medTests } from "@/constants/data/medicalTest";
 
-import MentalHealthHeader from "@/features/self-care/components/mentalTest/mentalHealthScreen/MentalHealthHeader";
+import MentalHealthHeader from "@/features/self-care/components/mental-test/mentalHealthScreen/MentalHealthHeader";
 import MentalHealthTestItem, {
   MentalTest,
-} from "@/features/self-care/components/mentalTest/mentalHealthScreen/MentalHealthTestItem";
+} from "@/features/self-care/components/mental-test/mentalHealthScreen/MentalHealthTestItem";
 
 const MentalHealthTestScreen = () => {
   const navigation = useNavigation();

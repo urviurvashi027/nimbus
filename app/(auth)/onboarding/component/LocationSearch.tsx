@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { View, StyleSheet } from "react-native";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 
 type Props = {
   onSelect: (data: any, details: any) => void;
@@ -10,7 +10,8 @@ type Props = {
 };
 
 // Use EXPO_PUBLIC_ prefix for Expo environment variables
-const GOOGLE_PLACES_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY || ""; 
+const GOOGLE_PLACES_API_KEY =
+  process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY || "";
 
 export default function LocationSearch({
   onSelect,

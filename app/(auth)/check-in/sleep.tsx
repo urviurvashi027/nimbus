@@ -12,7 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 import { useLocalSearchParams, useNavigation } from "expo-router";
 
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 
 import { ScreenView } from "@/components/ui/Themed";
 import NotificationSettingRow from "@/features/check-in/components/common/NotificationSettingRow";

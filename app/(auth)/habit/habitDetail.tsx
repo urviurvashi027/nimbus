@@ -1,24 +1,22 @@
 import { View, Text, StyleSheet, Platform } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
-import {
-  ScrollView,
-} from "react-native-gesture-handler";
+import { ScrollView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { ScreenView } from "@/components/ui/Themed";
 import { getHabitDetailsById } from "@/features/habit/services/habitService";
-import ThemeContext from "@/context/ThemeContext";
-import WeeklyHabitRowPanel from "@/features/habit/components/habitDetails/WeeklyRowPanel";
-import SummaryPanel from "@/features/habit/components/habitDetails/SummaryPanel";
-import HabitDetailsPanel from "@/features/habit/components/habitDetails/HabitDetailsPanel";
-import HeaderPanel from "@/features/habit/components/habitDetails/HeaderPanel";
-import MonthlyOverviewPanel from "@/features/habit/components/habitDetails/MonthlyOverviewPanel";
+import ThemeContext from "@/contexts/ThemeContext";
+import WeeklyHabitRowPanel from "@/features/habit/components/habit-details/WeeklyRowPanel";
+import SummaryPanel from "@/features/habit/components/habit-details/SummaryPanel";
+import HabitDetailsPanel from "@/features/habit/components/habit-details/HabitDetailsPanel";
+import HeaderPanel from "@/features/habit/components/habit-details/HeaderPanel";
+import MonthlyOverviewPanel from "@/features/habit/components/habit-details/MonthlyOverviewPanel";
 import AppHeader from "@/components/layout/AppHeader";
 import { format, isBefore, parseISO, startOfDay } from "date-fns";
-import { formatReminderTime } from "@/utils/dates";
-import HabitDetailsSkeleton from "@/features/habit/components/habitDetails/HabitDetailsSkeleton";
-import { DeleteHabitModal } from "@/features/habit/components/habitDetails/DeleteHabitModal";
+import { formatReminderTime } from "@/utils/date-time";
+import HabitDetailsSkeleton from "@/features/habit/components/habit-details/HabitDetailsSkeleton";
+import { DeleteHabitModal } from "@/features/habit/components/habit-details/DeleteHabitModal";
 
 const HabitDetails = () => {
   const router = useRouter();

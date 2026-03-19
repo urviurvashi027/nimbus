@@ -3,9 +3,9 @@ import React, { useContext, useEffect, useState } from "react";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { ScrollView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import { ScreenView } from "@/components/ui/Themed";
-import StatsDetails from "@/features/habit/components/habitStatistics/StatsDetails";
+import StatsDetails from "@/features/habit/components/habit-statistics/StatsDetails";
 
 const StatsScreen = () => {
   const { newTheme, toggleTheme, useSystemTheme } = useContext(ThemeContext);

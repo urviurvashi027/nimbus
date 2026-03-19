@@ -11,14 +11,14 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 
 import { useLocalSearchParams, useNavigation } from "expo-router";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import { ScreenView } from "@/components/ui/Themed";
 import NotificationSettingRow from "@/features/check-in/components/common/NotificationSettingRow";
 import ReadingOverviewCard from "@/features/check-in/components/reading/ReadingOverviewCard";
 import LogReadingModal from "@/features/check-in/components/reading/LogReadingSheet";
 import WeeklySummary from "@/features/check-in/components/reading/WeeklySummary";
 
-import { readingData } from "@/constant/data/dailyCheckin";
+import { readingData } from "@/constants/data/dailyCheckin";
 import { DailyCheckInDetailResponse } from "@/features/check-in/types/dailyCheckin";
 import { getHabitDetailsByDate } from "@/features/check-in/services/dailyCheckinService";
 import { toMinutes } from "@/features/check-in/utils/dailyCheckin";

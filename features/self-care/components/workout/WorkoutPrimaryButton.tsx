@@ -2,7 +2,7 @@
 
 import React from "react";
 import { ViewStyle } from "react-native";
-import StyledButton from "@/components/ui/themeComponents/StyledButton";
+import StyledButton from "@/components/ui/theme-components/StyledButton";
 
 type Props = {
   label: string;

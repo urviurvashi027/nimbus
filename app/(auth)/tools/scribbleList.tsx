@@ -12,7 +12,7 @@ import {
 import { router, useNavigation } from "expo-router";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import { ScreenView } from "@/components/ui/Themed";
 import ToolScreenHeader from "@/features/tools/components/common/ToolScreenHeader";
 import FilterPill from "@/features/self-care/components/workout/FilterPill";

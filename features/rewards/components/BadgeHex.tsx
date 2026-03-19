@@ -2,7 +2,7 @@ import React, { memo, useContext } from "react";
 import { View, Text } from "react-native";
 import Svg, { Polygon, Circle } from "react-native-svg";
 import { Ionicons } from "@expo/vector-icons";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import type { Badge } from "../types/types";
 
 const HEX_SIZE = 78;

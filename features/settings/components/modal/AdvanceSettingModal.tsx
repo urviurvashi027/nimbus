@@ -8,9 +8,9 @@ import {
   FlatList,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import SettingDetail from "./PreferenceDetailModal";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { useNimbusToast } from "@/components/ui/toast/useNimbusToast";
 // import { useReminder } from "@/context/ReminderContext";
 

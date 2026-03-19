@@ -13,7 +13,7 @@ import {
   LayoutChangeEvent,
 } from "react-native";
 import { addDays, isSameDay, startOfDay, subDays } from "date-fns";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 
 type Props = {
   value: Date;
@@ -46,8 +46,9 @@ export default function DateScroller({
   const days = useMemo(() => {
     // Generate range: Today - range ... Today ... Today + range
     const total = 2 * daysAroundToday + 1;
-    return Array.from({ length: total }, (_, i) =>
-      atMidnight(addDays(subDays(today, daysAroundToday), i)) // Start from past
+    return Array.from(
+      { length: total },
+      (_, i) => atMidnight(addDays(subDays(today, daysAroundToday), i)) // Start from past
     );
   }, [today, daysAroundToday]);
 
@@ -91,7 +92,7 @@ export default function DateScroller({
         horizontal
         showsHorizontalScrollIndicator={false}
         // Remove snapToInterval to allow smooth free scrolling
-        // snapToInterval={itemWidth} 
+        // snapToInterval={itemWidth}
         decelerationRate="normal"
         getItemLayout={(_, index) => ({
           length: itemWidth,

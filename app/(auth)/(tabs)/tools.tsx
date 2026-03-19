@@ -9,18 +9,18 @@ import {
 import React, { useContext, useEffect, useState } from "react";
 import { router, useNavigation } from "expo-router";
 // application level import
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 
 import {
   buttons as NavigationButton,
   NavigationButtonType,
-} from "@/constant/data/toolsButton";
+} from "@/constants/data/toolsButton";
 
 import { ScreenView } from "@/components/ui/Themed";
 import TrendingCardCarousel from "@/components/layout/TrendingCardCarousel";
 import MoodTrackerModal from "../tools/dump/MoodTracker/MoodTracker";
-import VideoScroller from "@/features/tools/components/videoScroller/VideoScroller";
-import AudiobookScroller from "@/features/tools/components/audioScroller/AudioScroller";
+import VideoScroller from "@/features/tools/components/video-scroller/VideoScroller";
+import AudiobookScroller from "@/features/tools/components/audio-scroller/AudioScroller";
 
 import {
   getArticleList,

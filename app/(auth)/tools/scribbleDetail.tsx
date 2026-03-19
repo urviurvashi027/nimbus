@@ -16,10 +16,13 @@ import {
 import { router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import { ScreenView } from "@/components/ui/Themed";
-import StyledButton from "@/components/ui/themeComponents/StyledButton";
-import { scribbleService, Scribble } from "@/features/tools/services/scribbleService";
+import StyledButton from "@/components/ui/theme-components/StyledButton";
+import {
+  scribbleService,
+  Scribble,
+} from "@/features/tools/services/scribbleService";
 
 const ScribbleDetailScreen = () => {
   const { newTheme, spacing, typography } = useContext(ThemeContext);
@@ -57,7 +60,7 @@ const ScribbleDetailScreen = () => {
     const regex = /#(\w+)/g;
     const found = content.match(regex);
     // Enforce lowercase on tags
-    return found ? Array.from(new Set(found.map(t => t.toLowerCase()))) : [];
+    return found ? Array.from(new Set(found.map((t) => t.toLowerCase()))) : [];
   }, [content]);
 
   // Function to render highlighted content
@@ -89,15 +92,17 @@ const ScribbleDetailScreen = () => {
     try {
       setIsSaving(true);
       // Clean tags: remove '#' prefix and enforce lowercase before sending
-      const tagList = tags.map(t => t.replace('#', '').toLowerCase());
+      const tagList = tags.map((t) => t.replace("#", "").toLowerCase());
 
       // Enforce lowercase on hashtags WITHIN the content string
-      const lowercasedContent = content.replace(/#(\w+)/g, (match) => match.toLowerCase());
+      const lowercasedContent = content.replace(/#(\w+)/g, (match) =>
+        match.toLowerCase()
+      );
 
-      await scribbleService.updateScribble(params.id, { 
-        title, 
-        content: lowercasedContent, 
-        tag_list: tagList 
+      await scribbleService.updateScribble(params.id, {
+        title,
+        content: lowercasedContent,
+        tag_list: tagList,
       });
       router.back();
     } catch (e) {
@@ -192,7 +197,9 @@ const ScribbleDetailScreen = () => {
             {/* Note Area */}
             <View style={styles.inputContainer}>
               {/* Highlighted display (rendered behind or above) */}
-              <View style={styles.displayArea}>{renderHighlightedContent()}</View>
+              <View style={styles.displayArea}>
+                {renderHighlightedContent()}
+              </View>
 
               {/* Hidden Actual Input */}
               <TextInput
@@ -227,17 +234,24 @@ const ScribbleDetailScreen = () => {
         animationType="fade"
         onRequestClose={() => setIsDeleteModalVisible(false)}
       >
-        <TouchableWithoutFeedback onPress={() => setIsDeleteModalVisible(false)}>
+        <TouchableWithoutFeedback
+          onPress={() => setIsDeleteModalVisible(false)}
+        >
           <View style={styles.modalOverlay}>
             <TouchableWithoutFeedback>
               <View style={styles.modalContent}>
                 <View style={styles.modalHeader}>
                   <View style={styles.modalIconBg}>
-                    <Ionicons name="trash" size={28} color={newTheme.error || "#FF7A7A"} />
+                    <Ionicons
+                      name="trash"
+                      size={28}
+                      color={newTheme.error || "#FF7A7A"}
+                    />
                   </View>
                   <Text style={styles.modalTitle}>Delete Scribble?</Text>
                   <Text style={styles.modalSubtitle}>
-                    This action cannot be undone. Are you sure you want to remove this note?
+                    This action cannot be undone. Are you sure you want to
+                    remove this note?
                   </Text>
                 </View>
 
@@ -249,7 +263,11 @@ const ScribbleDetailScreen = () => {
                     <Text style={styles.cancelBtnText}>Cancel</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    style={[styles.modalBtn, styles.deleteConfirmBtn, { backgroundColor: newTheme.error || "#FF7A7A" }]}
+                    style={[
+                      styles.modalBtn,
+                      styles.deleteConfirmBtn,
+                      { backgroundColor: newTheme.error || "#FF7A7A" },
+                    ]}
                     onPress={handleDelete}
                     disabled={isDeleting}
                   >

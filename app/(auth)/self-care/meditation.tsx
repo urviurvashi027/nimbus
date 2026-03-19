@@ -12,7 +12,7 @@ import {
 import { Audio } from "expo-av";
 import { useNavigation } from "expo-router";
 
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import { ScreenView } from "@/components/ui/Themed";
 
 import { Meditations } from "@/features/tools/types/toolsTypes";

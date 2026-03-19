@@ -8,7 +8,7 @@ import {
   Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import { styles } from "@/features/rewards/components/styles";
 import AchievementCard from "@/features/rewards/components/AchievementCard";
 import BadgeHex from "@/features/rewards/components/BadgeHex";

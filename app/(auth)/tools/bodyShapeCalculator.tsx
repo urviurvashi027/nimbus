@@ -5,7 +5,7 @@ import { View, Text, StyleSheet, Alert, Platform } from "react-native";
 import { Image } from "expo-image";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ScreenView } from "@/components/ui/Themed";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import { useNavigation } from "expo-router";
 
 import {
@@ -15,8 +15,8 @@ import {
 import { getBodyShapeInfo } from "@/features/tools/services/toolService";
 
 // Nimbus components
-import InputField from "@/components/ui/themeComponents/StyledInput";
-import StyledButton from "@/components/ui/themeComponents/StyledButton";
+import InputField from "@/components/ui/theme-components/StyledInput";
+import StyledButton from "@/components/ui/theme-components/StyledButton";
 import ToolScreenHeader from "@/features/tools/components/common/ToolScreenHeader";
 
 type BodyShape =

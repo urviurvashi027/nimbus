@@ -6,7 +6,7 @@ import {
   StyleSheet,
   GestureResponderEvent,
 } from "react-native";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 
 type Props = {
   label: string;

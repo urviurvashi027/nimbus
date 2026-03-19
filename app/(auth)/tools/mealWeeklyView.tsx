@@ -15,10 +15,10 @@ import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { addDays } from "date-fns";
 
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import { ScreenView } from "@/components/ui/Themed";
 import ToolScreenHeader from "@/features/tools/components/common/ToolScreenHeader";
-import { formatDay, toApiDate, toFriendlyDate } from "@/utils/dateTime";
+import { formatDay, toApiDate, toFriendlyDate } from "@/utils/date-time";
 import * as FileSystem from "expo-file-system";
 import {
   getMealPlanRange,
@@ -27,8 +27,8 @@ import {
   getMealPlanPdfUrl,
 } from "@/features/tools/services/mealService";
 import { FilterPill } from "@/features/self-care/components/workout/FilterPill";
-import StyledButton from "@/components/ui/themeComponents/StyledButton";
-import { useAuth } from "@/context/AuthContext";
+import StyledButton from "@/components/ui/theme-components/StyledButton";
+import { useAuth } from "@/contexts/AuthContext";
 
 const MealWeeklyViewScreen = () => {
   const { newTheme, spacing, typography } = useContext(ThemeContext);

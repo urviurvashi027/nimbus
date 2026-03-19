@@ -11,7 +11,7 @@ import {
 import { useNavigation, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import { ScreenView } from "@/components/ui/Themed";
 import { PaymentMethod } from "@/features/billing/types/payment";
 import PaymentMethodCard from "@/features/billing/components/PaymentMethodCard";

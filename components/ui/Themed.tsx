@@ -16,8 +16,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // import { useColorScheme } from "./UseColorScheme";
 import { useContext } from "react";
-import ThemeContext from "@/context/ThemeContext";
-import { Spacing, Typography } from "@/types/themeTypes";
+import ThemeContext from "@/contexts/ThemeContext";
+import { Spacing, Typography } from "@/theme/types";
 import { Ionicons } from "@expo/vector-icons";
 
 type ThemeProps = {

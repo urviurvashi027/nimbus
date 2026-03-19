@@ -1,8 +1,8 @@
 import React, { useContext, useMemo, useState } from "react";
 import { View, Text } from "react-native";
-import ThemeContext from "@/context/ThemeContext";
-import { NimbusInput } from "@/components/ui/themeComponents/NimbusInput";
-import { NimbusButton } from "@/components/ui/themeComponents/NimbusButton";
+import ThemeContext from "@/contexts/ThemeContext";
+import { NimbusInput } from "@/components/ui/theme-components/NimbusInput";
+import { NimbusButton } from "@/components/ui/theme-components/NimbusButton";
 
 export default function NimbusPasswordStep({
   onSubmit,

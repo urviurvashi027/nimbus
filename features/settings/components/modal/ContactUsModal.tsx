@@ -15,9 +15,9 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 
-import ThemeContext from "@/context/ThemeContext";
-import StyledButton from "@/components/ui/themeComponents/StyledButton";
-import InputField from "@/components/ui/themeComponents/StyledInputOld";
+import ThemeContext from "@/contexts/ThemeContext";
+import StyledButton from "@/components/ui/theme-components/StyledButton";
+import InputField from "@/components/ui/theme-components/StyledInputOld";
 
 import { getDeviceDetails } from "@/utils/helper";
 import { contactUs } from "@/services/contactService";

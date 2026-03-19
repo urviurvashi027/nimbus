@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { useNavigation } from "expo-router";
 
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import { ScreenView } from "@/components/ui/Themed";
 
 import ReflectionEntryModal from "@/features/self-care/components/reflection/ReflectionEntryModal";

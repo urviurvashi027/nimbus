@@ -13,7 +13,7 @@ import { useLocalSearchParams, useNavigation, router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 
 import { ScreenView } from "@/components/ui/Themed";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import {
   HabitDateType,
   Duration,
@@ -23,12 +23,12 @@ import {
   formatDurationDisplay,
   toBackendDurationPayload,
   parseBackendTimeToDate,
-} from "@/utils/time";
+} from "@/utils/date-time";
 import { createBulkHabit } from "@/features/habit/services/habitService";
 import { useNimbusToast } from "@/components/ui/toast/useNimbusToast";
-import StartDateModal from "@/features/habit/components/createHabit/Modal/StartDateModal";
-import HabitDurationModal from "@/features/habit/components/createHabit/Modal/DurationModal";
-import StyledButton from "@/components/ui/themeComponents/StyledButton";
+import StartDateModal from "@/features/habit/components/create-habit/Modal/StartDateModal";
+import HabitDurationModal from "@/features/habit/components/create-habit/Modal/DurationModal";
+import StyledButton from "@/components/ui/theme-components/StyledButton";
 
 // ---------------------------------------------------------
 type HabitItem = {

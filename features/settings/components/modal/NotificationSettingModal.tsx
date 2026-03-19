@@ -14,19 +14,19 @@ import {
 } from "react-native";
 import { format } from "date-fns";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import type { ReminderSettings } from "@/services/remiderStorageService";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   daysShortToNums,
   formatToAmPm,
   inferRepeatFromWeekdays,
   numsToDaysShort,
   timeStringToISO,
-} from "@/utils/notoficationHelper";
+} from "@/utils/notificationHelper";
 import { arraysEqual, deriveHHmmss } from "@/utils/helper";
-import StyledSwitch from "@/components/ui/themeComponents/StyledSwitch";
-import StyledButton from "@/components/ui/themeComponents/StyledButton";
+import StyledSwitch from "@/components/ui/theme-components/StyledSwitch";
+import StyledButton from "@/components/ui/theme-components/StyledButton";
 import { useNimbusToast } from "@/components/ui/toast/useNimbusToast";
 
 type Props = {

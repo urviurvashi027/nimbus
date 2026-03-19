@@ -11,7 +11,7 @@ import {
 import { router, useNavigation } from "expo-router";
 
 import { ScreenView } from "@/components/ui/Themed";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 
 import AnimatedChip from "@/features/tools/components/common/AnimatedChips";
 import ToolScreenHeader from "@/features/tools/components/common/ToolScreenHeader";

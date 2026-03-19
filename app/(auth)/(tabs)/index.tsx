@@ -27,8 +27,8 @@ import {
 } from "date-fns";
 
 import { ScreenView } from "@/components/ui/Themed";
-import ThemeContext from "@/context/ThemeContext";
-import { useAuth } from "@/context/AuthContext";
+import ThemeContext from "@/contexts/ThemeContext";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   getHabitList,
   markHabitDone,

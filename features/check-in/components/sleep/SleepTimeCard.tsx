@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import { Row } from "./PartsRow";
 import BedtimeModal from "./BedTimeModal";
 import AlarmModal from "./AlarmModal";
-import { fromHHmm, toHHmm } from "@/utils/time";
+import { fromHHmm, toHHmm } from "@/utils/date-time";
 
 export type SleepTimeCardProps = {
   defaultBedtime?: string; // "23:00"

@@ -1,7 +1,7 @@
 import React, { useContext, useMemo } from "react";
 import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import type { NimbusAlertPayload, NimbusAlertVariant } from "./useNimbusAlert";
 
 export default function NimbusAlert({

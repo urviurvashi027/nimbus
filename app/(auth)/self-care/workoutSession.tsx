@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import { ScreenView } from "@/components/ui/Themed";
 
 import WorkoutSessionHeader from "@/features/self-care/components/workout/WorkoutSessionHeader";

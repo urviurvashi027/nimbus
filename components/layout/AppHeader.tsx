@@ -1,7 +1,7 @@
 import React, { useContext, useMemo } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 
 type RightAction = {
   icon?: keyof typeof Ionicons.glyphMap; // e.g. "ellipsis-horizontal"

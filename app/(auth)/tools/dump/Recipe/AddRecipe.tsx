@@ -14,11 +14,11 @@ import {
   Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import { StyledButton } from "@/components/ui/StyledButton";
 // If you do not use expo-image-picker, the optional upload will be disabled
 import * as ImagePicker from "expo-image-picker";
-import InputField from "@/components/ui/themeComponents/StyledInputOld";
+import InputField from "@/components/ui/theme-components/StyledInputOld";
 import { router, useNavigation } from "expo-router";
 
 type Ingredient = { id: string; item: string; quantity: string };

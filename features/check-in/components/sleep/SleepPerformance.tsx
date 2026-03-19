@@ -2,7 +2,7 @@
 import React, { useContext, useMemo, useState } from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import Svg, { Line } from "react-native-svg";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import LogSheet, { LogPayload } from "../common/logSheet/SleepLogSheet";
 
 type Props = {

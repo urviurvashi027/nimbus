@@ -12,7 +12,7 @@ import {
 import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import { Tab } from "./components/Tabs";
 import { TimeRow } from "./components/TimeRow";
 import { GhostButton } from "./components/GhostButton";

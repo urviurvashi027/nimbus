@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 
 type OnboardingHeaderProps = {
   step: number;

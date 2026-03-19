@@ -2,7 +2,7 @@
 
 import React, { useContext } from "react";
 import { View, StyleSheet } from "react-native";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 
 const SoundscapeLibrarySkeleton: React.FC = () => {
   const { newTheme, spacing, typography } = useContext(ThemeContext);

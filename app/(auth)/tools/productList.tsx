@@ -6,7 +6,7 @@ import { useNavigation } from "expo-router";
 import ComingSoonFeatureScreen from "@/features/tools/components/common/ComingSoonFeatureScreen";
 import { ScreenView } from "@/components/ui/Themed";
 import { Platform } from "react-native";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 
 const AffiliateProductsComingSoonScreen: React.FC = () => {
   const navigation = useNavigation();

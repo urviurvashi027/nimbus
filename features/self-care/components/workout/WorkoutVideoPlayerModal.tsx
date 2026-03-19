@@ -16,7 +16,7 @@ import {
 } from "expo-video";
 import { Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 
 interface WorkoutVideoPlayerModalProps {
   visible: boolean;
@@ -35,7 +35,10 @@ const WorkoutVideoPlayerModal: React.FC<WorkoutVideoPlayerModalProps> = ({
   onClose,
 }) => {
   const { newTheme, spacing, typography } = useContext(ThemeContext);
-  const styles = useMemo(() => styling(newTheme, spacing, typography), [newTheme, spacing, typography]);
+  const styles = useMemo(
+    () => styling(newTheme, spacing, typography),
+    [newTheme, spacing, typography]
+  );
 
   const player = useVideoPlayer(videoSource, (p) => {
     p.loop = true;
@@ -98,12 +101,12 @@ const WorkoutVideoPlayerModal: React.FC<WorkoutVideoPlayerModalProps> = ({
     >
       <View style={styles.overlay}>
         <BlurView intensity={25} tint="dark" style={StyleSheet.absoluteFill} />
-        
+
         {/* Backdrop Touchable to close */}
-        <TouchableOpacity 
-          style={StyleSheet.absoluteFill} 
-          activeOpacity={1} 
-          onPress={handleClose} 
+        <TouchableOpacity
+          style={StyleSheet.absoluteFill}
+          activeOpacity={1}
+          onPress={handleClose}
         />
 
         <View style={styles.card}>
@@ -139,7 +142,11 @@ const WorkoutVideoPlayerModal: React.FC<WorkoutVideoPlayerModalProps> = ({
               style={styles.seekBtn}
               activeOpacity={0.7}
             >
-              <Ionicons name="play-back" size={28} color={newTheme.textPrimary} />
+              <Ionicons
+                name="play-back"
+                size={28}
+                color={newTheme.textPrimary}
+              />
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -147,7 +154,12 @@ const WorkoutVideoPlayerModal: React.FC<WorkoutVideoPlayerModalProps> = ({
               style={styles.playBtn}
               activeOpacity={0.8}
             >
-              <View style={[styles.playBtnInner, { backgroundColor: newTheme.accent }]}>
+              <View
+                style={[
+                  styles.playBtnInner,
+                  { backgroundColor: newTheme.accent },
+                ]}
+              >
                 <Ionicons
                   name={isPlaying ? "pause" : "play"}
                   size={32}
@@ -161,7 +173,11 @@ const WorkoutVideoPlayerModal: React.FC<WorkoutVideoPlayerModalProps> = ({
               style={styles.seekBtn}
               activeOpacity={0.7}
             >
-              <Ionicons name="play-forward" size={28} color={newTheme.textPrimary} />
+              <Ionicons
+                name="play-forward"
+                size={28}
+                color={newTheme.textPrimary}
+              />
             </TouchableOpacity>
           </View>
 

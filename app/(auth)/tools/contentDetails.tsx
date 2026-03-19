@@ -23,19 +23,19 @@ import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import ArticleSection from "@/features/tools/components/contentDetails/ArticleSection";
-import NutritionInfo from "@/features/tools/components/contentDetails/NutritionInfo";
+import ArticleSection from "@/features/tools/components/content-details/ArticleSection";
+import NutritionInfo from "@/features/tools/components/content-details/NutritionInfo";
 
 import {
   getArticleDetails,
   getRoutineDetails,
 } from "@/features/tools/services/toolService";
-import ThemeContext from "@/context/ThemeContext";
-import { TitleHeader } from "@/features/tools/components/contentDetails/TitleHeader";
-import { CatalogCard } from "@/features/tools/components/contentDetails/Catalog";
-import { HeroBanner } from "@/features/tools/components/contentDetails/HeroBanner";
+import ThemeContext from "@/contexts/ThemeContext";
+import { TitleHeader } from "@/features/tools/components/content-details/TitleHeader";
+import { CatalogCard } from "@/features/tools/components/content-details/Catalog";
+import { HeroBanner } from "@/features/tools/components/content-details/HeroBanner";
 import { ScreenView } from "@/components/ui/Themed";
-import StyledButton from "@/components/ui/themeComponents/StyledButton";
+import StyledButton from "@/components/ui/theme-components/StyledButton";
 
 const FAVORITES_KEY = "favorites_v1";
 

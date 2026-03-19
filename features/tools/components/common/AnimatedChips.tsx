@@ -1,5 +1,5 @@
 // AnimatedChip.tsx
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import React, { useContext } from "react";
 import { Text, TouchableOpacity, StyleSheet, Animated } from "react-native";
 

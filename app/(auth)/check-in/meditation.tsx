@@ -10,12 +10,12 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 
 import { useLocalSearchParams, useNavigation } from "expo-router";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import { ScreenView } from "@/components/ui/Themed";
 import NotificationSettingRow from "@/features/check-in/components/common/NotificationSettingRow";
 import MeditationWeeklySummary from "@/features/check-in/components/meditation/WeeklySummary";
 import MeditationGaugeCard from "@/features/check-in/components/meditation/MeditationGaugeCard";
-import { meditationData } from "@/constant/data/dailyCheckin";
+import { meditationData } from "@/constants/data/dailyCheckin";
 import { DailyCheckInDetailResponse } from "@/features/check-in/types/dailyCheckin";
 import { getHabitDetailsByDate } from "@/features/check-in/services/dailyCheckinService";
 import { toMinutes } from "@/features/check-in/utils/dailyCheckin";

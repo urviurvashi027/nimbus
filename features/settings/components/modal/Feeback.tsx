@@ -13,10 +13,10 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
-import StyledButton from "@/components/ui/themeComponents/StyledButton";
-import InputField from "@/components/ui/themeComponents/StyledInputOld";
+import StyledButton from "@/components/ui/theme-components/StyledButton";
+import InputField from "@/components/ui/theme-components/StyledInputOld";
 import { logFeedback } from "@/features/settings/services/settingService";
 
 export default function ReportFeedbackModal({ visible, onClose }: any) {

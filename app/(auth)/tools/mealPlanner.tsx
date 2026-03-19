@@ -14,7 +14,7 @@ import { router, useNavigation } from "expo-router";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import Svg, { Circle } from "react-native-svg";
 
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import { ScreenView } from "@/components/ui/Themed";
 import ToolScreenHeader from "@/features/tools/components/common/ToolScreenHeader";
 import {
@@ -24,7 +24,7 @@ import {
   DayPlan,
   Meal,
 } from "@/features/tools/services/mealService";
-import { toApiDate, toFriendlyDate } from "@/utils/dateTime";
+import { toApiDate, toFriendlyDate } from "@/utils/date-time";
 
 const { width } = Dimensions.get("window");
 

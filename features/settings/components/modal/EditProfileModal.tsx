@@ -14,13 +14,12 @@ import {
   ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { Asset } from "expo-asset";
 
-import ThemeContext from "@/context/ThemeContext";
-import { useAuth } from "@/context/AuthContext";
+import ThemeContext from "@/contexts/ThemeContext";
+import { useAuth } from "@/contexts/AuthContext";
 
-import InputField from "@/components/ui/themeComponents/StyledInputOld";
-import StyledButton from "@/components/ui/themeComponents/StyledButton";
+import InputField from "@/components/ui/theme-components/StyledInputOld";
+import StyledButton from "@/components/ui/theme-components/StyledButton";
 import AvatarPickerModal from "./AvatarPickerModal";
 import { useNimbusToast } from "@/components/ui/toast/useNimbusToast";
 
@@ -34,7 +33,7 @@ import AvatarFitnessFemale from "@/assets/images/avatar/fitnessfemale.svg";
 import AvatarFinanceGuy from "@/assets/images/avatar/financeguy.svg";
 import AvatarDeveloperGuy from "@/assets/images/avatar/developerguy.svg";
 import AvatarFemale from "@/assets/images/avatar/female.svg";
-import { svgIndexToFileUri } from "@/constant/builtinAvatars";
+import { svgIndexToFileUri } from "../../constants/builtinAvatars";
 import { SvgUri } from "react-native-svg";
 
 const BUILTIN_SVGS = [

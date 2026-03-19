@@ -11,18 +11,18 @@ import {
 } from "react-native";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import { ScreenView } from "@/components/ui/Themed";
 
-import MentalHealthTestDetails from "@/features/self-care/components/mentalTest/getStartedScreen/MentalHealthTestDetails";
-import MentalHealthQuestion from "@/features/self-care/components/mentalTest/getStartedScreen/MentalHealthQuestion";
+import MentalHealthTestDetails from "@/features/self-care/components/mental-test/getStartedScreen/MentalHealthTestDetails";
+import MentalHealthQuestion from "@/features/self-care/components/mental-test/getStartedScreen/MentalHealthQuestion";
 import MentalHealthTestResult, {
   ResultData,
-} from "@/features/self-care/components/mentalTest/getStartedScreen/MentalHealthTestResult";
-import MedicalTestShell from "@/features/self-care/components/mentalTest/getStartedScreen/MedicalTestShell";
-import MedicalTestHeader from "@/features/self-care/components/mentalTest/getStartedScreen/MentalTestHeader";
+} from "@/features/self-care/components/mental-test/getStartedScreen/MentalHealthTestResult";
+import MedicalTestShell from "@/features/self-care/components/mental-test/getStartedScreen/MedicalTestShell";
+import MedicalTestHeader from "@/features/self-care/components/mental-test/getStartedScreen/MentalTestHeader";
 
-import testData, { medicalTestData } from "@/constant/data/medicalTest";
+import testData, { medicalTestData } from "@/constants/data/medicalTest";
 
 // ────────────────────────────────────────────────────────────────
 // Types

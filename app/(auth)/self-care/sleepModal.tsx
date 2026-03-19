@@ -9,12 +9,12 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import HorizontalListCardScroll from "@/components/layout/HorizontalListCardScroll";
 // import HorizontalBannerCardScroll from "@/features/tools/components/common/HorizontalBannerCardScroll";
 
 import { router } from "expo-router";
-import { banners } from "@/constant/data/banner";
+import { banners } from "@/constants/data/banner";
 import HorizontalBanner from "@/components/layout/HorizontalBanner";
 import { getSoundscapeList } from "@/features/tools/services/toolService";
 import { useNimbusToast } from "@/components/ui/toast/useNimbusToast";

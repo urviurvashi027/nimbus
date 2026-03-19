@@ -13,11 +13,11 @@ import {
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import { ScreenView } from "@/components/ui/Themed";
-import StyledButton from "@/components/ui/themeComponents/StyledButton";
+import StyledButton from "@/components/ui/theme-components/StyledButton";
 import { scribbleService } from "@/features/tools/services/scribbleService";
-import { formatApiDate } from "@/utils/dates";
+import { formatApiDate } from "@/utils/date-time";
 
 const CreateScribbleScreen = () => {
   const { newTheme, spacing, typography } = useContext(ThemeContext);
@@ -32,7 +32,7 @@ const CreateScribbleScreen = () => {
     const regex = /#(\w+)/g;
     const found = content.match(regex);
     // Enforce lowercase on tags
-    return found ? Array.from(new Set(found.map(t => t.toLowerCase()))) : [];
+    return found ? Array.from(new Set(found.map((t) => t.toLowerCase()))) : [];
   }, [content]);
 
   // Function to render highlighted content
@@ -67,7 +67,9 @@ const CreateScribbleScreen = () => {
       const tagList = tags.map((t) => t.replace("#", "").toLowerCase());
 
       // Enforce lowercase on hashtags WITHIN the content string
-      const lowercasedContent = content.replace(/#(\w+)/g, (match) => match.toLowerCase());
+      const lowercasedContent = content.replace(/#(\w+)/g, (match) =>
+        match.toLowerCase()
+      );
 
       await scribbleService.saveScribble({
         title,
@@ -137,7 +139,9 @@ const CreateScribbleScreen = () => {
             {/* Note Area */}
             <View style={styles.inputContainer}>
               {/* Highlighted display (rendered behind or above) */}
-              <View style={styles.displayArea}>{renderHighlightedContent()}</View>
+              <View style={styles.displayArea}>
+                {renderHighlightedContent()}
+              </View>
 
               {/* Hidden Actual Input */}
               <TextInput

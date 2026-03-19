@@ -10,7 +10,7 @@ import {
 import { router, useNavigation } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import { ScreenView } from "@/components/ui/Themed";
 import { StyledButton } from "@/components/ui/StyledButton";
 import { PlanDetailsCard } from "@/features/billing/components/PlanDetailsCard";

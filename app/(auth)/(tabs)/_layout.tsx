@@ -2,9 +2,9 @@ import React, { useContext } from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { theme as newThemeKit } from "@/constant/theme/Colors";
+import { theme as newThemeKit } from "@/theme/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 
 // function TabBarIcon(props: {
 //   name: React.ComponentProps<typeof FontAwesome>["name"];
@@ -73,7 +73,7 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="setting"
+        name="settings"
         options={{
           tabBarLabel: "Setting",
           tabBarIcon: ({ color }) => (

@@ -14,15 +14,18 @@ import {
 import { router, useLocalSearchParams } from "expo-router";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import { ScreenView } from "@/components/ui/Themed";
-import StyledButton from "@/components/ui/themeComponents/StyledButton";
+import StyledButton from "@/components/ui/theme-components/StyledButton";
 import ToolScreenHeader from "@/features/tools/components/common/ToolScreenHeader";
 import DateInput from "@/components/ui/picker/DateInput";
 import TimeInput from "@/components/ui/picker/TimeInput";
 import DatePickerSheet from "@/components/ui/picker/DatePickerSheet";
 import { FilterPill } from "@/features/self-care/components/workout/FilterPill";
-import { getRecipeList, searchRecipes } from "@/features/tools/services/toolService";
+import {
+  getRecipeList,
+  searchRecipes,
+} from "@/features/tools/services/toolService";
 import {
   addMealItem,
   getDailyMealPlan,
@@ -34,7 +37,7 @@ import {
   toApiDate,
   toFriendlyDate,
   toFriendlyRange,
-} from "@/utils/dateTime";
+} from "@/utils/date-time";
 import { useNimbusToast } from "@/components/ui/toast/useNimbusToast";
 import { addDays } from "date-fns";
 

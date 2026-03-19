@@ -2,12 +2,12 @@ import React, { useContext, useState } from "react";
 import { View, Text } from "react-native";
 import { Stack, router } from "expo-router";
 
-import ThemeContext from "@/context/ThemeContext";
-import { useAuth } from "@/context/AuthContext";
+import ThemeContext from "@/contexts/ThemeContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 import { NimbusAuthLayout } from "@/features/auth/components/NimbusAuthLayout";
-import { NimbusInput } from "@/components/ui/themeComponents/NimbusInput";
-import { NimbusButton } from "@/components/ui/themeComponents/NimbusButton";
+import { NimbusInput } from "@/components/ui/theme-components/NimbusInput";
+import { NimbusButton } from "@/components/ui/theme-components/NimbusButton";
 
 import NimbusOtpVerifyStep from "@/features/auth/components/NimbusOtpVerifyStep";
 import NimbusPasswordStep from "@/features/auth/components/NimbusPasswordStep";

@@ -8,7 +8,7 @@ import {
   StyleProp,
   TextStyle,
 } from "react-native";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 
 type Alignment = "left" | "center";
 

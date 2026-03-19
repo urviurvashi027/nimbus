@@ -10,14 +10,14 @@ import React, { useContext, useEffect, useState } from "react";
 import { router, useNavigation } from "expo-router";
 
 // application level import
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 
 import {
   buttons as NavigationButton,
   NavigationButtonType,
-} from "@/constant/data/selfCareButton";
-import { banners } from "@/constant/data/banner";
-import { medTests } from "@/constant/data/medicalTest";
+} from "@/constants/data/selfCareButton";
+import { banners } from "@/constants/data/banner";
+import { medTests } from "@/constants/data/medicalTest";
 
 import { ScreenView } from "@/components/ui/Themed";
 import TrendingCardCarousel from "@/components/layout/TrendingCardCarousel";

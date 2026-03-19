@@ -3,8 +3,8 @@ import { View, Text, StyleSheet, Modal, Platform } from "react-native";
 import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
-import ThemeContext from "@/context/ThemeContext";
-import { toHHmm, overnightDiff, fmtDuration } from "@/utils/time";
+import ThemeContext from "@/contexts/ThemeContext";
+import { toHHmm, overnightDiff, fmtDuration } from "@/utils/date-time";
 import { PrimaryButton, GhostButton } from "./ui/Button";
 
 export default function BedtimeModal({

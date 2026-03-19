@@ -2,8 +2,8 @@ import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { View, Text, TextInput, Pressable } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 
-import ThemeContext from "@/context/ThemeContext";
-import { NimbusButton } from "@/components/ui/themeComponents/NimbusButton";
+import ThemeContext from "@/contexts/ThemeContext";
+import { NimbusButton } from "@/components/ui/theme-components/NimbusButton";
 import { getOtp, verifyOtp } from "@/features/auth/services/loginService";
 import { useNimbusToast } from "@/components/ui/toast/useNimbusToast";
 
