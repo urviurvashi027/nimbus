@@ -1,0 +1,29 @@
+name: Unit Tests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    name: Run Jest Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        # Using 'npm ci' ensures a clean, reproducible install based on package-lock.json
+        run: npm ci
+
+      - name: Run Unit Tests
+        run: npm test -- --watchAll=false
