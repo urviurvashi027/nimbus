@@ -27,8 +27,8 @@ import VideoClassCard from "@/features/self-care/components/MasterclassCard";
 import HorizontalBanner from "@/components/layout/HorizontalBanner";
 import PricingModal from "@/components/ui/PricingModal";
 import NavigationIconButton from "@/components/ui/NavigationIconButton";
-import SleepModal from "../self-care/sleepModal";
-import ThingsToDoModal from "../self-care/ThingsToDoScreen";
+import SleepScreen from "../self-care/sleep";
+import ThingsToDoModal from "../self-care/thingsToDo";
 
 import {
   getMeditationAudioList,
@@ -362,7 +362,7 @@ const SelfCare: React.FC = () => {
 
       {/* Modal Details */}
       {/* Sleep Modal */}
-      <SleepModal
+      <SleepScreen
         visible={showSleepTagsModal}
         onClose={() => setShowSleepTagsModal(false)}
       />

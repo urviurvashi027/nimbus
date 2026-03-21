@@ -4,36 +4,36 @@ import {
   Text,
   TouchableOpacity,
   Animated,
-  Image,
   Modal,
   StyleSheet,
 } from "react-native";
+
 const activities = [
   {
     text: "Clean your comb",
-    image: require("../../../assets/images/mentalTest/adhdTest.png"),
+    image: require("@/assets/images/mentalTest/adhdTest.png"),
   },
   {
     text: "Drink water",
-    image: require("../../../assets/images/mentalTest/adhdTest.png"),
+    image: require("@/assets/images/mentalTest/adhdTest.png"),
   },
   {
     text: "Take a deep breath",
-    image: require("../../../assets/images/mentalTest/adhdTest.png"),
+    image: require("@/assets/images/mentalTest/adhdTest.png"),
   },
   {
     text: "Stretch your body",
-    image: require("../../../assets/images/mentalTest/adhdTest.png"),
+    image: require("@/assets/images/mentalTest/adhdTest.png"),
   },
   {
     text: "Write a journal",
-    image: require("../../../assets/images/mentalTest/adhdTest.png"),
+    image: require("@/assets/images/mentalTest/adhdTest.png"),
   },
 ];
 
 const MAX_SPINS = 3;
 
-const ThingsToDoModal = ({ isVisible, onClose }: any) => {
+export const ThingsToDoScreen = ({ isVisible, onClose }: any) => {
   const [spinning, setSpinning] = useState(false);
   const [selectedActivities, setSelectedActivities] = useState<
     Array<{ text: string; image: any }>
@@ -50,7 +50,7 @@ const ThingsToDoModal = ({ isVisible, onClose }: any) => {
   ];
 
   useEffect(() => {
-    if (!isVisible) {
+    if (isVisible === false) {
       resetSlotMachine();
     }
   }, [isVisible]);
@@ -103,43 +103,51 @@ const ThingsToDoModal = ({ isVisible, onClose }: any) => {
     })
   );
 
+  const content = (
+    <View style={styles.container}>
+      <Text style={styles.title}>Pick a little act of</Text>
+      <Text style={styles.selfLoveText}>SELF-LOVE</Text>
+
+      <View style={styles.slotMachine}>
+        {spinValues.map((spinValue, index) => (
+          <Animated.View
+            key={index}
+            style={{ transform: [{ rotateX: spinAnimation[index] }] }}
+          >
+            <Text style={styles.emoji}>
+              {selectedActivities[index].text || "❓"}
+            </Text>
+          </Animated.View>
+        ))}
+      </View>
+
+      <TouchableOpacity
+        style={styles.spinButton}
+        onPress={spin}
+        disabled={spinning || spinCount >= MAX_SPINS}
+      >
+        <Text style={styles.spinText}>
+          Spin Again ({spinCount + 1}/{MAX_SPINS})
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.doneButton} onPress={onClose}>
+        <Text style={styles.doneText}>Let's do it!</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+        <Text style={styles.closeText}>Close</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
+  if (isVisible === undefined) {
+    return content;
+  }
+
   return (
     <Modal visible={isVisible} animationType="slide" transparent={false}>
-      <View style={styles.container}>
-        <Text style={styles.title}>Pick a little act of</Text>
-        <Text style={styles.selfLoveText}>SELF-LOVE</Text>
-
-        <View style={styles.slotMachine}>
-          {spinValues.map((spinValue, index) => (
-            <Animated.View
-              key={index}
-              style={{ transform: [{ rotateX: spinAnimation[index] }] }}
-            >
-              <Text style={styles.emoji}>
-                {selectedActivities[index].text || "❓"}
-              </Text>
-            </Animated.View>
-          ))}
-        </View>
-
-        <TouchableOpacity
-          style={styles.spinButton}
-          onPress={spin}
-          disabled={spinning || spinCount >= MAX_SPINS}
-        >
-          <Text style={styles.spinText}>
-            Spin Again ({spinCount + 1}/{MAX_SPINS})
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.doneButton} onPress={onClose}>
-          <Text style={styles.doneText}>Let's do it!</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-          <Text style={styles.closeText}>Close</Text>
-        </TouchableOpacity>
-      </View>
+      {content}
     </Modal>
   );
 };
@@ -182,12 +190,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
   },
-  spinAgainButton: {
-    backgroundColor: "orange",
-    padding: 15,
-    borderRadius: 50,
-    marginTop: 20,
-  },
   doneButton: {
     backgroundColor: "green",
     padding: 15,
@@ -198,23 +200,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     color: "white",
-  },
-  resultContainer: {
-    backgroundColor: "lightblue",
-    padding: 20,
-    borderRadius: 10,
-    alignItems: "center",
-    marginTop: 20,
-  },
-  resultText: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#000",
-  },
-  resultImage: {
-    width: 50,
-    height: 50,
-    marginVertical: 10,
   },
   closeButton: {
     backgroundColor: "red",
@@ -228,5 +213,3 @@ const styles = StyleSheet.create({
     color: "white",
   },
 });
-
-export default ThingsToDoModal;

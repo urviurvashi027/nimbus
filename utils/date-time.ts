@@ -67,9 +67,6 @@ export const toApiTime = (date: Date): string => {
   return format(date, DATE_FORMATS.API_TIME);
 };
 
-/** Alias for toApiDate */
-export const formatApiDate = toApiDate;
-
 export const toISODate = (d: Date) => d.toISOString().slice(0, 10);
 
 /** Convert Date object to HH:mm:ss for backend */
@@ -135,9 +132,6 @@ export const toFriendlyTime = (date: Date | string): string => {
 export const toFriendlyRange = (start: Date, end: Date): string => {
   return `${format(start, "d MMM")} — ${format(end, "d MMM")}`;
 };
-
-/** Alias for toFriendlyRange */
-export const formatDateRange = toFriendlyRange;
 
 /** Returns "Sun", "Mon", etc. */
 export const formatDay = (date: Date) => format(date, "EEE");
@@ -271,11 +265,6 @@ export const generateDateRange = (center: Date, rangeCount = 14) => {
   return dates;
 };
 
-/** Alias for generateDateRange with slightly different signature if needed */
-export const generateDates = (center: Date, range = 14) => {
-  return generateDateRange(center, range);
-};
-
 /** Calculate duration in minutes between two dates */
 export function durationFromRange(start: Date, end: Date) {
   const s = start.getHours() * 60 + start.getMinutes();
@@ -283,8 +272,6 @@ export function durationFromRange(start: Date, end: Date) {
   const diff = (e - s + 24 * 60) % (24 * 60);
   return diff === 0 ? 24 * 60 : diff;
 }
-
-export const overnightDiff = durationFromRange;
 
 /** Formats minutes into "1h 30m" or "2h" */
 export function fmtDuration(mins: number) {
@@ -297,5 +284,3 @@ export function fmtDuration(mins: number) {
 export function toHHmm(d: Date) {
   return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
-
-export const toHHmmReading = toHHmm;

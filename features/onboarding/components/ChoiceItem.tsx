@@ -1,7 +1,6 @@
 import ThemeContext from "@/contexts/ThemeContext";
-import React, { useContext, useEffect, useState } from "react";
-import { View, Text, StyleSheet, Pressable } from "react-native";
-import Svg, { Path } from "react-native-svg";
+import React, { useContext } from "react";
+import { Text, StyleSheet, Pressable } from "react-native";
 
 const ChoiceItem = ({ choice, selected, onPress }: any) => {
   const { newTheme } = useContext(ThemeContext);

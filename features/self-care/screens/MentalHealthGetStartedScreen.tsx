@@ -1,13 +1,9 @@
-// app/(auth)/SelfCare/test/MedicalTestScreen.tsx
-
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import {
   View,
   StyleSheet,
   Platform,
   ActivityIndicator,
-  TouchableOpacity,
-  Text,
 } from "react-native";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 
@@ -57,10 +53,10 @@ const scoreMapping: Record<ScoreOption, number> = {
 // Main Screen
 // ────────────────────────────────────────────────────────────────
 
-const MentalHealthGetStartedScreen: React.FC = () => {
+export const MentalHealthGetStartedScreen: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<StepState>(0);
   const [responses, setResponses] = useState<ResponsesState>({});
-  const [selectedAnswers, setSelectedAnswers] = useState<
+  const [, setSelectedAnswers] = useState<
     Record<number, ScoreOption>
   >({});
   const [medicalTestDetails, setMedicalTestDetails] = useState<
@@ -99,7 +95,6 @@ const MentalHealthGetStartedScreen: React.FC = () => {
     category: string,
     selectedOption: ScoreOption
   ) => {
-    console.log(questionId, category, selectedOption, "selected option");
     setSelectedAnswers((prev) => ({ ...prev, [questionId]: selectedOption }));
     setResponses((prev) => ({
       ...prev,
@@ -191,11 +186,8 @@ const MentalHealthGetStartedScreen: React.FC = () => {
 
   const isLoading = !medicalTestDetails;
 
-  // const bgColor = medicalTestDetails?.color ?? newTheme.background;
-
   return (
     <ScreenView
-      // bgColor={bgColor}
       style={{
         paddingHorizontal: 0,
         paddingTop:
@@ -239,7 +231,6 @@ const MentalHealthGetStartedScreen: React.FC = () => {
               <MentalHealthQuestion
                 questionData={medicalTestDetails.questions[currentStep - 1]}
                 totalSteps={medicalTestDetails.questions.length}
-                // color={medicalTestDetails.progressBarBg}
                 currentStep={currentStep}
                 onAnswerSelect={handleAnswerSelect}
                 onNext={handleNext}
@@ -250,10 +241,6 @@ const MentalHealthGetStartedScreen: React.FC = () => {
     </ScreenView>
   );
 };
-
-// ────────────────────────────────────────────────────────────────
-// Styles
-// ────────────────────────────────────────────────────────────────
 
 const styling = (newTheme: any, spacing: any, typography: any) =>
   StyleSheet.create({
@@ -266,5 +253,3 @@ const styling = (newTheme: any, spacing: any, typography: any) =>
       alignItems: "center",
     },
   });
-
-export default MentalHealthGetStartedScreen;

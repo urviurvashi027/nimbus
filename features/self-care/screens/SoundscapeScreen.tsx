@@ -1,0 +1,250 @@
+import React, { useState, useEffect, useContext } from "react";
+import {
+  View,
+  FlatList,
+  StyleSheet,
+  Platform,
+  SafeAreaView,
+  Text,
+} from "react-native";
+import { Audio } from "expo-av";
+import { useNavigation } from "expo-router";
+
+import { TrackType } from "@/constants/data/soundtrack";
+import ThemeContext from "@/contexts/ThemeContext";
+import { ScreenView } from "@/components/ui/Themed";
+import { getSoundscapeList } from "@/features/tools/services/toolService";
+import BottomPlayer from "@/components/layout/BottomPlayer";
+
+import SoundscapeHeader from "@/features/self-care/components/soundscape/SoundscapeHeader";
+import SoundscapeForYouSection from "@/features/self-care/components/soundscape/SoundscapeForYouSection";
+import SoundscapeLibraryItem from "@/features/self-care/components/soundscape/SoundscapeLibraryItem";
+import SoundscapeForYouSkeleton from "@/features/self-care/components/soundscape/SoundscapeForYouSkeleton";
+import SoundscapeLibrarySkeleton from "@/features/self-care/components/soundscape/SoundscapeLibrarySkeleton";
+
+export const SoundscapeScreen = () => {
+  const [currentTrack, setCurrentTrack] = useState<TrackType | null>(null);
+  const [sound, setSound] = useState<Audio.Sound | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const [libraryTracks, setLibraryTracks] = useState<any[] | undefined>();
+  const [favTracks, setFavTracks] = useState<any[] | undefined>();
+  const [showForYou, setShowForYou] = useState(false);
+  const [showLibrary, setShowLibrary] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const navigation = useNavigation();
+  const { newTheme, spacing, typography } = useContext(ThemeContext);
+  const styles = styling(newTheme, spacing, typography);
+
+  // soft pastel palette for featured cards
+  const colorPalette = [
+    // Rosewood (warm calm)
+    { bgColor: "rgba(233, 168, 160, 0.14)", color: "#E0A39B" },
+
+    // Sage (signature Nimbus)
+    { bgColor: "rgba(167, 201, 180, 0.14)", color: "#A7C9B4" },
+
+    // Sand / Gold (premium highlight)
+    { bgColor: "rgba(224, 199, 129, 0.14)", color: "#E0C781" },
+
+    // Mist / Sky (clean + modern)
+    { bgColor: "rgba(152, 190, 214, 0.14)", color: "#98BED6" },
+
+    // Mauve (soft luxury)
+    { bgColor: "rgba(192, 167, 207, 0.14)", color: "#C0A7CF" },
+  ];
+
+  const getSoundscapeListData = async () => {
+    setIsLoading(true);
+    try {
+      const result: any = await getSoundscapeList();
+      const tracks = result?.data || (Array.isArray(result) ? result : []);
+
+      if (Array.isArray(tracks)) {
+        const processedTracks = tracks.map((track: any) => ({
+          ...track,
+          image: track.image
+            ? { uri: track.image }
+            : require("@/assets/images/logo.png"), // use a fallback if null
+        }));
+
+        setFavTracks(processedTracks.slice(0, 3));
+        setLibraryTracks(processedTracks);
+        setShowForYou(true);
+        setShowLibrary(true);
+      } else {
+        console.error("API response data is not an array:", result);
+      }
+    } catch (error: any) {
+      console.log(error, "API Error Response");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getSoundscapeListData();
+  }, []);
+
+  useEffect(() => {
+    navigation.setOptions({ headerShown: false });
+  }, [navigation]);
+
+  useEffect(() => {
+    return sound
+      ? () => {
+          sound.unloadAsync();
+        }
+      : undefined;
+  }, [sound]);
+
+  const handlePlayPause = async (track: any) => {
+    try {
+      if (currentTrack?.id === track.id) {
+        if (isPlaying) {
+          await sound?.pauseAsync();
+        } else {
+          await sound?.playAsync();
+        }
+        setIsPlaying(!isPlaying);
+        return;
+      }
+
+      if (sound) {
+        await sound.unloadAsync();
+      }
+
+      const { sound: newSound } = await Audio.Sound.createAsync(
+        typeof track.source === "string" ? { uri: track.source } : track.source
+      );
+
+      setSound(newSound);
+      setCurrentTrack(track);
+      setIsPlaying(true);
+      await newSound.playAsync();
+    } catch (error) {
+      console.error("Error playing audio:", error);
+    }
+  };
+
+  const handleClosePlayer = async () => {
+    try {
+      if (sound) {
+        await sound.stopAsync();
+        await sound.unloadAsync();
+        setSound(null);
+      }
+    } catch (err) {
+      console.warn("Error stopping sound on close:", err);
+    } finally {
+      setIsPlaying(false);
+      setCurrentTrack(null);
+    }
+  };
+
+  // Header for the vertical list: For You + Library title
+  const renderListHeader = () => (
+    <View>
+      {showForYou && favTracks && (
+        <SoundscapeForYouSection
+          tracks={favTracks}
+          onPlayPause={handlePlayPause}
+          colorPalette={colorPalette}
+        />
+      )}
+
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>Library</Text>
+      </View>
+    </View>
+  );
+
+  // While loading → show skeleton layout instead of list
+  if (isLoading) {
+    return (
+      <ScreenView
+        style={{
+          paddingTop:
+            Platform.OS === "ios"
+              ? spacing["xxl"] + spacing["xxl"] * 0.4
+              : spacing.xl,
+          paddingHorizontal: spacing.md,
+        }}
+      >
+        <SafeAreaView style={{ flex: 1 }}>
+          <View style={styles.container}>
+            <SoundscapeHeader onBack={() => navigation.goBack()} />
+            <SoundscapeForYouSkeleton />
+            <SoundscapeLibrarySkeleton />
+          </View>
+        </SafeAreaView>
+      </ScreenView>
+    );
+  }
+
+  // Loaded state
+  return (
+    <ScreenView
+      style={{
+        paddingTop:
+          Platform.OS === "ios"
+            ? spacing["xxl"] + spacing["xxl"] * 0.4
+            : spacing.xl,
+        paddingHorizontal: spacing.md,
+      }}
+    >
+      <SafeAreaView style={{ flex: 1 }}>
+        <View style={styles.container}>
+          <SoundscapeHeader onBack={() => navigation.goBack()} />
+
+          {showLibrary && libraryTracks && (
+            <FlatList
+              data={libraryTracks}
+              keyExtractor={(item) => item.id}
+              showsVerticalScrollIndicator={false}
+              ListHeaderComponent={renderListHeader}
+              renderItem={({ item }) => (
+                <SoundscapeLibraryItem
+                  item={item}
+                  isActive={currentTrack?.id === item.id && isPlaying}
+                  onPress={() => handlePlayPause(item)}
+                />
+              )}
+              contentContainerStyle={{
+                paddingBottom: spacing.xl * 2, // keep last row above bottom player
+              }}
+            />
+          )}
+        </View>
+
+        {currentTrack && (
+          <BottomPlayer
+            title={currentTrack.title}
+            subtitle={`${currentTrack.duration || "3"} min · Soundscape`}
+            image={currentTrack.image}
+            isPlaying={isPlaying}
+            onPlayPause={() => handlePlayPause(currentTrack)}
+            onClose={handleClosePlayer}
+          />
+        )}
+      </SafeAreaView>
+    </ScreenView>
+  );
+};
+
+const styling = (newTheme: any, spacing: any, typography: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+    },
+    sectionHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginBottom: spacing.md,
+    },
+    sectionTitle: {
+      ...typography.h3,
+      color: newTheme.textPrimary,
+    },
+  });

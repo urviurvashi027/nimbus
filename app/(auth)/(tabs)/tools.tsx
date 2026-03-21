@@ -19,7 +19,7 @@ import {
 
 import { ScreenView } from "@/components/ui/Themed";
 import TrendingCardCarousel from "@/components/layout/TrendingCardCarousel";
-import MoodTrackerModal from "../tools/dump/MoodTracker/MoodTracker";
+import MoodTrackerModal from "@/features/tools/components/common/MoodTrackerModal";
 import VideoScroller from "@/features/tools/components/video-scroller/VideoScroller";
 import AudiobookScroller from "@/features/tools/components/audio-scroller/AudioScroller";
 
@@ -30,7 +30,7 @@ import {
 } from "@/features/tools/services/toolService";
 import HeroFeatureCard from "@/features/tools/components/common/HeroFeatureCard";
 import NavigationIconButton from "@/components/ui/NavigationIconButton";
-import { FILTER_MAP } from "../tools/routineTemplate";
+import { FILTER_MAP } from "@/features/tools/screens/RoutineTemplateScreen";
 
 const Tools: React.FC = () => {
   const navigation = useNavigation();
@@ -191,7 +191,7 @@ const Tools: React.FC = () => {
 
   const handleCardPress = (id: string, type: string) => {
     router.push({
-      pathname: "/(auth)/tools/contentDetails",
+      pathname: ROUTES.AUTH.TOOLS_CONTENT_DETAILS,
       params: { id: id, type: type },
     });
   };
@@ -201,27 +201,27 @@ const Tools: React.FC = () => {
   };
 
   const onClickOfArticleAll = () => {
-    router.push("/(auth)/tools/articleList");
+    router.push(ROUTES.AUTH.TOOLS_ARTICLE_LIST);
   };
 
   const onClickOfRoutineAll = () => {
-    router.push("/(auth)/tools/routineTemplate");
+    router.push(ROUTES.AUTH.TOOLS_ROUTINE_TEMPLATE);
   };
 
   const onClickOfRecipeAll = () => {
-    router.push("/(auth)/tools/recipe");
+    router.push(ROUTES.AUTH.TOOLS_RECIPE);
   };
 
   const onClickOfSkincareRoutineAll = () => {
     router.push({
-      pathname: "/(auth)/tools/routineTemplate",
+      pathname: ROUTES.AUTH.TOOLS_ROUTINE_TEMPLATE,
       params: { filter: "Skincare" },
     });
   };
 
   const onClickOfHacksRoutineAll = () => {
     router.push({
-      pathname: "/(auth)/tools/routineTemplate",
+      pathname: ROUTES.AUTH.TOOLS_ROUTINE_TEMPLATE,
       params: { filter: "Hacks" },
     });
   };
@@ -273,14 +273,14 @@ const Tools: React.FC = () => {
               subtitle="Plan your weekly meals and track nutrition goals."
               icon="restaurant"
               colors={["#FF9A9E", "#FECFEF"]}
-              onPress={() => router.push("/(auth)/tools/mealPlanner")}
+              onPress={() => router.push(ROUTES.AUTH.TOOLS_MEAL_PLANNER)}
             />
             <HeroFeatureCard
               title="Scribble Journal"
               subtitle="Capture thoughts, ideas, and daily reflections."
               icon="pencil"
               colors={["#a18cd1", "#fbc2eb"]}
-              onPress={() => router.push("/(auth)/tools/scribbleList")}
+              onPress={() => router.push(ROUTES.AUTH.TOOLS_SCRIBBLE_LIST)}
             />
           </View>
 

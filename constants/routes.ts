@@ -40,7 +40,7 @@ export const ROUTES = {
     TOOLS_MEAL_WEEKLY: "/(auth)/tools/mealWeeklyView",
     TOOLS_MEAL_CREATION: "/(auth)/tools/mealCreation",
     TOOLS_PROTEIN_CALC: "/(auth)/tools/proteinCalculator",
-    TOOLS_AI_THERAPY: "/(auth)/tools/AItherapy",
+    TOOLS_AI_THERAPY: "/(auth)/tools/aiTherapy",
     TOOLS_ROUTINE_LIST: "/(auth)/tools/templateRoutineList",
     TOOLS_ARTICLE_LIST: "/(auth)/tools/articleList",
     TOOLS_SCRIBBLE_DETAIL: "/(auth)/tools/scribbleDetail",
@@ -54,9 +54,9 @@ export const ROUTES = {
     TOOLS_CONTENT_DETAILS: "/(auth)/tools/contentDetails",
 
     // Self Care
-    SELF_CARE_THINGS_TO_DO: "/(auth)/self-care/ThingsToDoScreen",
-    SELF_CARE_GET_STARTED: "/(auth)/self-care/MentalHealthGetStartedScreen",
-    SELF_CARE_SLEEP_MODAL: "/(auth)/self-care/sleepModal",
+    SELF_CARE_THINGS_TO_DO: "/(auth)/self-care/thingsToDo",
+    SELF_CARE_GET_STARTED: "/(auth)/self-care/mentalHealthGetStarted",
+    SELF_CARE_SLEEP: "/(auth)/self-care/sleep",
     SELF_CARE_REFLECTION: "/(auth)/self-care/reflection",
     SELF_CARE_MEDITATION: "/(auth)/self-care/meditation",
     SELF_CARE_MENTAL_TEST: "/(auth)/self-care/mentalHealthTest",
@@ -71,8 +71,9 @@ export const ROUTES = {
     CHECK_IN_READING: "/(auth)/check-in/reading",
 
     // Billing
-    BILLING_PAYMENT_METHOD: "/(auth)/billing/choosePaymentMethod",
-    BILLING_PAYMENT_SUMMARY: "/(auth)/billing/reviewPaymentSummary",
+    BILLING_UPGRADE: "/(auth)/billing/upgrade",
+    BILLING_CHOOSE_METHOD: "/(auth)/billing/choosePaymentMethod",
+    BILLING_REVIEW_SUMMARY: "/(auth)/billing/reviewPaymentSummary",
 
     // Onboarding & New User
     ONBOARDING_WELCOME: "/(auth)/onboarding/welcome",
@@ -82,9 +83,8 @@ export const ROUTES = {
     // Others
     COACH: "/(auth)/coach",
     REWARDS: "/(auth)/rewards",
-    UPGRADE: "/(auth)/upgrade",
     STATISTICS_DETAILS: "/(auth)/statistics/details",
-    SUCCESS_STATE: "/(auth)/state/SuccessScreen",
+    SUCCESS_STATE: "/(auth)/state/success",
   },
 } as const;
 

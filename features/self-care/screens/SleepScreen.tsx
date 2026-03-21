@@ -11,21 +11,21 @@ import { Ionicons } from "@expo/vector-icons";
 
 import ThemeContext from "@/contexts/ThemeContext";
 import HorizontalListCardScroll from "@/components/layout/HorizontalListCardScroll";
-// import HorizontalBannerCardScroll from "@/features/tools/components/common/HorizontalBannerCardScroll";
 
 import { router } from "expo-router";
 import { banners } from "@/constants/data/banner";
 import HorizontalBanner from "@/components/layout/HorizontalBanner";
 import { getSoundscapeList } from "@/features/tools/services/toolService";
 import { useNimbusToast } from "@/components/ui/toast/useNimbusToast";
+import { ROUTES } from "@/constants/routes";
 
-const SleepModal = ({ visible, onClose }: any) => {
+export const SleepScreen = ({ visible, onClose }: any) => {
   const [libraryTracks, setLibraryTracks] = useState<any>([]);
   const toast = useNimbusToast();
 
   const onModalClose = () => {
     console.log("modal cloe clicked");
-    onClose();
+    onClose?.();
   };
 
   const { newTheme } = useContext(ThemeContext);
@@ -37,7 +37,7 @@ const SleepModal = ({ visible, onClose }: any) => {
   };
 
   const onClickOfAll = () => {
-    router.push("/(auth)/self-care/soundscape");
+    router.push(ROUTES.AUTH.SELF_CARE_SOUNDSCAPE);
   };
 
   const getSoundscapeListData = async () => {
@@ -70,70 +70,79 @@ const SleepModal = ({ visible, onClose }: any) => {
     getSoundscapeListData();
   }, []);
 
+  const content = (
+    <View style={styles.modalContainer}>
+      {/* Back Button */}
+      <TouchableOpacity style={styles.backButton} onPress={onModalClose}>
+        <Ionicons
+          name="arrow-back"
+          size={24}
+          color={newTheme.textSecondary}
+        />
+      </TouchableOpacity>
+
+      <View style={styles.modalContent}>
+        <ScrollView style={styles.scrollView}>
+          <Text style={styles.header}>Better Sleep</Text>
+          <Text style={styles.subHeader}>Good Sleep is your super power</Text>
+
+          {/* Start Tracking Button */}
+          <TouchableOpacity style={styles.startButton}>
+            <Text style={styles.startButtonText}>START</Text>
+            <Text style={styles.startButtonSubText}>Tracking</Text>
+          </TouchableOpacity>
+
+          {/* Sleep Report */}
+          <View style={styles.reportPanel}>
+            <Text style={styles.reportTitle}>SLEEP REPORT</Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.daysRow}
+            >
+              {["30", "31", "1", "2", "3", "4", "5"].map((day, index) => (
+                <TouchableOpacity key={index} style={styles.dayCircle}>
+                  <Text style={styles.dayText}>{day}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+
+            <TouchableOpacity style={styles.demoButton}>
+              <Text style={styles.demoButtonText}>View Demo Report</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Sleep Aids */}
+          <View style={styles.sleepAidSection}>
+            <Text style={styles.reportTitle}>SLEEP AIDSs</Text>
+          </View>
+
+          <HorizontalListCardScroll
+            title="Soundscape"
+            description="The sound of nature gives you better sleep."
+            backgroundColor="#fbfcb3"
+            itemList={libraryTracks}
+            onClickOfAll={onClickOfAll}
+          />
+
+          <HorizontalBanner data={banners} onPress={handleBannerPress} />
+        </ScrollView>
+      </View>
+    </View>
+  );
+
+  // If visible is undefined, it's being used as a regular screen route
+  if (visible === undefined) {
+    return content;
+  }
+
   return (
     <Modal
       animationType="slide"
       presentationStyle="fullScreen"
       visible={visible}
     >
-      <View style={styles.modalContainer}>
-        {/* Back Button */}
-        <TouchableOpacity style={styles.backButton} onPress={onModalClose}>
-          <Ionicons
-            name="arrow-back"
-            size={24}
-            color={newTheme.textSecondary}
-          />
-        </TouchableOpacity>
-
-        <View style={styles.modalContent}>
-          <ScrollView style={styles.scrollView}>
-            <Text style={styles.header}>Better Sleep</Text>
-            <Text style={styles.subHeader}>Good Sleep is your super power</Text>
-
-            {/* Start Tracking Button */}
-            <TouchableOpacity style={styles.startButton}>
-              <Text style={styles.startButtonText}>START</Text>
-              <Text style={styles.startButtonSubText}>Tracking</Text>
-            </TouchableOpacity>
-
-            {/* Sleep Report */}
-            <View style={styles.reportPanel}>
-              <Text style={styles.reportTitle}>SLEEP REPORT</Text>
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                style={styles.daysRow}
-              >
-                {["30", "31", "1", "2", "3", "4", "5"].map((day, index) => (
-                  <TouchableOpacity key={index} style={styles.dayCircle}>
-                    <Text style={styles.dayText}>{day}</Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-
-              <TouchableOpacity style={styles.demoButton}>
-                <Text style={styles.demoButtonText}>View Demo Report</Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* Sleep Aids */}
-            <View style={styles.sleepAidSection}>
-              <Text style={styles.reportTitle}>SLEEP AIDSs</Text>
-            </View>
-
-            <HorizontalListCardScroll
-              title="Soundscape"
-              description="The sound of nature gives you better sleep."
-              backgroundColor="#fbfcb3"
-              itemList={libraryTracks}
-              onClickOfAll={onClickOfAll}
-            />
-
-            <HorizontalBanner data={banners} onPress={handleBannerPress} />
-          </ScrollView>
-        </View>
-      </View>
+      {content}
     </Modal>
   );
 };
@@ -161,7 +170,7 @@ const styling = (theme: any) =>
       position: "absolute",
       top: 90,
       left: 20,
-      zIndex: 999, // <--- try adding this
+      zIndex: 999,
     },
     modalContent: {
       marginTop: 50,
@@ -233,5 +242,3 @@ const styling = (theme: any) =>
       marginTop: 30,
     },
   });
-
-export default SleepModal;

@@ -1,6 +1,5 @@
 import React, { useContext } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
-import { useRouter } from "expo-router";
+import { View, Text, StyleSheet } from "react-native";
 import ThemeContext from "@/contexts/ThemeContext";
 
 type OnboardingHeaderProps = {
@@ -12,26 +11,13 @@ type OnboardingHeaderProps = {
 const OnboardingHeader: React.FC<OnboardingHeaderProps> = ({
   step,
   totalSteps,
-  onBack,
 }) => {
-  const router = useRouter();
-
   const progress = (step / totalSteps) * 100;
-
   const { newTheme } = useContext(ThemeContext);
-
   const styles = styling(newTheme);
 
   return (
     <View style={styles.container}>
-      {/* Back Button */}
-      {/* <Pressable
-        onPress={onBack || (() => router.back())}
-        style={styles.backButton}
-      >
-        <Ionicons name="arrow-back" size={22} color="#ECEFF4" />
-      </Pressable> */}
-
       {/* Progress Bar */}
       <View style={styles.progressBar}>
         <View style={[styles.progressFill, { width: `${progress}%` }]} />
@@ -52,10 +38,6 @@ const styling = (newTheme: any) =>
       flexDirection: "row",
       alignItems: "center",
       paddingHorizontal: 20,
-    },
-    backButton: {
-      padding: 6,
-      marginRight: 12,
     },
     progressBar: {
       flex: 1, // take available space

@@ -7,15 +7,16 @@ import {
   ScrollView,
   SafeAreaView,
 } from "react-native";
-import { router, useNavigation } from "expo-router";
+import { useRouter, useNavigation } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 
 import ThemeContext from "@/contexts/ThemeContext";
 import { ScreenView } from "@/components/ui/Themed";
-import { StyledButton } from "@/components/ui/StyledButton";
+import StyledButton from "@/components/ui/theme-components/StyledButton";
 import { PlanDetailsCard } from "@/features/billing/components/PlanDetailsCard";
 import { BillingToggle } from "@/features/billing/components/BillingToggle";
 import { BillingPeriod, Plan } from "@/features/billing/types/payment";
+import { ROUTES } from "@/constants/routes";
 
 // 🔢 Your plan copy – tweak prices / copy as you like
 const PLANS: Record<BillingPeriod, Plan> = {
@@ -48,15 +49,14 @@ const PLANS: Record<BillingPeriod, Plan> = {
   },
 };
 
-const UpgradePlanScreen = () => {
+export const UpgradePlanScreen = () => {
   const navigation = useNavigation();
+  const router = useRouter();
   const { newTheme } = useContext(ThemeContext);
   const [billing, setBilling] = useState<BillingPeriod>("monthly");
 
   const styles = useMemo(() => styling(newTheme), [newTheme]);
   const activePlan = PLANS[billing];
-
-  //    const navigation = useNavigation();
 
   useEffect(() => {
     navigation.setOptions({
@@ -65,9 +65,7 @@ const UpgradePlanScreen = () => {
   }, [navigation]);
 
   const handleContinue = () => {
-    // TODO: hook up to in-app purchase / Stripe flow
-    router.push("/(auth)/billing/choosePaymentMethod");
-
+    router.push(ROUTES.AUTH.BILLING_CHOOSE_METHOD);
     console.log("Upgrade with plan:", billing);
   };
 
@@ -125,6 +123,8 @@ const UpgradePlanScreen = () => {
                   : `Continue – ${activePlan.price} / year`
               }
               onPress={handleContinue}
+              variant="primary"
+              fullWidth
             />
           </View>
         </View>
@@ -132,10 +132,6 @@ const UpgradePlanScreen = () => {
     </ScreenView>
   );
 };
-
-export default UpgradePlanScreen;
-
-/* ----------------- Styles for screen ----------------- */
 
 const styling = (t: any) =>
   StyleSheet.create({

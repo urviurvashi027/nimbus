@@ -27,6 +27,7 @@ import { router } from "expo-router";
 import ProfileHeader from "@/features/settings/components/ProfileHeader";
 import StyledSwitch from "@/components/ui/theme-components/StyledSwitch";
 import { SvgUri } from "react-native-svg";
+import { ROUTES } from "@/constants/routes";
 
 type FormState = {
   darkMode: boolean;
@@ -278,10 +279,10 @@ export default function profile() {
             }
             planLabel={"Nimbus Free"}
             avatarUrl={userProfile?.avatar || null} // ✅ URL string
-            onPressManagePlan={() => router.push("/(auth)/upgrade")}
+            onPressManagePlan={() => router.push(ROUTES.AUTH.BILLING_UPGRADE)}
           />
           <View style={{ paddingVertical: 20 }}>
-            <UpgradeBanner onPress={() => router.push("/(auth)/upgrade")} />
+            <UpgradeBanner onPress={() => router.push(ROUTES.AUTH.BILLING_UPGRADE)} />
           </View>
 
           {Section.map(({ header, items }) => (
