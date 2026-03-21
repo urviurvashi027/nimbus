@@ -10,7 +10,7 @@ import {
   Dimensions,
   ImageSourcePropType,
 } from "react-native";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 
 const { width: SCREEN_W } = Dimensions.get("window");
 const DEFAULT_CARD_WIDTH = SCREEN_W * 0.84;

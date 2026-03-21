@@ -9,7 +9,7 @@ import {
   Easing,
   GestureResponderEvent,
 } from "react-native";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import { StyledButton } from "@/components/ui/StyledButton";
 
 const { width: WINDOW_WIDTH } = Dimensions.get("window");

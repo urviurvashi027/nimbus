@@ -7,8 +7,8 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native";
-import ThemeContext from "@/context/ThemeContext";
-import StyledButton from "@/components/ui/themeComponents/StyledButton";
+import ThemeContext from "@/contexts/ThemeContext";
+import StyledButton from "@/components/ui/theme-components/StyledButton";
 
 const faqs = [
   {

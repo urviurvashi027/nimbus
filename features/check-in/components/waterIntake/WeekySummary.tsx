@@ -10,7 +10,7 @@ import {
   Text,
 } from "react-native";
 import Svg, { Line, Rect, Text as SvgText } from "react-native-svg";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 
 type DayDatum = { day: string; percent: number };
 

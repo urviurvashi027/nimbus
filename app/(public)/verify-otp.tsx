@@ -2,7 +2,7 @@ import React, { useContext, useMemo, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import { ScreenView } from "@/components/ui/Themed";
 import NimbusOtpVerifyStep from "@/features/auth/components/NimbusOtpVerifyStep"; // adjust path
 

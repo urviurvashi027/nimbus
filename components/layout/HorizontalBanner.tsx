@@ -11,7 +11,7 @@ import {
   NativeScrollEvent,
   NativeSyntheticEvent,
 } from "react-native";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 
 interface BannerItem {
   id: string;

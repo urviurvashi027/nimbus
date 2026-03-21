@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 
 export const MeditationFeaturedSkeleton: React.FC = () => {
   const { newTheme, spacing } = useContext(ThemeContext);

@@ -14,7 +14,7 @@ import {
   Platform,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 
 /* SVG avatar imports (your existing assets) */
@@ -27,7 +27,7 @@ import AvatarFinanceGuy from "@/assets/images/avatar/financeguy.svg";
 import AvatarFitnessFemale from "@/assets/images/avatar/fitnessfemale.svg";
 import AvatarSeriousFemale from "@/assets/images/avatar/seriousfemale.svg";
 import AvatarYoungGuy from "@/assets/images/avatar/youngguy.svg";
-import StyledButton from "@/components/ui/themeComponents/StyledButton";
+import StyledButton from "@/components/ui/theme-components/StyledButton";
 
 const BUILTIN_SVGS = [
   AvatarBusy,

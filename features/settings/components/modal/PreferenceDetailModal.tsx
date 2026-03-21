@@ -10,16 +10,16 @@ import {
   ScrollView,
   Platform,
 } from "react-native";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import {
   setPreference,
   getPreference,
   PreferenceKey,
 } from "@/services/PreferenceStorage";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
 
-import StyledButton from "@/components/ui/themeComponents/StyledButton";
+import StyledButton from "@/components/ui/theme-components/StyledButton";
 
 type Props = {
   visible: boolean;

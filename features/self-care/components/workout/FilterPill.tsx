@@ -1,5 +1,5 @@
 // components/FilterPill.tsx
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import React, { FC, useContext } from "react";
 import {
   Pressable,

@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { View, StyleSheet, Text } from "react-native";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 
 export const InfoRow = ({
   title,

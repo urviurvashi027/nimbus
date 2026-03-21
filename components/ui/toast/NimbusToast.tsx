@@ -2,7 +2,7 @@ import React, { useContext, useMemo } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import Toast, { BaseToast, BaseToastProps } from "react-native-toast-message";
 import { Ionicons } from "@expo/vector-icons";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 
 // Keep your existing Toast.show({ type, text1, text2 }) calls.
 // This config makes them look Nimbus.

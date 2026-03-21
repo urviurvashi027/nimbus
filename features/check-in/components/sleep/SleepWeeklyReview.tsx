@@ -1,4 +1,4 @@
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import React, { useContext, useMemo } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { LineChart } from "react-native-gifted-charts";

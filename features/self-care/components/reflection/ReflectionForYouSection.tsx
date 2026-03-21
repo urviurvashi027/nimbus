@@ -2,7 +2,7 @@
 
 import React, { useContext } from "react";
 import { View, Text, FlatList, StyleSheet, Dimensions } from "react-native";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import ReflectionFeaturedCard from "@/features/self-care/components/reflection/ReflectionFeatureCard";
 
 const { width } = Dimensions.get("window");

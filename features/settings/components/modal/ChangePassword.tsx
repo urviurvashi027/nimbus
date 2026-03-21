@@ -9,15 +9,15 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 
-import StyledButton from "@/components/ui/themeComponents/StyledButton";
-import InputField from "@/components/ui/themeComponents/StyledInputOld";
+import StyledButton from "@/components/ui/theme-components/StyledButton";
+import InputField from "@/components/ui/theme-components/StyledInputOld";
 
 // import { StyledButton } from "../common/ThemedComponent/StyledButton";
 
 import { changePassword } from "@/features/settings/services/settingService";
-import ErrorBanner from "@/components/ui/themeComponents/ErrorBanner";
+import ErrorBanner from "@/components/ui/theme-components/ErrorBanner";
 
 export default function ChangePasswordModal({
   visible,

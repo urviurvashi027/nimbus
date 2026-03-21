@@ -1,9 +1,9 @@
 import React, { useContext, useEffect } from "react";
 import { View, Text, StyleSheet, Pressable, Dimensions } from "react-native";
 import { router, useNavigation } from "expo-router";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import { ScreenView } from "@/components/ui/Themed";
-import { NimbusButton } from "@/components/ui/themeComponents/NimbusButton";
+import { NimbusButton } from "@/components/ui/theme-components/NimbusButton";
 
 import RelaxMenIcon from "@/assets/images/logoNew/1.svg";
 

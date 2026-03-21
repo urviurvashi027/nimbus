@@ -7,7 +7,7 @@ import {
   GestureResponderEvent,
   ViewStyle,
 } from "react-native";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 
 type Variant = "pill" | "circle";

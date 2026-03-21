@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { PrimaryButton } from "./ui/Buttons";
 import ProgressBar from "./ProgressBar";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 
 export type ReadingOverviewCardProps = {
   title?: string; // default: "Reading"

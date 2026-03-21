@@ -15,7 +15,7 @@ import {
   Pressable,
 } from "react-native";
 import DailyCheckInCard from "@/features/home/components/component/DailyCheckInCard";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import { useRouter } from "expo-router";
 import { getCheckinList } from "@/features/check-in/services/dailyCheckinService";
 import {

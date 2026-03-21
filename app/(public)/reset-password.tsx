@@ -2,10 +2,10 @@ import React, { useContext, useMemo, useState } from "react";
 import { View, Text, StyleSheet, Alert } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import { ScreenView } from "@/components/ui/Themed";
-import { NimbusInput } from "@/components/ui/themeComponents/NimbusInput";
-import { NimbusButton } from "@/components/ui/themeComponents/NimbusButton";
+import { NimbusInput } from "@/components/ui/theme-components/NimbusInput";
+import { NimbusButton } from "@/components/ui/theme-components/NimbusButton";
 import { useNimbusAlert } from "@/components/ui/alert/useNimbusAlert";
 import { setPassword as resetPassword } from "@/features/auth/services/loginService";
 import { useNimbusToast } from "@/components/ui/toast/useNimbusToast";

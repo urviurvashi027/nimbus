@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   GestureResponderEvent,
 } from "react-native";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>["name"];

@@ -15,8 +15,8 @@ import {
   Urbanist_700Bold,
 } from "@expo-google-fonts/urbanist";
 
-import AuthProvider from "@/context/AuthContext";
-import { ThemeProvider } from "@/context/ThemeContext";
+import AuthProvider from "@/contexts/AuthContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 // import HabitContext from "@/context/HabitContext";
 import { HabitCreateRequest } from "@/features/habit/types/habitTypes";
 import { NimbusAlertProvider } from "@/components/ui/alert/NimbusAlertProvider";

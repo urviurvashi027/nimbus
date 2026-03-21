@@ -1,7 +1,7 @@
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import React, { useContext } from "react";
 import { Modal, View, Text, StyleSheet, ScrollView } from "react-native";
-import StyledButton from "@/components/ui/themeComponents/StyledButton";
+import StyledButton from "@/components/ui/theme-components/StyledButton";
 
 const TermsModal = ({
   visible,

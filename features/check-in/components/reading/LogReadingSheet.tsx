@@ -13,7 +13,7 @@ import {
 import QuickLogTab, { QuickLogPayload } from "./QuickLog";
 import TimerTab from "./TimerTab";
 import { SegmentedTabs } from "./ui/SegmentedTab";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 
 type Props = {
   visible: boolean;

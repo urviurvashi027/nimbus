@@ -11,7 +11,7 @@ import {
   AccessibilityInfo,
   Dimensions,
 } from "react-native";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 
 type WaterTrackerProps = {
   value: number;

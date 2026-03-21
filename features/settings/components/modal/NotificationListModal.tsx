@@ -11,16 +11,16 @@ import {
   Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import ReminderDetail from "./NotificationSettingModal"; // your detail component
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   formatBackendTime,
   mergeReminders,
   repeatLabelFromDays,
-} from "@/utils/notoficationHelper";
+} from "@/utils/notificationHelper";
 import { NotificationType } from "@/types/notificationType";
-import { NOTIFICATION_TYPES } from "@/constant/data/notificationType";
+import { NOTIFICATION_TYPES } from "@/constants/data/notificationType";
 
 export default function NotificationListModal({
   visible,

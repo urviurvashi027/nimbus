@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { View, Text, FlatList, StyleSheet, Dimensions } from "react-native";
 
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import MeditationFeaturedCard from "@/features/self-care/components/meditation/MeditationFeautredCard";
 import { EnrichedMeditation } from "../../types/selfCareTypes";
 

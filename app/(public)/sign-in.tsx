@@ -4,15 +4,15 @@ import { View, Text, StyleSheet, Pressable, Alert } from "react-native";
 import { Stack, router, useNavigation } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 
-import { ScreenView } from "@/components/ui/themeComponents/ScreenView";
-import { NimbusInput } from "@/components/ui/themeComponents/NimbusInput";
-import { NimbusButton } from "@/components/ui/themeComponents/NimbusButton";
+import { ScreenView } from "@/components/ui/theme-components/ScreenView";
+import { NimbusInput } from "@/components/ui/theme-components/NimbusInput";
+import { NimbusButton } from "@/components/ui/theme-components/NimbusButton";
 import { StyledCheckbox } from "@/components/ui/StyledCheckbox";
 import { useNimbusToast } from "@/components/ui/toast/useNimbusToast";
 import AppHeader from "@/components/layout/AppHeader";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function SignIn() {
   const { newTheme, tokens, typography, spacing } = useContext(ThemeContext);

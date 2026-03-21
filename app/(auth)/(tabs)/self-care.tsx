@@ -10,14 +10,15 @@ import React, { useContext, useEffect, useState } from "react";
 import { router, useNavigation } from "expo-router";
 
 // application level import
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
+import { ROUTES } from "@/constants/routes";
 
 import {
   buttons as NavigationButton,
   NavigationButtonType,
-} from "@/constant/data/selfCareButton";
-import { banners } from "@/constant/data/banner";
-import { medTests } from "@/constant/data/medicalTest";
+} from "@/constants/data/selfCareButton";
+import { banners } from "@/constants/data/banner";
+import { medTests } from "@/constants/data/medicalTest";
 
 import { ScreenView } from "@/components/ui/Themed";
 import TrendingCardCarousel from "@/components/layout/TrendingCardCarousel";
@@ -26,8 +27,8 @@ import VideoClassCard from "@/features/self-care/components/MasterclassCard";
 import HorizontalBanner from "@/components/layout/HorizontalBanner";
 import PricingModal from "@/components/ui/PricingModal";
 import NavigationIconButton from "@/components/ui/NavigationIconButton";
-import SleepModal from "../self-care/sleepModal";
-import ThingsToDoModal from "../self-care/ThingsToDoScreen";
+import SleepScreen from "../self-care/sleep";
+import ThingsToDoModal from "../self-care/thingsToDo";
 
 import {
   getMeditationAudioList,
@@ -207,16 +208,16 @@ const SelfCare: React.FC = () => {
   const onClickOfAll = (title: string) => {
     switch (title) {
       case "medicalTest":
-        router.push("/(auth)/self-care/mentalHealthTest");
+        router.push(ROUTES.AUTH.SELF_CARE_MENTAL_TEST);
         break;
       case "soundscape":
-        router.push("/(auth)/self-care/soundscape");
+        router.push(ROUTES.AUTH.SELF_CARE_SOUNDSCAPE);
         break;
       case "meditation":
-        router.push("/(auth)/self-care/meditation");
+        router.push(ROUTES.AUTH.SELF_CARE_MEDITATION);
         break;
       case "routine":
-        router.push("/(auth)/tools/routineTemplate");
+        router.push(ROUTES.AUTH.TOOLS_ROUTINE_TEMPLATE);
         break;
     }
   };
@@ -361,7 +362,7 @@ const SelfCare: React.FC = () => {
 
       {/* Modal Details */}
       {/* Sleep Modal */}
-      <SleepModal
+      <SleepScreen
         visible={showSleepTagsModal}
         onClose={() => setShowSleepTagsModal(false)}
       />

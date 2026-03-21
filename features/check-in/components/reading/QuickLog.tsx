@@ -7,8 +7,8 @@ import { PrimaryButton, GhostButton } from "./ui/LogSheetButton";
 import { BookChips } from "./ui/BookChips";
 import { MoodChips, Mood } from "./ui/MoodChips";
 import { MinuteStepper } from "./ui/MinuteStepper";
-import { toISODate, toHHmmReading, durationFromRange } from "@/utils/time";
-import ThemeContext from "@/context/ThemeContext";
+import { toISODate, toHHmm, durationFromRange } from "@/utils/date-time";
+import ThemeContext from "@/contexts/ThemeContext";
 
 export type QuickLogPayload = {
   bookId?: string;

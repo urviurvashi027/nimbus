@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { Redirect } from "expo-router";
 import * as SecureStore from "expo-secure-store";
-import { StoreKey } from "@/constant/Constant";
+import { StoreKey } from "@/constants/Constant";
 
 const TOKEN_KEY = StoreKey.TOKEN_KEY;
 const ONBOARDING_DONE_KEY = StoreKey.ONBOARDING_DONE_KEY;

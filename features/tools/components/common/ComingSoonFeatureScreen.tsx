@@ -3,9 +3,9 @@
 import React, { useContext } from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import ToolScreenHeader from "@/features/tools/components/common/ToolScreenHeader";
-import StyledButton from "@/components/ui/themeComponents/StyledButton";
+import StyledButton from "@/components/ui/theme-components/StyledButton";
 
 export type ComingSoonConfig = {
   emoji?: string; // optional emoji before title

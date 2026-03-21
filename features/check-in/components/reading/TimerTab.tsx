@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 import { PrimaryButton, GhostButton } from "./ui/LogSheetButton";
 import { MoodChips, Mood } from "./ui/MoodChips";
 import { BookChips } from "./ui/BookChips";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 
 export default function TimerTab({
   onCancel,

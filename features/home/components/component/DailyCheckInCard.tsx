@@ -1,5 +1,5 @@
 // DailyCheckInCard.tsx
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import { useRouter } from "expo-router";
 import React, { useContext } from "react";
 import {

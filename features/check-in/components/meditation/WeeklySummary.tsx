@@ -3,7 +3,7 @@ import React, { useContext, useMemo } from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import { LineChart } from "react-native-gifted-charts";
 import { Ionicons } from "@expo/vector-icons";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 
 type Point = { day: string; percent: number };
 

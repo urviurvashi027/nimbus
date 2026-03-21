@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from "axios";
 import { API_ENDPOINTS } from "@/config/apiConfig";
-import { toApiDate } from "@/utils/dateTime";
+import { toApiDate } from "@/utils/date-time";
 
 export interface Meal {
   id: number;

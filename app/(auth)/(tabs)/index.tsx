@@ -27,8 +27,9 @@ import {
 } from "date-fns";
 
 import { ScreenView } from "@/components/ui/Themed";
-import ThemeContext from "@/context/ThemeContext";
-import { useAuth } from "@/context/AuthContext";
+import ThemeContext from "@/contexts/ThemeContext";
+import { ROUTES } from "@/constants/routes";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   getHabitList,
   markHabitDone,
@@ -134,7 +135,7 @@ export default function TabOneScreen() {
   //   loadHabits(isoDate);
   // }, [isoDate, loadHabits]);
 
-  const onCreateClick = () => router.push("/(auth)/habit/createHabit");
+  const onCreateClick = () => router.push(ROUTES.AUTH.CREATE_HABIT);
 
   const handleHabitDoneClick = async (id: string, count: any) => {
     const currentIsoDate = format(startOfDay(selectedDate), "yyyy-MM-dd");
@@ -217,7 +218,7 @@ export default function TabOneScreen() {
                   <TopBadge
                     iconName="star"
                     variant="pill"
-                    onPress={() => router.push("/(auth)/coach")}
+                    onPress={() => router.push(ROUTES.AUTH.COACH)}
                   />
                 </View>
               )}

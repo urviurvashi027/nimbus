@@ -11,9 +11,9 @@ import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Audio } from "expo-av";
 
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 
-import { TrackType } from "@/constant/data/soundtrack";
+import { TrackType } from "@/constants/data/soundtrack";
 
 interface PropType {
   backgroundColor: string; // now treated as optional tint / fallback

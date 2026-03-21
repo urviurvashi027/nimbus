@@ -8,7 +8,7 @@ import {
   GestureResponderEvent,
 } from "react-native";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import { PaymentMethod } from "@/features/billing/types/payment";
 
 type Props = {

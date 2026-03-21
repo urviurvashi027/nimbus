@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 
 interface ToolScreenHeaderProps {
   title: string;
@@ -37,12 +37,20 @@ const ToolScreenHeader: React.FC<ToolScreenHeaderProps> = ({
       {/* Top action row */}
       <View style={styles.topRow}>
         <TouchableOpacity style={styles.backButton} onPress={onBack}>
-          <Ionicons name="arrow-back" size={24} color={newTheme.textSecondary} />
+          <Ionicons
+            name="arrow-back"
+            size={24}
+            color={newTheme.textSecondary}
+          />
         </TouchableOpacity>
 
         {rightIcon && (
           <TouchableOpacity style={styles.rightButton} onPress={onRightPress}>
-            <Ionicons name={rightIcon} size={24} color={newTheme.textSecondary} />
+            <Ionicons
+              name={rightIcon}
+              size={24}
+              color={newTheme.textSecondary}
+            />
           </TouchableOpacity>
         )}
       </View>
