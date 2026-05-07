@@ -1,5 +1,9 @@
-import { ThemeColors, Spacing, Typography, ColorSet } from "./types";
+import { ThemeColors, Spacing, Typography, ColorSet } from "@/types/themeTypes";
 import { tokens } from "./tokens";
+
+type ThemeColorsWithTokens = ThemeColors & {
+  tokens: typeof tokens;
+};
 
 // latest theme color
 // Define a base set of colors that might be shared or used as a default
@@ -93,7 +97,11 @@ const spacing: Spacing = {
 };
 
 // Now, create the main theme object that adheres to the ThemeColors interface
-export const theme: ThemeColors = {
+export const theme: ThemeColorsWithTokens = {
+  basic: {
+    ...basicColors,
+  },
+
   // The 'dark' theme can extend the basic one if they are similar
   dark: {
     ...basicColors,
