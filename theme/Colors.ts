@@ -1,5 +1,9 @@
-import { ThemeColors, Spacing, Typography, ColorSet } from "./types";
+import { ThemeColors, Spacing, Typography, ColorSet } from "@/types/themeTypes";
 import { tokens } from "./tokens";
+
+type ThemeColorsWithTokens = ThemeColors & {
+  tokens: typeof tokens;
+};
 
 // latest theme color
 // Define a base set of colors that might be shared or used as a default
@@ -71,22 +75,14 @@ const basicColors: ColorSet = {
 };
 
 const typography: Typography = {
-  h1: { fontFamily: "System", fontSize: 32, fontWeight: "bold", lineHeight: 40 },
-  h2: { fontFamily: "System", fontSize: 24, fontWeight: "bold", lineHeight: 32 },
-  h3: { fontFamily: "System", fontSize: 20, fontWeight: "600", lineHeight: 28 },
-  body: {
-    fontFamily: "System",
-    fontSize: 16,
-    fontWeight: "normal",
-    lineHeight: 24,
-  },
-  caption: {
-    fontFamily: "System",
-    fontSize: 12,
-    fontWeight: "normal",
-    lineHeight: 16,
-  },
-  button: { fontFamily: "System", fontSize: 16, fontWeight: "bold" },
+  h1: { fontSize: 32, fontWeight: "bold", lineHeight: 40 },
+  h2: { fontSize: 24, fontWeight: "bold", lineHeight: 32 },
+  h3: { fontSize: 20, fontWeight: "600", lineHeight: 28 },
+  h4: { fontSize: 14, fontWeight: "700", lineHeight: 18 },
+  body: { fontSize: 16, fontWeight: "normal", lineHeight: 24 },
+  caption: { fontSize: 12, fontWeight: "500", lineHeight: 16 },
+  smallCaption: { fontSize: 10, fontWeight: "600", lineHeight: 14 },
+  button: { fontSize: 16, fontWeight: "bold" },
 };
 
 // 2. Define your standard spacing
@@ -101,7 +97,11 @@ const spacing: Spacing = {
 };
 
 // Now, create the main theme object that adheres to the ThemeColors interface
-export const theme: ThemeColors = {
+export const theme: ThemeColorsWithTokens = {
+  basic: {
+    ...basicColors,
+  },
+
   // The 'dark' theme can extend the basic one if they are similar
   dark: {
     ...basicColors,
@@ -118,4 +118,3 @@ export const theme: ThemeColors = {
   typography: typography,
   tokens: tokens,
 };
-

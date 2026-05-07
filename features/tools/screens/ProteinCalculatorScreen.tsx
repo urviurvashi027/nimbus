@@ -5,10 +5,15 @@ import { useNavigation } from "expo-router";
 import { ScreenView } from "@/components/ui/Themed";
 import ThemeContext from "@/contexts/ThemeContext";
 
+// <<<<<<< HEAD:features/tools/screens/ProteinCalculatorScreen.tsx
 import StyledInput from "@/components/ui/theme-components/StyledInput";
 import StyledButton from "@/components/ui/theme-components/StyledButton";
 import NimbusDropdown from "@/components/ui/theme-components/NimbusDropdown";
 import ToolScreenHeader from "@/features/tools/components/common/ToolScreenHeader";
+// =======
+
+// import AppHeader from "@/components/common/AppHeader";
+// >>>>>>> 0903e1c (tool screen header replaced by app header):app/(auth)/toolsScreen/ProteinCalculatorScreen.tsx
 
 import { getProteinIntakeInfo } from "@/features/tools/services/toolService";
 import {
@@ -16,6 +21,7 @@ import {
   proteinIntakeCalculatorResponse,
 } from "@/features/tools/types/toolsTypes";
 import { activityLevelList, genderList } from "@/constants/data/tools";
+import AppHeader from "@/components/layout/AppHeader";
 
 export const ProteinCalculatorScreen = () => {
   const navigation = useNavigation();
@@ -95,7 +101,7 @@ export const ProteinCalculatorScreen = () => {
       }}
     >
       <View style={styles.container}>
-        <ToolScreenHeader
+        <AppHeader
           title="Protein Intake Calculator"
           subtitle={subtitle}
           onBack={() => navigation.goBack()}

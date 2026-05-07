@@ -7,7 +7,6 @@ import {
 } from "react-native";
 import { Image } from "expo-image";
 import React, { useContext, useEffect, useState } from "react";
-import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Audio } from "expo-av";
 
@@ -19,7 +18,7 @@ interface PropType {
   backgroundColor: string; // now treated as optional tint / fallback
   title: string;
   description: string;
-  itemList: Array<TrackType | any>;
+  itemList: any[];
   noOfRows?: number;
   onClickOfAll: () => void;
 }
@@ -65,14 +64,6 @@ const HorizontalListCardScroll: React.FC<PropType> = (props) => {
       lowerTitle.includes("meditation")
     ) {
       handlePlayPause(entry);
-    } else if (
-      lowerTitle.includes("medical") ||
-      lowerTitle.includes("assessment")
-    ) {
-      router.push({
-        pathname: "/(auth)/self-care/mentalHealthTest",
-        params: { id: entry.id },
-      });
     }
   };
 

@@ -14,7 +14,10 @@ import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/contexts/ThemeContext";
 import { ScreenView } from "@/components/ui/Themed";
 
+// <<
 import WorkoutSessionHeader from "@/features/self-care/components/workout/WorkoutSessionHeader";
+// =======
+// import AppHeader from "@/components/common/AppHeader";
 import DifficultyTabs, {
   DifficultyOptionKey,
 } from "@/features/self-care/components/workout/DifficultyTabs";
@@ -27,6 +30,7 @@ import WorkoutPrimaryButton from "@/features/self-care/components/workout/Workou
 import WorkoutTipBanner from "@/features/self-care/components/workout/WorkoutTipBanner";
 
 import { getWorkoutDetails } from "@/features/self-care/services/selfCareService";
+import AppHeader from "@/components/layout/AppHeader";
 
 // Helper to parse "5 min" or "30s" to seconds
 const parseTimeToSeconds = (timeStr?: string): number => {
@@ -111,7 +115,7 @@ export const WorkoutSessionScreen = () => {
     setRemaining(mode === "workout" ? WORK_DURATION : REST_DURATION);
     setIsRunning(false);
     setHasStarted(false);
-  }, [currentVariation, WORK_DURATION, REST_DURATION]); 
+  }, [currentVariation, WORK_DURATION, REST_DURATION]);
 
   // Separated mode change sync
   useEffect(() => {
@@ -206,7 +210,7 @@ export const WorkoutSessionScreen = () => {
     >
       <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.container}>
-          <WorkoutSessionHeader
+          <AppHeader
             title={workoutData.name}
             onBack={() => navigation.goBack()}
           />

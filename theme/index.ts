@@ -36,6 +36,12 @@ export const typography: Typography = {
     fontWeight: "600",
     lineHeight: 28,
   },
+  h4: {
+    fontFamily: "Urbanist_600SemiBold",
+    fontSize: 14,
+    fontWeight: "600",
+    lineHeight: 18,
+  },
   body: {
     fontFamily: "Outfit_400Regular",
     fontSize: 16,
@@ -47,6 +53,12 @@ export const typography: Typography = {
     fontSize: 12,
     fontWeight: "400",
     lineHeight: 16,
+  },
+  smallCaption: {
+    fontFamily: "Outfit_600SemiBold",
+    fontSize: 10,
+    fontWeight: "600",
+    lineHeight: 14,
   },
   button: {
     fontFamily: "Outfit_600SemiBold",

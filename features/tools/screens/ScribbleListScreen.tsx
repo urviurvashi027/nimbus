@@ -20,8 +20,17 @@ import {
   scribbleService,
   Scribble,
 } from "@/features/tools/services/scribbleService";
+// =======
+// import ThemeContext from "@/context/ThemeContext";
+// import { ScreenView } from "@/components/Themed";
+// import AppHeader from "@/components/common/AppHeader";
+// import FilterPill from "@/components/selfCare/workout/FilterPill";
+// import { scribbleService, Scribble } from "@/services/scribbleService";
+// >>>>>>> 0903e1c (tool screen header replaced by app header):app/(auth)/toolsScreen/ScribbleListScreen.tsx
+
 import { useFocusEffect } from "expo-router";
 import { ROUTES } from "@/constants/routes";
+import AppHeader from "@/components/layout/AppHeader";
 
 export const ScribbleListScreen = () => {
   const { newTheme, spacing, typography } = useContext(ThemeContext);
@@ -120,7 +129,7 @@ export const ScribbleListScreen = () => {
       }}
     >
       <SafeAreaView style={{ flex: 1 }}>
-        <ToolScreenHeader
+        <AppHeader
           title="Scribbles"
           subtitle="Jot down your thoughts and ideas."
           onBack={() => router.back()}

@@ -1,6 +1,8 @@
 import { BackendEntry } from "@/features/settings/types/settingTypes";
-import { ReminderSettings } from "@/types/notificationType";
+import { NotificationType, ReminderSettings } from "@/types/notificationType";
 import { parse, format, isValid } from "date-fns";
+
+export type ReminderType = NotificationType;
 
 /** Accept "HH:mm:ss" or "HH:mm" and return "7:30 AM" / "7:30 PM". Return fallback if invalid. */
 const TIME_HHMMSS_RE = /^\d{1,2}:\d{2}(:\d{2})?$/;

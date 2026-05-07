@@ -12,14 +12,22 @@ import { useNavigation } from "expo-router";
 import ThemeContext from "@/contexts/ThemeContext";
 import { ScreenView } from "@/components/ui/Themed";
 
+// <<<<<<<
 import ReflectionEntryModal from "@/features/self-care/components/reflection/ReflectionEntryModal";
 import ReflectionItemCard from "@/features/self-care/components/reflection/ReflectionItemCard";
-import ReflectionHeader from "@/features/self-care/components/reflection/ReflectionHeader";
 import ReflectionForYouSection from "@/features/self-care/components/reflection/ReflectionForYouSection";
 import ReflectionForYouSkeleton from "@/features/self-care/components/reflection/ReflectionForYouSkeleton";
 import ReflectionLibrarySkeleton from "@/features/self-care/components/reflection/ReflectionLibrarySkeleton";
+// =======
+// import ReflectionEntryModal from "@/components/selfCare/reflection/ReflectionEntryModal";
+// import ReflectionItemCard from "@/components/selfCare/reflection/ReflectionItemCard";
+// import AppHeader from "@/components/common/AppHeader";
+// import ReflectionForYouSection from "@/components/selfCare/reflection/ReflectionForYouSection";
+// import ReflectionForYouSkeleton from "@/components/selfCare/reflection/ReflectionForYouSkeleton";
+// import ReflectionLibrarySkeleton from "@/components/selfCare/reflection/ReflectionLibrarySkeleton";
 
 import { getJournalList } from "@/features/self-care/services/selfCareService";
+import AppHeader from "@/components/layout/AppHeader";
 
 export const ReflectionScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -142,7 +150,11 @@ export const ReflectionScreen = () => {
       >
         <SafeAreaView style={{ flex: 1 }}>
           <View style={styles.container}>
-            <ReflectionHeader onBack={() => navigation.goBack()} />
+            <AppHeader
+              title="Reflection"
+              subtitle="Gently explore your thoughts, one prompt at a time."
+              onBack={() => navigation.goBack()}
+            />
             <ReflectionForYouSkeleton />
             <ReflectionLibrarySkeleton />
           </View>
@@ -165,7 +177,11 @@ export const ReflectionScreen = () => {
       <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.container}>
           {/* Header (non-scrollable) */}
-          <ReflectionHeader onBack={() => navigation.goBack()} />
+          <AppHeader
+            title="Reflection"
+            subtitle="Gently explore your thoughts, one prompt at a time."
+            onBack={() => navigation.goBack()}
+          />
 
           {/* Vertical scroll for For You + All list */}
           {showLibrary && journalList && (

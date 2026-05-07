@@ -1,12 +1,26 @@
 import React, { useContext, useMemo } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, TextStyle } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  TextStyle,
+  ViewStyle,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/contexts/ThemeContext";
 
 type RightAction = {
-  icon?: keyof typeof Ionicons.glyphMap; // e.g. "ellipsis-horizontal"
+  icon?: keyof typeof Ionicons.glyphMap;
   onPress: () => void;
   accessibilityLabel?: string;
+};
+
+export type HeaderRightAction = {
+  icon?: keyof typeof Ionicons.glyphMap;
+  onPress: () => void;
+  accessibilityLabel?: string;
+  badge?: number | boolean;
 };
 
 interface AppHeaderProps {
@@ -14,8 +28,10 @@ interface AppHeaderProps {
   subtitle?: string;
   onBack?: () => void;
   rightAction?: RightAction;
+  rightActions?: HeaderRightAction[];
   titleStyle?: TextStyle;
   subtitleStyle?: TextStyle;
+  containerStyle?: ViewStyle;
 }
 
 const AppHeader: React.FC<AppHeaderProps> = ({
@@ -23,8 +39,10 @@ const AppHeader: React.FC<AppHeaderProps> = ({
   subtitle,
   onBack,
   rightAction,
+  rightActions = [],
   titleStyle,
   subtitleStyle,
+  containerStyle,
 }) => {
   const { newTheme, nimbusColors, spacing, typography } = useContext(ThemeContext);
 
@@ -33,9 +51,14 @@ const AppHeader: React.FC<AppHeaderProps> = ({
     [newTheme, nimbusColors, spacing, typography]
   );
 
+  const actions = rightActions.length
+    ? rightActions
+    : rightAction
+      ? [rightAction]
+      : [];
+
   return (
-    <View style={styles.container}>
-      {/* Top row: back + right action */}
+    <View style={[styles.container, containerStyle]}>
       <View style={styles.topRow}>
         <View style={styles.leftSlot}>
           {onBack && (
@@ -47,7 +70,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
               activeOpacity={0.7}
             >
               <Ionicons
-                name="arrow-back"
+                name="chevron-back"
                 size={22}
                 color={nimbusColors.text.secondary || newTheme.textSecondary}
               />
@@ -56,30 +79,36 @@ const AppHeader: React.FC<AppHeaderProps> = ({
         </View>
 
         <View style={styles.rightSlot}>
-          {!!rightAction && (
+          {actions.slice(0, 2).map((action, index) => (
             <TouchableOpacity
-              style={styles.iconButton}
-              onPress={rightAction.onPress}
+              key={`${action.icon ?? "action"}-${index}`}
+              style={[styles.iconButton, index > 0 && { marginLeft: spacing.sm }]}
+              onPress={action.onPress}
               accessibilityRole="button"
-              accessibilityLabel={
-                rightAction.accessibilityLabel ?? "More options"
-              }
+              accessibilityLabel={action.accessibilityLabel ?? "Action"}
               activeOpacity={0.7}
             >
               <Ionicons
-                name={rightAction.icon ?? "ellipsis-horizontal"}
-                size={22}
-                color={nimbusColors.text.secondary || newTheme.textSecondary}
+                name={action.icon ?? "ellipsis-horizontal"}
+                size={20}
+                color={newTheme.textPrimary}
+                style={{ opacity: 0.9 }}
               />
+              {!!("badge" in action && action.badge) && <View style={styles.badge} />}
             </TouchableOpacity>
-          )}
+          ))}
         </View>
       </View>
 
-      {/* Title block */}
       <View style={styles.textBlock}>
-        <Text style={[styles.title, titleStyle]}>{title}</Text>
-        {!!subtitle && <Text style={[styles.subtitle, subtitleStyle]}>{subtitle}</Text>}
+        <Text style={[styles.title, titleStyle]} numberOfLines={1}>
+          {title}
+        </Text>
+        {!!subtitle && (
+          <Text style={[styles.subtitle, subtitleStyle]} numberOfLines={2}>
+            {subtitle}
+          </Text>
+        )}
       </View>
     </View>
   );
@@ -88,6 +117,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
 const styling = (theme: any, c: any, spacing: any, typography: any) =>
   StyleSheet.create({
     container: {
+      paddingBottom: spacing.sm,
       marginBottom: spacing.lg,
     },
     topRow: {
@@ -97,29 +127,40 @@ const styling = (theme: any, c: any, spacing: any, typography: any) =>
       marginBottom: spacing.md,
     },
     leftSlot: {
-      minWidth: 44,
+      flex: 1,
       alignItems: "flex-start",
-      justifyContent: "center",
     },
     rightSlot: {
-      minWidth: 44,
-      alignItems: "flex-end",
-      justifyContent: "center",
+      flex: 1,
+      flexDirection: "row",
+      justifyContent: "flex-end",
+      alignItems: "center",
     },
-
-    // Nimbus-ish premium icon touch target
     iconButton: {
-      width: 44,
-      height: 44,
-      borderRadius: 14,
+      width: 40,
+      height: 40,
+      borderRadius: 12,
       alignItems: "center",
       justifyContent: "center",
-      backgroundColor: c.interaction.pressed || "rgba(255,255,255,0.04)",
+      backgroundColor: c.interaction.pressed || "rgba(255,255,255,0.05)",
       borderWidth: 1,
-      borderColor: c.border.subtle || "rgba(255,255,255,0.06)",
+      borderColor: c.border.subtle || "rgba(255,255,255,0.08)",
+      position: "relative",
     },
-
-    textBlock: {},
+    badge: {
+      position: "absolute",
+      top: 8,
+      right: 8,
+      width: 7,
+      height: 7,
+      borderRadius: 4,
+      backgroundColor: theme.accent,
+      borderWidth: 1.5,
+      borderColor: theme.surface,
+    },
+    textBlock: {
+      paddingHorizontal: spacing.xs,
+    },
     title: {
       ...typography.h2,
       color: c.text.primary || theme.textPrimary,

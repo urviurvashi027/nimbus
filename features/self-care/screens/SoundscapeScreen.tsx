@@ -16,11 +16,19 @@ import { ScreenView } from "@/components/ui/Themed";
 import { getSoundscapeList } from "@/features/tools/services/toolService";
 import BottomPlayer from "@/components/layout/BottomPlayer";
 
+// <<<<
 import SoundscapeHeader from "@/features/self-care/components/soundscape/SoundscapeHeader";
 import SoundscapeForYouSection from "@/features/self-care/components/soundscape/SoundscapeForYouSection";
 import SoundscapeLibraryItem from "@/features/self-care/components/soundscape/SoundscapeLibraryItem";
 import SoundscapeForYouSkeleton from "@/features/self-care/components/soundscape/SoundscapeForYouSkeleton";
 import SoundscapeLibrarySkeleton from "@/features/self-care/components/soundscape/SoundscapeLibrarySkeleton";
+import AppHeader from "@/components/layout/AppHeader";
+// =======
+// import AppHeader from "@/components/common/AppHeader";
+// import SoundscapeForYouSection from "@/components/selfCare/soundscape/SoundscapeForYouSection";
+// import SoundscapeLibraryItem from "@/components/selfCare/soundscape/SoundscapeLibraryItem";
+// import SoundscapeForYouSkeleton from "@/components/selfCare/soundscape/SoundscapeForYouSkeleton";
+// import SoundscapeLibrarySkeleton from "@/components/selfCare/soundscape/SoundscapeLibrarySkeleton";
 
 export const SoundscapeScreen = () => {
   const [currentTrack, setCurrentTrack] = useState<TrackType | null>(null);
@@ -174,7 +182,11 @@ export const SoundscapeScreen = () => {
       >
         <SafeAreaView style={{ flex: 1 }}>
           <View style={styles.container}>
-            <SoundscapeHeader onBack={() => navigation.goBack()} />
+            <AppHeader
+              title="Soundscape"
+              subtitle="Immerse yourself in the sounds of true nature."
+              onBack={() => navigation.goBack()}
+            />
             <SoundscapeForYouSkeleton />
             <SoundscapeLibrarySkeleton />
           </View>
@@ -196,7 +208,11 @@ export const SoundscapeScreen = () => {
     >
       <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.container}>
-          <SoundscapeHeader onBack={() => navigation.goBack()} />
+          <AppHeader
+            title="Soundscape"
+            subtitle="Immerse yourself in the sounds of true nature."
+            onBack={() => navigation.goBack()}
+          />
 
           {showLibrary && libraryTracks && (
             <FlatList

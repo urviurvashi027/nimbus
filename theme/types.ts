@@ -31,8 +31,10 @@ export interface Typography {
   h1: FontSet;
   h2: FontSet;
   h3: FontSet;
+  h4: FontSet;
   body: FontSet;
   caption: FontSet;
+  smallCaption: FontSet;
   button: FontSet;
 }
 

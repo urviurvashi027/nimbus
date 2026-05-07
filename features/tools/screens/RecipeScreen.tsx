@@ -12,14 +12,30 @@ import { router, useNavigation } from "expo-router";
 import { ScreenView } from "@/components/ui/Themed";
 import ThemeContext from "@/contexts/ThemeContext";
 
-import AnimatedChip from "@/features/tools/components/common/AnimatedChips";
+// <<<<<<< HEAD:features/tools/screens/RecipeScreen.tsx
+// import AnimatedChip from "@/features/tools/components/common/AnimatedChips";
 import ToolScreenHeader from "@/features/tools/components/common/ToolScreenHeader";
 import ContentPosterCard from "@/features/tools/components/common/ContentPosterCard";
 import EmptyState from "@/features/tools/components/common/EmptyState";
 import { RoutineSkeletonGrid } from "@/features/tools/components/common/RoutineSkeletonGrid";
+// =======
 
+// <<<
 import { getRecipeList } from "@/features/tools/services/toolService";
 import { ROUTES } from "@/constants/routes";
+import AppHeader from "@/components/layout/AppHeader";
+import AnimatedChip from "../components/common/AnimatedChips";
+import RecipeCard from "../components/common/RecipeCard";
+// =======
+// import AppHeader from "@/components/common/AppHeader";
+
+// import RecipeCard from "@/components/tools/common/RecipeCard";
+
+// import EmptyState from "@/components/tools/common/EmptyState";
+// import { RoutineSkeletonGrid } from "@/components/tools/common/RoutineSkeletonGrid";
+
+// import { getRecipeList } from "@/services/toolService";
+// >>>>>
 
 // ───────────────────────────────── Filters ────────────────────────────────────
 const FILTERS = [
@@ -81,9 +97,14 @@ export const RecipeScreen: React.FC = () => {
           ...item,
           height: heights[Math.floor(Math.random() * heights.length)],
           // Provide a fallback if image is null
+          // <<<<<
           image: item.image
             ? { uri: item.image }
             : require("@/assets/images/mt.jpg"),
+          // ===
+          // image: item.image ? { uri: item.image } : require("@/assets/images/mt.jpg"),
+          // favorite: Math.random() > 0.5, // Randomized favorite state as requested
+          // >>>
         }));
 
         setRecipes(processed);
@@ -110,8 +131,13 @@ export const RecipeScreen: React.FC = () => {
 
   const handleItemClick = (item: any) => {
     router.push({
+      // <<
       pathname: ROUTES.AUTH.TOOLS_CONTENT_DETAILS,
       params: { id: item.id, type: "recipe" },
+      // ==
+      // pathname: "/(auth)/toolsScreen/RecipeDetailScreen",
+      // params: { id: item.id },
+      // >>
     });
   };
 
@@ -120,10 +146,21 @@ export const RecipeScreen: React.FC = () => {
   // ─────────────────────── Header inside list ─────────────────────
   const renderListHeader = () => (
     <View>
-      <ToolScreenHeader
+      <AppHeader
         title="Recipe Plan"
         subtitle={subtitle}
         onBack={() => navigation.goBack()}
+        rightActions={[
+          {
+            icon: "heart-outline",
+            onPress: () => console.log("Favorites pressed"),
+          },
+          {
+            icon: "bag-outline",
+            onPress: () => console.log("Cart pressed"),
+            badge: true,
+          },
+        ]}
       />
 
       <ScrollView
@@ -181,12 +218,19 @@ export const RecipeScreen: React.FC = () => {
           contentContainerStyle={styles.listContent}
           columnWrapperStyle={styles.columnWrapper}
           renderItem={({ item }) => (
-            <ContentPosterCard
-              title={item.title}
+            <RecipeCard
+              title={item.title || item.name}
               image={item.image}
               tag={item.category}
               height={item.height}
+              time={item.prep_time || "15 min"}
+              calories={item.calories ? `${item.calories} kcal` : undefined}
+              favorite={item.favorite}
               onPress={() => handleItemClick(item)}
+              onFavoritePress={async (isFav) => {
+                // Mocking an API call
+                return new Promise((resolve) => setTimeout(resolve, 800));
+              }}
             />
           )}
         />

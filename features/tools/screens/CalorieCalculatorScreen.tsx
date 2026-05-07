@@ -9,6 +9,11 @@ import StyledInput from "@/components/ui/theme-components/StyledInput";
 import StyledButton from "@/components/ui/theme-components/StyledButton";
 import NimbusDropdown from "@/components/ui/theme-components/NimbusDropdown";
 import ToolScreenHeader from "@/features/tools/components/common/ToolScreenHeader";
+// =======
+// import StyledInput from "@/components/common/themeComponents/StyledInput";
+// import StyledButton from "@/components/common/themeComponents/StyledButton";
+// import NimbusDropdown from "@/components/common/themeComponents/NimbusDropdown";
+// import AppHeader from "@/components/common/AppHeader";
 
 import { getCalorieIntakeInfo } from "@/features/tools/services/toolService";
 import {
@@ -16,6 +21,7 @@ import {
   calorieCalculatorResponse,
 } from "@/features/tools/types/toolsTypes";
 import { activityLevelList, genderList } from "@/constants/data/tools";
+import AppHeader from "@/components/layout/AppHeader";
 
 export const CalorieCalculatorScreen = () => {
   const navigation = useNavigation();
@@ -106,7 +112,7 @@ export const CalorieCalculatorScreen = () => {
       }}
     >
       <View style={styles.container}>
-        <ToolScreenHeader
+        <AppHeader
           title="Calorie Intake Calculator"
           subtitle={subtitle}
           onBack={() => navigation.goBack()}

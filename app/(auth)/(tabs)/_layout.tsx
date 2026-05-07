@@ -1,90 +1,55 @@
 import React, { useContext } from "react";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, Tabs } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
-import { theme as newThemeKit } from "@/theme/Colors";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import ThemeContext from "@/contexts/ThemeContext";
-
-// function TabBarIcon(props: {
-//   name: React.ComponentProps<typeof FontAwesome>["name"];
-//   color: string;
-// }) {
-//   return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
-// }
+import CustomTabBar from "@/components/ui/CustomTabBar";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-  const { toggleTheme, newTheme, useSystemTheme } = useContext(ThemeContext);
-
-  // const styles = styling(theme);
+  const { newTheme } = useContext(ThemeContext);
 
   return (
     <Tabs
+      tabBar={(props) => <CustomTabBar {...props} />}
       screenOptions={{
-        tabBarActiveTintColor:
-          newThemeKit[colorScheme ?? "light"].accentPressed,
         headerShown: false,
-        tabBarStyle: {
-          backgroundColor: newThemeKit[colorScheme ?? "light"].background, // White background
-          borderTopWidth: 1,
-          borderTopColor: newTheme.surface,
-        },
+        tabBarShowLabel: false,
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
           tabBarLabel: "Routine",
-          tabBarIcon: ({ color }) => (
-            <Ionicons
-              name="body-outline"
-              size={24}
-              color={newThemeKit[colorScheme ?? "light"].accentPressed}
-            />
-          ),
         }}
       />
       <Tabs.Screen
         name="self-care"
         options={{
-          tabBarLabel: "Self Care",
-          tabBarIcon: ({ color }) => (
-            <Ionicons
-              name="fitness-outline"
-              size={24}
-              color={newThemeKit[colorScheme ?? "light"].accentPressed}
-            />
-          ),
+          tabBarLabel: "Stats",
         }}
-      ></Tabs.Screen>
+      />
+      {/* Placeholder for the center plus button */}
+      <Tabs.Screen
+        name="plus-button-placeholder"
+        options={{
+          tabBarLabel: "Add",
+        }}
+        listeners={{
+          tabPress: (e) => {
+            e.preventDefault();
+          },
+        }}
+      />
       <Tabs.Screen
         name="tools"
         options={{
           tabBarLabel: "Tools",
-          tabBarIcon: ({ color }) => (
-            <Ionicons
-              name="construct-outline"
-              size={24}
-              color={newThemeKit[colorScheme ?? "light"].accentPressed}
-            />
-          ),
         }}
       />
-
       <Tabs.Screen
         name="settings"
         options={{
-          tabBarLabel: "Setting",
-          tabBarIcon: ({ color }) => (
-            <Ionicons
-              name="people-outline"
-              size={24}
-              color={newThemeKit[colorScheme ?? "light"].accentPressed}
-            />
-          ),
+          tabBarLabel: "Profile",
         }}
-      ></Tabs.Screen>
+      />
     </Tabs>
   );
 }

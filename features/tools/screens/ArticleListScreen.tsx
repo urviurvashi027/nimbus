@@ -16,10 +16,15 @@ import ToolScreenHeader from "@/features/tools/components/common/ToolScreenHeade
 import AnimatedChip from "@/features/tools/components/common/AnimatedChips";
 import { RoutineSkeletonGrid } from "@/features/tools/components/common/RoutineSkeletonGrid";
 import ContentPosterCard from "@/features/tools/components/common/ContentPosterCard";
+// import AppHeader from "@/components/common/AppHeader";
+// import AnimatedChip from "@/components/tools/common/AnimatedChips";
+// import { RoutineSkeletonGrid } from "@/components/tools/common/RoutineSkeletonGrid";
+// import ContentPosterCard from "@/components/tools/common/ContentPosterCard";
 
 import { getArticleList } from "@/features/tools/services/toolService";
 import EmptyState from "@/features/tools/components/common/EmptyState";
 import { ROUTES } from "@/constants/routes";
+import AppHeader from "@/components/layout/AppHeader";
 
 // ──────────────────────────────────────────────
 // Filters
@@ -117,10 +122,21 @@ export const ArticleListScreen: React.FC = () => {
   /** ── Header *inside* FlatList so everything scrolls together ── */
   const renderListHeader = () => (
     <View>
-      <ToolScreenHeader
+      <AppHeader
         title="Article Library"
         subtitle="Deep dives into healing, neuroscience, and mindful living."
         onBack={() => navigation.goBack()}
+        // =======
+        rightActions={[
+          {
+            icon: "search-outline",
+            onPress: () => console.log("Search pressed"),
+          },
+          {
+            icon: "bookmark-outline",
+            onPress: () => console.log("Bookmark pressed"),
+          },
+        ]}
       />
 
       <ScrollView

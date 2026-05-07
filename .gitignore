@@ -33,6 +33,7 @@ yarn-error.*
 .env
 .env*.local
 
+
 # typescript
 *.tsbuildinfo
 
@@ -40,3 +41,9 @@ app-example
 /ios
 /android
 todoTask/
+/screenshot
+<<<<<<< HEAD
+
+=======
+/todoTask
+>>>>>>> b48a46e (tool screen header replaced by app header in self care)
