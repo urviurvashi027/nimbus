@@ -7,7 +7,7 @@ import {
   SafeAreaView,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
-import { router, useNavigation } from "expo-router";
+import { router } from "expo-router";
 
 // application level import
 import ThemeContext from "@/contexts/ThemeContext";
@@ -18,12 +18,10 @@ import {
   NavigationButtonType,
 } from "@/constants/data/selfCareButton";
 import { banners } from "@/constants/data/banner";
-import { medTests } from "@/constants/data/medicalTest";
 
 import { ScreenView } from "@/components/ui/Themed";
 import TrendingCardCarousel from "@/components/layout/TrendingCardCarousel";
 import HorizontalListCardScroll from "@/components/layout/HorizontalListCardScroll";
-import VideoClassCard from "@/features/self-care/components/MasterclassCard";
 import HorizontalBanner from "@/components/layout/HorizontalBanner";
 import PricingModal from "@/components/ui/PricingModal";
 import NavigationIconButton from "@/components/ui/NavigationIconButton";
@@ -33,7 +31,6 @@ import ThingsToDoModal from "../self-care/thingsToDo";
 import {
   getMeditationAudioList,
   // getMentalTestList,
-  getWorkoutVideo,
 } from "@/features/self-care/services/selfCareService";
 import {
   getRoutineList,
@@ -42,18 +39,11 @@ import {
 
 import {
   MeditationAudioListItem,
-  WorkoutVideoListItem,
 } from "@/features/self-care/types/selfCareTypes";
 import { SoundscapeTrackListItem } from "@/features/tools/types/toolsTypes";
 
 const SelfCare: React.FC = () => {
-  const navigation = useNavigation();
   const [selectedButton, setSelectedButton] = useState<string | number>("");
-
-  // Backend api states
-  const [workoutVideoList, setWorkoutVideoList] = useState<
-    WorkoutVideoListItem[]
-  >([]);
 
   const [meditationList, setMeditationList] = useState<
     MeditationAudioListItem[]
@@ -62,8 +52,6 @@ const SelfCare: React.FC = () => {
   const [soundscapeTrackList, setSoundscapeTrackList] = useState<
     SoundscapeTrackListItem[]
   >([]);
-
-  const [medicalListData, setMedicalListData] = useState<any[]>([]);
 
   // Modal States
   const [showPricingModal, setShowPricingModal] = useState(false);
@@ -82,33 +70,6 @@ const SelfCare: React.FC = () => {
       router.push(button.screen);
     } else if (button.action === "modal") {
       modalHandler(button.screen);
-    }
-  };
-
-  const getWorkoutVideoList = async () => {
-    // need to add filters functionality and category param changes
-    try {
-      const result = await getWorkoutVideo();
-      // Check if 'result' and 'result.data' exist and is an array
-      if (result && result.success !== false && Array.isArray(result.data)) {
-        const processedVideo = result.data.map((item: any) => {
-          return {
-            ...item, // Spread operator to keep original properties
-            isLocked: false,
-            coachName: item.coach_name || "UU",
-            image: {
-              uri: item.image,
-            },
-          };
-        });
-
-        setWorkoutVideoList(processedVideo);
-      } else {
-        // Handle the case where the data is not in the expected format
-        console.error("API response data is not an array:", result);
-      }
-    } catch (error: any) {
-      console.log(error, "API Error Response");
     }
   };
 
@@ -207,9 +168,6 @@ const SelfCare: React.FC = () => {
   // function to be called on click of all button horizontalListCard
   const onClickOfAll = (title: string) => {
     switch (title) {
-      case "medicalTest":
-        router.push(ROUTES.AUTH.SELF_CARE_MENTAL_TEST);
-        break;
       case "soundscape":
         router.push(ROUTES.AUTH.SELF_CARE_SOUNDSCAPE);
         break;
@@ -224,14 +182,6 @@ const SelfCare: React.FC = () => {
 
   const handleBannerPress = (id: string) => {
     console.log("Banner pressed:", id);
-  };
-
-  const handleWorkoutVideoClicked = (card: any) => {
-    if (card.isLocked) {
-      setShowPricingModal(true);
-    } else {
-      setShowPricingModal(false);
-    }
   };
 
   const getRoutineData = async (category?: string) => {
@@ -260,7 +210,6 @@ const SelfCare: React.FC = () => {
 
   useEffect(() => {
     setSelectedButton("");
-    // getWorkoutVideoList();
     getMeditationTrackList();
     getSoundscapeTrackList();
     getRoutineData();
@@ -301,7 +250,10 @@ const SelfCare: React.FC = () => {
           ))}
         </ScrollView>
 
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
           {/* Workout Video List Section */}
           {/* <ScrollView
             horizontal
@@ -336,16 +288,6 @@ const SelfCare: React.FC = () => {
             onClickOfAll={() => onClickOfAll("routine")}
             onPress={handleCardPress}
           />
-
-          {/* Medical Test List Section */}
-          {/* <HorizontalListCardScroll
-            title="Clinical Assessments"
-            description="Mental health is everything"
-            backgroundColor="#cbc7f6"
-            noOfRows={2}
-            itemList={medTests}
-            onClickOfAll={() => onClickOfAll("medicalTest")}
-          /> */}
 
           <HorizontalBanner data={banners} onPress={handleBannerPress} />
 

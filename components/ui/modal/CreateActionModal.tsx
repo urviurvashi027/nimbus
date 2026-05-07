@@ -7,12 +7,11 @@ import {
   Animated,
   Easing,
   Pressable,
-  Platform,
   TouchableWithoutFeedback,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 
 interface CreateActionModalProps {
   visible: boolean;
@@ -60,7 +59,7 @@ const CreateActionModal: React.FC<CreateActionModalProps> = ({
         }),
       ]).start();
     }
-  }, [visible]);
+  }, [fadeAnim, slideAnim, visible]);
 
   const handleAction = (route: any) => {
     onClose();
@@ -156,9 +155,13 @@ const ActionOption: React.FC<ActionOptionProps> = ({
           flexDirection: "row",
           alignItems: "center",
           borderRadius: 20,
-          backgroundColor: pressed ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.02)",
+          backgroundColor: pressed
+            ? "rgba(255,255,255,0.06)"
+            : "rgba(255,255,255,0.02)",
           borderWidth: 1,
-          borderColor: pressed ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.05)",
+          borderColor: pressed
+            ? "rgba(255,255,255,0.1)"
+            : "rgba(255,255,255,0.05)",
         },
       ]}
     >
@@ -198,19 +201,17 @@ const ActionOption: React.FC<ActionOptionProps> = ({
           {description}
         </Text>
       </View>
-      <View style={{ 
-        width: 32, 
-        height: 32, 
-        borderRadius: 16, 
-        backgroundColor: "rgba(255,255,255,0.05)",
-        justifyContent: "center",
-        alignItems: "center"
-      }}>
-        <Ionicons
-          name="chevron-forward"
-          size={18}
-          color={theme.accent}
-        />
+      <View
+        style={{
+          width: 32,
+          height: 32,
+          borderRadius: 16,
+          backgroundColor: "rgba(255,255,255,0.05)",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Ionicons name="chevron-forward" size={18} color={theme.accent} />
       </View>
     </Pressable>
   );

@@ -55,11 +55,9 @@ export const ROUTES = {
 
     // Self Care
     SELF_CARE_THINGS_TO_DO: "/(auth)/self-care/thingsToDo",
-    SELF_CARE_GET_STARTED: "/(auth)/self-care/mentalHealthGetStarted",
     SELF_CARE_SLEEP: "/(auth)/self-care/sleep",
     SELF_CARE_REFLECTION: "/(auth)/self-care/reflection",
     SELF_CARE_MEDITATION: "/(auth)/self-care/meditation",
-    SELF_CARE_MENTAL_TEST: "/(auth)/self-care/mentalHealthTest",
     SELF_CARE_SOUNDSCAPE: "/(auth)/self-care/soundscape",
     SELF_CARE_WORKOUT_SESSION: "/(auth)/self-care/workoutSession",
     SELF_CARE_WORKOUT: "/(auth)/self-care/workout",
@@ -91,4 +89,4 @@ export const ROUTES = {
 /**
  * Type helper for Route constants
  */
-export type RoutePath = typeof ROUTES[keyof typeof ROUTES];
+export type RoutePath = (typeof ROUTES)[keyof typeof ROUTES];

@@ -6,15 +6,12 @@ import {
   TouchableOpacity,
   ImageBackground,
   Animated,
-  Dimensions,
   Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import ThemeContext from "@/context/ThemeContext";
+import ThemeContext from "@/contexts/ThemeContext";
 import { tokens } from "@/theme/tokens";
-
-const { width } = Dimensions.get("window");
 
 interface RecipeCardProps {
   title: string;
