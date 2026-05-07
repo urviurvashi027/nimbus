@@ -1,5 +1,5 @@
 import React, { useContext, useMemo } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, TextStyle } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/contexts/ThemeContext";
 
@@ -14,6 +14,8 @@ interface AppHeaderProps {
   subtitle?: string;
   onBack?: () => void;
   rightAction?: RightAction;
+  titleStyle?: TextStyle;
+  subtitleStyle?: TextStyle;
 }
 
 const AppHeader: React.FC<AppHeaderProps> = ({
@@ -21,12 +23,14 @@ const AppHeader: React.FC<AppHeaderProps> = ({
   subtitle,
   onBack,
   rightAction,
+  titleStyle,
+  subtitleStyle,
 }) => {
-  const { newTheme, spacing, typography } = useContext(ThemeContext);
+  const { newTheme, nimbusColors, spacing, typography } = useContext(ThemeContext);
 
   const styles = useMemo(
-    () => styling(newTheme, spacing, typography),
-    [newTheme, spacing, typography]
+    () => styling(newTheme, nimbusColors, spacing, typography),
+    [newTheme, nimbusColors, spacing, typography]
   );
 
   return (
@@ -45,7 +49,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
               <Ionicons
                 name="arrow-back"
                 size={22}
-                color={newTheme.textSecondary}
+                color={nimbusColors.text.secondary || newTheme.textSecondary}
               />
             </TouchableOpacity>
           )}
@@ -65,7 +69,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
               <Ionicons
                 name={rightAction.icon ?? "ellipsis-horizontal"}
                 size={22}
-                color={newTheme.textSecondary}
+                color={nimbusColors.text.secondary || newTheme.textSecondary}
               />
             </TouchableOpacity>
           )}
@@ -74,14 +78,14 @@ const AppHeader: React.FC<AppHeaderProps> = ({
 
       {/* Title block */}
       <View style={styles.textBlock}>
-        <Text style={styles.title}>{title}</Text>
-        {!!subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+        <Text style={[styles.title, titleStyle]}>{title}</Text>
+        {!!subtitle && <Text style={[styles.subtitle, subtitleStyle]}>{subtitle}</Text>}
       </View>
     </View>
   );
 };
 
-const styling = (theme: any, spacing: any, typography: any) =>
+const styling = (theme: any, c: any, spacing: any, typography: any) =>
   StyleSheet.create({
     container: {
       marginBottom: spacing.lg,
@@ -110,19 +114,19 @@ const styling = (theme: any, spacing: any, typography: any) =>
       borderRadius: 14,
       alignItems: "center",
       justifyContent: "center",
-      backgroundColor: "rgba(255,255,255,0.04)",
+      backgroundColor: c.interaction.pressed || "rgba(255,255,255,0.04)",
       borderWidth: 1,
-      borderColor: "rgba(255,255,255,0.06)",
+      borderColor: c.border.subtle || "rgba(255,255,255,0.06)",
     },
 
     textBlock: {},
     title: {
       ...typography.h2,
-      color: theme.textPrimary,
+      color: c.text.primary || theme.textPrimary,
     },
     subtitle: {
       ...typography.body,
-      color: theme.textSecondary,
+      color: c.text.secondary || theme.textSecondary,
       marginTop: spacing.xs,
     },
   });

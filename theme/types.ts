@@ -1,4 +1,4 @@
-export type ThemeName = "dark" | "light"; // add "basic" later only if needed
+export type ThemeName = "dark" | "light" | "nimbus";
 
 /**
  * @interface FontSet
@@ -20,6 +20,7 @@ export interface FontSet {
     | "800"
     | "900";
   lineHeight?: number;
+  letterSpacing?: number;
 }
 
 /**
@@ -33,6 +34,64 @@ export interface Typography {
   body: FontSet;
   caption: FontSet;
   button: FontSet;
+}
+
+export interface TypographyTokens {
+  fontFamily: {
+    body: string;
+    display: string;
+    mono: string;
+  };
+  fontSize: {
+    xs: number;
+    sm: number;
+    md: number;
+    lg: number;
+    xl: number;
+    xxl: number;
+    displaySm: number;
+    displayMd: number;
+    displayLg: number;
+  };
+  fontWeight: {
+    regular: "400" | "normal";
+    medium: "500";
+    semibold: "600";
+    bold: "700" | "bold";
+  };
+  lineHeight: {
+    xs: number;
+    sm: number;
+    md: number;
+    lg: number;
+    xl: number;
+    xxl: number;
+    displaySm: number;
+    displayMd: number;
+    displayLg: number;
+  };
+  letterSpacing: {
+    tighter: number;
+    tight: number;
+    normal: number;
+    wide: number;
+    wider: number;
+  };
+  textStyle: {
+    displayLarge: FontSet;
+    displayMedium: FontSet;
+    heading1: FontSet;
+    heading2: FontSet;
+    title: FontSet;
+    subtitle: FontSet;
+    body: FontSet;
+    bodyMedium: FontSet;
+    caption: FontSet;
+    label: FontSet;
+    button: FontSet;
+    input: FontSet;
+    inputLabel: FontSet;
+  };
 }
 
 /**
@@ -140,6 +199,211 @@ export interface ColorSet {
   disabled: string;
 }
 
+//---------------------------------------------------------// New Nimbus Color Set Structure for Enhanced Scalability and Flexibility
+/**
+ * @interface NimbusColorSet
+ * @description The new scalable, nested color set structure.
+ */
+export interface NimbusColorSet {
+  bg: {
+    base: string;
+    subtle: string;
+    elevated: string;
+  };
+  surface: {
+    base: string;
+    raised: string;
+  };
+  text: {
+    primary: string;
+    secondary: string;
+    disabled: string;
+    inverse: string;
+  };
+  brand: {
+    primary: string;
+    primaryPressed: string;
+    subtle: string;
+  };
+  state: {
+    info: string;
+    success: string;
+    warning: string;
+    error: string;
+  };
+  border: {
+    default: string;
+    muted: string;
+    subtle: string;
+  };
+  divider: string;
+  overlay: {
+    light: string;
+    strong: string;
+  };
+  shadow: {
+    default: string;
+  };
+  focus: {
+    color: string;
+    ring: string;
+  };
+  button: {
+    primary: {
+      bg: string;
+      text: string;
+      pressed: string;
+    };
+    ghost: {
+      bg: string;
+      border: string;
+      text: string;
+    };
+  };
+  interaction: {
+    pressed: string;
+    hover: string;
+    selected: string;
+  };
+}
+
+//---------------------------------------------------------// Complete Theme Interface Combining Both Color Structures for Backward Compatibility and Future-Proofing
+export interface SpacingTokens {
+  scale: {
+    px: number;
+    xxs: number;
+    xs: number;
+    sm: number;
+    md: number;
+    lg: number;
+    xl: number;
+    xxl: number;
+    xxxl: number;
+  };
+  layout: {
+    screenPadding: number;
+    screenPaddingTop: {
+      ios: number;
+      android: number;
+    };
+    sectionGap: number;
+    contentGap: number;
+    stackGap: number;
+  };
+  component: {
+    inputHeight: number;
+    buttonHeight: number;
+    chipHeight: number;
+    headerHeight: number;
+    headerHeightLarge: number;
+  };
+  icon: {
+    xs: number;
+    sm: number;
+    md: number;
+    lg: number;
+    xl: number;
+  };
+  radius: {
+    sm: number;
+    md: number;
+    lg: number;
+    xl: number;
+    pill: number;
+  };
+  borderWidth: {
+    hairline: number;
+    thin: number;
+    medium: number;
+  };
+}
+
+export interface ComponentTokens {
+  button: {
+    primary: {
+      height: number;
+      borderRadius: number;
+      paddingHorizontal: number;
+      bg: string;
+      text: string;
+      pressedBg: string;
+      disabledBg: string;
+      disabledText: string;
+      borderWidth: number;
+      borderColor: string;
+    };
+    ghost: {
+      height: number;
+      borderRadius: number;
+      paddingHorizontal: number;
+      bg: string;
+      text: string;
+      pressedBg: string;
+      borderWidth: number;
+      borderColor: string;
+      disabledBg: string;
+      disabledText: string;
+    };
+    subtle: {
+      height: number;
+      borderRadius: number;
+      paddingHorizontal: number;
+      bg: string;
+      text: string;
+      pressedBg: string;
+      borderWidth: number;
+      borderColor: string;
+      disabledBg: string;
+      disabledText: string;
+    };
+  };
+  input: {
+    height: number;
+    borderRadius: number;
+    paddingHorizontal: number;
+    bg: string;
+    text: string;
+    placeholder: string;
+    borderColor: string;
+    focusBorderColor: string;
+    focusRingColor: string;
+    disabledBg: string;
+    disabledText: string;
+    errorBorderColor: string;
+    labelColor: string;
+    helperColor: string;
+    errorColor: string;
+  };
+  card: {
+    base: {
+      bg: string;
+      borderColor: string;
+      borderWidth: number;
+      borderRadius: number;
+      padding: number;
+      shadowColor: string;
+    };
+    raised: {
+      bg: string;
+      borderColor: string;
+      borderWidth: number;
+      borderRadius: number;
+      padding: number;
+      shadowColor: string;
+    };
+    interactive: {
+      bg: string;
+      borderColor: string;
+      selectedBorderColor: string;
+      borderWidth: number;
+      borderRadius: number;
+      padding: number;
+      pressedOverlay: string;
+      selectedBg: string;
+    };
+  };
+}
+
 /**
  * @type AppTheme
  * @description The complete theme interface for the application.
@@ -147,8 +411,12 @@ export interface ColorSet {
 export type AppTheme = {
   name: ThemeName;
   colors: ColorSet;
+  nimbusColors?: NimbusColorSet; // Add the new colors as optional for gradual migration
   spacing: Spacing;
   typography: Typography;
+  nimbusTypography?: TypographyTokens;
+  nimbusSpacing?: SpacingTokens;
+  nimbusComponents?: ComponentTokens;
   tokens: NimbusTokens;
 };
 

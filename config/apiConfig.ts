@@ -1,8 +1,5 @@
 // apiConfig.ts
 
-import { contactUs } from "@/services/contactService";
-import { logFeedback } from "@/features/settings/services/settingService";
-
 // Define base URLs for different environments
 const ENV = process.env.NODE_ENV as "development" | "staging" | "production";
 
@@ -20,83 +17,89 @@ export const API_URL = BASE_URL;
 
 // Define API endpoints
 export const API_ENDPOINTS = {
-  login: `${BASE_URL}/auth/login/`,
-  register: `${BASE_URL}/auth/register/`,
-  logout: `${BASE_URL}/auth/logout/`,
+  login: `${BASE_URL}/api/v1/auth/login/`,
+  register: `${BASE_URL}/api/v1/auth/register/`,
+  logout: `${BASE_URL}/api/v1/auth/logout/`,
 
-  fetchUserDetails: `${BASE_URL}/profile/users/me/`,
+  fetchUserDetails: `${BASE_URL}/api/v1/profile/users/me/`,
 
-  getOtp: `${BASE_URL}/auth/request-otp/`,
-  verifyOtp: `${BASE_URL}/auth/verify-otp/`,
+  getOtp: `${BASE_URL}/api/v1/auth/request-otp/`,
+  verifyOtp: `${BASE_URL}/api/v1/auth/verify-otp/`,
 
-  setPassword: `${BASE_URL}/auth/set-password/`,
-  forgotPassword: `${BASE_URL}/auth/forgot-password/`,
-  changePassword: `${BASE_URL}/auth/reset-password/`,
+  setPassword: `${BASE_URL}/api/v1/auth/set-password/`,
+  forgotPassword: `${BASE_URL}/api/v1/auth/forgot-password/`,
+  changePassword: `${BASE_URL}/api/v1/auth/reset-password/`,
 
-  createHabit: `${BASE_URL}/api/habits/`,
-  bulkCreateHabit: `${BASE_URL}/api/habits/bulk_create/`,
+  createHabit: `${BASE_URL}/api/v1/habits/`,
+  bulkCreateHabit: `${BASE_URL}/api/v1/habits/bulk_create/`,
   activateHabitTemplate: (id: number | string) =>
     `${BASE_URL}/api/habit-templates/${id}/activate/`,
-  habitTypeList: `${BASE_URL}/api/habit-types/`,
-  habitTagList: `${BASE_URL}/api/tags/`,
-  habitDetailsById: `${BASE_URL}/api/habits/`,
-  habitDelete: `${BASE_URL}/api/habits/delete`,
-  habitUnit: `${BASE_URL}/api/habit-units/`,
+  habitTypeList: `${BASE_URL}/api/v1/habit-types/`,
+  habitTagList: `${BASE_URL}/api/v1/tags/`,
+  habitDetailsById: `${BASE_URL}/api/v1/habits/`,
+  habitDelete: `${BASE_URL}/api/v1/habits/delete`,
+  habitUnit: `${BASE_URL}/api/v1/habit-units/`,
 
-  habitPatch: `${BASE_URL}/api/habits/`,
+  habitPatch: `${BASE_URL}/api/v1/habits/`,
 
-  getArticleList: `${BASE_URL}/media/media-assets/?type=article`,
-  getArticleDetails: `${BASE_URL}/media/media-assets/`,
-  getSoundscapeList: `${BASE_URL}/media/media-assets/?type=soundscape`,
-  getJournalList: `${BASE_URL}/assesment/journal-templates/`,
-  submitJournal: `${BASE_URL}/assesment/journal-entries/`,
-  getJournalEntry: `${BASE_URL}/assesment/journal-entries/`,
-  getWorkoutVideoList: `${BASE_URL}/media/media-assets/?type=video`,
-  getRecipeList: `${BASE_URL}/media/media-assets/?type=recipe`,
-  searchRecipes: (query: string) => `${BASE_URL}/media/media-assets/recipes/?search=${query}`,
+  getArticleList: `${BASE_URL}/api/v1/media/media-assets/?type=article`,
+  getArticleDetails: `${BASE_URL}/api/v1/media/media-assets/`,
+  getSoundscapeList: `${BASE_URL}/api/v1/media/media-assets/?type=soundscape`,
+
+  getJournalList: `${BASE_URL}/api/v1/assesments/journal-templates/`,
+  submitJournal: `${BASE_URL}/api/v1/assesments/journal-entries/`,
+  getJournalEntry: `${BASE_URL}/api/v1/assesments/journal-entries/`,
+
+  getWorkoutVideoList: `${BASE_URL}/api/v1/media/media-assets/?type=video`,
+  getRecipeList: `${BASE_URL}/api/v1/media/media-assets/?type=recipe`,
+  searchRecipes: (query: string) =>
+    `${BASE_URL}/api/v1/media/media-assets/recipes/?search=${query}`,
   getRoutineTemplate: `${BASE_URL}/api/habit-templates/`,
   //TODO: category Data fix
-  getShortVideoList: `${BASE_URL}/media/media-assets/?type=shortVideo`,
-  getAudioBookList: `${BASE_URL}/media/media-assets/?type=meditation&category=audioBook`,
-  getMeditationList: `${BASE_URL}/media/media-assets/?type=meditation&category=breathwork`,
+  getShortVideoList: `${BASE_URL}/api/v1/media/media-assets/?type=shortVideo`,
+  getAudioBookList: `${BASE_URL}/api/v1/media/media-assets/?type=meditation&category=audioBook`,
+  getMeditationList: `${BASE_URL}/api/v1/media/media-assets/?type=meditation&category=breathwork`,
 
   getMentalTestList: `${BASE_URL}/assesment/assessments/`,
-  getWorkouts: `${BASE_URL}/workouts/`,
+
+  getWorkouts: `${BASE_URL}/api/v1/workouts/`,
   getWorkoutDetails: (id: number | string) => `${BASE_URL}/workouts/${id}/`,
 
-    getWeeklyMealPlan: (startDate: string) => `${BASE_URL}/meals/plans/week/?start_date=${startDate}`,
+  getWeeklyMealPlan: (startDate: string) =>
+    `${BASE_URL}/api/v1/meals/plans/week/?start_date=${startDate}`,
 
-    getMealPlanPdf: (startDate: string, endDate: string) => `${BASE_URL}/meals/plans/pdf/?start_date=${startDate}&end_date=${endDate}`,
+  getMealPlanPdf: (startDate: string, endDate: string) =>
+    `${BASE_URL}/api/v1/meals/plans/pdf/?start_date=${startDate}&end_date=${endDate}`,
 
-    getDailyMealPlan: (date?: string) =>
+  getDailyMealPlan: (date?: string) =>
     date
-      ? `${BASE_URL}/meals/plans/?date=${date}`
-      : `${BASE_URL}/meals/plans/today/`,
+      ? `${BASE_URL}/api/v1/meals/plans/?date=${date}`
+      : `${BASE_URL}/api/v1/meals/plans/today/`,
   getMealDashboard: (days: number = 30) =>
-    `${BASE_URL}/meals/dashboard/?days=${days}`,
-    addMealItem: `${BASE_URL}/meals/items/`,
-    bulkUpdateMealPlan: `${BASE_URL}/meals/plans/bulk_update/`,
-    scribbles: `${BASE_URL}/scribbles/`,
-  recentScribbleTags: `${BASE_URL}/scribbles/recent_tags/`,
-  calorieCalculator: `${BASE_URL}/calculators/calories/`,
-  proteinIntakeCalculator: `${BASE_URL}/calculators/protein/`,
-  bodyShapeCalculator: `${BASE_URL}/calculators/body_shape/`,
+    `${BASE_URL}/api/v1/meals/dashboard/?days=${days}`,
+  addMealItem: `${BASE_URL}/api/v1/meals/items/`,
+  bulkUpdateMealPlan: `${BASE_URL}/api/v1/meals/plans/bulk_update/`,
+  scribbles: `${BASE_URL}/api/v1/scribbles/`,
+  recentScribbleTags: `${BASE_URL}/api/v1/scribbles/recent_tags/`,
+  calorieCalculator: `${BASE_URL}/api/v1/calculators/calories/`,
+  proteinIntakeCalculator: `${BASE_URL}/api/v1/calculators/protein/`,
+  bodyShapeCalculator: `${BASE_URL}/api/v1/calculators/body_shape/`,
 
-  reportBug: `${BASE_URL}/api/bug-reports/`,
-  logFeedback: `${BASE_URL}/api/feedback/`,
+  reportBug: `${BASE_URL}/api/v1/bug-reports/`,
+  logFeedback: `${BASE_URL}/api/v1/feedback/`,
 
   personaQuestion: `${BASE_URL}/profile/persona-questions/`,
   submitPersonaAnswers: `${BASE_URL}/profile/persona-answers/`,
   contactUs: `${BASE_URL}/support/tickets/`,
 
   markHabitDone: (habitId: number) =>
-    `${BASE_URL}/api/habits/${habitId}/mark_complete/`,
+    `${BASE_URL}/api/v1/habits/${habitId}/mark_complete/`,
 
   // ✅ NEW: Function for fetching habits with date & filter
   getDailyCheckInByDate: (date: string, isDailyCheckIn = true) =>
-    `${BASE_URL}/api/habits/?date=${date}&is_daily_checkin=${isDailyCheckIn}`,
+    `${BASE_URL}/api/v1/habits/?date=${date}&is_daily_checkin=${isDailyCheckIn}`,
   // ✅ NEW: Function for fetching habits with date & filter
   // ✅ Dynamic: fetch single habit details by id + date
   getHabitDetailsByDate: (habitId: number, date: string) =>
-    `${BASE_URL}/api/habits/${habitId}/?date=${date}`,
+    `${BASE_URL}/api/v1/habits/${habitId}/?date=${date}`,
 };

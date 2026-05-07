@@ -2,6 +2,10 @@ import type { AppTheme, Spacing, Typography, ThemeName } from "./types";
 import { tokens } from "./tokens";
 import { darkColors } from "./palettes/dark";
 import { lightColors } from "./palettes/light";
+import { nimbusColors } from "./palettes/nimbus";
+import { SVATypography } from "./typography";
+import { SVASpacing } from "./spacing";
+import { SVAComponents } from "./components";
 
 export const spacing: Spacing = {
   xs: 4,
@@ -64,6 +68,17 @@ const themes = {
     colors: lightColors,
     spacing,
     typography,
+    tokens,
+  },
+  nimbus: {
+    name: "nimbus" as const,
+    colors: darkColors, // Fallback to darkColors for old flat keys
+    nimbusColors: nimbusColors,
+    spacing,
+    typography,
+    nimbusTypography: SVATypography,
+    nimbusSpacing: SVASpacing,
+    nimbusComponents: SVAComponents,
     tokens,
   },
 };
