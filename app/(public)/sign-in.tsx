@@ -1,10 +1,12 @@
 // app/(public)/signIn.tsx
 import React, { useContext, useMemo, useState } from "react";
 import { View, Text, StyleSheet, Pressable, Alert } from "react-native";
-import { Stack, router, useNavigation } from "expo-router";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { router, useNavigation } from "expo-router";
 
 import ThemeContext from "@/contexts/ThemeContext";
+import { NimbusColorSet } from "@/theme/types";
+import { SVATypography } from "@/theme/typography";
+import { SVASpacing } from "@/theme/spacing";
 
 import { ScreenView } from "@/components/ui/theme-components/ScreenView";
 import { NimbusInput } from "@/components/ui/theme-components/NimbusInput";
@@ -15,10 +17,9 @@ import AppHeader from "@/components/layout/AppHeader";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function SignIn() {
-  const { newTheme, tokens, typography, spacing } = useContext(ThemeContext);
+  const { nimbusColors } = useContext(ThemeContext);
   const { onLogin } = useAuth();
   const navigation = useNavigation();
-  // const insets = useSafeAreaInsets(); // Not needed anymore
 
   // Hide the native header
   React.useEffect(() => {
@@ -28,10 +29,7 @@ export default function SignIn() {
   }, [navigation]);
 
   // Pass all theme objects to styling function
-  const styles = useMemo(
-    () => styling(newTheme, tokens, typography, spacing),
-    [newTheme, tokens, typography, spacing]
-  );
+  const styles = useMemo(() => styling(nimbusColors), [nimbusColors]);
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -78,15 +76,17 @@ export default function SignIn() {
   };
 
   return (
-    <ScreenView>
+    <ScreenView style={{ paddingHorizontal: SVASpacing.layout.screenPadding }}>
       {/* Nimbus Shared Header */}
       <AppHeader
         title="Welcome back"
         subtitle="Sign in to continue your Nimbus journey."
         onBack={() => router.back()}
+        titleStyle={SVATypography.textStyle.heading2}
+        subtitleStyle={SVATypography.textStyle.body}
       />
 
-      <View style={{ marginTop: spacing.md }} />
+      <View style={{ marginTop: SVASpacing.scale.md }} />
 
       <NimbusInput
         label="Username"
@@ -95,9 +95,11 @@ export default function SignIn() {
         placeholder="John Cena"
         autoCapitalize="none"
         returnKeyType="next"
+        labelStyle={SVATypography.textStyle.inputLabel}
+        inputStyle={[SVATypography.textStyle.input, { height: SVASpacing.component.inputHeight }]}
       />
 
-      <View style={{ marginTop: spacing.md }} />
+      <View style={{ marginTop: SVASpacing.scale.md }} />
 
       <NimbusInput
         label="Password"
@@ -108,9 +110,11 @@ export default function SignIn() {
         enablePasswordToggle
         returnKeyType="done"
         onSubmitEditing={submit}
+        labelStyle={SVATypography.textStyle.inputLabel}
+        inputStyle={[SVATypography.textStyle.input, { height: SVASpacing.component.inputHeight }]}
       />
 
-      <View style={{ marginTop: spacing.md }} />
+      <View style={{ marginTop: SVASpacing.scale.md }} />
 
       <View style={styles.row}>
         <StyledCheckbox
@@ -127,15 +131,17 @@ export default function SignIn() {
         </Pressable>
       </View>
 
-      <View style={{ marginTop: spacing.lg }} />
+      <View style={{ marginTop: SVASpacing.scale.lg }} />
 
       <NimbusButton
         label={loading ? "Signing in..." : "Sign in"}
         onPress={submit}
         disabled={loading}
+        textStyle={SVATypography.textStyle.button}
+        style={{ height: SVASpacing.component.buttonHeight }}
       />
 
-      <View style={{ marginTop: spacing.xl }} />
+      <View style={{ marginTop: SVASpacing.scale.xl }} />
 
       <Pressable onPress={() => router.push("/(public)/register")}>
         <Text style={styles.footerText}>
@@ -147,7 +153,7 @@ export default function SignIn() {
   );
 }
 
-const styling = (t: any, tokens: any, typography: any, spacing: any) =>
+const styling = (c: NimbusColorSet) =>
   StyleSheet.create({
     row: {
       flexDirection: "row",
@@ -155,23 +161,23 @@ const styling = (t: any, tokens: any, typography: any, spacing: any) =>
       justifyContent: "space-between",
     },
     rememberText: {
-      ...typography.body,
+      ...SVATypography.textStyle.subtitle,
       fontSize: 14,
-      color: t.textPrimary,
+      color: c.text.primary,
       fontWeight: "600",
     },
     link: {
-      ...typography.button,
+      ...SVATypography.textStyle.button,
       fontSize: 14,
-      color: t.accent,
+      color: c.brand.primary,
     },
     footerText: {
-      ...typography.body,
-      color: t.textSecondary,
+      ...SVATypography.textStyle.body,
+      color: c.text.secondary,
       textAlign: "center",
     },
     footerStrong: {
-      ...typography.button,
-      color: t.textPrimary,
+      ...SVATypography.textStyle.button,
+      color: c.text.primary,
     },
   });

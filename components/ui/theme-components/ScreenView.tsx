@@ -11,18 +11,17 @@ export function ScreenView(
   }
 ) {
   const { style, bgColor, padding, useSafeTop = true, ...otherProps } = props;
-  const { newTheme, tokens, spacing } = useContext(ThemeContext);
+  const { newTheme, nimbusColors, tokens, spacing } = useContext(ThemeContext);
   const insets = useSafeAreaInsets();
-  console.log("ScreenView insets:", insets, spacing.md);
+
+  const backgroundColor = bgColor || nimbusColors.bg.base || newTheme.background;
 
   const standardStyle = {
-    backgroundColor: bgColor || newTheme.background,
+    backgroundColor,
     paddingHorizontal: padding !== undefined ? padding : tokens.layout.screenX,
     paddingTop: useSafeTop ? insets.top + spacing.md : padding ?? spacing.md,
     flex: 1,
   };
-
-  console.log("ScreenView rendered with bgColor:", standardStyle);
 
   return <View style={[standardStyle, style]} {...otherProps} />;
 }

@@ -1,18 +1,8 @@
 // Checkbox.tsx
-import React from "react";
+import React, { useContext } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import Svg, { Path } from "react-native-svg";
-
-// Theme colors (can later be moved to a central theme file)
-const colors = {
-  background: "#1C1E1A",
-  border: "#A3BE8C",
-  checkedBg: "#A3BE8C",
-  checkmark: "#ECEFF4",
-  text: "#ECEFF4",
-  textSecondary: "#A1A69B",
-  disabled: "#5C6157",
-};
+import ThemeContext from "@/contexts/ThemeContext";
 
 export type CheckboxProps = {
   checked: boolean;
@@ -27,6 +17,18 @@ export const StyledCheckbox: React.FC<CheckboxProps> = ({
   label,
   disabled,
 }) => {
+  const { newTheme, nimbusColors } = useContext(ThemeContext);
+
+  const colors = {
+    background: nimbusColors.bg.base || newTheme.background,
+    border: nimbusColors.brand.primary || newTheme.accent,
+    checkedBg: nimbusColors.brand.primary || newTheme.accent,
+    checkmark: nimbusColors.text.inverse || newTheme.buttonPrimaryText || "#10120E",
+    text: nimbusColors.text.primary || newTheme.textPrimary,
+    textSecondary: nimbusColors.text.secondary || newTheme.textSecondary,
+    disabled: nimbusColors.text.disabled || newTheme.textDisabled,
+  };
+
   return (
     <Pressable
       onPress={onToggle}
@@ -63,7 +65,7 @@ export const StyledCheckbox: React.FC<CheckboxProps> = ({
       </View>
       {label ? (
         typeof label === "string" ? (
-          <Text style={styles.label}>{label}</Text>
+          <Text style={[styles.label, { color: colors.text }]}>{label}</Text>
         ) : (
           label
         )
@@ -87,7 +89,6 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   label: {
-    color: colors.text,
     fontSize: 14,
   },
 });

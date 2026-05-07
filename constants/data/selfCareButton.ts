@@ -10,53 +10,43 @@ export type NavigationButtonType = {
 };
 
 export const buttons: NavigationButtonType[] = [
-  // {
-  //   id: 1,
-  //   label: "Assess",
-  //   action: "navigate",
-  //   screen: ROUTES.AUTH.SELF_CARE_MENTAL_TEST,
-  //   iconName: "clipboard-text-outline",
-  // },
+  //done
   {
-    id: 2,
+    id: 1,
     label: "Zen",
     action: "navigate",
     screen: ROUTES.AUTH.SELF_CARE_MEDITATION,
     iconName: "meditation",
   },
+  // done
   {
-    id: 3,
+    id: 2,
     label: "Move",
     action: "navigate",
     screen: ROUTES.AUTH.SELF_CARE_WORKOUT,
     iconName: "dumbbell",
   },
+  //done
   {
-    id: 4,
+    id: 3,
     label: "Sonic",
     action: "navigate",
     screen: ROUTES.AUTH.SELF_CARE_SOUNDSCAPE,
     iconName: "music-circle-outline",
   },
+  // done
   {
-    id: 5,
+    id: 4,
     label: "Reflect",
     action: "navigate",
     screen: ROUTES.AUTH.SELF_CARE_REFLECTION,
     iconName: "book-open-variant",
   },
-  {
-    id: 6,
-    label: "Rest",
-    action: "modal",
-    screen: "Sleep",
-    iconName: "weather-night",
-  },
-  {
-    id: 7,
-    label: "Action",
-    action: "modal",
-    screen: "thingsToDo",
-    iconName: "check-circle-outline",
-  },
+  // {
+  //   id: 5,
+  //   label: "Action",
+  //   action: "modal",
+  //   screen: "thingsToDo",
+  //   iconName: "check-circle-outline",
+  // },
 ];

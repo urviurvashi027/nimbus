@@ -36,7 +36,7 @@ export function NimbusButton({
   style,
   textStyle,
 }: NimbusButtonProps) {
-  const { newTheme, typography } = useContext(ThemeContext);
+  const { newTheme, nimbusColors, typography } = useContext(ThemeContext);
   const isDisabled = !!disabled || !!loading;
 
   // Determine base colors based on variant
@@ -44,28 +44,28 @@ export function NimbusButton({
     switch (variant) {
       case "secondary":
         return {
-          backgroundColor: newTheme.surfaceMuted,
+          backgroundColor: nimbusColors.surface.base || newTheme.surfaceMuted,
           borderColor: "transparent",
-          textColor: newTheme.textPrimary,
+          textColor: nimbusColors.text.primary || newTheme.textPrimary,
         };
       case "outline":
         return {
           backgroundColor: "transparent",
-          borderColor: newTheme.border,
-          textColor: newTheme.textPrimary,
+          borderColor: nimbusColors.border.default || newTheme.border,
+          textColor: nimbusColors.text.primary || newTheme.textPrimary,
         };
       case "ghost":
         return {
           backgroundColor: "transparent",
           borderColor: "transparent",
-          textColor: newTheme.accent,
+          textColor: nimbusColors.brand.primary || newTheme.accent,
         };
       case "primary":
       default:
         return {
-          backgroundColor: newTheme.accent,
+          backgroundColor: nimbusColors.button.primary.bg || newTheme.accent,
           borderColor: "transparent",
-          textColor: newTheme.buttonPrimaryText ?? "#10120E",
+          textColor: nimbusColors.button.primary.text || newTheme.buttonPrimaryText || "#10120E",
         };
     }
   };
