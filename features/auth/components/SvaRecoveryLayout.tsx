@@ -31,11 +31,11 @@ export function SvaRecoveryLayout({
   children,
   footer,
 }: Props) {
-  const { nimbusColors } = useContext(ThemeContext);
+  const { svaColors } = useContext(ThemeContext);
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={[s.screen, { backgroundColor: nimbusColors.bg.base }]}>
+    <View style={[s.screen, { backgroundColor: svaColors.bg.base }]}>
       <KeyboardAvoidingView
         style={s.flex}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -55,22 +55,22 @@ export function SvaRecoveryLayout({
           <View
             style={[
               s.outerCard,
-              { backgroundColor: nimbusColors.surface.base },
+              { backgroundColor: svaColors.surface.base },
             ]}
           >
             <View
               style={[
                 s.topBar,
                 {
-                  backgroundColor: nimbusColors.bg.base,
-                  borderBottomColor: nimbusColors.border.muted,
+                  backgroundColor: svaColors.bg.base,
+                  borderBottomColor: svaColors.border.muted,
                 },
               ]}
             >
               <Text
                 style={[
                   s.brandWordmark,
-                  { color: nimbusColors.brand.primary },
+                  { color: svaColors.brand.primary },
                 ]}
               >
                 SVA
@@ -87,8 +87,8 @@ export function SvaRecoveryLayout({
                   style={({ pressed }) => [
                     s.backButton,
                     {
-                      backgroundColor: nimbusColors.surface.raised,
-                      borderColor: nimbusColors.border.default,
+                      backgroundColor: svaColors.surface.raised,
+                      borderColor: svaColors.border.default,
                       opacity: pressed ? 0.9 : 1,
                     },
                   ]}
@@ -96,7 +96,7 @@ export function SvaRecoveryLayout({
                   <Ionicons
                     name="chevron-back"
                     size={20}
-                    color={nimbusColors.text.primary}
+                    color={svaColors.text.primary}
                   />
                 </Pressable>
               </View>
@@ -106,7 +106,7 @@ export function SvaRecoveryLayout({
                   style={[
                     s.title,
                     {
-                      color: nimbusColors.text.primary,
+                      color: svaColors.text.primary,
                       textShadowColor: "rgba(0,0,0,0.2)",
                     },
                   ]}
@@ -117,7 +117,7 @@ export function SvaRecoveryLayout({
                 <Text
                   style={[
                     s.subtitle,
-                    { color: nimbusColors.text.secondary },
+                    { color: svaColors.text.secondary },
                   ]}
                 >
                   {subtitle}

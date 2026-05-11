@@ -26,11 +26,11 @@ export function NimbusAuthLayout({
   onBack?: () => void;
   children: ReactNode;
 }) {
-  const { nimbusColors } = useContext(ThemeContext);
+  const { svaColors } = useContext(ThemeContext);
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={[s.screen, { backgroundColor: nimbusColors.bg.base }]}>
+    <View style={[s.screen, { backgroundColor: svaColors.bg.base }]}>
       <KeyboardAvoidingView
         style={s.flex}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -51,12 +51,12 @@ export function NimbusAuthLayout({
             style={[
               s.topBar,
               {
-                borderBottomColor: nimbusColors.border.muted,
+                borderBottomColor: svaColors.border.muted,
               },
             ]}
           >
             <Text
-              style={[s.brandWordmark, { color: nimbusColors.brand.primary }]}
+              style={[s.brandWordmark, { color: svaColors.brand.primary }]}
             >
               SVA
             </Text>
@@ -66,8 +66,8 @@ export function NimbusAuthLayout({
             style={[
               s.progressTrack,
               {
-                backgroundColor: nimbusColors.surface.base,
-                borderColor: nimbusColors.border.muted,
+                backgroundColor: svaColors.surface.base,
+                borderColor: svaColors.border.muted,
               },
             ]}
           >
@@ -77,7 +77,7 @@ export function NimbusAuthLayout({
                 s.progressFill,
                 {
                   width: `${Math.max(0, Math.min(1, step / total)) * 100}%`,
-                  backgroundColor: nimbusColors.brand.primary,
+                  backgroundColor: svaColors.brand.primary,
                 },
               ]}
             />
@@ -92,8 +92,8 @@ export function NimbusAuthLayout({
               style={({ pressed }) => [
                 s.backBtn,
                 {
-                  backgroundColor: nimbusColors.surface.raised,
-                  borderColor: nimbusColors.border.default,
+                  backgroundColor: svaColors.surface.raised,
+                  borderColor: svaColors.border.default,
                   opacity: !onBack ? 0 : pressed ? 0.9 : 1,
                 },
               ]}
@@ -102,7 +102,7 @@ export function NimbusAuthLayout({
               <Ionicons
                 name="chevron-back"
                 size={22}
-                color={nimbusColors.text.primary}
+                color={svaColors.text.primary}
               />
             </Pressable>
           </View>

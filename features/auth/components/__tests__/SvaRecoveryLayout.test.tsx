@@ -7,18 +7,18 @@ import ThemeContext from "../../../../contexts/ThemeContext";
 import { getTheme } from "../../../../theme";
 import { SvaRecoveryLayout } from "../SvaRecoveryLayout";
 
-const theme = getTheme("nimbus");
+const theme = getTheme("sva");
 const themeValue = {
   theme: "nimbus",
   toggleTheme: jest.fn(),
   useSystemTheme: jest.fn(),
   newTheme: theme.colors,
-  nimbusColors: theme.nimbusColors,
+  svaColors: theme.svaColors,
   spacing: theme.spacing,
   typography: theme.typography,
-  nimbusTypography: theme.nimbusTypography,
-  nimbusSpacing: theme.nimbusSpacing,
-  nimbusComponents: theme.nimbusComponents,
+  svaTypography: theme.svaTypography,
+  svaSpacing: theme.svaSpacing,
+  svaComponents: theme.svaComponents,
   tokens: theme.tokens,
   activeTheme: theme,
 };
@@ -75,4 +75,3 @@ describe("SvaRecoveryLayout", () => {
     expect(onBack).toHaveBeenCalledTimes(1);
   });
 });
-

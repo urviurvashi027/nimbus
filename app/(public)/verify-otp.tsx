@@ -15,10 +15,10 @@ const OTP_LENGTH = 6;
 const RESEND_SECONDS = 45;
 
 export default function VerifyOtpScreen() {
-  const { nimbusColors, nimbusComponents } = useContext(ThemeContext);
+  const { svaColors, svaComponents } = useContext(ThemeContext);
   const styles = useMemo(
-    () => createStyles(nimbusColors, nimbusComponents),
-    [nimbusColors, nimbusComponents]
+    () => createStyles(svaColors, svaComponents),
+    [svaColors, svaComponents]
   );
 
   const params = useLocalSearchParams<{ email?: string }>();
@@ -144,7 +144,7 @@ export default function VerifyOtpScreen() {
         onBack={() => router.back()}
         supportingContent={
           <View style={styles.emailRow}>
-            <Text style={[styles.emailCopy, { color: nimbusColors.text.secondary }]}>
+            <Text style={[styles.emailCopy, { color: svaColors.text.secondary }]}>
               Not your email?
             </Text>
 
@@ -157,7 +157,7 @@ export default function VerifyOtpScreen() {
               }
               hitSlop={8}
             >
-              <Text style={[styles.emailAction, { color: nimbusColors.brand.primary }]}>
+              <Text style={[styles.emailAction, { color: svaColors.brand.primary }]}>
                 Edit Email
               </Text>
             </Pressable>
@@ -168,9 +168,9 @@ export default function VerifyOtpScreen() {
           style={[
             styles.codeShell,
             {
-              backgroundColor: nimbusColors.surface.raised,
-              borderColor: nimbusColors.border.default,
-              shadowColor: nimbusColors.shadow.default,
+              backgroundColor: svaColors.surface.raised,
+              borderColor: svaColors.border.default,
+              shadowColor: svaColors.shadow.default,
             },
           ]}
         >
@@ -186,7 +186,7 @@ export default function VerifyOtpScreen() {
           />
 
           {errorMsg ? (
-            <Text style={[styles.errorText, { color: nimbusColors.state.error }]}>
+            <Text style={[styles.errorText, { color: svaColors.state.error }]}>
               {errorMsg}
             </Text>
           ) : null}
@@ -203,14 +203,14 @@ export default function VerifyOtpScreen() {
               <Ionicons
                 name="arrow-forward"
                 size={18}
-                color={nimbusColors.text.inverse}
+                color={svaColors.text.inverse}
               />
             }
           />
 
           <View style={styles.resendRow}>
             {timer > 0 ? (
-              <Text style={[styles.resendText, { color: nimbusColors.text.disabled }]}>
+              <Text style={[styles.resendText, { color: svaColors.text.disabled }]}>
                 RESEND CODE IN {formatTimer(timer)}
               </Text>
             ) : (
@@ -218,7 +218,7 @@ export default function VerifyOtpScreen() {
                 <Text
                   style={[
                     styles.resendAction,
-                    { color: nimbusColors.brand.primary },
+                    { color: svaColors.brand.primary },
                   ]}
                 >
                   {resending ? "SENDING..." : "RESEND CODE"}
@@ -232,7 +232,7 @@ export default function VerifyOtpScreen() {
   );
 }
 
-function createStyles(nimbusColors: any, nimbusComponents: any) {
+function createStyles(svaColors: any, svaComponents: any) {
   return StyleSheet.create({
     emailRow: {
       flexDirection: "row",
@@ -248,7 +248,7 @@ function createStyles(nimbusColors: any, nimbusComponents: any) {
       ...SVATypography.textStyle.label,
       lineHeight: 18,
       textDecorationLine: "underline",
-      textDecorationColor: nimbusColors.brand.primary,
+      textDecorationColor: svaColors.brand.primary,
     },
     codeShell: {
       width: "100%",
@@ -274,7 +274,7 @@ function createStyles(nimbusColors: any, nimbusComponents: any) {
     primaryButton: {
       width: "100%",
       minHeight: 56,
-      borderRadius: nimbusComponents?.button?.primary?.borderRadius ?? 16,
+      borderRadius: svaComponents?.button?.primary?.borderRadius ?? 16,
     },
     primaryButtonText: {
       ...SVATypography.textStyle.button,

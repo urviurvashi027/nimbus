@@ -40,21 +40,21 @@ export function SvaAuthButton({
   textStyle,
   testID,
 }: SvaAuthButtonProps) {
-  const { nimbusColors, nimbusComponents } = useContext(ThemeContext);
+  const { svaColors, svaComponents } = useContext(ThemeContext);
   const isDisabled = disabled || loading;
 
   const palette =
     variant === "primary"
       ? {
-          bg: nimbusComponents?.button.primary.bg ?? nimbusColors.brand.primary,
+          bg: svaComponents?.button.primary.bg ?? svaColors.brand.primary,
           borderColor: "transparent",
           textColor:
-            nimbusComponents?.button.primary.text ?? nimbusColors.text.inverse,
+            svaComponents?.button.primary.text ?? svaColors.text.inverse,
         }
       : {
-          bg: nimbusColors.surface.base,
-          borderColor: nimbusColors.border.default,
-          textColor: nimbusColors.text.primary,
+          bg: svaColors.surface.base,
+          borderColor: svaColors.border.default,
+          textColor: svaColors.text.primary,
         };
 
   return (
@@ -68,7 +68,7 @@ export function SvaAuthButton({
         {
           backgroundColor: isDisabled
             ? variant === "primary"
-              ? nimbusComponents?.button.primary.disabledBg ??
+              ? svaComponents?.button.primary.disabledBg ??
                 "rgba(163,190,140,0.28)"
               : "rgba(255,255,255,0.03)"
             : palette.bg,
@@ -116,4 +116,3 @@ const s = StyleSheet.create({
     marginLeft: 10,
   },
 });
-

@@ -71,7 +71,7 @@ function getPasswordStrength(value: string) {
   const hasSymbol = /[^A-Za-z0-9]/.test(value);
 
   if (hasLength && hasNumber && hasSymbol) {
-    return { label: "HIGH INTEGRITY", percent: 100 };
+    return { label: "STRONG", percent: 100 };
   }
 
   if (value.length >= 10 && (hasNumber || hasSymbol)) {
@@ -107,7 +107,9 @@ export default function RegistrationScreen() {
 }
 
 function RegistrationFlowInner() {
-  const { nimbusColors, nimbusComponents } = useContext(ThemeContext);
+  const { svaColors, svaComponents } = useContext(ThemeContext);
+  const nimbusColors = svaColors;
+  const nimbusComponents = svaComponents;
   const { onRegister } = useAuth();
   const toast = useNimbusToast();
 
@@ -139,8 +141,8 @@ function RegistrationFlowInner() {
   const confirmRef = useRef<TextInput>(null);
 
   const styles = useMemo(
-    () => createStyles(nimbusColors, nimbusComponents),
-    [nimbusColors, nimbusComponents]
+    () => createStyles(svaColors, svaComponents),
+    [svaColors, svaComponents]
   );
 
   const derivedUsername = useMemo(() => {
@@ -783,7 +785,7 @@ function RegistrationFlowInner() {
           </Text>
 
           <Text style={[styles.subtitle, { color: nimbusColors.text.secondary }]}>
-            Choose a password that maintains the integrity of your data.
+            Use a strong password you can remember.
           </Text>
 
           <View style={styles.fieldBlock}>
@@ -874,9 +876,11 @@ function RegistrationFlowInner() {
               </View>
             ) : null}
 
+            <View style={styles.inputGap} />
+
             <SvaAuthInput
               ref={confirmRef}
-              label="VERIFY INTEGRITY"
+              label="CONFIRM PASSWORD"
               preset="password"
               showPasswordToggle
               value={confirmPassword}
@@ -884,7 +888,7 @@ function RegistrationFlowInner() {
                 setConfirmPassword(value);
                 if (errMsg) setErrMsg("");
               }}
-              placeholder="Verify access key"
+              placeholder="Confirm password"
               autoCapitalize="none"
               autoCorrect={false}
               editable={!loading}
@@ -972,7 +976,10 @@ function RegistrationFlowInner() {
   );
 }
 
-function createStyles(nimbusColors: any, nimbusComponents: any) {
+function createStyles(svaColors: any, svaComponents: any) {
+  const nimbusColors = svaColors;
+  const nimbusComponents = svaComponents;
+
   return StyleSheet.create({
     title: {
       ...SVATypography.textStyle.displayMedium,

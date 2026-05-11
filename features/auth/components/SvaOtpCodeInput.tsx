@@ -28,7 +28,7 @@ export function SvaOtpCodeInput({
   testID,
   containerStyle,
 }: SvaOtpCodeInputProps) {
-  const { nimbusColors } = useContext(ThemeContext);
+  const { svaColors } = useContext(ThemeContext);
   const inputs = useRef<(TextInput | null)[]>([]);
   const [active, setActive] = useState(0);
 
@@ -105,16 +105,16 @@ export function SvaOtpCodeInput({
               autoComplete="one-time-code"
               maxLength={1}
               caretHidden
-              selectionColor={nimbusColors.brand.primary}
-              cursorColor={nimbusColors.brand.primary}
+              selectionColor={svaColors.brand.primary}
+              cursorColor={svaColors.brand.primary}
               placeholder=""
               style={[
                 s.input,
                 {
-                  color: nimbusColors.text.primary,
+                  color: svaColors.text.primary,
                   borderBottomColor: focused || filled
-                    ? nimbusColors.brand.primary
-                    : nimbusColors.border.muted,
+                    ? svaColors.brand.primary
+                    : svaColors.border.muted,
                   marginRight: index === length - 1 ? 0 : 10,
                 },
               ]}

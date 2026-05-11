@@ -36,7 +36,7 @@ export function NimbusButton({
   style,
   textStyle,
 }: NimbusButtonProps) {
-  const { newTheme, nimbusColors, typography } = useContext(ThemeContext);
+  const { newTheme, svaColors, typography } = useContext(ThemeContext);
   const isDisabled = !!disabled || !!loading;
 
   // Determine base colors based on variant
@@ -44,28 +44,28 @@ export function NimbusButton({
     switch (variant) {
       case "secondary":
         return {
-          backgroundColor: nimbusColors.surface.base || newTheme.surfaceMuted,
+          backgroundColor: svaColors.surface.base || newTheme.surfaceMuted,
           borderColor: "transparent",
-          textColor: nimbusColors.text.primary || newTheme.textPrimary,
+          textColor: svaColors.text.primary || newTheme.textPrimary,
         };
       case "outline":
         return {
           backgroundColor: "transparent",
-          borderColor: nimbusColors.border.default || newTheme.border,
-          textColor: nimbusColors.text.primary || newTheme.textPrimary,
+          borderColor: svaColors.border.default || newTheme.border,
+          textColor: svaColors.text.primary || newTheme.textPrimary,
         };
       case "ghost":
         return {
           backgroundColor: "transparent",
           borderColor: "transparent",
-          textColor: nimbusColors.brand.primary || newTheme.accent,
+          textColor: svaColors.brand.primary || newTheme.accent,
         };
       case "primary":
       default:
         return {
-          backgroundColor: nimbusColors.button.primary.bg || newTheme.accent,
+          backgroundColor: svaColors.button.primary.bg || newTheme.accent,
           borderColor: "transparent",
-          textColor: nimbusColors.button.primary.text || newTheme.buttonPrimaryText || "#10120E",
+          textColor: svaColors.button.primary.text || newTheme.buttonPrimaryText || "#10120E",
         };
     }
   };

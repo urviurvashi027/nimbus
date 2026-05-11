@@ -13,10 +13,10 @@ import { SvaRecoveryLayout } from "@/features/auth/components/SvaRecoveryLayout"
 import { SVATypography } from "@/theme/typography";
 
 export default function ResetPasswordScreen() {
-  const { nimbusColors, nimbusComponents } = useContext(ThemeContext);
+  const { svaColors, svaComponents } = useContext(ThemeContext);
   const styles = useMemo(
-    () => createStyles(nimbusColors, nimbusComponents),
-    [nimbusColors, nimbusComponents]
+    () => createStyles(svaColors, svaComponents),
+    [svaColors, svaComponents]
   );
 
   const params = useLocalSearchParams<{ email?: string; otp?: string }>();
@@ -113,9 +113,9 @@ export default function ResetPasswordScreen() {
           style={[
             styles.formShell,
             {
-              backgroundColor: nimbusColors.surface.raised,
-              borderColor: nimbusColors.border.default,
-              shadowColor: nimbusColors.shadow.default,
+              backgroundColor: svaColors.surface.raised,
+              borderColor: svaColors.border.default,
+              shadowColor: svaColors.shadow.default,
             },
           ]}
         >
@@ -154,7 +154,7 @@ export default function ResetPasswordScreen() {
           />
 
           {errorMsg ? (
-            <Text style={[styles.errorText, { color: nimbusColors.state.error }]}>
+            <Text style={[styles.errorText, { color: svaColors.state.error }]}>
               {errorMsg}
             </Text>
           ) : null}
@@ -171,7 +171,7 @@ export default function ResetPasswordScreen() {
               <Ionicons
                 name="arrow-forward"
                 size={18}
-                color={nimbusColors.text.inverse}
+                color={svaColors.text.inverse}
               />
             }
           />
@@ -181,7 +181,7 @@ export default function ResetPasswordScreen() {
   );
 }
 
-function createStyles(nimbusColors: any, nimbusComponents: any) {
+function createStyles(svaColors: any, svaComponents: any) {
   return StyleSheet.create({
     formShell: {
       width: "100%",
@@ -215,7 +215,7 @@ function createStyles(nimbusColors: any, nimbusComponents: any) {
     primaryButton: {
       width: "100%",
       minHeight: 56,
-      borderRadius: nimbusComponents?.button?.primary?.borderRadius ?? 16,
+      borderRadius: svaComponents?.button?.primary?.borderRadius ?? 16,
     },
     primaryButtonText: {
       ...SVATypography.textStyle.button,
@@ -226,7 +226,7 @@ function createStyles(nimbusColors: any, nimbusComponents: any) {
     footer: {
       ...SVATypography.textStyle.caption,
       fontFamily: "Inter_500Medium",
-      color: nimbusColors.text.disabled,
+      color: svaColors.text.disabled,
       fontSize: 11,
       lineHeight: 18,
       textAlign: "center",

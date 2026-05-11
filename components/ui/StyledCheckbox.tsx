@@ -17,16 +17,16 @@ export const StyledCheckbox: React.FC<CheckboxProps> = ({
   label,
   disabled,
 }) => {
-  const { newTheme, nimbusColors } = useContext(ThemeContext);
+  const { newTheme, svaColors } = useContext(ThemeContext);
 
   const colors = {
-    background: nimbusColors.bg.base || newTheme.background,
-    border: nimbusColors.brand.primary || newTheme.accent,
-    checkedBg: nimbusColors.brand.primary || newTheme.accent,
-    checkmark: nimbusColors.text.inverse || newTheme.buttonPrimaryText || "#10120E",
-    text: nimbusColors.text.primary || newTheme.textPrimary,
-    textSecondary: nimbusColors.text.secondary || newTheme.textSecondary,
-    disabled: nimbusColors.text.disabled || newTheme.textDisabled,
+    background: svaColors.bg.base || newTheme.background,
+    border: svaColors.brand.primary || newTheme.accent,
+    checkedBg: svaColors.brand.primary || newTheme.accent,
+    checkmark: svaColors.text.inverse || newTheme.buttonPrimaryText || "#10120E",
+    text: svaColors.text.primary || newTheme.textPrimary,
+    textSecondary: svaColors.text.secondary || newTheme.textSecondary,
+    disabled: svaColors.text.disabled || newTheme.textDisabled,
   };
 
   return (

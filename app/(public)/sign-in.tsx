@@ -23,7 +23,7 @@ import { SvaAuthButton } from "@/features/auth/components/SvaAuthButton";
 import type { TextInput } from "react-native";
 
 export default function SignIn() {
-  const { nimbusColors, nimbusComponents } = useContext(ThemeContext);
+  const { svaColors, svaComponents } = useContext(ThemeContext);
   const { onLogin } = useAuth();
   const toast = useNimbusToast();
   const insets = useSafeAreaInsets();
@@ -36,8 +36,8 @@ export default function SignIn() {
   const [loading, setLoading] = useState(false);
 
   const styles = useMemo(
-    () => createStyles(nimbusColors, nimbusComponents, insets.top, insets.bottom),
-    [nimbusColors, nimbusComponents, insets.top, insets.bottom]
+    () => createStyles(svaColors, svaComponents, insets.top, insets.bottom),
+    [svaColors, svaComponents, insets.top, insets.bottom]
   );
 
   const submit = async () => {
@@ -80,7 +80,7 @@ export default function SignIn() {
   };
 
   return (
-    <View style={[styles.screen, { backgroundColor: nimbusColors.bg.base }]}>
+    <View style={[styles.screen, { backgroundColor: svaColors.bg.base }]}>
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -97,7 +97,7 @@ export default function SignIn() {
                 style={[
                   styles.outerCard,
                   {
-                    backgroundColor: nimbusColors.surface.base,
+                    backgroundColor: svaColors.surface.base,
                   },
                 ]}
               >
@@ -105,15 +105,15 @@ export default function SignIn() {
                   style={[
                     styles.brandStrip,
                     {
-                      backgroundColor: nimbusColors.bg.base,
-                      borderBottomColor: nimbusColors.border.muted,
+                      backgroundColor: svaColors.bg.base,
+                      borderBottomColor: svaColors.border.muted,
                     },
                   ]}
                 >
                   <Text
                     style={[
                       styles.brandWordmark,
-                      { color: nimbusColors.brand.primary },
+                      { color: svaColors.brand.primary },
                     ]}
                   >
                     SVA
@@ -125,7 +125,7 @@ export default function SignIn() {
                     style={[
                       styles.heroTitle,
                       {
-                        color: nimbusColors.text.primary,
+                        color: svaColors.text.primary,
                         textShadowColor: "rgba(0,0,0,0.2)",
                       },
                     ]}
@@ -136,7 +136,7 @@ export default function SignIn() {
                   <Text
                     style={[
                       styles.heroSubtitle,
-                      { color: nimbusColors.text.secondary },
+                      { color: svaColors.text.secondary },
                     ]}
                   >
                     Deep Health & Burnout Prevention AI
@@ -146,9 +146,9 @@ export default function SignIn() {
                     style={[
                       styles.formShell,
                       {
-                        backgroundColor: nimbusColors.surface.raised,
-                        borderColor: nimbusColors.border.default,
-                        shadowColor: nimbusColors.shadow.default,
+                        backgroundColor: svaColors.surface.raised,
+                        borderColor: svaColors.border.default,
+                        shadowColor: svaColors.shadow.default,
                       },
                     ]}
                   >
@@ -197,7 +197,7 @@ export default function SignIn() {
                           <Ionicons
                             name="arrow-forward"
                             size={18}
-                            color={nimbusComponents?.button.primary.text ?? nimbusColors.text.inverse}
+                            color={svaComponents?.button.primary.text ?? svaColors.text.inverse}
                           />
                         }
                       />
@@ -215,7 +215,7 @@ export default function SignIn() {
                           <Ionicons
                             name="person-add-outline"
                             size={18}
-                            color={nimbusColors.text.primary}
+                            color={svaColors.text.primary}
                           />
                         }
                       />
@@ -230,7 +230,7 @@ export default function SignIn() {
                     <Text
                       style={[
                         styles.forgotAccessText,
-                        { color: nimbusColors.text.secondary },
+                        { color: svaColors.text.secondary },
                       ]}
                     >
                       Lost Access
@@ -240,19 +240,19 @@ export default function SignIn() {
                       <View
                         style={[
                           styles.forgotAccessLine,
-                          { backgroundColor: nimbusColors.border.default },
+                          { backgroundColor: svaColors.border.default },
                         ]}
                       />
                       <View
                         style={[
                           styles.forgotAccessDot,
-                          { backgroundColor: nimbusColors.border.default },
+                          { backgroundColor: svaColors.border.default },
                         ]}
                       />
                       <View
                         style={[
                           styles.forgotAccessLine,
-                          { backgroundColor: nimbusColors.border.default },
+                          { backgroundColor: svaColors.border.default },
                         ]}
                       />
                     </View>
@@ -268,8 +268,8 @@ export default function SignIn() {
 }
 
 function createStyles(
-  nimbusColors: any,
-  nimbusComponents: any,
+  svaColors: any,
+  svaComponents: any,
   topInset: number,
   bottomInset: number
 ) {
@@ -357,10 +357,10 @@ function createStyles(
       width: "100%",
     },
     inputLabel: {
-      color: nimbusColors.text.secondary,
+      color: svaColors.text.secondary,
     },
     inputText: {
-      color: nimbusColors.text.primary,
+      color: svaColors.text.primary,
     },
     inputGap: {
       height: 18,
@@ -371,7 +371,7 @@ function createStyles(
     primaryButton: {
       width: "100%",
       minHeight: 56,
-      borderRadius: nimbusComponents?.button?.primary?.borderRadius ?? 16,
+      borderRadius: svaComponents?.button?.primary?.borderRadius ?? 16,
     },
     primaryButtonText: {
       ...SVATypography.textStyle.button,

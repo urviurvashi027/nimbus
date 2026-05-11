@@ -11,10 +11,10 @@ export function ScreenView(
   }
 ) {
   const { style, bgColor, padding, useSafeTop = true, ...otherProps } = props;
-  const { newTheme, nimbusColors, tokens, spacing } = useContext(ThemeContext);
+  const { newTheme, svaColors, tokens, spacing } = useContext(ThemeContext);
   const insets = useSafeAreaInsets();
 
-  const backgroundColor = bgColor || nimbusColors.bg.base || newTheme.background;
+  const backgroundColor = bgColor || svaColors.bg.base || newTheme.background;
 
   const standardStyle = {
     backgroundColor,

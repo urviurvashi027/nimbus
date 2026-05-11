@@ -61,7 +61,7 @@ export const SvaAuthInput = forwardRef<TextInput, SvaAuthInputProps>(
     },
     ref
   ) => {
-    const { nimbusColors } = useContext(ThemeContext);
+    const { svaColors } = useContext(ThemeContext);
     const [focused, setFocused] = useState(false);
     const [showSecret, setShowSecret] = useState(false);
 
@@ -86,8 +86,8 @@ export const SvaAuthInput = forwardRef<TextInput, SvaAuthInputProps>(
     const effectiveAutoCapitalize = autoCapitalize ?? "none";
 
     const borderColor = focused
-      ? nimbusColors.brand.primary
-      : nimbusColors.border.muted;
+      ? svaColors.brand.primary
+      : svaColors.border.muted;
 
     return (
       <View style={[s.container, containerStyle]}>
@@ -97,7 +97,7 @@ export const SvaAuthInput = forwardRef<TextInput, SvaAuthInputProps>(
               style={[
                 s.label,
                 {
-                  color: nimbusColors.text.secondary,
+                  color: svaColors.text.secondary,
                   flex: 1,
                   marginBottom: 0,
                 },
@@ -110,7 +110,7 @@ export const SvaAuthInput = forwardRef<TextInput, SvaAuthInputProps>(
           </View>
         ) : (
           <Text
-            style={[s.label, { color: nimbusColors.text.secondary }, labelStyle]}
+            style={[s.label, { color: svaColors.text.secondary }, labelStyle]}
           >
             {label}
           </Text>
@@ -132,11 +132,11 @@ export const SvaAuthInput = forwardRef<TextInput, SvaAuthInputProps>(
             {...rest}
             autoCapitalize={effectiveAutoCapitalize}
             keyboardType={effectiveKeyboardType}
-            placeholderTextColor={nimbusColors.text.disabled}
+            placeholderTextColor={svaColors.text.disabled}
             secureTextEntry={effectiveSecureTextEntry}
-            style={[s.input, { color: nimbusColors.text.primary }, inputStyle]}
-            selectionColor={nimbusColors.brand.primary}
-            cursorColor={nimbusColors.brand.primary}
+            style={[s.input, { color: svaColors.text.primary }, inputStyle]}
+            selectionColor={svaColors.brand.primary}
+            cursorColor={svaColors.brand.primary}
             onFocus={(e) => {
               setFocused(true);
               onFocus?.(e);
@@ -160,18 +160,18 @@ export const SvaAuthInput = forwardRef<TextInput, SvaAuthInputProps>(
               <Ionicons
                 name={showSecret ? "eye-off-outline" : "eye-outline"}
                 size={18}
-                color={nimbusColors.text.secondary}
+              color={svaColors.text.secondary}
               />
             </Pressable>
           ) : null}
         </View>
 
         {errorText ? (
-          <Text style={[s.feedback, { color: nimbusColors.state.error }]}>
+          <Text style={[s.feedback, { color: svaColors.state.error }]}>
             {errorText}
           </Text>
         ) : helperText ? (
-          <Text style={[s.feedback, { color: nimbusColors.text.secondary }]}>
+          <Text style={[s.feedback, { color: svaColors.text.secondary }]}>
             {helperText}
           </Text>
         ) : null}

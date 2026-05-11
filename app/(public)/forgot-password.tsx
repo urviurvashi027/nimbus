@@ -14,10 +14,10 @@ import { ROUTES } from "@/constants/routes";
 import { SVATypography } from "@/theme/typography";
 
 export default function ForgotPasswordScreen() {
-  const { nimbusColors, nimbusComponents } = useContext(ThemeContext);
+  const { svaColors, svaComponents } = useContext(ThemeContext);
   const styles = useMemo(
-    () => createStyles(nimbusColors, nimbusComponents),
-    [nimbusColors, nimbusComponents]
+    () => createStyles(svaColors, svaComponents),
+    [svaColors, svaComponents]
   );
 
   const params = useLocalSearchParams<{ email?: string }>();
@@ -123,9 +123,9 @@ export default function ForgotPasswordScreen() {
           style={[
             styles.formShell,
             {
-              backgroundColor: nimbusColors.surface.raised,
-              borderColor: nimbusColors.border.default,
-              shadowColor: nimbusColors.shadow.default,
+              backgroundColor: svaColors.surface.raised,
+              borderColor: svaColors.border.default,
+              shadowColor: svaColors.shadow.default,
             },
           ]}
         >
@@ -160,8 +160,8 @@ export default function ForgotPasswordScreen() {
                 name="arrow-forward"
                 size={18}
                 color={
-                  nimbusComponents?.button.primary.text ??
-                  nimbusColors.text.inverse
+                  svaComponents?.button.primary.text ??
+                  svaColors.text.inverse
                 }
               />
             }
@@ -173,7 +173,7 @@ export default function ForgotPasswordScreen() {
             hitSlop={10}
           >
             <Text
-              style={[styles.secondaryActionText, { color: nimbusColors.text.secondary }]}
+              style={[styles.secondaryActionText, { color: svaColors.text.secondary }]}
             >
               Try another way
             </Text>
@@ -184,7 +184,7 @@ export default function ForgotPasswordScreen() {
   );
 }
 
-function createStyles(nimbusColors: any, nimbusComponents: any) {
+function createStyles(svaColors: any, svaComponents: any) {
   return StyleSheet.create({
     formShell: {
       width: "100%",
@@ -208,7 +208,7 @@ function createStyles(nimbusColors: any, nimbusComponents: any) {
     primaryButton: {
       width: "100%",
       minHeight: 56,
-      borderRadius: nimbusComponents?.button?.primary?.borderRadius ?? 16,
+      borderRadius: svaComponents?.button?.primary?.borderRadius ?? 16,
     },
     primaryButtonText: {
       ...SVATypography.textStyle.button,
@@ -224,7 +224,7 @@ function createStyles(nimbusColors: any, nimbusComponents: any) {
     footer: {
       ...SVATypography.textStyle.caption,
       fontFamily: "Inter_500Medium",
-      color: nimbusColors.text.disabled,
+      color: svaColors.text.disabled,
       fontSize: 11,
       lineHeight: 18,
       textAlign: "center",

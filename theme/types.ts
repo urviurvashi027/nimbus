@@ -1,4 +1,4 @@
-export type ThemeName = "dark" | "light" | "nimbus";
+export type ThemeName = "dark" | "light" | "sva";
 
 /**
  * @interface FontSet
@@ -267,7 +267,25 @@ export interface NimbusColorSet {
     hover: string;
     selected: string;
   };
+  chart: {
+    lime: string;
+    blue: string;
+    amber: string;
+    rose: string;
+    seafoam: string;
+    lavender: string;
+    grid: string;
+    areaFade: string;
+  };
+  gradient: {
+    accent: string;
+    lime: string;
+    blue: string;
+    amber: string;
+  };
 }
+
+export type SvaColorSet = NimbusColorSet;
 
 //---------------------------------------------------------// Complete Theme Interface Combining Both Color Structures for Backward Compatibility and Future-Proofing
 export interface SpacingTokens {
@@ -413,24 +431,15 @@ export interface ComponentTokens {
 export type AppTheme = {
   name: ThemeName;
   colors: ColorSet;
-  nimbusColors?: NimbusColorSet; // Add the new colors as optional for gradual migration
+  svaColors?: SvaColorSet;
+  svaTypography?: TypographyTokens;
+  svaSpacing?: SpacingTokens;
+  svaComponents?: ComponentTokens;
+  nimbusColors?: NimbusColorSet; // Compatibility alias for the old namespace
   spacing: Spacing;
   typography: Typography;
-  nimbusTypography?: TypographyTokens;
-  nimbusSpacing?: SpacingTokens;
-  nimbusComponents?: ComponentTokens;
+  nimbusTypography?: TypographyTokens; // Compatibility alias for the old namespace
+  nimbusSpacing?: SpacingTokens; // Compatibility alias for the old namespace
+  nimbusComponents?: ComponentTokens; // Compatibility alias for the old namespace
   tokens: NimbusTokens;
 };
-
-/**
- * @interface ThemeColors
- * @description A collection of all available color themes and global configurations.
- * Used primarily in the theme context or palette definitions.
- */
-export interface ThemeColors {
-  light: ColorSet;
-  dark: ColorSet;
-  typography: Typography;
-  spacing: Spacing;
-  tokens: NimbusTokens;
-}
