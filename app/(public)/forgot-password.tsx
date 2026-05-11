@@ -1,101 +1,104 @@
-import React, { useContext, useMemo, useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { router, useNavigation } from "expo-router";
+import React, { useContext, useEffect, useMemo, useState } from "react";
+import { StyleSheet, Text, View } from "react-native";
+import { router, Stack, useLocalSearchParams } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 
 import ThemeContext from "@/contexts/ThemeContext";
-
-import { ScreenView } from "@/components/ui/theme-components/ScreenView";
-import { NimbusInput } from "@/components/ui/theme-components/NimbusInput";
-import { NimbusButton } from "@/components/ui/theme-components/NimbusButton";
+import { forgotPassword } from "@/features/auth/services/loginService";
 import { useNimbusAlert } from "@/components/ui/alert/useNimbusAlert";
 import { useNimbusToast } from "@/components/ui/toast/useNimbusToast";
-import AppHeader from "@/components/layout/AppHeader";
-
-import { forgotPassword } from "@/features/auth/services/loginService";
+import { SvaAuthButton } from "@/features/auth/components/SvaAuthButton";
+import { SvaAuthInput } from "@/features/auth/components/SvaAuthInput";
+import { SvaAuthTextAction } from "@/features/auth/components/SvaAuthTextAction";
+import { SvaRecoveryLayout } from "@/features/auth/components/SvaRecoveryLayout";
+import { ROUTES } from "@/constants/routes";
+import { SVATypography } from "@/theme/typography";
 
 export default function ForgotPasswordScreen() {
-  const { newTheme, spacing, typography } = useContext(ThemeContext);
+  const { svaColors, svaComponents } = useContext(ThemeContext);
   const styles = useMemo(
-    () => styling(newTheme, spacing, typography),
-    [newTheme, spacing, typography]
+    () => createStyles(svaColors, svaComponents),
+    [svaColors, svaComponents]
   );
 
-  const [email, setEmail] = useState("");
-  const [errMsg, setErrMsg] = useState<string>("");
+  const params = useLocalSearchParams<{ email?: string }>();
+  const routeEmail = typeof params.email === "string" ? params.email : "";
+
+  const [email, setEmail] = useState(routeEmail);
+  const [errorMsg, setErrorMsg] = useState("");
   const [loading, setLoading] = useState(false);
 
   const toast = useNimbusToast();
   const alert = useNimbusAlert();
-  const navigation = useNavigation();
 
-  // Hide the native header
-  React.useEffect(() => {
-    navigation.setOptions({
-      headerShown: false,
-    });
-  }, [navigation]);
+  useEffect(() => {
+    if (routeEmail) {
+      setEmail(routeEmail);
+    }
+  }, [routeEmail]);
 
   const validate = (value: string) => {
-    const v = value.trim();
+    const trimmed = value.trim();
     const emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
 
-    if (!v) return "Email is required.";
-    if (!emailRegex.test(v)) return "Please enter a valid email address.";
+    if (!trimmed) return "Email is required.";
+    if (!emailRegex.test(trimmed)) return "Please enter a valid email address.";
     return "";
   };
 
-  const onChangeEmail = (v: string) => {
-    setEmail(v);
-    if (errMsg) setErrMsg(""); // clear once user starts fixing
-  };
+  const onSubmit = async () => {
+    const trimmed = email.trim();
+    const validationError = validate(trimmed);
 
-  const submit = async () => {
-    const v = email.trim();
-    const e = validate(v);
-
-    if (e) {
-      setErrMsg(e);
+    if (validationError) {
+      setErrorMsg(validationError);
       return;
     }
 
     setLoading(true);
-    setErrMsg("");
+    setErrorMsg("");
 
     try {
-      const result = await forgotPassword({ email: v });
+      const result = await forgotPassword({ email: trimmed });
 
-      if (result?.success) {
-        toast.show({
-          variant: "success",
-          title: "OTP sent",
-          message: "Check your email for the verification code.",
-        });
-
-        router.replace({
-          pathname: "/(public)/verify-otp",
-          params: { email: v },
-        });
-        return;
-      }
-
-      if (!result?.success) {
+      if (result?.success === false) {
         alert.show({
           variant: "error",
           title: "Unable to send code",
           message:
             typeof result?.message === "string"
               ? result.message
-              : "We couldn’t send a verification code right now. Please try again.",
+              : "We couldn't send a verification code right now. Please try again.",
           primary: { label: "OK" },
         });
         return;
       }
-    } catch (err: any) {
+
+      if (result?.message) {
+        toast.show({
+          variant: "success",
+          title: "Secure code sent",
+          message: String(result.message),
+        });
+      } else {
+        toast.show({
+          variant: "success",
+          title: "Secure code sent",
+          message: "Check your email for the verification code.",
+        });
+      }
+
+      router.replace({
+        pathname: ROUTES.PUBLIC.VERIFY_OTP,
+        params: { email: trimmed },
+      });
+      return;
+    } catch (error: any) {
       alert.show({
         variant: "error",
         title: "Unable to send code",
-        message: err.message,
-        primary: { label: "OK" }, // just closes
+        message: error?.message ?? "We couldn't send a verification code.",
+        primary: { label: "OK" },
       });
     } finally {
       setLoading(false);
@@ -103,60 +106,115 @@ export default function ForgotPasswordScreen() {
   };
 
   return (
-    <ScreenView>
-      <AppHeader
-        title="Forgot password"
-        subtitle="Enter your email and we’ll send a one-time code to reset your password."
+    <>
+      <Stack.Screen options={{ headerShown: false }} />
+
+      <SvaRecoveryLayout
+        title="Recover Access"
+        subtitle="Enter your registered email to receive a secure verification code."
         onBack={() => router.back()}
-      />
+        footer={
+          <Text style={styles.footer}>
+            Check your spam folder if you don't receive the email within two
+            minutes.
+          </Text>
+        }
+      >
+        <View
+          style={[
+            styles.formShell,
+            {
+              backgroundColor: svaColors.surface.raised,
+              borderColor: svaColors.border.default,
+              shadowColor: svaColors.shadow.default,
+            },
+          ]}
+        >
+          <SvaAuthInput
+            label="EMAIL ADDRESS"
+            preset="email"
+            value={email}
+            onChangeText={(value) => {
+              setEmail(value);
+              if (errorMsg) setErrorMsg("");
+            }}
+            placeholder="email@domain.com"
+            autoCapitalize="none"
+            autoCorrect={false}
+            editable={!loading}
+            returnKeyType="done"
+            onSubmitEditing={onSubmit}
+            errorText={errorMsg}
+            containerStyle={styles.inputBlock}
+          />
 
-      <View style={{ marginTop: spacing.md }} />
+          <View style={styles.actionGap} />
 
-      <NimbusInput
-        label="Email"
-        preset="email"
-        value={email}
-        onChangeText={onChangeEmail}
-        placeholder="john@domain.com"
-        autoCapitalize="none"
-        autoCorrect={false}
-      />
+          <SvaAuthButton
+            label={loading ? "Sending Secure Code..." : "Send Secure Code"}
+            onPress={onSubmit}
+            loading={loading}
+            style={styles.primaryButton}
+            rightIcon={
+              <Ionicons
+                name="arrow-forward"
+                size={18}
+                color={
+                  svaComponents?.button.primary.text ??
+                  svaColors.text.inverse
+                }
+              />
+            }
+          />
 
-      {!!errMsg && (
-        <Text style={[styles.errorText, { color: newTheme.error }]}>
-          {errMsg}
-        </Text>
-      )}
-
-      <View style={{ marginTop: spacing.lg }} />
-
-      <NimbusButton
-        label={loading ? "Sending secure code…" : "Send secure code"}
-        onPress={submit}
-        disabled={loading}
-      />
-
-      <View style={{ marginTop: spacing.sm }} />
-
-      <Text style={styles.helper}>
-        If you don’t see the email, check your spam folder.
-      </Text>
-    </ScreenView>
+          <SvaAuthTextAction
+            onPress={() => router.replace(ROUTES.PUBLIC.SIGN_IN)}
+            variant="muted"
+            style={styles.secondaryAction}
+            hitSlop={10}
+          >
+            Try another way
+          </SvaAuthTextAction>
+        </View>
+      </SvaRecoveryLayout>
+    </>
   );
 }
 
-const styling = (t: any, spacing: any, typography: any) =>
-  StyleSheet.create({
-    errorText: {
-      marginTop: spacing.xs,
-      fontWeight: "700",
-      ...typography.caption,
+function createStyles(svaColors: any, svaComponents: any) {
+  return StyleSheet.create({
+    formShell: {
+      width: "100%",
+      marginTop: 32,
+      borderRadius: 26,
+      borderWidth: StyleSheet.hairlineWidth,
+      paddingHorizontal: 20,
+      paddingTop: 24,
+      paddingBottom: 20,
+      shadowOpacity: 0.12,
+      shadowRadius: 18,
+      shadowOffset: { width: 0, height: 10 },
+      elevation: 2,
     },
-    helper: {
-      marginTop: spacing.xs,
+    inputBlock: {
+      width: "100%",
+    },
+    actionGap: {
+      height: 22,
+    },
+    primaryButton: {
+      width: "100%",
+      minHeight: 56,
+      borderRadius: svaComponents?.button?.primary?.borderRadius ?? 16,
+    },
+    secondaryAction: {
+      alignItems: "center",
+      paddingTop: 18,
+    },
+    footer: {
+      ...SVATypography.textStyle.authFootnote,
+      color: svaColors.text.disabled,
       textAlign: "center",
-      color: t.textSecondary,
-      fontWeight: "600",
-      ...typography.caption,
     },
   });
+}

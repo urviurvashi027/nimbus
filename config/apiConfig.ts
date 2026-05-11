@@ -88,8 +88,8 @@ export const API_ENDPOINTS = {
   reportBug: `${BASE_URL}/api/v1/bug-reports/`,
   logFeedback: `${BASE_URL}/api/v1/feedback/`,
 
-  personaQuestion: `${BASE_URL}/profile/persona-questions/`,
-  submitPersonaAnswers: `${BASE_URL}/profile/persona-answers/`,
+  personaQuestion: `${BASE_URL}/api/v1/profile/persona-questions/`,
+  submitPersonaAnswers: `${BASE_URL}/api/v1/profile/persona-answers/`,
   contactUs: `${BASE_URL}/support/tickets/`,
 
   markHabitDone: (habitId: number) =>

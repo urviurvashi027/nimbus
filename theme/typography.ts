@@ -95,6 +95,86 @@ export const SVATypography: TypographyTokens = {
       letterSpacing: 0,
     },
 
+    authTitle: {
+      fontFamily: "CormorantGaramond_500Medium",
+      fontSize: 31,
+      fontWeight: "500",
+      lineHeight: 34,
+      letterSpacing: -0.35,
+    },
+
+    authSubtitle: {
+      fontFamily: "Inter_400Regular",
+      fontSize: 14,
+      fontWeight: "400",
+      lineHeight: 20,
+      letterSpacing: 0,
+    },
+
+    authBody: {
+      fontFamily: "Inter_400Regular",
+      fontSize: 12,
+      fontWeight: "400",
+      lineHeight: 18,
+      letterSpacing: 0,
+    },
+
+    authFootnote: {
+      fontFamily: "Inter_400Regular",
+      fontSize: 11,
+      fontWeight: "400",
+      lineHeight: 18,
+      letterSpacing: 0,
+    },
+
+    brandWordmark: {
+      fontFamily: "Inter_700Bold",
+      fontSize: 18,
+      fontWeight: "700",
+      lineHeight: 22,
+      letterSpacing: 4.8,
+    },
+
+    authLabel: {
+      fontFamily: "Inter_600SemiBold",
+      fontSize: 12,
+      fontWeight: "600",
+      lineHeight: 18,
+      letterSpacing: 0,
+    },
+
+    authLabelStrong: {
+      fontFamily: "Inter_700Bold",
+      fontSize: 12,
+      fontWeight: "700",
+      lineHeight: 18,
+      letterSpacing: 0.8,
+    },
+
+    authTinyLabel: {
+      fontFamily: "Inter_600SemiBold",
+      fontSize: 11,
+      fontWeight: "600",
+      lineHeight: 16,
+      letterSpacing: 1.4,
+    },
+
+    authActionLabel: {
+      fontFamily: "Inter_600SemiBold",
+      fontSize: 13,
+      fontWeight: "600",
+      lineHeight: 18,
+      letterSpacing: 1.1,
+    },
+
+    authMonoLabel: {
+      fontFamily: "SpaceMono-Regular",
+      fontSize: 11,
+      fontWeight: "400",
+      lineHeight: 16,
+      letterSpacing: 2.6,
+    },
+
     body: {
       fontFamily: "Inter_400Regular",
       fontSize: 16,

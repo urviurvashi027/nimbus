@@ -1,10 +1,11 @@
+import { useCallback, useMemo } from "react";
 import Toast from "react-native-toast-message";
 
 type Variant = "success" | "error" | "info" | "warning";
 
 export function useNimbusToast() {
-  return {
-    show: (args: { variant: Variant; title: string; message?: string }) => {
+  const show = useCallback(
+    (args: { variant: Variant; title: string; message?: string }) => {
       Toast.show({
         type: args.variant,
         text1: args.title,
@@ -12,6 +13,16 @@ export function useNimbusToast() {
         position: "bottom",
       });
     },
-    hide: () => Toast.hide(),
-  };
+    []
+  );
+
+  const hide = useCallback(() => Toast.hide(), []);
+
+  return useMemo(
+    () => ({
+      show,
+      hide,
+    }),
+    [hide, show]
+  );
 }

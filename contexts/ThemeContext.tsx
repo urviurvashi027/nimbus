@@ -9,15 +9,15 @@ import React, {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useColorScheme } from "react-native";
 import { getTheme } from "@/theme";
-import { nimbusColors as defaultNimbusColors } from "@/theme/palettes/nimbus";
+import { svaColors as defaultSvaColors } from "@/theme/palettes/nimbus";
 import type {
   AppTheme,
   ThemeName,
   ColorSet,
   Spacing,
   Typography,
-  NimbusTokens,
-  NimbusColorSet,
+  SvaTokens,
+  SvaColorSet,
   TypographyTokens,
   SpacingTokens,
   ComponentTokens,
@@ -29,21 +29,26 @@ interface ThemeContextData {
   toggleTheme: (newTheme: ThemeName) => void;
   useSystemTheme: () => void;
   newTheme: ColorSet;
-  nimbusColors: NimbusColorSet;
+  svaColors: SvaColorSet;
   spacing: Spacing;
   typography: Typography;
-  nimbusTypography?: TypographyTokens;
-  nimbusSpacing?: SpacingTokens;
-  nimbusComponents?: ComponentTokens;
-  tokens: NimbusTokens;
+  svaTypography?: TypographyTokens;
+  svaSpacing?: SpacingTokens;
+  svaComponents?: ComponentTokens;
+  tokens: SvaTokens;
   activeTheme: AppTheme; // Allow access to full theme object if needed
 }
 
 // Default initial theme (fallback)
 const defaultTheme = getTheme("dark");
 
-const isThemeName = (value: string | null): value is ThemeName =>
-  value === "dark" || value === "light" || value === "nimbus";
+const normalizeThemeName = (value: string | null): ThemeName | null => {
+  if (value === "dark" || value === "light" || value === "sva") {
+    return value;
+  }
+
+  return null;
+};
 
 // 2. Create the context with a default value
 const ThemeContext = createContext<ThemeContextData>({
@@ -51,12 +56,12 @@ const ThemeContext = createContext<ThemeContextData>({
   toggleTheme: () => {},
   useSystemTheme: () => {},
   newTheme: defaultTheme.colors,
-  nimbusColors: defaultNimbusColors,
+  svaColors: defaultTheme.svaColors ?? defaultSvaColors,
   spacing: defaultTheme.spacing,
   typography: defaultTheme.typography,
-  nimbusTypography: defaultTheme.nimbusTypography,
-  nimbusSpacing: defaultTheme.nimbusSpacing,
-  nimbusComponents: defaultTheme.nimbusComponents,
+  svaTypography: defaultTheme.svaTypography,
+  svaSpacing: defaultTheme.svaSpacing,
+  svaComponents: defaultTheme.svaComponents,
   tokens: defaultTheme.tokens,
   activeTheme: defaultTheme,
 });
@@ -82,8 +87,9 @@ export const ThemeProvider: FC<ThemeProviderProps> = ({ children }) => {
     const loadTheme = async () => {
       try {
         const savedTheme = await AsyncStorage.getItem("theme");
-        if (isThemeName(savedTheme)) {
-          setThemeName(savedTheme);
+        const normalizedTheme = normalizeThemeName(savedTheme);
+        if (normalizedTheme) {
+          setThemeName(normalizedTheme);
         }
       } catch (error) {
         console.warn("Error loading theme:", error);
@@ -122,12 +128,12 @@ export const ThemeProvider: FC<ThemeProviderProps> = ({ children }) => {
     toggleTheme,
     useSystemTheme,
     newTheme: activeTheme.colors,
-    nimbusColors: activeTheme.nimbusColors || defaultNimbusColors,
+    svaColors: activeTheme.svaColors ?? defaultSvaColors,
     spacing: activeTheme.spacing,
     typography: activeTheme.typography,
-    nimbusTypography: activeTheme.nimbusTypography,
-    nimbusSpacing: activeTheme.nimbusSpacing,
-    nimbusComponents: activeTheme.nimbusComponents,
+    svaTypography: activeTheme.svaTypography,
+    svaSpacing: activeTheme.svaSpacing,
+    svaComponents: activeTheme.svaComponents,
     tokens: activeTheme.tokens,
     activeTheme,
   };

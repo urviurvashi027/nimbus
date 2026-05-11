@@ -6,6 +6,16 @@ import * as SplashScreen from "expo-splash-screen";
 import { useFonts } from "expo-font";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import {
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+  Inter_700Bold,
+} from "@expo-google-fonts/inter";
+import {
+  CormorantGaramond_500Medium,
+  CormorantGaramond_600SemiBold,
+} from "@expo-google-fonts/cormorant-garamond";
+import {
   Outfit_300Light,
   Outfit_400Regular,
   Outfit_600SemiBold,
@@ -18,7 +28,6 @@ import {
 import AuthProvider from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 // import HabitContext from "@/context/HabitContext";
-import { HabitCreateRequest } from "@/features/habit/types/habitTypes";
 import { NimbusAlertProvider } from "@/components/ui/alert/NimbusAlertProvider";
 import { NimbusToastHost } from "@/components/ui/toast/NimbusToast";
 
@@ -32,6 +41,13 @@ export const unstable_settings = {
 export default function RootLayout() {
   const [loaded, error] = useFonts({
     ...FontAwesome.font,
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+    CormorantGaramond_500Medium,
+    CormorantGaramond_600SemiBold,
+    "SpaceMono-Regular": require("../assets/fonts/SpaceMono-Regular.ttf"),
     Outfit_300Light,
     Outfit_400Regular,
     Outfit_600SemiBold,
@@ -57,18 +73,6 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-  const [habitData, setHabitData] = React.useState<HabitCreateRequest>({
-    name: "",
-    habit_type_id: 0,
-    color: "",
-    tags: [],
-    habit_metric: { unit: "", count: 0 },
-    habit_duration: { all_day: true },
-    habit_frequency: { frequency_type: "", interval: 0, start_date: "" },
-    remind_at: { ten_min_before: true },
-    subtasks: [],
-  });
-
   return (
     <AuthProvider>
       <ThemeProvider>

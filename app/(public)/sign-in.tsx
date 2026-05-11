@@ -1,74 +1,79 @@
-// app/(public)/signIn.tsx
-import React, { useContext, useMemo, useState } from "react";
-import { View, Text, StyleSheet, Pressable, Alert } from "react-native";
-import { router, useNavigation } from "expo-router";
+import React, { useContext, useMemo, useRef, useState } from "react";
+import {
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { router } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import ThemeContext from "@/contexts/ThemeContext";
-import { NimbusColorSet } from "@/theme/types";
-import { SVATypography } from "@/theme/typography";
-import { SVASpacing } from "@/theme/spacing";
-
-import { ScreenView } from "@/components/ui/theme-components/ScreenView";
-import { NimbusInput } from "@/components/ui/theme-components/NimbusInput";
-import { NimbusButton } from "@/components/ui/theme-components/NimbusButton";
-import { StyledCheckbox } from "@/components/ui/StyledCheckbox";
-import { useNimbusToast } from "@/components/ui/toast/useNimbusToast";
-import AppHeader from "@/components/layout/AppHeader";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNimbusToast } from "@/components/ui/toast/useNimbusToast";
+import { ROUTES } from "@/constants/routes";
+import { SVATypography } from "@/theme/typography";
+import { SvaAuthInput } from "@/features/auth/components/SvaAuthInput";
+import { SvaAuthButton } from "@/features/auth/components/SvaAuthButton";
+import { SvaAuthTextAction } from "@/features/auth/components/SvaAuthTextAction";
+
+import type { TextInput } from "react-native";
 
 export default function SignIn() {
-  const { nimbusColors } = useContext(ThemeContext);
+  const { svaColors, svaComponents } = useContext(ThemeContext);
   const { onLogin } = useAuth();
-  const navigation = useNavigation();
+  const toast = useNimbusToast();
+  const insets = useSafeAreaInsets();
 
-  // Hide the native header
-  React.useEffect(() => {
-    navigation.setOptions({
-      headerShown: false,
-    });
-  }, [navigation]);
+  const memberIdRef = useRef<TextInput>(null);
+  const accessCodeRef = useRef<TextInput>(null);
 
-  // Pass all theme objects to styling function
-  const styles = useMemo(() => styling(nimbusColors), [nimbusColors]);
-
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
+  const [memberId, setMemberId] = useState("");
+  const [accessCode, setAccessCode] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const toast = useNimbusToast();
+  const styles = useMemo(
+    () => createStyles(svaColors, svaComponents, insets.top, insets.bottom),
+    [svaColors, svaComponents, insets.top, insets.bottom]
+  );
 
   const submit = async () => {
-    if (!username.trim() || !password.trim()) {
+    if (!memberId.trim() || !accessCode.trim()) {
       Alert.alert(
         "Missing details",
-        "Please enter your username and password."
+        "Please enter your member ID and access code."
       );
       return;
     }
 
     setLoading(true);
     try {
-      const result = await onLogin?.(username.trim(), password);
+      const result = await onLogin?.(memberId.trim(), accessCode);
+
       if (result?.success) {
         toast.show({
           variant: "success",
           title: "Welcome back",
-          message: "Welcome back",
+          message: "Access granted",
         });
         router.replace("/(auth)/(tabs)");
         return;
       }
+
       toast.show({
         variant: "error",
         title: "Login failed",
-        message: "Login failed",
+        message: "Unable to verify your access.",
       });
-    } catch (e: any) {
+    } catch (error: any) {
       toast.show({
         variant: "error",
         title: "Login failed",
-        message: e?.message ?? "Please try again",
+        message: error?.message ?? "Please try again.",
       });
     } finally {
       setLoading(false);
@@ -76,108 +81,309 @@ export default function SignIn() {
   };
 
   return (
-    <ScreenView style={{ paddingHorizontal: SVASpacing.layout.screenPadding }}>
-      {/* Nimbus Shared Header */}
-      <AppHeader
-        title="Welcome back"
-        subtitle="Sign in to continue your Nimbus journey."
-        onBack={() => router.back()}
-        titleStyle={SVATypography.textStyle.heading2}
-        subtitleStyle={SVATypography.textStyle.body}
-      />
-
-      <View style={{ marginTop: SVASpacing.scale.md }} />
-
-      <NimbusInput
-        label="Username"
-        value={username}
-        onChangeText={setUsername}
-        placeholder="John Cena"
-        autoCapitalize="none"
-        returnKeyType="next"
-        labelStyle={SVATypography.textStyle.inputLabel}
-        inputStyle={[SVATypography.textStyle.input, { height: SVASpacing.component.inputHeight }]}
-      />
-
-      <View style={{ marginTop: SVASpacing.scale.md }} />
-
-      <NimbusInput
-        label="Password"
-        preset="password"
-        value={password}
-        onChangeText={setPassword}
-        placeholder="••••••••"
-        enablePasswordToggle
-        returnKeyType="done"
-        onSubmitEditing={submit}
-        labelStyle={SVATypography.textStyle.inputLabel}
-        inputStyle={[SVATypography.textStyle.input, { height: SVASpacing.component.inputHeight }]}
-      />
-
-      <View style={{ marginTop: SVASpacing.scale.md }} />
-
-      <View style={styles.row}>
-        <StyledCheckbox
-          checked={rememberMe}
-          onToggle={() => setRememberMe((v) => !v)}
-          label={<Text style={styles.rememberText}>Remember me</Text>}
-        />
-
-        <Pressable
-          onPress={() => router.push("/(public)/forgot-password")}
-          hitSlop={10}
+    <View style={[styles.screen, { backgroundColor: svaColors.bg.base }]}>
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <ScrollView
+          style={styles.flex}
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
-          <Text style={styles.link}>Forgot password?</Text>
-        </Pressable>
-      </View>
+          <View style={styles.content}>
+            <View style={styles.cardShell}>
+              <View
+                style={[
+                  styles.outerCard,
+                  {
+                    backgroundColor: svaColors.surface.base,
+                  },
+                ]}
+              >
+                <View
+                  style={[
+                    styles.brandStrip,
+                    {
+                      backgroundColor: svaColors.bg.base,
+                      borderBottomColor: svaColors.border.muted,
+                    },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.brandWordmark,
+                      { color: svaColors.brand.primary },
+                    ]}
+                  >
+                    SVA
+                  </Text>
+                </View>
 
-      <View style={{ marginTop: SVASpacing.scale.lg }} />
+                <View style={styles.heroBody}>
+                  <Text
+                    style={[
+                      styles.heroTitle,
+                      {
+                        color: svaColors.text.primary,
+                        textShadowColor: "rgba(0,0,0,0.2)",
+                      },
+                    ]}
+                  >
+                    Welcome to your sanctuary.
+                  </Text>
 
-      <NimbusButton
-        label={loading ? "Signing in..." : "Sign in"}
-        onPress={submit}
-        disabled={loading}
-        textStyle={SVATypography.textStyle.button}
-        style={{ height: SVASpacing.component.buttonHeight }}
-      />
+                  <Text
+                    style={[
+                      styles.heroSubtitle,
+                      { color: svaColors.text.secondary },
+                    ]}
+                  >
+                    Deep Health & Burnout Prevention AI
+                  </Text>
 
-      <View style={{ marginTop: SVASpacing.scale.xl }} />
+                  <View
+                    style={[
+                      styles.formShell,
+                      {
+                        backgroundColor: svaColors.surface.raised,
+                        borderColor: svaColors.border.default,
+                        shadowColor: svaColors.shadow.default,
+                      },
+                    ]}
+                  >
+                    <SvaAuthInput
+                      ref={memberIdRef}
+                      label="MEMBER ID"
+                      placeholder="Enter your unique ID"
+                      value={memberId}
+                      onChangeText={setMemberId}
+                      autoCapitalize="none"
+                      returnKeyType="next"
+                      onSubmitEditing={() => accessCodeRef.current?.focus()}
+                      editable={!loading}
+                      containerStyle={styles.inputBlock}
+                      inputStyle={styles.inputText}
+                      labelStyle={styles.inputLabel}
+                    />
 
-      <Pressable onPress={() => router.push("/(public)/register")}>
-        <Text style={styles.footerText}>
-          Don’t have an account?{" "}
-          <Text style={styles.footerStrong}>Create one</Text>
-        </Text>
-      </Pressable>
-    </ScreenView>
+                    <View style={styles.inputGap} />
+
+                    <SvaAuthInput
+                      ref={accessCodeRef}
+                      label="ACCESS CODE"
+                      preset="password"
+                      showPasswordToggle
+                      placeholder="••••••••"
+                      value={accessCode}
+                      onChangeText={setAccessCode}
+                      autoCapitalize="none"
+                      returnKeyType="done"
+                      onSubmitEditing={submit}
+                      editable={!loading}
+                      containerStyle={styles.inputBlock}
+                      inputStyle={styles.inputText}
+                      labelStyle={styles.inputLabel}
+                    />
+
+                    <View style={styles.buttonStack}>
+                      <SvaAuthButton
+                        label={loading ? "Entering Sanctuary..." : "Enter Sanctuary"}
+                        onPress={submit}
+                        loading={loading}
+                        style={styles.primaryButton}
+                        rightIcon={
+                          <Ionicons
+                            name="arrow-forward"
+                            size={18}
+                            color={svaComponents?.button.primary.text ?? svaColors.text.inverse}
+                          />
+                        }
+                      />
+
+                      <View style={styles.secondaryButtonGap} />
+
+                      <SvaAuthButton
+                        label="Register for Sanctuary"
+                        onPress={() => router.push(ROUTES.PUBLIC.REGISTER)}
+                        variant="secondary"
+                        disabled={loading}
+                        style={styles.secondaryButton}
+                        leftIcon={
+                          <Ionicons
+                            name="person-add-outline"
+                            size={18}
+                            color={svaColors.text.primary}
+                          />
+                        }
+                      />
+                    </View>
+                  </View>
+
+                  <SvaAuthTextAction
+                    onPress={() => router.push(ROUTES.PUBLIC.FORGOT_PASSWORD)}
+                    variant="muted"
+                    style={styles.forgotAccess}
+                    hitSlop={10}
+                    secondaryContent={
+                      <View style={styles.forgotAccessDecor}>
+                        <View
+                          style={[
+                            styles.forgotAccessLine,
+                            { backgroundColor: svaColors.border.default },
+                          ]}
+                        />
+                        <View
+                          style={[
+                            styles.forgotAccessDot,
+                            { backgroundColor: svaColors.border.default },
+                          ]}
+                        />
+                        <View
+                          style={[
+                            styles.forgotAccessLine,
+                            { backgroundColor: svaColors.border.default },
+                          ]}
+                        />
+                      </View>
+                    }
+                  >
+                    Lost Access
+                  </SvaAuthTextAction>
+                </View>
+              </View>
+            </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </View>
   );
 }
 
-const styling = (c: NimbusColorSet) =>
-  StyleSheet.create({
-    row: {
-      flexDirection: "row",
+function createStyles(
+  svaColors: any,
+  svaComponents: any,
+  topInset: number,
+  bottomInset: number
+) {
+  const styles = StyleSheet.create({
+    flex: {
+      flex: 1,
+    },
+    screen: {
+      flex: 1,
+    },
+    scrollContent: {
+      flexGrow: 1,
+    },
+    content: {
+      flex: 1,
+      width: "100%",
+      maxWidth: "100%",
+      alignSelf: "center",
+      paddingTop: topInset,
+      paddingBottom: bottomInset,
+      paddingHorizontal: 0,
+      justifyContent: "flex-start",
+    },
+    cardShell: {
+      width: "100%",
+      flex: 1,
+    },
+    outerCard: {
+      borderRadius: 0,
+      borderWidth: 0,
+      flex: 1,
+      overflow: "hidden",
+    },
+    brandStrip: {
+      height: 66,
       alignItems: "center",
-      justifyContent: "space-between",
+      justifyContent: "center",
+      borderBottomWidth: StyleSheet.hairlineWidth,
     },
-    rememberText: {
-      ...SVATypography.textStyle.subtitle,
-      fontSize: 14,
-      color: c.text.primary,
-      fontWeight: "600",
+    brandWordmark: {
+      ...SVATypography.textStyle.brandWordmark,
     },
-    link: {
-      ...SVATypography.textStyle.button,
-      fontSize: 14,
-      color: c.brand.primary,
+    heroBody: {
+      flex: 1,
+      paddingHorizontal: 16,
+      paddingTop: 40,
+      paddingBottom: 20,
+      alignItems: "center",
     },
-    footerText: {
-      ...SVATypography.textStyle.body,
-      color: c.text.secondary,
+    heroTitle: {
+      ...SVATypography.textStyle.authTitle,
       textAlign: "center",
     },
-    footerStrong: {
-      ...SVATypography.textStyle.button,
-      color: c.text.primary,
+    heroSubtitle: {
+      ...SVATypography.textStyle.authSubtitle,
+      marginTop: 8,
+      textAlign: "center",
+    },
+    formShell: {
+      width: "100%",
+      marginTop: 32,
+      borderRadius: 26,
+      borderWidth: StyleSheet.hairlineWidth,
+      paddingHorizontal: 20,
+      paddingTop: 24,
+      paddingBottom: 18,
+      shadowOpacity: 0.12,
+      shadowRadius: 18,
+      shadowOffset: { width: 0, height: 10 },
+      elevation: 2,
+    },
+    inputBlock: {
+      width: "100%",
+    },
+    inputLabel: {
+      color: svaColors.text.secondary,
+    },
+    inputText: {
+      color: svaColors.text.primary,
+    },
+    inputGap: {
+      height: 18,
+    },
+    buttonStack: {
+      marginTop: 24,
+    },
+    primaryButton: {
+      width: "100%",
+      minHeight: 56,
+      borderRadius: svaComponents?.button?.primary?.borderRadius ?? 16,
+    },
+    secondaryButtonGap: {
+      height: 12,
+    },
+    secondaryButton: {
+      width: "100%",
+      minHeight: 52,
+      borderRadius: 15,
+    },
+    forgotAccess: {
+      marginTop: "auto",
+      paddingTop: 24,
+    },
+    forgotAccessDecor: {
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    forgotAccessLine: {
+      width: 38,
+      height: 1,
+      opacity: 0.14,
+    },
+    forgotAccessDot: {
+      width: 3,
+      height: 3,
+      borderRadius: 1.5,
+      marginHorizontal: 14,
+      opacity: 0.14,
     },
   });
+
+  return styles;
+}

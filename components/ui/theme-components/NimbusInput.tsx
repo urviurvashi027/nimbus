@@ -36,7 +36,7 @@ export function NimbusInput({
   labelStyle,
   ...props
 }: NimbusInputProps) {
-  const { newTheme, nimbusColors } = useContext(ThemeContext);
+  const { newTheme, svaColors } = useContext(ThemeContext);
   const [focused, setFocused] = useState(false);
   const [showPwd, setShowPwd] = useState(false);
 
@@ -63,13 +63,13 @@ export function NimbusInput({
       : undefined;
 
   const borderColor = focused
-    ? nimbusColors.focus.color || newTheme.focus || nimbusColors.brand.primary || newTheme.accent
-    : nimbusColors.border.default || newTheme.border;
+    ? svaColors.focus.color || newTheme.focus || svaColors.brand.primary || newTheme.accent
+    : svaColors.border.default || newTheme.border;
 
   return (
     <View style={containerStyle}>
       {!!label && (
-        <Text style={[s.label, { color: nimbusColors.text.secondary || newTheme.textSecondary }, labelStyle]}>
+        <Text style={[s.label, { color: svaColors.text.secondary || newTheme.textSecondary }, labelStyle]}>
           {label}
         </Text>
       )}
@@ -78,7 +78,7 @@ export function NimbusInput({
         style={[
           s.wrap,
           {
-            backgroundColor: nimbusColors.surface.base || newTheme.surface,
+            backgroundColor: svaColors.surface.base || newTheme.surface,
             borderColor,
           },
         ]}
@@ -89,15 +89,15 @@ export function NimbusInput({
             <Ionicons
               name={leftIcon as any}
               size={18}
-              color={nimbusColors.text.secondary || newTheme.textSecondary}
+              color={svaColors.text.secondary || newTheme.textSecondary}
             />
           </View>
         )}
 
         <TextInput
           {...props}
-          style={[s.input, { color: nimbusColors.text.primary || newTheme.textPrimary }, inputStyle]}
-          placeholderTextColor={nimbusColors.text.disabled || newTheme.textSecondary}
+          style={[s.input, { color: svaColors.text.primary || newTheme.textPrimary }, inputStyle]}
+          placeholderTextColor={svaColors.text.disabled || newTheme.textSecondary}
           keyboardType={keyboardType}
           autoCapitalize={autoCapitalize}
           secureTextEntry={secureTextEntry}
@@ -121,7 +121,7 @@ export function NimbusInput({
             <Ionicons
               name={showPwd ? "eye-off-outline" : "eye-outline"}
               size={18}
-              color={nimbusColors.text.secondary || newTheme.textSecondary}
+              color={svaColors.text.secondary || newTheme.textSecondary}
             />
           </Pressable>
         )}

@@ -44,11 +44,11 @@ const AppHeader: React.FC<AppHeaderProps> = ({
   subtitleStyle,
   containerStyle,
 }) => {
-  const { newTheme, nimbusColors, spacing, typography } = useContext(ThemeContext);
+  const { newTheme, svaColors, spacing, typography } = useContext(ThemeContext);
 
   const styles = useMemo(
-    () => styling(newTheme, nimbusColors, spacing, typography),
-    [newTheme, nimbusColors, spacing, typography]
+    () => styling(newTheme, svaColors, spacing, typography),
+    [newTheme, svaColors, spacing, typography]
   );
 
   const actions = rightActions.length
@@ -72,7 +72,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
               <Ionicons
                 name="chevron-back"
                 size={22}
-                color={nimbusColors.text.secondary || newTheme.textSecondary}
+                color={svaColors.text.secondary || newTheme.textSecondary}
               />
             </TouchableOpacity>
           )}

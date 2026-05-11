@@ -1,4 +1,4 @@
-export type ThemeName = "dark" | "light" | "nimbus";
+export type ThemeName = "dark" | "light" | "sva";
 
 /**
  * @interface FontSet
@@ -86,6 +86,16 @@ export interface TypographyTokens {
     heading2: FontSet;
     title: FontSet;
     subtitle: FontSet;
+    authTitle: FontSet;
+    authSubtitle: FontSet;
+    authBody: FontSet;
+    authFootnote: FontSet;
+    brandWordmark: FontSet;
+    authLabel: FontSet;
+    authLabelStrong: FontSet;
+    authTinyLabel: FontSet;
+    authActionLabel: FontSet;
+    authMonoLabel: FontSet;
     body: FontSet;
     bodyMedium: FontSet;
     caption: FontSet;
@@ -111,10 +121,10 @@ export interface Spacing {
 }
 
 /**
- * @type NimbusTokens
+ * @type SvaTokens
  * @description Design tokens for various UI elements.
  */
-export type NimbusTokens = {
+export type SvaTokens = {
   radius: { input: number; button: number; card: number; chip: number };
   size: {
     inputHeight: number;
@@ -201,12 +211,12 @@ export interface ColorSet {
   disabled: string;
 }
 
-//---------------------------------------------------------// New Nimbus Color Set Structure for Enhanced Scalability and Flexibility
+//---------------------------------------------------------// Nested SVA color set structure
 /**
- * @interface NimbusColorSet
+ * @interface SvaColorSet
  * @description The new scalable, nested color set structure.
  */
-export interface NimbusColorSet {
+export interface SvaColorSet {
   bg: {
     base: string;
     subtle: string;
@@ -266,6 +276,22 @@ export interface NimbusColorSet {
     pressed: string;
     hover: string;
     selected: string;
+  };
+  chart: {
+    lime: string;
+    blue: string;
+    amber: string;
+    rose: string;
+    seafoam: string;
+    lavender: string;
+    grid: string;
+    areaFade: string;
+  };
+  gradient: {
+    accent: string;
+    lime: string;
+    blue: string;
+    amber: string;
   };
 }
 
@@ -413,24 +439,11 @@ export interface ComponentTokens {
 export type AppTheme = {
   name: ThemeName;
   colors: ColorSet;
-  nimbusColors?: NimbusColorSet; // Add the new colors as optional for gradual migration
+  svaColors?: SvaColorSet;
+  svaTypography?: TypographyTokens;
+  svaSpacing?: SpacingTokens;
+  svaComponents?: ComponentTokens;
   spacing: Spacing;
   typography: Typography;
-  nimbusTypography?: TypographyTokens;
-  nimbusSpacing?: SpacingTokens;
-  nimbusComponents?: ComponentTokens;
-  tokens: NimbusTokens;
+  tokens: SvaTokens;
 };
-
-/**
- * @interface ThemeColors
- * @description A collection of all available color themes and global configurations.
- * Used primarily in the theme context or palette definitions.
- */
-export interface ThemeColors {
-  light: ColorSet;
-  dark: ColorSet;
-  typography: Typography;
-  spacing: Spacing;
-  tokens: NimbusTokens;
-}

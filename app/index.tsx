@@ -3,12 +3,13 @@ import React, { useEffect, useState } from "react";
 import { Redirect } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { StoreKey } from "@/constants/Constant";
+import { ROUTES } from "@/constants/routes";
 
 const TOKEN_KEY = StoreKey.TOKEN_KEY;
 const ONBOARDING_DONE_KEY = StoreKey.ONBOARDING_DONE_KEY;
 
 type Href =
-  | "/(public)/landing"
+  | typeof ROUTES.PUBLIC.LANDING
   | "/(auth)/onboarding/questions"
   | "/(auth)/(tabs)";
 
@@ -21,7 +22,7 @@ export default function Index() {
 
       // ✅ No token => always show Landing first
       if (!token) {
-        setHref("/(public)/landing");
+        setHref(ROUTES.PUBLIC.LANDING);
         return;
       }
 
