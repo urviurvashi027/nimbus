@@ -1,6 +1,6 @@
-import type { NimbusColorSet } from "../types";
+import type { SvaColorSet } from "../types";
 
-export const svaColors: NimbusColorSet = {
+export const svaColors: SvaColorSet = {
   bg: {
     base: "#1C1E1A",
     subtle: "#23261F",
@@ -83,5 +83,3 @@ export const svaColors: NimbusColorSet = {
     amber: "#F6C889",
   },
 };
-
-export const nimbusColors = svaColors; // Compatibility alias for the old namespace

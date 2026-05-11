@@ -15,7 +15,7 @@ import ThemeContext from "@/contexts/ThemeContext";
 import { SVATypography } from "@/theme/typography";
 import { tokens } from "@/theme/tokens";
 
-export function NimbusAuthLayout({
+export function SvaAuthLayout({
   step,
   total,
   onBack,

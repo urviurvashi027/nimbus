@@ -16,7 +16,7 @@ import type {
   ColorSet,
   Spacing,
   Typography,
-  NimbusTokens,
+  SvaTokens,
   SvaColorSet,
   TypographyTokens,
   SpacingTokens,
@@ -35,11 +35,7 @@ interface ThemeContextData {
   svaTypography?: TypographyTokens;
   svaSpacing?: SpacingTokens;
   svaComponents?: ComponentTokens;
-  nimbusColors: SvaColorSet;
-  nimbusTypography?: TypographyTokens;
-  nimbusSpacing?: SpacingTokens;
-  nimbusComponents?: ComponentTokens;
-  tokens: NimbusTokens;
+  tokens: SvaTokens;
   activeTheme: AppTheme; // Allow access to full theme object if needed
 }
 
@@ -49,10 +45,6 @@ const defaultTheme = getTheme("dark");
 const normalizeThemeName = (value: string | null): ThemeName | null => {
   if (value === "dark" || value === "light" || value === "sva") {
     return value;
-  }
-
-  if (value === "nimbus") {
-    return "sva";
   }
 
   return null;
@@ -70,10 +62,6 @@ const ThemeContext = createContext<ThemeContextData>({
   svaTypography: defaultTheme.svaTypography,
   svaSpacing: defaultTheme.svaSpacing,
   svaComponents: defaultTheme.svaComponents,
-  nimbusColors: defaultTheme.nimbusColors ?? defaultSvaColors,
-  nimbusTypography: defaultTheme.nimbusTypography ?? defaultTheme.svaTypography,
-  nimbusSpacing: defaultTheme.nimbusSpacing ?? defaultTheme.svaSpacing,
-  nimbusComponents: defaultTheme.nimbusComponents ?? defaultTheme.svaComponents,
   tokens: defaultTheme.tokens,
   activeTheme: defaultTheme,
 });
@@ -140,22 +128,12 @@ export const ThemeProvider: FC<ThemeProviderProps> = ({ children }) => {
     toggleTheme,
     useSystemTheme,
     newTheme: activeTheme.colors,
-    svaColors:
-      activeTheme.svaColors ||
-      activeTheme.nimbusColors ||
-      defaultSvaColors,
+    svaColors: activeTheme.svaColors ?? defaultSvaColors,
     spacing: activeTheme.spacing,
     typography: activeTheme.typography,
-    svaTypography: activeTheme.svaTypography || activeTheme.nimbusTypography,
-    svaSpacing: activeTheme.svaSpacing || activeTheme.nimbusSpacing,
-    svaComponents: activeTheme.svaComponents || activeTheme.nimbusComponents,
-    nimbusColors:
-      activeTheme.nimbusColors ||
-      activeTheme.svaColors ||
-      defaultSvaColors,
-    nimbusTypography: activeTheme.nimbusTypography,
-    nimbusSpacing: activeTheme.nimbusSpacing,
-    nimbusComponents: activeTheme.nimbusComponents,
+    svaTypography: activeTheme.svaTypography,
+    svaSpacing: activeTheme.svaSpacing,
+    svaComponents: activeTheme.svaComponents,
     tokens: activeTheme.tokens,
     activeTheme,
   };

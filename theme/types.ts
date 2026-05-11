@@ -111,10 +111,10 @@ export interface Spacing {
 }
 
 /**
- * @type NimbusTokens
+ * @type SvaTokens
  * @description Design tokens for various UI elements.
  */
-export type NimbusTokens = {
+export type SvaTokens = {
   radius: { input: number; button: number; card: number; chip: number };
   size: {
     inputHeight: number;
@@ -201,12 +201,12 @@ export interface ColorSet {
   disabled: string;
 }
 
-//---------------------------------------------------------// New Nimbus Color Set Structure for Enhanced Scalability and Flexibility
+//---------------------------------------------------------// Nested SVA color set structure
 /**
- * @interface NimbusColorSet
+ * @interface SvaColorSet
  * @description The new scalable, nested color set structure.
  */
-export interface NimbusColorSet {
+export interface SvaColorSet {
   bg: {
     base: string;
     subtle: string;
@@ -284,8 +284,6 @@ export interface NimbusColorSet {
     amber: string;
   };
 }
-
-export type SvaColorSet = NimbusColorSet;
 
 //---------------------------------------------------------// Complete Theme Interface Combining Both Color Structures for Backward Compatibility and Future-Proofing
 export interface SpacingTokens {
@@ -435,11 +433,7 @@ export type AppTheme = {
   svaTypography?: TypographyTokens;
   svaSpacing?: SpacingTokens;
   svaComponents?: ComponentTokens;
-  nimbusColors?: NimbusColorSet; // Compatibility alias for the old namespace
   spacing: Spacing;
   typography: Typography;
-  nimbusTypography?: TypographyTokens; // Compatibility alias for the old namespace
-  nimbusSpacing?: SpacingTokens; // Compatibility alias for the old namespace
-  nimbusComponents?: ComponentTokens; // Compatibility alias for the old namespace
-  tokens: NimbusTokens;
+  tokens: SvaTokens;
 };

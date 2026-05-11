@@ -127,10 +127,6 @@ const themes: Record<ThemeName, AppTheme> = {
     svaTypography: SVATypography,
     svaSpacing: SVASpacing,
     svaComponents: SVAComponents,
-    nimbusColors: svaColors,
-    nimbusTypography: SVATypography,
-    nimbusSpacing: SVASpacing,
-    nimbusComponents: SVAComponents,
     tokens,
   },
   light: {
@@ -142,10 +138,6 @@ const themes: Record<ThemeName, AppTheme> = {
     svaTypography: SVATypography,
     svaSpacing: SVASpacing,
     svaComponents: SVAComponents,
-    nimbusColors: svaColors,
-    nimbusTypography: SVATypography,
-    nimbusSpacing: SVASpacing,
-    nimbusComponents: SVAComponents,
     tokens,
   },
   sva: {
@@ -157,10 +149,6 @@ const themes: Record<ThemeName, AppTheme> = {
     svaTypography: SVATypography,
     svaSpacing: SVASpacing,
     svaComponents: SVAComponents,
-    nimbusColors: svaColors,
-    nimbusTypography: SVATypography,
-    nimbusSpacing: SVASpacing,
-    nimbusComponents: SVAComponents,
     tokens,
   },
 };

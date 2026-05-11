@@ -181,10 +181,9 @@ const s = StyleSheet.create({
     width: "100%",
   },
   title: {
-    ...SVATypography.textStyle.displayMedium,
-    fontFamily: "CormorantGaramond_500Medium",
+    fontFamily: SVATypography.fontFamily.display,
     fontSize: 31,
-    fontWeight: "500",
+    fontWeight: SVATypography.fontWeight.medium,
     lineHeight: 34,
     letterSpacing: -0.35,
   },

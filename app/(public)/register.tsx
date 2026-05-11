@@ -21,7 +21,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { ROUTES } from "@/constants/routes";
 import { getOtp, verifyOtp } from "@/features/auth/services/loginService";
 import { useNimbusToast } from "@/components/ui/toast/useNimbusToast";
-import { NimbusAuthLayout } from "@/features/auth/components/NimbusAuthLayout";
+import { SvaAuthLayout } from "@/features/auth/components/SvaAuthLayout";
 import { SvaAuthInput } from "@/features/auth/components/SvaAuthInput";
 import { SvaAuthButton } from "@/features/auth/components/SvaAuthButton";
 import { SvaOtpCodeInput } from "@/features/auth/components/SvaOtpCodeInput";
@@ -108,8 +108,6 @@ export default function RegistrationScreen() {
 
 function RegistrationFlowInner() {
   const { svaColors, svaComponents } = useContext(ThemeContext);
-  const nimbusColors = svaColors;
-  const nimbusComponents = svaComponents;
   const { onRegister } = useAuth();
   const toast = useNimbusToast();
 
@@ -406,14 +404,14 @@ function RegistrationFlowInner() {
   );
 
   return (
-    <NimbusAuthLayout step={step} total={TOTAL_STEPS} onBack={prev}>
+    <SvaAuthLayout step={step} total={TOTAL_STEPS} onBack={prev}>
       {step === 1 && (
         <View>
           <Text
             style={[
               styles.title,
               {
-                color: nimbusColors.text.primary,
+                color: svaColors.text.primary,
                 textShadowColor: "rgba(0,0,0,0.2)",
               },
             ]}
@@ -421,7 +419,7 @@ function RegistrationFlowInner() {
             Welcome Home.
           </Text>
 
-          <Text style={[styles.subtitle, { color: nimbusColors.text.secondary }]}>
+          <Text style={[styles.subtitle, { color: svaColors.text.secondary }]}>
             Let&apos;s begin your journey into the Sanctuary.
           </Text>
 
@@ -490,8 +488,8 @@ function RegistrationFlowInner() {
                 name="arrow-forward"
                 size={18}
                 color={
-                  nimbusComponents?.button.primary.text ??
-                  nimbusColors.text.inverse
+                  svaComponents?.button.primary.text ??
+                  svaColors.text.inverse
                 }
               />
             }
@@ -507,7 +505,7 @@ function RegistrationFlowInner() {
             style={[
               styles.title,
               {
-                color: nimbusColors.text.primary,
+                color: svaColors.text.primary,
                 textShadowColor: "rgba(0,0,0,0.2)",
               },
             ]}
@@ -515,7 +513,7 @@ function RegistrationFlowInner() {
             Almost There.
           </Text>
 
-          <Text style={[styles.subtitle, { color: nimbusColors.text.secondary }]}>
+          <Text style={[styles.subtitle, { color: svaColors.text.secondary }]}>
             Securely link your clinical identity.
           </Text>
 
@@ -561,7 +559,7 @@ function RegistrationFlowInner() {
           </View>
 
           {errMsg ? (
-            <Text style={[styles.errorText, { color: nimbusColors.state.error }]}>
+            <Text style={[styles.errorText, { color: svaColors.state.error }]}>
               {errMsg}
             </Text>
           ) : null}
@@ -571,7 +569,7 @@ function RegistrationFlowInner() {
               <Ionicons
                 name="shield-checkmark"
                 size={18}
-                color={nimbusColors.brand.primary}
+                color={svaColors.brand.primary}
               />
             </View>
 
@@ -579,7 +577,7 @@ function RegistrationFlowInner() {
               <Text
                 style={[
                   styles.infoTitle,
-                  { color: nimbusColors.text.primary },
+                  { color: svaColors.text.primary },
                 ]}
               >
                 Secure Verification
@@ -587,7 +585,7 @@ function RegistrationFlowInner() {
               <Text
                 style={[
                   styles.infoBody,
-                  { color: nimbusColors.text.secondary },
+                  { color: svaColors.text.secondary },
                 ]}
               >
                 By providing your number, you agree to receive a one-time
@@ -616,8 +614,8 @@ function RegistrationFlowInner() {
                 name="arrow-forward"
                 size={18}
                 color={
-                  nimbusComponents?.button.primary.text ??
-                  nimbusColors.text.inverse
+                  svaComponents?.button.primary.text ??
+                  svaColors.text.inverse
                 }
               />
             }
@@ -633,7 +631,7 @@ function RegistrationFlowInner() {
             style={[
               styles.title,
               {
-                color: nimbusColors.text.primary,
+                color: svaColors.text.primary,
                 textShadowColor: "rgba(0,0,0,0.2)",
               },
             ]}
@@ -641,7 +639,7 @@ function RegistrationFlowInner() {
             Verify Identity.
           </Text>
 
-          <Text style={[styles.subtitle, { color: nimbusColors.text.secondary }]}>
+          <Text style={[styles.subtitle, { color: svaColors.text.secondary }]}>
             Enter the secure code sent to your device.
           </Text>
 
@@ -649,7 +647,7 @@ function RegistrationFlowInner() {
             <Text
               style={[
                 styles.destinationLabel,
-                { color: nimbusColors.text.secondary },
+                { color: svaColors.text.secondary },
               ]}
             >
               Sent to
@@ -657,7 +655,7 @@ function RegistrationFlowInner() {
             <Text
               style={[
                 styles.destinationValue,
-                { color: nimbusColors.text.primary },
+                { color: svaColors.text.primary },
               ]}
             >
               {otpCopiedDestination || otpRecipient || "your mobile number"}
@@ -672,7 +670,7 @@ function RegistrationFlowInner() {
               <Text
                 style={[
                   styles.destinationAction,
-                  { color: nimbusColors.brand.primary },
+                  { color: svaColors.brand.primary },
                 ]}
               >
                 Edit Number
@@ -685,7 +683,7 @@ function RegistrationFlowInner() {
           </View>
 
           {errMsg ? (
-            <Text style={[styles.errorText, { color: nimbusColors.state.error }]}>
+            <Text style={[styles.errorText, { color: svaColors.state.error }]}>
               {errMsg}
             </Text>
           ) : null}
@@ -703,8 +701,8 @@ function RegistrationFlowInner() {
                 name="arrow-forward"
                 size={18}
                 color={
-                  nimbusComponents?.button.primary.text ??
-                  nimbusColors.text.inverse
+                  svaComponents?.button.primary.text ??
+                  svaColors.text.inverse
                 }
               />
             }
@@ -713,7 +711,7 @@ function RegistrationFlowInner() {
           <View style={styles.resendRow}>
             {otpTimer > 0 ? (
               <Text
-                style={[styles.resendText, { color: nimbusColors.text.disabled }]}
+                style={[styles.resendText, { color: svaColors.text.disabled }]}
               >
                 RESEND CODE IN {String(Math.floor(otpTimer / 60)).padStart(2, "0")}:
                 {String(otpTimer % 60).padStart(2, "0")}
@@ -727,7 +725,7 @@ function RegistrationFlowInner() {
                 <Text
                   style={[
                     styles.resendAction,
-                    { color: nimbusColors.brand.primary },
+                    { color: svaColors.brand.primary },
                   ]}
                 >
                   {otpSending ? "SENDING..." : "RESEND CODE"}
@@ -743,7 +741,7 @@ function RegistrationFlowInner() {
               <Ionicons
                 name="shield-checkmark"
                 size={18}
-                color={nimbusColors.brand.primary}
+                color={svaColors.brand.primary}
               />
             </View>
 
@@ -751,7 +749,7 @@ function RegistrationFlowInner() {
               <Text
                 style={[
                   styles.infoTitle,
-                  { color: nimbusColors.text.primary },
+                  { color: svaColors.text.primary },
                 ]}
               >
                 Secure Verification
@@ -759,7 +757,7 @@ function RegistrationFlowInner() {
               <Text
                 style={[
                   styles.infoBody,
-                  { color: nimbusColors.text.secondary },
+                  { color: svaColors.text.secondary },
                 ]}
               >
                 SVA uses military-grade encryption to ensure your health data
@@ -776,7 +774,7 @@ function RegistrationFlowInner() {
             style={[
               styles.title,
               {
-                color: nimbusColors.text.primary,
+                color: svaColors.text.primary,
                 textShadowColor: "rgba(0,0,0,0.2)",
               },
             ]}
@@ -784,7 +782,7 @@ function RegistrationFlowInner() {
             Secure your Sanctuary.
           </Text>
 
-          <Text style={[styles.subtitle, { color: nimbusColors.text.secondary }]}>
+          <Text style={[styles.subtitle, { color: svaColors.text.secondary }]}>
             Use a strong password you can remember.
           </Text>
 
@@ -811,8 +809,8 @@ function RegistrationFlowInner() {
                     size={18}
                     color={
                       showPasswordTooltip
-                        ? nimbusColors.brand.primary
-                        : nimbusColors.text.secondary
+                        ? svaColors.brand.primary
+                        : svaColors.text.secondary
                     }
                   />
                 </Pressable>
@@ -838,16 +836,16 @@ function RegistrationFlowInner() {
                 style={[
                   styles.passwordTooltip,
                   {
-                    backgroundColor: nimbusColors.surface.raised,
-                    borderColor: nimbusColors.border.default,
-                    shadowColor: nimbusColors.shadow.default,
+                    backgroundColor: svaColors.surface.raised,
+                    borderColor: svaColors.border.default,
+                    shadowColor: svaColors.shadow.default,
                   },
                 ]}
               >
                 <Text
                   style={[
                     styles.passwordTooltipTitle,
-                    { color: nimbusColors.text.primary },
+                    { color: svaColors.text.primary },
                   ]}
                 >
                   Password requirements
@@ -859,13 +857,13 @@ function RegistrationFlowInner() {
                       <View
                         style={[
                           styles.passwordTooltipDot,
-                          { backgroundColor: nimbusColors.brand.primary },
+                          { backgroundColor: svaColors.brand.primary },
                         ]}
                       />
                       <Text
                         style={[
                           styles.passwordTooltipText,
-                          { color: nimbusColors.text.secondary },
+                          { color: svaColors.text.secondary },
                         ]}
                       >
                         {item}
@@ -899,7 +897,7 @@ function RegistrationFlowInner() {
 
             {errMsg ? (
               <Text
-                style={[styles.errorText, { color: nimbusColors.state.error }]}
+                style={[styles.errorText, { color: svaColors.state.error }]}
               >
                 {errMsg}
               </Text>
@@ -911,7 +909,7 @@ function RegistrationFlowInner() {
                   <Text
                     style={[
                       styles.strengthLabel,
-                      { color: nimbusColors.text.secondary },
+                      { color: svaColors.text.secondary },
                     ]}
                   >
                     STRENGTH
@@ -919,7 +917,7 @@ function RegistrationFlowInner() {
                   <Text
                     style={[
                       styles.strengthValue,
-                      { color: nimbusColors.brand.primary },
+                      { color: svaColors.brand.primary },
                     ]}
                   >
                     {passwordStrength.label}
@@ -930,8 +928,8 @@ function RegistrationFlowInner() {
                   style={[
                     styles.strengthTrack,
                     {
-                      backgroundColor: nimbusColors.surface.base,
-                      borderColor: nimbusColors.border.muted,
+                      backgroundColor: svaColors.surface.base,
+                      borderColor: svaColors.border.muted,
                     },
                   ]}
                 >
@@ -959,8 +957,8 @@ function RegistrationFlowInner() {
                 name="arrow-forward"
                 size={18}
                 color={
-                  nimbusComponents?.button.primary.text ??
-                  nimbusColors.text.inverse
+                  svaComponents?.button.primary.text ??
+                  svaColors.text.inverse
                 }
               />
             }
@@ -972,20 +970,16 @@ function RegistrationFlowInner() {
           )}
         </View>
       )}
-    </NimbusAuthLayout>
+    </SvaAuthLayout>
   );
 }
 
 function createStyles(svaColors: any, svaComponents: any) {
-  const nimbusColors = svaColors;
-  const nimbusComponents = svaComponents;
-
   return StyleSheet.create({
     title: {
-      ...SVATypography.textStyle.displayMedium,
-      fontFamily: "CormorantGaramond_500Medium",
+      fontFamily: SVATypography.fontFamily.display,
       fontSize: 31,
-      fontWeight: "500",
+      fontWeight: SVATypography.fontWeight.medium,
       lineHeight: 34,
       letterSpacing: -0.35,
     },
@@ -1024,7 +1018,7 @@ function createStyles(svaColors: any, svaComponents: any) {
     primaryButton: {
       width: "100%",
       minHeight: 56,
-      borderRadius: nimbusComponents?.button?.primary?.borderRadius ?? 16,
+      borderRadius: svaComponents?.button?.primary?.borderRadius ?? 16,
     },
     primaryButtonText: {
       ...SVATypography.textStyle.button,
@@ -1089,8 +1083,8 @@ function createStyles(svaColors: any, svaComponents: any) {
       marginTop: 20,
       borderRadius: 20,
       borderWidth: StyleSheet.hairlineWidth,
-      borderColor: nimbusColors.border.default,
-      backgroundColor: nimbusColors.surface.raised,
+      borderColor: svaColors.border.default,
+      backgroundColor: svaColors.surface.raised,
       flexDirection: "row",
       alignItems: "flex-start",
       padding: 16,
@@ -1102,9 +1096,9 @@ function createStyles(svaColors: any, svaComponents: any) {
       borderRadius: 10,
       alignItems: "center",
       justifyContent: "center",
-      backgroundColor: nimbusColors.surface.base,
+      backgroundColor: svaColors.surface.base,
       borderWidth: StyleSheet.hairlineWidth,
-      borderColor: nimbusColors.border.muted,
+      borderColor: svaColors.border.muted,
     },
     infoCopy: {
       flex: 1,
@@ -1202,7 +1196,7 @@ function createStyles(svaColors: any, svaComponents: any) {
     strengthFill: {
       height: "100%",
       borderRadius: 999,
-      backgroundColor: nimbusColors.brand.primary,
+      backgroundColor: svaColors.brand.primary,
     },
     stepFooter: {
       marginTop: 18,
@@ -1215,7 +1209,7 @@ function createStyles(svaColors: any, svaComponents: any) {
       fontSize: 11,
       lineHeight: 16,
       letterSpacing: 2.6,
-      color: nimbusColors.text.disabled,
+      color: svaColors.text.disabled,
       textTransform: "uppercase",
     },
     stepNote: {
@@ -1223,7 +1217,7 @@ function createStyles(svaColors: any, svaComponents: any) {
       fontFamily: "Inter_400Regular",
       fontSize: 11,
       lineHeight: 18,
-      color: nimbusColors.text.disabled,
+      color: svaColors.text.disabled,
       textAlign: "center",
       maxWidth: 250,
     },

@@ -8,7 +8,7 @@ import { SvaAuthInput } from "../SvaAuthInput";
 
 const theme = getTheme("sva");
 const themeValue = {
-  theme: "nimbus",
+  theme: "sva",
   toggleTheme: jest.fn(),
   useSystemTheme: jest.fn(),
   newTheme: theme.colors,

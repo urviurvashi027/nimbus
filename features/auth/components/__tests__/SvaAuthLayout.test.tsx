@@ -5,11 +5,11 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import ThemeContext from "../../../../contexts/ThemeContext";
 import { getTheme } from "../../../../theme";
-import { NimbusAuthLayout } from "../NimbusAuthLayout";
+import { SvaAuthLayout } from "../SvaAuthLayout";
 
 const theme = getTheme("sva");
 const themeValue = {
-  theme: "nimbus",
+  theme: "sva",
   toggleTheme: jest.fn(),
   useSystemTheme: jest.fn(),
   newTheme: theme.colors,
@@ -38,15 +38,15 @@ function renderLayout(element: React.ReactElement) {
   );
 }
 
-describe("NimbusAuthLayout", () => {
+describe("SvaAuthLayout", () => {
   it("renders the SVA header, progress fill, and invokes back", () => {
     const onBack = jest.fn();
     const tree = renderLayout(
-      <NimbusAuthLayout step={2} total={4} onBack={onBack}>
+      <SvaAuthLayout step={2} total={4} onBack={onBack}>
         <View>
           <Text>Child content</Text>
         </View>
-      </NimbusAuthLayout>
+      </SvaAuthLayout>
     );
 
     expect(
