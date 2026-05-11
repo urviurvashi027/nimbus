@@ -1,4 +1,32 @@
+/* eslint-env jest */
 import 'react-native-gesture-handler/jestSetup';
+
+jest.mock('@react-native-async-storage/async-storage', () =>
+  require('@react-native-async-storage/async-storage/jest/async-storage-mock')
+);
+
+jest.mock('@expo/vector-icons', () => {
+  const React = require('react');
+  const { Text } = require('react-native');
+
+  const MockIcon = ({ name, ...props }) =>
+    React.createElement(Text, props, name ?? "icon");
+
+  return {
+    Ionicons: MockIcon,
+    FontAwesome: MockIcon,
+  };
+});
+
+jest.mock('@expo/vector-icons/FontAwesome', () => {
+  const React = require('react');
+  const { Text } = require('react-native');
+
+  const MockIcon = ({ name, ...props }) =>
+    React.createElement(Text, props, name ?? "icon");
+
+  return MockIcon;
+});
 
 // Mock expo-device
 jest.mock('expo-device', () => ({

@@ -1,0 +1,58 @@
+import React from "react";
+import { TextInput } from "react-native";
+import renderer, { act } from "react-test-renderer";
+
+import ThemeContext from "../../../../contexts/ThemeContext";
+import { getTheme } from "../../../../theme";
+import { SvaOtpCodeInput } from "../SvaOtpCodeInput";
+
+const theme = getTheme("nimbus");
+const themeValue = {
+  theme: "nimbus",
+  toggleTheme: jest.fn(),
+  useSystemTheme: jest.fn(),
+  newTheme: theme.colors,
+  nimbusColors: theme.nimbusColors,
+  spacing: theme.spacing,
+  typography: theme.typography,
+  nimbusTypography: theme.nimbusTypography,
+  nimbusSpacing: theme.nimbusSpacing,
+  nimbusComponents: theme.nimbusComponents,
+  tokens: theme.tokens,
+  activeTheme: theme,
+};
+
+function renderOtp(element: React.ReactElement) {
+  return renderer.create(
+    <ThemeContext.Provider value={themeValue as any}>
+      {element}
+    </ThemeContext.Provider>
+  );
+}
+
+describe("SvaOtpCodeInput", () => {
+  it("renders one input per digit", () => {
+    const tree = renderOtp(
+      <SvaOtpCodeInput value="" onChange={jest.fn()} testID="otp" />
+    );
+
+    expect(tree.root.findAllByType(TextInput)).toHaveLength(6);
+  });
+
+  it("sanitizes pasted values before emitting changes", () => {
+    const onChange = jest.fn();
+    const tree = renderOtp(
+      <SvaOtpCodeInput value="" onChange={onChange} testID="otp" />
+    );
+
+    const firstInput = tree.root.findByProps({
+      testID: "otp-1",
+    }) as any;
+
+    act(() => {
+      firstInput.props.onChangeText("12a3456");
+    });
+
+    expect(onChange).toHaveBeenCalledWith("123456");
+  });
+});

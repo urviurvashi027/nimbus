@@ -1,203 +1,235 @@
 import React, { useContext, useMemo, useState } from "react";
-import { View, Text, StyleSheet, Alert } from "react-native";
-import { router, useLocalSearchParams } from "expo-router";
+import { StyleSheet, Text, View } from "react-native";
+import { router, Stack, useLocalSearchParams } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 
 import ThemeContext from "@/contexts/ThemeContext";
-import { ScreenView } from "@/components/ui/Themed";
-import { NimbusInput } from "@/components/ui/theme-components/NimbusInput";
-import { NimbusButton } from "@/components/ui/theme-components/NimbusButton";
 import { useNimbusAlert } from "@/components/ui/alert/useNimbusAlert";
-import { setPassword as resetPassword } from "@/features/auth/services/loginService";
 import { useNimbusToast } from "@/components/ui/toast/useNimbusToast";
-
-// import { normalizeApiError } from "@/utils/normalizeApiError";
-
-// ✅ Replace with your real service function name
-// import { resetPassword } from "@/features/auth/services/loginService";
+import { setPassword as updatePassword } from "@/features/auth/services/loginService";
+import { SvaAuthButton } from "@/features/auth/components/SvaAuthButton";
+import { SvaAuthInput } from "@/features/auth/components/SvaAuthInput";
+import { SvaRecoveryLayout } from "@/features/auth/components/SvaRecoveryLayout";
+import { SVATypography } from "@/theme/typography";
 
 export default function ResetPasswordScreen() {
-  const { newTheme } = useContext(ThemeContext);
-  const s = useMemo(() => styles(newTheme), [newTheme]);
-  const alert = useNimbusAlert();
+  const { nimbusColors, nimbusComponents } = useContext(ThemeContext);
+  const styles = useMemo(
+    () => createStyles(nimbusColors, nimbusComponents),
+    [nimbusColors, nimbusComponents]
+  );
 
-  const toast = useNimbusToast();
+  const params = useLocalSearchParams<{ email?: string; otp?: string }>();
+  const email = typeof params.email === "string" ? params.email.trim() : "";
+  const otp = typeof params.otp === "string" ? params.otp.trim() : "";
 
-  // expected params from OTP screen
-  const { email, otp } = useLocalSearchParams<{
-    email?: string;
-    otp?: string;
-  }>();
-
-  const [password, setPassword] = useState("");
+  const [password, setPasswordValue] = useState("");
   const [confirm, setConfirm] = useState("");
-
-  const [errMsg, setErrMsg] = useState<string>("");
+  const [errorMsg, setErrorMsg] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const validate = () => {
-    const p = password.trim();
-    const c = confirm.trim();
+  const toast = useNimbusToast();
+  const alert = useNimbusAlert();
 
-    if (!p) return "Please enter a new password.";
-    if (p.length < 8) return "Password must be at least 8 characters.";
-    if (!/[A-Z]/.test(p)) return "Add at least 1 uppercase letter.";
-    if (!/[0-9]/.test(p)) return "Add at least 1 number.";
-    if (!/[^A-Za-z0-9]/.test(p)) return "Add at least 1 special character.";
-    if (!c) return "Please confirm your password.";
-    if (p !== c) return "Passwords don’t match.";
+  const validate = () => {
+    const nextPassword = password.trim();
+    const nextConfirm = confirm.trim();
+
+    if (!nextPassword) return "Please enter a new password.";
+    if (nextPassword.length < 8) return "Password must be at least 8 characters.";
+    if (!/[A-Z]/.test(nextPassword)) return "Add at least 1 uppercase letter.";
+    if (!/[0-9]/.test(nextPassword)) return "Add at least 1 number.";
+    if (!/[^A-Za-z0-9]/.test(nextPassword)) {
+      return "Add at least 1 special character.";
+    }
+    if (!nextConfirm) return "Please confirm your password.";
+    if (nextPassword !== nextConfirm) return "Passwords do not match.";
     if (!email) return "Missing email. Please restart the reset flow.";
-    if (!otp) return "Missing OTP. Please verify again.";
+    if (!otp) return "Missing verification code. Please verify again.";
     return "";
   };
 
   const submit = async () => {
-    const e = validate();
-    if (e) {
-      setErrMsg(e);
+    const validationError = validate();
+    if (validationError) {
+      setErrorMsg(validationError);
       return;
     }
 
     setLoading(true);
-    setErrMsg("");
+    setErrorMsg("");
 
     try {
-      // ✅ match your backend contract here
-      // common patterns:
-      // { email, otp, new_password }
-      // OR { recipient: email, otp, password }
-      const res = await resetPassword({
-        email: String(email).trim(),
-        otp: String(otp).trim(),
+      const result = await updatePassword({
+        email,
+        otp,
         password: password.trim(),
       });
 
-      if (res?.success) {
+      if (result?.success) {
         toast.show({
           variant: "success",
           title: "Password updated",
           message: "You can now sign in with your new password.",
         });
 
-        // send them to sign in
-        router.push("/(public)/sign-in");
+        router.replace("/(public)/sign-in");
         return;
       }
 
-      // backend returns success:false with message/error_code
-      alert.show({
-        variant: "error",
-        title: "Couldn’t update password",
-        message: String(res?.message ?? "Please try again."),
-        primary: { label: "OK" },
-      });
-    } catch (err: any) {
-      //   const apiErr = normalizeApiError(err);
-
-      alert.show({
-        variant: "error",
-        title: "Couldn’t update password",
-        message: err.message,
-        primary: { label: "OK" },
-      });
+        alert.show({
+          variant: "error",
+          title: "Couldn't update password",
+          message: String(result?.message ?? "Please try again."),
+          primary: { label: "OK" },
+        });
+      } catch (error: any) {
+        alert.show({
+          variant: "error",
+          title: "Couldn't update password",
+          message: error?.message ?? "Please try again.",
+          primary: { label: "OK" },
+        });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <ScreenView style={s.container} bgColor={newTheme.background}>
-      <View style={s.header}>
-        <Text style={s.title}>Set new password</Text>
-        <Text style={s.subtitle}>
-          Choose a strong password you’ll remember. You can always change it
-          later in settings.
-        </Text>
-      </View>
+    <>
+      <Stack.Screen options={{ headerShown: false }} />
 
-      <NimbusInput
-        label="New password"
-        preset="password"
-        enablePasswordToggle
-        value={password}
-        onChangeText={(v) => {
-          setPassword(v);
-          if (errMsg) setErrMsg("");
-        }}
-        placeholder="••••••••"
-        autoCapitalize="none"
-        autoCorrect={false}
-      />
+      <SvaRecoveryLayout
+        title="Set New Password"
+        subtitle="Choose a strong password you'll remember."
+        onBack={() => router.back()}
+        footer={
+          <Text style={styles.footer}>
+            Use at least 8 characters with a number and a symbol.
+          </Text>
+        }
+      >
+        <View
+          style={[
+            styles.formShell,
+            {
+              backgroundColor: nimbusColors.surface.raised,
+              borderColor: nimbusColors.border.default,
+              shadowColor: nimbusColors.shadow.default,
+            },
+          ]}
+        >
+          <SvaAuthInput
+            label="NEW PASSWORD"
+            preset="password"
+            showPasswordToggle
+            value={password}
+            onChangeText={(value) => {
+              setPasswordValue(value);
+              if (errorMsg) setErrorMsg("");
+            }}
+            placeholder="Enter new password"
+            autoCapitalize="none"
+            autoCorrect={false}
+            editable={!loading}
+            containerStyle={styles.inputBlock}
+          />
 
-      <View style={{ height: 14 }} />
+          <View style={styles.inputGap} />
 
-      <NimbusInput
-        label="Confirm password"
-        preset="password"
-        enablePasswordToggle
-        value={confirm}
-        onChangeText={(v) => {
-          setConfirm(v);
-          if (errMsg) setErrMsg("");
-        }}
-        placeholder="••••••••"
-        autoCapitalize="none"
-        autoCorrect={false}
-      />
+          <SvaAuthInput
+            label="CONFIRM PASSWORD"
+            preset="password"
+            showPasswordToggle
+            value={confirm}
+            onChangeText={(value) => {
+              setConfirm(value);
+              if (errorMsg) setErrorMsg("");
+            }}
+            placeholder="Confirm new password"
+            autoCapitalize="none"
+            autoCorrect={false}
+            editable={!loading}
+            containerStyle={styles.inputBlock}
+          />
 
-      {!!errMsg && (
-        <Text style={[s.errorText, { color: newTheme.error }]}>{errMsg}</Text>
-      )}
+          {errorMsg ? (
+            <Text style={[styles.errorText, { color: nimbusColors.state.error }]}>
+              {errorMsg}
+            </Text>
+          ) : null}
 
-      <View style={{ height: 18 }} />
+          <View style={styles.buttonGap} />
 
-      <NimbusButton
-        label={loading ? "Updating password…" : "Update password"}
-        onPress={submit}
-        disabled={loading}
-        style={{ borderRadius: 16 }}
-      />
-
-      <View style={{ height: 10 }} />
-
-      <Text style={s.helper}>
-        Tip: Use at least 8 characters with a number and a symbol.
-      </Text>
-    </ScreenView>
+          <SvaAuthButton
+            label={loading ? "Updating Password..." : "Update Password"}
+            onPress={submit}
+            loading={loading}
+            style={styles.primaryButton}
+            textStyle={styles.primaryButtonText}
+            rightIcon={
+              <Ionicons
+                name="arrow-forward"
+                size={18}
+                color={nimbusColors.text.inverse}
+              />
+            }
+          />
+        </View>
+      </SvaRecoveryLayout>
+    </>
   );
 }
 
-const styles = (t: any) =>
-  StyleSheet.create({
-    container: {
-      paddingTop: 86,
+function createStyles(nimbusColors: any, nimbusComponents: any) {
+  return StyleSheet.create({
+    formShell: {
+      width: "100%",
+      marginTop: 30,
+      borderRadius: 26,
+      borderWidth: StyleSheet.hairlineWidth,
       paddingHorizontal: 20,
-      flex: 1,
+      paddingTop: 24,
+      paddingBottom: 20,
+      shadowOpacity: 0.12,
+      shadowRadius: 18,
+      shadowOffset: { width: 0, height: 10 },
+      elevation: 2,
     },
-    header: {
-      marginTop: 24,
-      marginBottom: 26,
+    inputBlock: {
+      width: "100%",
     },
-    title: {
-      color: t.textPrimary,
-      fontSize: 30,
-      fontWeight: "800",
-      letterSpacing: -0.2,
-    },
-    subtitle: {
-      marginTop: 10,
-      color: t.textSecondary,
-      fontSize: 15,
-      lineHeight: 22,
-      fontWeight: "600",
+    inputGap: {
+      height: 18,
     },
     errorText: {
-      marginTop: 10,
-      fontWeight: "700",
+      marginTop: 14,
+      ...SVATypography.textStyle.caption,
+      fontFamily: "Inter_600SemiBold",
+      fontSize: 12,
+      lineHeight: 18,
     },
-    helper: {
-      textAlign: "center",
-      color: t.textSecondary,
-      fontSize: 13,
+    buttonGap: {
+      height: 20,
+    },
+    primaryButton: {
+      width: "100%",
+      minHeight: 56,
+      borderRadius: nimbusComponents?.button?.primary?.borderRadius ?? 16,
+    },
+    primaryButtonText: {
+      ...SVATypography.textStyle.button,
+      fontFamily: "Inter_600SemiBold",
+      fontSize: 16,
       fontWeight: "600",
     },
+    footer: {
+      ...SVATypography.textStyle.caption,
+      fontFamily: "Inter_500Medium",
+      color: nimbusColors.text.disabled,
+      fontSize: 11,
+      lineHeight: 18,
+      textAlign: "center",
+    },
   });
+}

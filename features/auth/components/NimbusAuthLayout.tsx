@@ -1,16 +1,18 @@
 import React, { ReactNode, useContext } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  SafeAreaView,
   KeyboardAvoidingView,
   Platform,
+  Pressable,
   ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 import ThemeContext from "@/contexts/ThemeContext";
+import { SVATypography } from "@/theme/typography";
 import { tokens } from "@/theme/tokens";
 
 export function NimbusAuthLayout({
@@ -24,81 +26,121 @@ export function NimbusAuthLayout({
   onBack?: () => void;
   children: ReactNode;
 }) {
-  const { newTheme } = useContext(ThemeContext);
+  const { nimbusColors } = useContext(ThemeContext);
+  const insets = useSafeAreaInsets();
 
   return (
-    <SafeAreaView style={[s.safe, { backgroundColor: newTheme.background }]}>
+    <View style={[s.screen, { backgroundColor: nimbusColors.bg.base }]}>
       <KeyboardAvoidingView
         style={s.flex}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <ScrollView
+          style={s.flex}
           keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
           contentContainerStyle={[
             s.content,
-            { paddingHorizontal: tokens.layout.screenX },
+            {
+              paddingTop: insets.top + 6,
+              paddingBottom: insets.bottom + 28,
+            },
           ]}
         >
-          {/* Top row */}
-          <View style={s.topRow} pointerEvents="box-none">
-            <Pressable
-              onPress={onBack}
-              disabled={!onBack}
-              style={[s.backBtn, !onBack && { opacity: 0 }]}
-              hitSlop={12}
+          <View
+            style={[
+              s.topBar,
+              {
+                borderBottomColor: nimbusColors.border.muted,
+              },
+            ]}
+          >
+            <Text
+              style={[s.brandWordmark, { color: nimbusColors.brand.primary }]}
             >
-              <Ionicons
-                name="chevron-back"
-                size={22}
-                color={newTheme.textPrimary}
-              />
-            </Pressable>
-
-            <Text style={[s.stepText, { color: newTheme.textSecondary }]}>
-              {step} / {total}
+              SVA
             </Text>
           </View>
 
-          {/* Progress */}
           <View
             style={[
               s.progressTrack,
               {
-                backgroundColor: newTheme.surface,
-                borderColor: newTheme.border,
+                backgroundColor: nimbusColors.surface.base,
+                borderColor: nimbusColors.border.muted,
               },
             ]}
           >
             <View
+              testID="auth-progress-fill"
               style={[
                 s.progressFill,
                 {
-                  width: `${(step / total) * 100}%`,
-                  backgroundColor: newTheme.accent,
+                  width: `${Math.max(0, Math.min(1, step / total)) * 100}%`,
+                  backgroundColor: nimbusColors.brand.primary,
                 },
               ]}
             />
           </View>
 
-          {/* Body */}
+          <View style={s.backRow}>
+            <Pressable
+              onPress={onBack}
+              disabled={!onBack}
+              accessibilityRole="button"
+              accessibilityLabel="Go back"
+              style={({ pressed }) => [
+                s.backBtn,
+                {
+                  backgroundColor: nimbusColors.surface.raised,
+                  borderColor: nimbusColors.border.default,
+                  opacity: !onBack ? 0 : pressed ? 0.9 : 1,
+                },
+              ]}
+              hitSlop={12}
+            >
+              <Ionicons
+                name="chevron-back"
+                size={22}
+                color={nimbusColors.text.primary}
+              />
+            </Pressable>
+          </View>
+
           <View style={s.body}>{children}</View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const s = StyleSheet.create({
-  flex: { flex: 1 },
-  safe: { flex: 1 },
-  content: {
-    paddingTop: 22,
-    paddingBottom: 28,
+  flex: {
+    flex: 1,
   },
-  topRow: {
-    flexDirection: "row",
+  screen: {
+    flex: 1,
+  },
+  content: {
+    flexGrow: 1,
+    paddingHorizontal: tokens.layout.screenX,
+  },
+  topBar: {
+    height: 66,
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "center",
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  brandWordmark: {
+    ...SVATypography.textStyle.button,
+    fontFamily: "Inter_700Bold",
+    fontSize: 18,
+    fontWeight: "700",
+    letterSpacing: 4.8,
+  },
+  backRow: {
+    alignItems: "flex-start",
+    marginTop: 18,
   },
   backBtn: {
     width: 40,
@@ -106,15 +148,12 @@ const s = StyleSheet.create({
     borderRadius: 999,
     alignItems: "center",
     justifyContent: "center",
-  },
-  stepText: {
-    fontSize: 14,
-    fontWeight: "700",
+    borderWidth: StyleSheet.hairlineWidth,
   },
   progressTrack: {
-    height: tokens.size.progressHeight,
+    height: 2,
     borderRadius: 999,
-    marginTop: 12,
+    marginTop: 10,
     borderWidth: StyleSheet.hairlineWidth,
     overflow: "hidden",
   },
@@ -123,6 +162,8 @@ const s = StyleSheet.create({
     borderRadius: 999,
   },
   body: {
-    marginTop: 26,
+    flex: 1,
+    paddingTop: 20,
+    paddingBottom: 8,
   },
 });

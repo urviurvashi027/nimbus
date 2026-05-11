@@ -1,74 +1,78 @@
-// app/(public)/signIn.tsx
-import React, { useContext, useMemo, useState } from "react";
-import { View, Text, StyleSheet, Pressable, Alert } from "react-native";
-import { router, useNavigation } from "expo-router";
+import React, { useContext, useMemo, useRef, useState } from "react";
+import {
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { router } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import ThemeContext from "@/contexts/ThemeContext";
-import { NimbusColorSet } from "@/theme/types";
-import { SVATypography } from "@/theme/typography";
-import { SVASpacing } from "@/theme/spacing";
-
-import { ScreenView } from "@/components/ui/theme-components/ScreenView";
-import { NimbusInput } from "@/components/ui/theme-components/NimbusInput";
-import { NimbusButton } from "@/components/ui/theme-components/NimbusButton";
-import { StyledCheckbox } from "@/components/ui/StyledCheckbox";
-import { useNimbusToast } from "@/components/ui/toast/useNimbusToast";
-import AppHeader from "@/components/layout/AppHeader";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNimbusToast } from "@/components/ui/toast/useNimbusToast";
+import { SVATypography } from "@/theme/typography";
+import { SvaAuthInput } from "@/features/auth/components/SvaAuthInput";
+import { SvaAuthButton } from "@/features/auth/components/SvaAuthButton";
+
+import type { TextInput } from "react-native";
 
 export default function SignIn() {
-  const { nimbusColors } = useContext(ThemeContext);
+  const { nimbusColors, nimbusComponents } = useContext(ThemeContext);
   const { onLogin } = useAuth();
-  const navigation = useNavigation();
+  const toast = useNimbusToast();
+  const insets = useSafeAreaInsets();
 
-  // Hide the native header
-  React.useEffect(() => {
-    navigation.setOptions({
-      headerShown: false,
-    });
-  }, [navigation]);
+  const memberIdRef = useRef<TextInput>(null);
+  const accessCodeRef = useRef<TextInput>(null);
 
-  // Pass all theme objects to styling function
-  const styles = useMemo(() => styling(nimbusColors), [nimbusColors]);
-
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
+  const [memberId, setMemberId] = useState("");
+  const [accessCode, setAccessCode] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const toast = useNimbusToast();
+  const styles = useMemo(
+    () => createStyles(nimbusColors, nimbusComponents, insets.top, insets.bottom),
+    [nimbusColors, nimbusComponents, insets.top, insets.bottom]
+  );
 
   const submit = async () => {
-    if (!username.trim() || !password.trim()) {
+    if (!memberId.trim() || !accessCode.trim()) {
       Alert.alert(
         "Missing details",
-        "Please enter your username and password."
+        "Please enter your member ID and access code."
       );
       return;
     }
 
     setLoading(true);
     try {
-      const result = await onLogin?.(username.trim(), password);
+      const result = await onLogin?.(memberId.trim(), accessCode);
+
       if (result?.success) {
         toast.show({
           variant: "success",
           title: "Welcome back",
-          message: "Welcome back",
+          message: "Access granted",
         });
         router.replace("/(auth)/(tabs)");
         return;
       }
+
       toast.show({
         variant: "error",
         title: "Login failed",
-        message: "Login failed",
+        message: "Unable to verify your access.",
       });
-    } catch (e: any) {
+    } catch (error: any) {
       toast.show({
         variant: "error",
         title: "Login failed",
-        message: e?.message ?? "Please try again",
+        message: error?.message ?? "Please try again.",
       });
     } finally {
       setLoading(false);
@@ -76,108 +80,349 @@ export default function SignIn() {
   };
 
   return (
-    <ScreenView style={{ paddingHorizontal: SVASpacing.layout.screenPadding }}>
-      {/* Nimbus Shared Header */}
-      <AppHeader
-        title="Welcome back"
-        subtitle="Sign in to continue your Nimbus journey."
-        onBack={() => router.back()}
-        titleStyle={SVATypography.textStyle.heading2}
-        subtitleStyle={SVATypography.textStyle.body}
-      />
-
-      <View style={{ marginTop: SVASpacing.scale.md }} />
-
-      <NimbusInput
-        label="Username"
-        value={username}
-        onChangeText={setUsername}
-        placeholder="John Cena"
-        autoCapitalize="none"
-        returnKeyType="next"
-        labelStyle={SVATypography.textStyle.inputLabel}
-        inputStyle={[SVATypography.textStyle.input, { height: SVASpacing.component.inputHeight }]}
-      />
-
-      <View style={{ marginTop: SVASpacing.scale.md }} />
-
-      <NimbusInput
-        label="Password"
-        preset="password"
-        value={password}
-        onChangeText={setPassword}
-        placeholder="••••••••"
-        enablePasswordToggle
-        returnKeyType="done"
-        onSubmitEditing={submit}
-        labelStyle={SVATypography.textStyle.inputLabel}
-        inputStyle={[SVATypography.textStyle.input, { height: SVASpacing.component.inputHeight }]}
-      />
-
-      <View style={{ marginTop: SVASpacing.scale.md }} />
-
-      <View style={styles.row}>
-        <StyledCheckbox
-          checked={rememberMe}
-          onToggle={() => setRememberMe((v) => !v)}
-          label={<Text style={styles.rememberText}>Remember me</Text>}
-        />
-
-        <Pressable
-          onPress={() => router.push("/(public)/forgot-password")}
-          hitSlop={10}
+    <View style={[styles.screen, { backgroundColor: nimbusColors.bg.base }]}>
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <ScrollView
+          style={styles.flex}
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
-          <Text style={styles.link}>Forgot password?</Text>
-        </Pressable>
-      </View>
+          <View style={styles.content}>
+            <View style={styles.cardShell}>
+              <View
+                style={[
+                  styles.outerCard,
+                  {
+                    backgroundColor: nimbusColors.surface.base,
+                  },
+                ]}
+              >
+                <View
+                  style={[
+                    styles.brandStrip,
+                    {
+                      backgroundColor: nimbusColors.bg.base,
+                      borderBottomColor: nimbusColors.border.muted,
+                    },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.brandWordmark,
+                      { color: nimbusColors.brand.primary },
+                    ]}
+                  >
+                    SVA
+                  </Text>
+                </View>
 
-      <View style={{ marginTop: SVASpacing.scale.lg }} />
+                <View style={styles.heroBody}>
+                  <Text
+                    style={[
+                      styles.heroTitle,
+                      {
+                        color: nimbusColors.text.primary,
+                        textShadowColor: "rgba(0,0,0,0.2)",
+                      },
+                    ]}
+                  >
+                    Welcome to your sanctuary.
+                  </Text>
 
-      <NimbusButton
-        label={loading ? "Signing in..." : "Sign in"}
-        onPress={submit}
-        disabled={loading}
-        textStyle={SVATypography.textStyle.button}
-        style={{ height: SVASpacing.component.buttonHeight }}
-      />
+                  <Text
+                    style={[
+                      styles.heroSubtitle,
+                      { color: nimbusColors.text.secondary },
+                    ]}
+                  >
+                    Deep Health & Burnout Prevention AI
+                  </Text>
 
-      <View style={{ marginTop: SVASpacing.scale.xl }} />
+                  <View
+                    style={[
+                      styles.formShell,
+                      {
+                        backgroundColor: nimbusColors.surface.raised,
+                        borderColor: nimbusColors.border.default,
+                        shadowColor: nimbusColors.shadow.default,
+                      },
+                    ]}
+                  >
+                    <SvaAuthInput
+                      ref={memberIdRef}
+                      label="MEMBER ID"
+                      placeholder="Enter your unique ID"
+                      value={memberId}
+                      onChangeText={setMemberId}
+                      autoCapitalize="none"
+                      returnKeyType="next"
+                      onSubmitEditing={() => accessCodeRef.current?.focus()}
+                      editable={!loading}
+                      containerStyle={styles.inputBlock}
+                      inputStyle={styles.inputText}
+                      labelStyle={styles.inputLabel}
+                    />
 
-      <Pressable onPress={() => router.push("/(public)/register")}>
-        <Text style={styles.footerText}>
-          Don’t have an account?{" "}
-          <Text style={styles.footerStrong}>Create one</Text>
-        </Text>
-      </Pressable>
-    </ScreenView>
+                    <View style={styles.inputGap} />
+
+                    <SvaAuthInput
+                      ref={accessCodeRef}
+                      label="ACCESS CODE"
+                      preset="password"
+                      showPasswordToggle
+                      placeholder="••••••••"
+                      value={accessCode}
+                      onChangeText={setAccessCode}
+                      autoCapitalize="none"
+                      returnKeyType="done"
+                      onSubmitEditing={submit}
+                      editable={!loading}
+                      containerStyle={styles.inputBlock}
+                      inputStyle={styles.inputText}
+                      labelStyle={styles.inputLabel}
+                    />
+
+                    <View style={styles.buttonStack}>
+                      <SvaAuthButton
+                        label={loading ? "Entering Sanctuary..." : "Enter Sanctuary"}
+                        onPress={submit}
+                        loading={loading}
+                        style={styles.primaryButton}
+                        textStyle={styles.primaryButtonText}
+                        rightIcon={
+                          <Ionicons
+                            name="arrow-forward"
+                            size={18}
+                            color={nimbusComponents?.button.primary.text ?? nimbusColors.text.inverse}
+                          />
+                        }
+                      />
+
+                      <View style={styles.secondaryButtonGap} />
+
+                      <SvaAuthButton
+                        label="Register for Sanctuary"
+                        onPress={() => router.push("/(public)/register")}
+                        variant="secondary"
+                        disabled={loading}
+                        style={styles.secondaryButton}
+                        textStyle={styles.secondaryButtonText}
+                        leftIcon={
+                          <Ionicons
+                            name="person-add-outline"
+                            size={18}
+                            color={nimbusColors.text.primary}
+                          />
+                        }
+                      />
+                    </View>
+                  </View>
+
+                  <Pressable
+                    onPress={() => router.push("/(public)/forgot-password")}
+                    style={styles.forgotAccess}
+                    hitSlop={10}
+                  >
+                    <Text
+                      style={[
+                        styles.forgotAccessText,
+                        { color: nimbusColors.text.secondary },
+                      ]}
+                    >
+                      Lost Access
+                    </Text>
+
+                    <View style={styles.forgotAccessDecor}>
+                      <View
+                        style={[
+                          styles.forgotAccessLine,
+                          { backgroundColor: nimbusColors.border.default },
+                        ]}
+                      />
+                      <View
+                        style={[
+                          styles.forgotAccessDot,
+                          { backgroundColor: nimbusColors.border.default },
+                        ]}
+                      />
+                      <View
+                        style={[
+                          styles.forgotAccessLine,
+                          { backgroundColor: nimbusColors.border.default },
+                        ]}
+                      />
+                    </View>
+                  </Pressable>
+                </View>
+              </View>
+            </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </View>
   );
 }
 
-const styling = (c: NimbusColorSet) =>
-  StyleSheet.create({
-    row: {
-      flexDirection: "row",
+function createStyles(
+  nimbusColors: any,
+  nimbusComponents: any,
+  topInset: number,
+  bottomInset: number
+) {
+  const styles = StyleSheet.create({
+    flex: {
+      flex: 1,
+    },
+    screen: {
+      flex: 1,
+    },
+    scrollContent: {
+      flexGrow: 1,
+    },
+    content: {
+      flex: 1,
+      width: "100%",
+      maxWidth: "100%",
+      alignSelf: "center",
+      paddingTop: topInset,
+      paddingBottom: bottomInset,
+      paddingHorizontal: 0,
+      justifyContent: "flex-start",
+    },
+    cardShell: {
+      width: "100%",
+      flex: 1,
+    },
+    outerCard: {
+      borderRadius: 0,
+      borderWidth: 0,
+      flex: 1,
+      overflow: "hidden",
+    },
+    brandStrip: {
+      height: 66,
       alignItems: "center",
-      justifyContent: "space-between",
+      justifyContent: "center",
+      borderBottomWidth: StyleSheet.hairlineWidth,
     },
-    rememberText: {
-      ...SVATypography.textStyle.subtitle,
-      fontSize: 14,
-      color: c.text.primary,
-      fontWeight: "600",
-    },
-    link: {
+    brandWordmark: {
       ...SVATypography.textStyle.button,
-      fontSize: 14,
-      color: c.brand.primary,
+      fontFamily: "Inter_700Bold",
+      fontSize: 18,
+      fontWeight: "700",
+      letterSpacing: 4.8,
     },
-    footerText: {
-      ...SVATypography.textStyle.body,
-      color: c.text.secondary,
+    heroBody: {
+      flex: 1,
+      paddingHorizontal: 16,
+      paddingTop: 40,
+      paddingBottom: 20,
+      alignItems: "center",
+    },
+    heroTitle: {
+      ...SVATypography.textStyle.displayMedium,
+      fontFamily: "CormorantGaramond_500Medium",
+      fontSize: 30,
+      fontWeight: "500",
+      lineHeight: 33,
+      letterSpacing: -0.4,
       textAlign: "center",
     },
-    footerStrong: {
+    heroSubtitle: {
+      ...SVATypography.textStyle.subtitle,
+      fontFamily: "Inter_400Regular",
+      fontSize: 14,
+      lineHeight: 20,
+      marginTop: 8,
+      textAlign: "center",
+    },
+    formShell: {
+      width: "100%",
+      marginTop: 32,
+      borderRadius: 26,
+      borderWidth: StyleSheet.hairlineWidth,
+      paddingHorizontal: 20,
+      paddingTop: 24,
+      paddingBottom: 18,
+      shadowOpacity: 0.12,
+      shadowRadius: 18,
+      shadowOffset: { width: 0, height: 10 },
+      elevation: 2,
+    },
+    inputBlock: {
+      width: "100%",
+    },
+    inputLabel: {
+      color: nimbusColors.text.secondary,
+    },
+    inputText: {
+      color: nimbusColors.text.primary,
+    },
+    inputGap: {
+      height: 18,
+    },
+    buttonStack: {
+      marginTop: 24,
+    },
+    primaryButton: {
+      width: "100%",
+      minHeight: 56,
+      borderRadius: nimbusComponents?.button?.primary?.borderRadius ?? 16,
+    },
+    primaryButtonText: {
       ...SVATypography.textStyle.button,
-      color: c.text.primary,
+      fontFamily: "Inter_600SemiBold",
+      fontSize: 16,
+      fontWeight: "600",
+    },
+    secondaryButtonGap: {
+      height: 12,
+    },
+    secondaryButton: {
+      width: "100%",
+      minHeight: 52,
+      borderRadius: 15,
+    },
+    secondaryButtonText: {
+      ...SVATypography.textStyle.button,
+      fontFamily: "Inter_600SemiBold",
+      fontSize: 14,
+      fontWeight: "600",
+    },
+    forgotAccess: {
+      alignItems: "center",
+      marginTop: "auto",
+      paddingTop: 24,
+    },
+    forgotAccessText: {
+      ...SVATypography.textStyle.label,
+      fontFamily: "Inter_600SemiBold",
+      fontSize: 13,
+      fontWeight: "600",
+      letterSpacing: 1.1,
+    },
+    forgotAccessDecor: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginTop: 10,
+    },
+    forgotAccessLine: {
+      width: 38,
+      height: 1,
+      opacity: 0.14,
+    },
+    forgotAccessDot: {
+      width: 3,
+      height: 3,
+      borderRadius: 1.5,
+      marginHorizontal: 14,
+      opacity: 0.14,
     },
   });
+
+  return styles;
+}

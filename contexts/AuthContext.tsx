@@ -65,6 +65,7 @@ interface AuthProps {
   onRegister?: (
     username: string,
     fullName: string,
+    countryCode: string,
     mobile: string,
     email: string,
     password: string
@@ -240,15 +241,21 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   const _register = async (
     username: string,
     fullName: string,
+    countryCode: string,
     mobile: string,
     email?: string,
     password?: string
   ) => {
     try {
+      const cleanedMobile = mobile.trim();
+      const normalizedCountryCode = countryCode.trim().startsWith("+")
+        ? countryCode.trim()
+        : `+${countryCode.trim()}`;
+
       const request = {
         username: username,
         email,
-        phone_number: `+91${mobile}`,
+        phone_number: `${normalizedCountryCode}${cleanedMobile}`,
         full_name: fullName,
         password,
       };
