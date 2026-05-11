@@ -1,3 +1,3 @@
-import { BodyShapeCalculatorScreen } from "@/features/tools/screens/BodyShapeCalculatorScreen";
+import BodyShapeCalculator from "@/features/tools/screens/BodyShapeCalculatorScreen";
 
-export default BodyShapeCalculatorScreen;
+export default BodyShapeCalculator;
