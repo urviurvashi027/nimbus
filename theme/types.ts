@@ -86,6 +86,16 @@ export interface TypographyTokens {
     heading2: FontSet;
     title: FontSet;
     subtitle: FontSet;
+    authTitle: FontSet;
+    authSubtitle: FontSet;
+    authBody: FontSet;
+    authFootnote: FontSet;
+    brandWordmark: FontSet;
+    authLabel: FontSet;
+    authLabelStrong: FontSet;
+    authTinyLabel: FontSet;
+    authActionLabel: FontSet;
+    authMonoLabel: FontSet;
     body: FontSet;
     bodyMedium: FontSet;
     caption: FontSet;

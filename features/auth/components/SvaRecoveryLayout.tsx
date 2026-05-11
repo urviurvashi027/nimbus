@@ -161,11 +161,7 @@ const s = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   brandWordmark: {
-    ...SVATypography.textStyle.button,
-    fontFamily: "Inter_700Bold",
-    fontSize: 18,
-    fontWeight: "700",
-    letterSpacing: 4.8,
+    ...SVATypography.textStyle.brandWordmark,
   },
   body: {
     flex: 1,
@@ -181,17 +177,10 @@ const s = StyleSheet.create({
     width: "100%",
   },
   title: {
-    fontFamily: SVATypography.fontFamily.display,
-    fontSize: 31,
-    fontWeight: SVATypography.fontWeight.medium,
-    lineHeight: 34,
-    letterSpacing: -0.35,
+    ...SVATypography.textStyle.authTitle,
   },
   subtitle: {
-    ...SVATypography.textStyle.subtitle,
-    fontFamily: "Inter_400Regular",
-    fontSize: 14,
-    lineHeight: 20,
+    ...SVATypography.textStyle.authSubtitle,
     marginTop: 10,
   },
   supporting: {

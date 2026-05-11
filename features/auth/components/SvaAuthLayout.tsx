@@ -132,11 +132,7 @@ const s = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   brandWordmark: {
-    ...SVATypography.textStyle.button,
-    fontFamily: "Inter_700Bold",
-    fontSize: 18,
-    fontWeight: "700",
-    letterSpacing: 4.8,
+    ...SVATypography.textStyle.brandWordmark,
   },
   backRow: {
     alignItems: "flex-start",

@@ -29,7 +29,7 @@ import { SVATypography } from "@/theme/typography";
 
 const TOTAL_STEPS = 4;
 type Step = 1 | 2 | 3 | 4;
-const DISABLE_OTP_FLOW = true;
+const DISABLE_OTP_FLOW = false;
 
 const PASSWORD_REQUIREMENTS = [
   "At least 12 characters",
@@ -41,28 +41,6 @@ function buildUsernameFromEmail(email: string) {
   const localPart = email.trim().split("@")[0] ?? "";
   const sanitized = localPart.replace(/[^a-zA-Z0-9_]/g, "").toLowerCase();
   return sanitized || "sanctuary";
-}
-
-function normalizeCountryCode(value: string) {
-  const trimmed = value.trim();
-  if (!trimmed) return "";
-  return trimmed.startsWith("+") ? trimmed : `+${trimmed}`;
-}
-
-function formatMobileDisplay(countryCode: string, mobile: string) {
-  const normalizedCountryCode = normalizeCountryCode(countryCode);
-  const digits = mobile.replace(/\D/g, "");
-
-  if (!digits) return "";
-
-  if (digits.length === 10) {
-    return `${normalizedCountryCode} ${digits.slice(0, 3)} ${digits.slice(
-      3,
-      6
-    )} ${digits.slice(6)}`;
-  }
-
-  return `${normalizedCountryCode} ${digits}`;
 }
 
 function getPasswordStrength(value: string) {
@@ -152,10 +130,7 @@ function RegistrationFlowInner() {
     [password]
   );
 
-  const otpRecipient = useMemo(
-    () => formatMobileDisplay(countryCode, mobile),
-    [countryCode, mobile]
-  );
+  const otpRecipient = useMemo(() => email.trim(), [email]);
 
   const next = useCallback(() => {
     setStep((value) => Math.min(TOTAL_STEPS, value + 1) as Step);
@@ -202,17 +177,21 @@ function RegistrationFlowInner() {
     if (DISABLE_OTP_FLOW) {
       // Temporarily bypass the OTP request until the backend is stable.
       setErrMsg("");
-      setOtpCopiedDestination(formatMobileDisplay(countryCode, mobile));
+      setOtpCopiedDestination(email.trim());
       setOtpTimer(0);
       return true;
     }
 
-    const normalizedCode = normalizeCountryCode(countryCode);
-    const digits = mobile.replace(/\D/g, "");
-    const recipient = `${normalizedCode}${digits}`;
+    const recipient = email.trim();
 
-    if (!normalizedCode || digits.length !== 10) {
-      setErrMsg("Enter a valid 10-digit mobile number.");
+    if (!recipient) {
+      setErrMsg("Email is required.");
+      return false;
+    }
+
+    const emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+    if (!emailRegex.test(recipient)) {
+      setErrMsg("Please enter a valid email address.");
       return false;
     }
 
@@ -222,6 +201,7 @@ function RegistrationFlowInner() {
     try {
       const res = await getOtp({
         recipient,
+        channel: "email",
         name: derivedUsername || undefined,
       });
 
@@ -237,10 +217,10 @@ function RegistrationFlowInner() {
       toast.show({
         variant: "success",
         title: "Code sent",
-        message: "Check your number for the verification code.",
+        message: "Check your email for the verification code.",
       });
 
-      setOtpCopiedDestination(formatMobileDisplay(countryCode, mobile));
+      setOtpCopiedDestination(recipient);
       setOtpTimer(60);
       return true;
     } catch (error: any) {
@@ -249,7 +229,7 @@ function RegistrationFlowInner() {
     } finally {
       setOtpSending(false);
     }
-  }, [countryCode, derivedUsername, mobile, toast]);
+  }, [derivedUsername, email, toast]);
 
   const verifyCode = useCallback(async () => {
     if (DISABLE_OTP_FLOW) {
@@ -258,15 +238,13 @@ function RegistrationFlowInner() {
       return true;
     }
 
-    const normalizedCode = normalizeCountryCode(countryCode);
-    const digits = mobile.replace(/\D/g, "");
-    const recipient = `${normalizedCode}${digits}`;
+    const recipient = email.trim();
     const code = otp.trim();
 
     setErrMsg("");
 
-    if (!normalizedCode || digits.length !== 10) {
-      setErrMsg("Enter a valid 10-digit mobile number.");
+    if (!recipient) {
+      setErrMsg("Email is missing.");
       return false;
     }
 
@@ -303,7 +281,7 @@ function RegistrationFlowInner() {
     } finally {
       setOtpVerifying(false);
     }
-  }, [countryCode, mobile, next, otp, toast]);
+  }, [email, next, otp, toast]);
 
   const completeSignup = async () => {
     const trimmedPassword = password.trim();
@@ -482,14 +460,12 @@ function RegistrationFlowInner() {
               next();
             }}
             style={styles.primaryButton}
-            textStyle={styles.primaryButtonText}
             rightIcon={
               <Ionicons
                 name="arrow-forward"
                 size={18}
                 color={
-                  svaComponents?.button.primary.text ??
-                  svaColors.text.inverse
+                  svaComponents?.button.primary.text ?? svaColors.text.inverse
                 }
               />
             }
@@ -575,22 +551,15 @@ function RegistrationFlowInner() {
 
             <View style={styles.infoCopy}>
               <Text
-                style={[
-                  styles.infoTitle,
-                  { color: svaColors.text.primary },
-                ]}
+                style={[styles.infoTitle, { color: svaColors.text.primary }]}
               >
                 Secure Verification
               </Text>
               <Text
-                style={[
-                  styles.infoBody,
-                  { color: svaColors.text.secondary },
-                ]}
+                style={[styles.infoBody, { color: svaColors.text.secondary }]}
               >
-                By providing your number, you agree to receive a one-time
-                verification code. Standard data rates may apply. Your clinical
-                data remains encrypted and sovereign.
+                Your mobile number helps complete your profile. The
+                verification code will be sent to your email.
               </Text>
             </View>
           </View>
@@ -608,14 +577,12 @@ function RegistrationFlowInner() {
               next();
             }}
             style={styles.primaryButton}
-            textStyle={styles.primaryButtonText}
             rightIcon={
               <Ionicons
                 name="arrow-forward"
                 size={18}
                 color={
-                  svaComponents?.button.primary.text ??
-                  svaColors.text.inverse
+                  svaComponents?.button.primary.text ?? svaColors.text.inverse
                 }
               />
             }
@@ -640,7 +607,7 @@ function RegistrationFlowInner() {
           </Text>
 
           <Text style={[styles.subtitle, { color: svaColors.text.secondary }]}>
-            Enter the secure code sent to your device.
+            Enter the secure code sent to your email.
           </Text>
 
           <View style={styles.destinationRow}>
@@ -658,12 +625,12 @@ function RegistrationFlowInner() {
                 { color: svaColors.text.primary },
               ]}
             >
-              {otpCopiedDestination || otpRecipient || "your mobile number"}
+              {otpCopiedDestination || otpRecipient || "your email address"}
             </Text>
             <Pressable
               onPress={() => {
                 setErrMsg("");
-                setStep(2);
+                setStep(1);
               }}
               hitSlop={8}
             >
@@ -673,7 +640,7 @@ function RegistrationFlowInner() {
                   { color: svaColors.brand.primary },
                 ]}
               >
-                Edit Number
+                Edit Email
               </Text>
             </Pressable>
           </View>
@@ -695,14 +662,12 @@ function RegistrationFlowInner() {
             onPress={() => void verifyCode()}
             loading={otpVerifying}
             style={styles.primaryButton}
-            textStyle={styles.primaryButtonText}
             rightIcon={
               <Ionicons
                 name="arrow-forward"
                 size={18}
                 color={
-                  svaComponents?.button.primary.text ??
-                  svaColors.text.inverse
+                  svaComponents?.button.primary.text ?? svaColors.text.inverse
                 }
               />
             }
@@ -713,7 +678,8 @@ function RegistrationFlowInner() {
               <Text
                 style={[styles.resendText, { color: svaColors.text.disabled }]}
               >
-                RESEND CODE IN {String(Math.floor(otpTimer / 60)).padStart(2, "0")}:
+                RESEND CODE IN{" "}
+                {String(Math.floor(otpTimer / 60)).padStart(2, "0")}:
                 {String(otpTimer % 60).padStart(2, "0")}
               </Text>
             ) : (
@@ -747,18 +713,12 @@ function RegistrationFlowInner() {
 
             <View style={styles.infoCopy}>
               <Text
-                style={[
-                  styles.infoTitle,
-                  { color: svaColors.text.primary },
-                ]}
+                style={[styles.infoTitle, { color: svaColors.text.primary }]}
               >
                 Secure Verification
               </Text>
               <Text
-                style={[
-                  styles.infoBody,
-                  { color: svaColors.text.secondary },
-                ]}
+                style={[styles.infoBody, { color: svaColors.text.secondary }]}
               >
                 SVA uses military-grade encryption to ensure your health data
                 remains private and secure during the onboarding process.
@@ -792,9 +752,7 @@ function RegistrationFlowInner() {
               label="ACCESS KEY"
               labelAccessory={
                 <Pressable
-                  onPress={() =>
-                    setShowPasswordTooltip((value) => !value)
-                  }
+                  onPress={() => setShowPasswordTooltip((value) => !value)}
                   accessibilityRole="button"
                   accessibilityLabel="Password requirements"
                   hitSlop={10}
@@ -829,7 +787,7 @@ function RegistrationFlowInner() {
               returnKeyType="next"
               onSubmitEditing={() => confirmRef.current?.focus()}
               containerStyle={styles.inputBlock}
-              />
+            />
 
             {showPasswordTooltip ? (
               <View
@@ -947,18 +905,18 @@ function RegistrationFlowInner() {
           <View style={styles.buttonGap} />
 
           <SvaAuthButton
-            label={loading ? "Completing Registration..." : "Complete Registration"}
+            label={
+              loading ? "Completing Registration..." : "Complete Registration"
+            }
             onPress={() => void completeSignup()}
             loading={loading}
             style={styles.primaryButton}
-            textStyle={styles.primaryButtonText}
             rightIcon={
               <Ionicons
                 name="arrow-forward"
                 size={18}
                 color={
-                  svaComponents?.button.primary.text ??
-                  svaColors.text.inverse
+                  svaComponents?.button.primary.text ?? svaColors.text.inverse
                 }
               />
             }
@@ -977,19 +935,12 @@ function RegistrationFlowInner() {
 function createStyles(svaColors: any, svaComponents: any) {
   return StyleSheet.create({
     title: {
-      fontFamily: SVATypography.fontFamily.display,
-      fontSize: 31,
-      fontWeight: SVATypography.fontWeight.medium,
-      lineHeight: 34,
-      letterSpacing: -0.35,
+      ...SVATypography.textStyle.authTitle,
     },
     subtitle: {
-      ...SVATypography.textStyle.subtitle,
-      fontFamily: "Inter_400Regular",
-      fontSize: 14,
-      lineHeight: 20,
+      ...SVATypography.textStyle.authSubtitle,
       marginTop: 10,
-      maxWidth: 270,
+      maxWidth: 300,
     },
     fieldBlock: {
       marginTop: 30,
@@ -1020,18 +971,9 @@ function createStyles(svaColors: any, svaComponents: any) {
       minHeight: 56,
       borderRadius: svaComponents?.button?.primary?.borderRadius ?? 16,
     },
-    primaryButtonText: {
-      ...SVATypography.textStyle.button,
-      fontFamily: "Inter_600SemiBold",
-      fontSize: 16,
-      fontWeight: "600",
-    },
     errorText: {
       marginTop: 14,
-      ...SVATypography.textStyle.caption,
-      fontFamily: "Inter_600SemiBold",
-      fontSize: 12,
-      lineHeight: 18,
+      ...SVATypography.textStyle.authBody,
     },
     passwordHelpIcon: {
       alignItems: "center",
@@ -1049,10 +991,7 @@ function createStyles(svaColors: any, svaComponents: any) {
       elevation: 2,
     },
     passwordTooltipTitle: {
-      ...SVATypography.textStyle.label,
-      fontFamily: "Inter_700Bold",
-      fontSize: 12,
-      letterSpacing: 1,
+      ...SVATypography.textStyle.authLabelStrong,
       textTransform: "uppercase",
     },
     passwordTooltipList: {
@@ -1070,10 +1009,7 @@ function createStyles(svaColors: any, svaComponents: any) {
       borderRadius: 2.5,
     },
     passwordTooltipText: {
-      ...SVATypography.textStyle.caption,
-      fontFamily: "Inter_400Regular",
-      fontSize: 12,
-      lineHeight: 18,
+      ...SVATypography.textStyle.authBody,
       flex: 1,
     },
     strengthFooter: {
@@ -1104,17 +1040,11 @@ function createStyles(svaColors: any, svaComponents: any) {
       flex: 1,
     },
     infoTitle: {
-      ...SVATypography.textStyle.label,
-      fontFamily: "Inter_700Bold",
-      fontSize: 12,
-      letterSpacing: 0.8,
+      ...SVATypography.textStyle.authLabelStrong,
       textTransform: "uppercase",
     },
     infoBody: {
-      ...SVATypography.textStyle.caption,
-      fontFamily: "Inter_400Regular",
-      fontSize: 12,
-      lineHeight: 18,
+      ...SVATypography.textStyle.authBody,
       marginTop: 6,
     },
     otpWrap: {
@@ -1128,22 +1058,13 @@ function createStyles(svaColors: any, svaComponents: any) {
       gap: 6,
     },
     destinationLabel: {
-      ...SVATypography.textStyle.caption,
-      fontFamily: "Inter_600SemiBold",
-      fontSize: 12,
-      lineHeight: 18,
+      ...SVATypography.textStyle.authLabel,
     },
     destinationValue: {
-      ...SVATypography.textStyle.caption,
-      fontFamily: "Inter_600SemiBold",
-      fontSize: 12,
-      lineHeight: 18,
+      ...SVATypography.textStyle.authLabel,
     },
     destinationAction: {
-      ...SVATypography.textStyle.caption,
-      fontFamily: "Inter_600SemiBold",
-      fontSize: 12,
-      lineHeight: 18,
+      ...SVATypography.textStyle.authLabel,
       textDecorationLine: "underline",
     },
     resendRow: {
@@ -1151,18 +1072,11 @@ function createStyles(svaColors: any, svaComponents: any) {
       alignItems: "center",
     },
     resendText: {
-      ...SVATypography.textStyle.caption,
-      fontFamily: "Inter_600SemiBold",
-      fontSize: 11,
-      lineHeight: 16,
-      letterSpacing: 1.4,
+      ...SVATypography.textStyle.authTinyLabel,
       textTransform: "uppercase",
     },
     resendAction: {
-      ...SVATypography.textStyle.caption,
-      fontFamily: "Inter_600SemiBold",
-      fontSize: 11,
-      lineHeight: 16,
+      ...SVATypography.textStyle.authTinyLabel,
       letterSpacing: 1.5,
       textTransform: "uppercase",
     },
@@ -1174,16 +1088,12 @@ function createStyles(svaColors: any, svaComponents: any) {
       justifyContent: "space-between",
     },
     strengthLabel: {
-      ...SVATypography.textStyle.label,
-      fontFamily: "Inter_600SemiBold",
-      fontSize: 11,
+      ...SVATypography.textStyle.authTinyLabel,
       letterSpacing: 1.8,
       textTransform: "uppercase",
     },
     strengthValue: {
-      ...SVATypography.textStyle.label,
-      fontFamily: "Inter_600SemiBold",
-      fontSize: 11,
+      ...SVATypography.textStyle.authTinyLabel,
       letterSpacing: 1.6,
       textTransform: "uppercase",
     },
@@ -1204,19 +1114,12 @@ function createStyles(svaColors: any, svaComponents: any) {
       gap: 10,
     },
     stepLabel: {
-      ...SVATypography.textStyle.caption,
-      fontFamily: "SpaceMono-Regular",
-      fontSize: 11,
-      lineHeight: 16,
-      letterSpacing: 2.6,
+      ...SVATypography.textStyle.authMonoLabel,
       color: svaColors.text.disabled,
       textTransform: "uppercase",
     },
     stepNote: {
-      ...SVATypography.textStyle.caption,
-      fontFamily: "Inter_400Regular",
-      fontSize: 11,
-      lineHeight: 18,
+      ...SVATypography.textStyle.authFootnote,
       color: svaColors.text.disabled,
       textAlign: "center",
       maxWidth: 250,

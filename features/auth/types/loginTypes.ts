@@ -11,10 +11,6 @@ interface LogoutData {
   data: any;
 }
 
-interface SignupData {
-  data: any;
-}
-
 export interface LoginRequest {
   username: string;
   password: string;
@@ -47,6 +43,7 @@ export interface SignupRequest {
 
 export interface GetOtpRequest {
   recipient: string;
+  channel: "email";
   name?: string;
 }
 

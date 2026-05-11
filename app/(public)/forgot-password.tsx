@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -9,6 +9,7 @@ import { useNimbusAlert } from "@/components/ui/alert/useNimbusAlert";
 import { useNimbusToast } from "@/components/ui/toast/useNimbusToast";
 import { SvaAuthButton } from "@/features/auth/components/SvaAuthButton";
 import { SvaAuthInput } from "@/features/auth/components/SvaAuthInput";
+import { SvaAuthTextAction } from "@/features/auth/components/SvaAuthTextAction";
 import { SvaRecoveryLayout } from "@/features/auth/components/SvaRecoveryLayout";
 import { ROUTES } from "@/constants/routes";
 import { SVATypography } from "@/theme/typography";
@@ -154,7 +155,6 @@ export default function ForgotPasswordScreen() {
             onPress={onSubmit}
             loading={loading}
             style={styles.primaryButton}
-            textStyle={styles.primaryButtonText}
             rightIcon={
               <Ionicons
                 name="arrow-forward"
@@ -167,17 +167,14 @@ export default function ForgotPasswordScreen() {
             }
           />
 
-          <Pressable
-            onPress={() => router.replace("/(public)/sign-in")}
+          <SvaAuthTextAction
+            onPress={() => router.replace(ROUTES.PUBLIC.SIGN_IN)}
+            variant="muted"
             style={styles.secondaryAction}
             hitSlop={10}
           >
-            <Text
-              style={[styles.secondaryActionText, { color: svaColors.text.secondary }]}
-            >
-              Try another way
-            </Text>
-          </Pressable>
+            Try another way
+          </SvaAuthTextAction>
         </View>
       </SvaRecoveryLayout>
     </>
@@ -210,26 +207,14 @@ function createStyles(svaColors: any, svaComponents: any) {
       minHeight: 56,
       borderRadius: svaComponents?.button?.primary?.borderRadius ?? 16,
     },
-    primaryButtonText: {
-      ...SVATypography.textStyle.button,
-    },
     secondaryAction: {
       alignItems: "center",
       paddingTop: 18,
     },
-    secondaryActionText: {
-      ...SVATypography.textStyle.label,
-      letterSpacing: 1.1,
-    },
     footer: {
-      ...SVATypography.textStyle.caption,
-      fontFamily: "Inter_500Medium",
+      ...SVATypography.textStyle.authFootnote,
       color: svaColors.text.disabled,
-      fontSize: 11,
-      lineHeight: 18,
       textAlign: "center",
-      textTransform: "uppercase",
-      letterSpacing: 1.8,
     },
   });
 }

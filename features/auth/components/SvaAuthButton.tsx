@@ -5,7 +5,6 @@ import {
   StyleSheet,
   Text,
   type StyleProp,
-  type TextStyle,
   type ViewStyle,
   View,
 } from "react-native";
@@ -24,7 +23,6 @@ export type SvaAuthButtonProps = {
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
   style?: StyleProp<ViewStyle>;
-  textStyle?: StyleProp<TextStyle>;
   testID?: string;
 };
 
@@ -37,7 +35,6 @@ export function SvaAuthButton({
   leftIcon,
   rightIcon,
   style,
-  textStyle,
   testID,
 }: SvaAuthButtonProps) {
   const { svaColors, svaComponents } = useContext(ThemeContext);
@@ -83,7 +80,7 @@ export function SvaAuthButton({
       ) : (
         <>
           {leftIcon ? <View style={s.leftIcon}>{leftIcon}</View> : null}
-          <Text style={[s.label, { color: palette.textColor }, textStyle]}>
+          <Text style={[s.label, { color: palette.textColor }]}>
             {label}
           </Text>
           {rightIcon ? <View style={s.rightIcon}>{rightIcon}</View> : null}
@@ -105,9 +102,6 @@ const s = StyleSheet.create({
   },
   label: {
     ...SVATypography.textStyle.button,
-    fontFamily: "Inter_600SemiBold",
-    fontSize: 16,
-    fontWeight: "600",
   },
   leftIcon: {
     marginRight: 10,

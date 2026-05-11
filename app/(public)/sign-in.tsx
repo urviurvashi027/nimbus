@@ -3,7 +3,6 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -16,9 +15,11 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ThemeContext from "@/contexts/ThemeContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNimbusToast } from "@/components/ui/toast/useNimbusToast";
+import { ROUTES } from "@/constants/routes";
 import { SVATypography } from "@/theme/typography";
 import { SvaAuthInput } from "@/features/auth/components/SvaAuthInput";
 import { SvaAuthButton } from "@/features/auth/components/SvaAuthButton";
+import { SvaAuthTextAction } from "@/features/auth/components/SvaAuthTextAction";
 
 import type { TextInput } from "react-native";
 
@@ -192,7 +193,6 @@ export default function SignIn() {
                         onPress={submit}
                         loading={loading}
                         style={styles.primaryButton}
-                        textStyle={styles.primaryButtonText}
                         rightIcon={
                           <Ionicons
                             name="arrow-forward"
@@ -206,11 +206,10 @@ export default function SignIn() {
 
                       <SvaAuthButton
                         label="Register for Sanctuary"
-                        onPress={() => router.push("/(public)/register")}
+                        onPress={() => router.push(ROUTES.PUBLIC.REGISTER)}
                         variant="secondary"
                         disabled={loading}
                         style={styles.secondaryButton}
-                        textStyle={styles.secondaryButtonText}
                         leftIcon={
                           <Ionicons
                             name="person-add-outline"
@@ -222,41 +221,36 @@ export default function SignIn() {
                     </View>
                   </View>
 
-                  <Pressable
-                    onPress={() => router.push("/(public)/forgot-password")}
+                  <SvaAuthTextAction
+                    onPress={() => router.push(ROUTES.PUBLIC.FORGOT_PASSWORD)}
+                    variant="muted"
                     style={styles.forgotAccess}
                     hitSlop={10}
+                    secondaryContent={
+                      <View style={styles.forgotAccessDecor}>
+                        <View
+                          style={[
+                            styles.forgotAccessLine,
+                            { backgroundColor: svaColors.border.default },
+                          ]}
+                        />
+                        <View
+                          style={[
+                            styles.forgotAccessDot,
+                            { backgroundColor: svaColors.border.default },
+                          ]}
+                        />
+                        <View
+                          style={[
+                            styles.forgotAccessLine,
+                            { backgroundColor: svaColors.border.default },
+                          ]}
+                        />
+                      </View>
+                    }
                   >
-                    <Text
-                      style={[
-                        styles.forgotAccessText,
-                        { color: svaColors.text.secondary },
-                      ]}
-                    >
-                      Lost Access
-                    </Text>
-
-                    <View style={styles.forgotAccessDecor}>
-                      <View
-                        style={[
-                          styles.forgotAccessLine,
-                          { backgroundColor: svaColors.border.default },
-                        ]}
-                      />
-                      <View
-                        style={[
-                          styles.forgotAccessDot,
-                          { backgroundColor: svaColors.border.default },
-                        ]}
-                      />
-                      <View
-                        style={[
-                          styles.forgotAccessLine,
-                          { backgroundColor: svaColors.border.default },
-                        ]}
-                      />
-                    </View>
-                  </Pressable>
+                    Lost Access
+                  </SvaAuthTextAction>
                 </View>
               </View>
             </View>
@@ -310,11 +304,7 @@ function createStyles(
       borderBottomWidth: StyleSheet.hairlineWidth,
     },
     brandWordmark: {
-      ...SVATypography.textStyle.button,
-      fontFamily: "Inter_700Bold",
-      fontSize: 18,
-      fontWeight: "700",
-      letterSpacing: 4.8,
+      ...SVATypography.textStyle.brandWordmark,
     },
     heroBody: {
       flex: 1,
@@ -324,19 +314,11 @@ function createStyles(
       alignItems: "center",
     },
     heroTitle: {
-      ...SVATypography.textStyle.displayMedium,
-      fontFamily: "CormorantGaramond_500Medium",
-      fontSize: 30,
-      fontWeight: "500",
-      lineHeight: 33,
-      letterSpacing: -0.4,
+      ...SVATypography.textStyle.authTitle,
       textAlign: "center",
     },
     heroSubtitle: {
-      ...SVATypography.textStyle.subtitle,
-      fontFamily: "Inter_400Regular",
-      fontSize: 14,
-      lineHeight: 20,
+      ...SVATypography.textStyle.authSubtitle,
       marginTop: 8,
       textAlign: "center",
     },
@@ -373,12 +355,6 @@ function createStyles(
       minHeight: 56,
       borderRadius: svaComponents?.button?.primary?.borderRadius ?? 16,
     },
-    primaryButtonText: {
-      ...SVATypography.textStyle.button,
-      fontFamily: "Inter_600SemiBold",
-      fontSize: 16,
-      fontWeight: "600",
-    },
     secondaryButtonGap: {
       height: 12,
     },
@@ -387,28 +363,13 @@ function createStyles(
       minHeight: 52,
       borderRadius: 15,
     },
-    secondaryButtonText: {
-      ...SVATypography.textStyle.button,
-      fontFamily: "Inter_600SemiBold",
-      fontSize: 14,
-      fontWeight: "600",
-    },
     forgotAccess: {
-      alignItems: "center",
       marginTop: "auto",
       paddingTop: 24,
-    },
-    forgotAccessText: {
-      ...SVATypography.textStyle.label,
-      fontFamily: "Inter_600SemiBold",
-      fontSize: 13,
-      fontWeight: "600",
-      letterSpacing: 1.1,
     },
     forgotAccessDecor: {
       flexDirection: "row",
       alignItems: "center",
-      marginTop: 10,
     },
     forgotAccessLine: {
       width: 38,

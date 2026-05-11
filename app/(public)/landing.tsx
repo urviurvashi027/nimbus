@@ -4,6 +4,7 @@ import { router, useNavigation } from "expo-router";
 import ThemeContext from "@/contexts/ThemeContext";
 import { ScreenView } from "@/components/ui/Themed";
 import { NimbusButton } from "@/components/ui/theme-components/NimbusButton";
+import { ROUTES } from "@/constants/routes";
 
 import RelaxMenIcon from "@/assets/images/logoNew/1.svg";
 
@@ -22,11 +23,11 @@ const LandingScreen = () => {
   const styles = styling(newTheme, tokens, typography, spacing);
 
   const firstBtnSegmentBtnClick = () => {
-    router.push("/(public)/register");
+    router.push(ROUTES.PUBLIC.REGISTER);
   };
 
   const secondBtnSegmentBtnClick = () => {
-    router.push("/(public)/sign-in");
+    router.push(ROUTES.PUBLIC.SIGN_IN);
   };
 
   return (

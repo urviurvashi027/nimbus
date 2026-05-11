@@ -11,6 +11,7 @@ import * as SecureStore from "expo-secure-store";
 import axios from "axios";
 
 import { StoreKey } from "@/constants/Constant";
+import { ROUTES } from "@/constants/routes";
 import {
   login,
   signup,
@@ -29,7 +30,7 @@ export async function clearAuthAndOnboarding() {
 
 const resetApp = async () => {
   await clearAuthAndOnboarding();
-  router.replace("/(public)/landing");
+  router.replace(ROUTES.PUBLIC.LANDING);
 };
 
 type UserProfile = {
@@ -110,7 +111,7 @@ function useProtectedRoute(
 
     // not authed -> block auth routes
     if (!isAuthed && root === "(auth)") {
-      router.replace("/(public)/landing");
+      router.replace(ROUTES.PUBLIC.LANDING);
       return;
     }
 
@@ -359,7 +360,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
           token: null,
         });
         setUserProfile(null);
-        router.replace("/(public)/landing");
+        router.replace(ROUTES.PUBLIC.LANDING);
       }
     } catch (e) {}
   };
@@ -386,7 +387,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     setAuthState({ token: null, authenticated: false });
     setUserProfile(null);
 
-    router.replace("/(public)/landing");
+    router.replace(ROUTES.PUBLIC.LANDING);
   }, []);
 
   const _fetchUserProfile = async () => {

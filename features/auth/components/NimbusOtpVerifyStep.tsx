@@ -5,6 +5,7 @@ import { useLocalSearchParams } from "expo-router";
 import ThemeContext from "@/contexts/ThemeContext";
 import { NimbusButton } from "@/components/ui/theme-components/NimbusButton";
 import { getOtp, verifyOtp } from "@/features/auth/services/loginService";
+import type { GetOtpRequest } from "@/features/auth/types/loginTypes";
 import { useNimbusToast } from "@/components/ui/toast/useNimbusToast";
 
 type Props = {
@@ -97,7 +98,7 @@ export default function NimbusOtpVerifyStep({
     onError?.("");
 
     try {
-      const payload: any = { recipient: email };
+      const payload: GetOtpRequest = { recipient: email, channel: "email" };
       if (username) payload.name = username; // ✅ only when available
 
       const res = await getOtp(payload);

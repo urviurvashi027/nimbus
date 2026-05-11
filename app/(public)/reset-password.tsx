@@ -10,6 +10,7 @@ import { setPassword as updatePassword } from "@/features/auth/services/loginSer
 import { SvaAuthButton } from "@/features/auth/components/SvaAuthButton";
 import { SvaAuthInput } from "@/features/auth/components/SvaAuthInput";
 import { SvaRecoveryLayout } from "@/features/auth/components/SvaRecoveryLayout";
+import { ROUTES } from "@/constants/routes";
 import { SVATypography } from "@/theme/typography";
 
 export default function ResetPasswordScreen() {
@@ -73,7 +74,7 @@ export default function ResetPasswordScreen() {
           message: "You can now sign in with your new password.",
         });
 
-        router.replace("/(public)/sign-in");
+        router.replace(ROUTES.PUBLIC.SIGN_IN);
         return;
       }
 
@@ -166,7 +167,6 @@ export default function ResetPasswordScreen() {
             onPress={submit}
             loading={loading}
             style={styles.primaryButton}
-            textStyle={styles.primaryButtonText}
             rightIcon={
               <Ionicons
                 name="arrow-forward"
@@ -204,10 +204,7 @@ function createStyles(svaColors: any, svaComponents: any) {
     },
     errorText: {
       marginTop: 14,
-      ...SVATypography.textStyle.caption,
-      fontFamily: "Inter_600SemiBold",
-      fontSize: 12,
-      lineHeight: 18,
+      ...SVATypography.textStyle.authBody,
     },
     buttonGap: {
       height: 20,
@@ -217,18 +214,9 @@ function createStyles(svaColors: any, svaComponents: any) {
       minHeight: 56,
       borderRadius: svaComponents?.button?.primary?.borderRadius ?? 16,
     },
-    primaryButtonText: {
-      ...SVATypography.textStyle.button,
-      fontFamily: "Inter_600SemiBold",
-      fontSize: 16,
-      fontWeight: "600",
-    },
     footer: {
-      ...SVATypography.textStyle.caption,
-      fontFamily: "Inter_500Medium",
+      ...SVATypography.textStyle.authFootnote,
       color: svaColors.text.disabled,
-      fontSize: 11,
-      lineHeight: 18,
       textAlign: "center",
     },
   });

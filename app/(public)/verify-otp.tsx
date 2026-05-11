@@ -7,8 +7,10 @@ import ThemeContext from "@/contexts/ThemeContext";
 import { forgotPassword, verifyOtp } from "@/features/auth/services/loginService";
 import { useNimbusToast } from "@/components/ui/toast/useNimbusToast";
 import { SvaAuthButton } from "@/features/auth/components/SvaAuthButton";
+import { SvaAuthTextAction } from "@/features/auth/components/SvaAuthTextAction";
 import { SvaOtpCodeInput } from "@/features/auth/components/SvaOtpCodeInput";
 import { SvaRecoveryLayout } from "@/features/auth/components/SvaRecoveryLayout";
+import { ROUTES } from "@/constants/routes";
 import { SVATypography } from "@/theme/typography";
 
 const OTP_LENGTH = 6;
@@ -116,7 +118,7 @@ export default function VerifyOtpScreen() {
         });
 
         router.push({
-          pathname: "/(public)/reset-password",
+          pathname: ROUTES.PUBLIC.RESET_PASSWORD,
           params: { email, otp: code.trim() },
         });
         return;
@@ -148,19 +150,18 @@ export default function VerifyOtpScreen() {
               Not your email?
             </Text>
 
-            <Pressable
+            <SvaAuthTextAction
               onPress={() =>
                 router.replace({
-                  pathname: "/(public)/forgot-password",
+                  pathname: ROUTES.PUBLIC.FORGOT_PASSWORD,
                   params: { email },
                 })
               }
+              variant="link"
               hitSlop={8}
             >
-              <Text style={[styles.emailAction, { color: svaColors.brand.primary }]}>
-                Edit Email
-              </Text>
-            </Pressable>
+              Edit Email
+            </SvaAuthTextAction>
           </View>
         }
       >
@@ -198,7 +199,6 @@ export default function VerifyOtpScreen() {
             onPress={onVerify}
             loading={verifying}
             style={styles.primaryButton}
-            textStyle={styles.primaryButtonText}
             rightIcon={
               <Ionicons
                 name="arrow-forward"
@@ -241,14 +241,7 @@ function createStyles(svaColors: any, svaComponents: any) {
       gap: 4,
     },
     emailCopy: {
-      ...SVATypography.textStyle.label,
-      lineHeight: 18,
-    },
-    emailAction: {
-      ...SVATypography.textStyle.label,
-      lineHeight: 18,
-      textDecorationLine: "underline",
-      textDecorationColor: svaColors.brand.primary,
+      ...SVATypography.textStyle.authLabel,
     },
     codeShell: {
       width: "100%",
@@ -265,8 +258,7 @@ function createStyles(svaColors: any, svaComponents: any) {
     },
     errorText: {
       marginTop: 14,
-      ...SVATypography.textStyle.caption,
-      lineHeight: 18,
+      ...SVATypography.textStyle.authBody,
     },
     buttonGap: {
       height: 20,
@@ -276,26 +268,17 @@ function createStyles(svaColors: any, svaComponents: any) {
       minHeight: 56,
       borderRadius: svaComponents?.button?.primary?.borderRadius ?? 16,
     },
-    primaryButtonText: {
-      ...SVATypography.textStyle.button,
-    },
     resendRow: {
       marginTop: 14,
       alignItems: "center",
     },
     resendText: {
-      ...SVATypography.textStyle.caption,
-      fontFamily: "Inter_500Medium",
-      fontSize: 11,
-      lineHeight: 16,
+      ...SVATypography.textStyle.authTinyLabel,
       letterSpacing: 1.4,
       textTransform: "uppercase",
     },
     resendAction: {
-      ...SVATypography.textStyle.caption,
-      fontFamily: "Inter_500Medium",
-      fontSize: 11,
-      lineHeight: 16,
+      ...SVATypography.textStyle.authTinyLabel,
       letterSpacing: 1.5,
       textTransform: "uppercase",
     },
