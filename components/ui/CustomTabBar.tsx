@@ -24,10 +24,6 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({
   const styles = styling(newTheme, spacing);
 
   const onPlusPress = () => {
-    // Usually opens a "Create" modal or screen
-    // For now, we can navigate to habit creation if it exists
-    router.push("/(auth)/habit/createHabit");
-    // =======
     setModalVisible(true);
   };
 
