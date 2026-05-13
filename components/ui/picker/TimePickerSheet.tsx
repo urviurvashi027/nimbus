@@ -13,9 +13,9 @@ import {
 import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
-import { Ionicons } from "@expo/vector-icons";
 
 import ThemeContext from "@/contexts/ThemeContext";
+import ModalHeader from "@/components/ui/modal/ModalHeader";
 
 type Props = {
   visible: boolean;
@@ -108,20 +108,7 @@ export default function TimePickerSheet({
             },
           ]}
         >
-          {/* Header */}
-          <View style={styles.header}>
-            <Text style={[styles.title, { color: newTheme.textPrimary }]}>
-              {title}
-            </Text>
-
-            <TouchableOpacity
-              onPress={onClose}
-              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-              accessibilityLabel="Close time picker"
-            >
-              <Ionicons name="close" size={20} color={newTheme.textPrimary} />
-            </TouchableOpacity>
-          </View>
+          <ModalHeader title={title} onClose={onClose} />
 
           {/* Picker */}
           <View style={styles.picker}>
@@ -185,18 +172,6 @@ const createStyles = (t: any) =>
         },
         android: { elevation: 16 },
       }),
-    },
-    header: {
-      paddingHorizontal: 16,
-      paddingTop: 14,
-      paddingBottom: 10,
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-    },
-    title: {
-      fontSize: 16,
-      fontWeight: "700",
     },
     picker: {
       paddingBottom: Platform.OS === "ios" ? 8 : 0,

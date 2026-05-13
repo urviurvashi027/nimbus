@@ -112,7 +112,7 @@ const CreateActionModal: React.FC<CreateActionModalProps> = ({
               iconBg="rgba(163, 190, 140, 0.15)"
               title="Craft Unique Formula"
               description="Design a ritual tailored to your specific neural architecture."
-              onPress={() => handleAction("/(auth)/habit/createHabit")}
+              onPress={() => handleAction("/(auth)/habit/createProtocol")}
               svaTypography={svaTypography}
               styles={styles}
             />

@@ -1,10 +1,8 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
-  StyleSheet,
   TouchableOpacity,
-  Modal,
   StyleProp,
   ViewStyle,
 } from "react-native";
@@ -27,14 +25,22 @@ export type selectedTag = {
 interface HabitTagsInputProps {
   onSelect: (selectedTag: selectedTag) => void;
   style?: StyleProp<ViewStyle>;
+  label?: string;
+  showIcon?: boolean;
 }
 
-const HabitTagsInput: React.FC<HabitTagsInputProps> = ({ onSelect, style }) => {
+const HabitTagsInput: React.FC<HabitTagsInputProps> = ({
+  onSelect,
+  style,
+  label = "Add a vibe",
+  showIcon = true,
+}) => {
   const [tagsList, setTagsList] = useState<HabitTag[]>([]);
 
   const [selectedTag, setSelectedTag] = useState<HabitTag[]>([]);
 
   const [showHabitTagsModal, setShowHabitTagsModal] = useState(false);
+  const onSelectRef = useRef(onSelect);
 
   const { spacing, newTheme } = useContext(ThemeContext);
   const styles = styling(newTheme, spacing);
@@ -56,11 +62,7 @@ const HabitTagsInput: React.FC<HabitTagsInputProps> = ({ onSelect, style }) => {
 
   // Handle removing tags
   const handleRemoveTag = (index: number) => {
-    const res = selectedTag;
-    const updatedTags = [...res];
-    updatedTags.splice(index, 1);
-    // TODO
-    setSelectedTag(updatedTags);
+    setSelectedTag((prevTags) => prevTags.filter((_, i) => i !== index));
   };
 
   const handleOnSelect = (selectedHabitTag: any, newTag?: string) => {
@@ -89,10 +91,12 @@ const HabitTagsInput: React.FC<HabitTagsInputProps> = ({ onSelect, style }) => {
   };
 
   useEffect(() => {
-    if (selectedTag.length) {
-      const result = constructTagObject(selectedTag);
-      onSelect(result);
-    }
+    onSelectRef.current = onSelect;
+  }, [onSelect]);
+
+  useEffect(() => {
+    const result = constructTagObject(selectedTag);
+    onSelectRef.current(result);
   }, [selectedTag]);
 
   const onCloseModalClick = () => {
@@ -107,13 +111,19 @@ const HabitTagsInput: React.FC<HabitTagsInputProps> = ({ onSelect, style }) => {
           onPress={() => setShowHabitTagsModal(true)}
         >
           <View style={styles.rowLeft}>
-            <Ionicons
-              style={styles.iconLeft}
-              name="pricetags-outline"
-              size={20}
-              color={newTheme.textSecondary}
-            />
-            <Text style={styles.rowLabel}>Add a vibe</Text>
+            {showIcon && (
+              <Ionicons
+                style={styles.iconLeft}
+                name="pricetags-outline"
+                size={20}
+                color={newTheme.textSecondary}
+              />
+            )}
+            <Text
+              style={[styles.rowLabel, !showIcon && styles.rowLabelNoIcon]}
+            >
+              {label}
+            </Text>
           </View>
 
           <View style={styles.rowRight}>

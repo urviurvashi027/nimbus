@@ -15,6 +15,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/contexts/ThemeContext";
+import ModalHeader from "@/components/ui/modal/ModalHeader";
 
 export type SelectableItem = {
   id: string | number;
@@ -154,22 +155,7 @@ export default function SelectableListModal<T extends SelectableItem>({
         ]}
       >
         <View style={[styles.card, style]}>
-          {/* Header */}
-          <View style={styles.header}>
-            <Text style={styles.headerTitle} accessibilityRole="header">
-              {title}
-            </Text>
-
-            <Pressable
-              onPress={onClose}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              accessibilityLabel="Close"
-              accessibilityRole="button"
-              style={styles.closeBtn}
-            >
-              <Ionicons name="close" size={22} color={newTheme.textPrimary} />
-            </Pressable>
-          </View>
+          <ModalHeader title={title} onClose={onClose} />
 
           <FlatList
             data={options}
@@ -212,23 +198,6 @@ const makeStyles = (t: any, spacing: any) =>
         },
         android: { elevation: 12 },
       }),
-    },
-
-    header: {
-      paddingHorizontal: 18,
-      paddingTop: 18,
-      paddingBottom: 10,
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-    },
-    headerTitle: {
-      fontSize: 20,
-      fontWeight: "700",
-      color: t.textPrimary,
-    },
-    closeBtn: {
-      padding: 2,
     },
 
     separator: {

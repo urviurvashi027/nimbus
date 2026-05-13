@@ -33,6 +33,8 @@ interface HabitReminderInputProps {
   onSelect: (value: any) => void;
   style?: StyleProp<ViewStyle>;
   isEditMode?: EditData;
+  label?: string;
+  fallbackLabel?: string;
 }
 
 const HabitReminderInput: React.FC<HabitReminderInputProps> = ({
@@ -40,6 +42,8 @@ const HabitReminderInput: React.FC<HabitReminderInputProps> = ({
   isAllDayEnabled,
   isEditMode,
   style,
+  label = "Your daily nudge",
+  fallbackLabel = "Select the preset",
 }) => {
   const { newTheme, spacing } = useContext(ThemeContext);
   const styles = styling(newTheme, spacing);
@@ -72,12 +76,10 @@ const HabitReminderInput: React.FC<HabitReminderInputProps> = ({
     }
   }, [isEditMode, onSelect]);
 
-  console.log("HabitReminderInput rendered", isAllDayEnabled);
-
   // ✅ consistent UI time across app
   const userDisplay = useMemo(() => {
-    return formatReminderDisplay(reminderAt, { fallback: "Select the preset" });
-  }, [reminderAt]);
+    return formatReminderDisplay(reminderAt, { fallback: fallbackLabel });
+  }, [fallbackLabel, reminderAt]);
 
   const handleHabitReminder = (next: ReminderAt) => {
     setReminderAt(next);
@@ -114,7 +116,7 @@ const HabitReminderInput: React.FC<HabitReminderInputProps> = ({
             size={20}
             color={newTheme.textSecondary}
           />
-          <Text style={styles.rowLabel}>Your daily nudge</Text>
+          <Text style={styles.rowLabel}>{label}</Text>
         </View>
 
         <View style={styles.rowRight}>
