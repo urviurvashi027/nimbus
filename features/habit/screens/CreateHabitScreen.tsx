@@ -1,10 +1,8 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import {
   View,
-  TouchableOpacity,
   StyleSheet,
   TextInput,
-  ActivityIndicator,
   SafeAreaView,
   ScrollView,
   Pressable,
@@ -31,10 +29,10 @@ import EmojiSelector from "@/features/habit/components/create-habit/EmojiSelecto
 import AppHeader from "@/components/layout/AppHeader";
 
 import { createHabit } from "@/features/habit/services/habitService";
+import { fromApiDate, toApiDate, toBackendTime } from "@/utils/date-time";
 
 import {
   ReminderAt,
-  FrequencyObj,
   MetricFormat,
   Duration,
   HabitDateType,
@@ -58,9 +56,8 @@ export const CreateHabitScreen = () => {
   const [name, setName] = useState("");
   const [habitTypeId, sethabitTypeId] = useState<number>(0);
   const [tags, setTags] = useState<selectedTag>({} as selectedTag);
-  const [metric, setMetric] = useState<MetricFormat | {}>({});
-  const [frequency, setFrequency] = useState<FrequencyObj | null>(null);
-  const [duration, setDuration] = useState<Duration>({ all_day: undefined });
+  const [metric, setMetric] = useState<MetricFormat | null>(null);
+  const [duration, setDuration] = useState<Duration>({ all_day: true });
   const [date, setDate] = useState<HabitDateType>();
   const [reminderAt, setReminderAt] = useState<ReminderAt>({});
   const [emoji, setEmoji] = useState<string>("🙂");
@@ -108,16 +105,69 @@ export const CreateHabitScreen = () => {
     setDate(v);
   };
 
-  const handleFrequencySelect = (v: any) => setFrequency(v);
-
   const handleReminderSelect = useCallback((v: any) => {
     setReminderAt(v);
     console.log(v, "selected reminder details");
   }, []);
 
-  const getFrequencyDetail = () => {
-    if (frequency?.frequency_type || date?.start_date)
-      return { ...frequency, ...date };
+  const normalizeDateValue = (value?: Date | string | null) => {
+    if (!value) return undefined;
+    const parsed = value instanceof Date ? value : fromApiDate(value);
+    return toApiDate(parsed);
+  };
+
+  const normalizeDurationForBackend = (value: any) => {
+    if (!value || value.all_day) return { all_day: true };
+
+    const payload: any = {};
+    if (value.start_time) {
+      payload.start_time =
+        typeof value.start_time === "string"
+          ? value.start_time
+          : toBackendTime(value.start_time);
+    }
+    if (value.end_time) {
+      payload.end_time =
+        typeof value.end_time === "string"
+          ? value.end_time
+          : toBackendTime(value.end_time);
+    }
+
+    return payload;
+  };
+
+  const normalizeFrequencyForBackend = (value?: any) => {
+    const payload: any = {
+      start_date: normalizeDateValue(value?.start_date) ?? toApiDate(new Date()),
+    };
+
+    const endDate = normalizeDateValue(value?.end_date);
+    if (endDate) payload.end_date = endDate;
+
+    if (value?.frequency_type) payload.frequency_type = value.frequency_type;
+    if (typeof value?.interval === "number") payload.interval = value.interval;
+    if (value?.days_of_week?.length) payload.days_of_week = value.days_of_week;
+    if (value?.days_of_month?.length) payload.days_of_month = value.days_of_month;
+
+    return payload;
+  };
+
+  const normalizeReminderForBackend = (value?: any) => {
+    if (!value) return {};
+
+    if (value.time) {
+      return {
+        time:
+          typeof value.time === "string"
+            ? value.time
+            : toBackendTime(value.time),
+      };
+    }
+
+    if (value.ten_min_before) return { ten_min_before: true };
+    if (value.thirty_min_before) return { thirty_min_before: true };
+
+    return {};
   };
 
   const getFormattedTag = () => {
@@ -132,18 +182,20 @@ export const CreateHabitScreen = () => {
 
   const validateAndBuild = () => {
     if (!name.trim()) return { ok: false, msg: "Please enter a habit name." };
-    if (!Object.keys(metric).length)
+    if (!metric || !Object.keys(metric).length)
       return { ok: false, msg: "Please choose a metric." };
     if (!Object.keys(reminderAt).length)
       return { ok: false, msg: "Please set a reminder." };
 
-    const freq = getFrequencyDetail();
+    const freq = normalizeFrequencyForBackend(date);
+    const durationPayload = normalizeDurationForBackend(duration);
+    const reminderPayload = normalizeReminderForBackend(reminderAt);
     const payload: any = {
       name: name.trim(),
       habit_type_id: habitTypeId,
       color: colorSchema,
       habit_metric: metric,
-      habit_duration: duration,
+      habit_duration: durationPayload,
       habit_frequency: freq,
       tags: getFormattedTag(),
       icon: emoji,
@@ -151,8 +203,7 @@ export const CreateHabitScreen = () => {
 
     console.log(payload, "final payload");
 
-    if (reminderAt?.time || reminderAt?.ten_min_before)
-      payload.remind_at = reminderAt;
+    if (Object.keys(reminderPayload).length) payload.remind_at = reminderPayload;
     return { ok: true, payload };
   };
 
@@ -176,7 +227,7 @@ export const CreateHabitScreen = () => {
           message: "Failed to create habit",
         });
       }
-    } catch (err: any) {
+    } catch {
       toast.show({
         variant: "error",
         title: "Somthing went wrong",
@@ -336,6 +387,7 @@ export const CreateHabitScreen = () => {
               <HabitDurationInput
                 style={styles.rowItem}
                 onSelect={handleDurationSelect}
+                label="Rhythm"
               />
               <HabitDateInput
                 style={styles.rowItem}

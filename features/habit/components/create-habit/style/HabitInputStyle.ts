@@ -1,4 +1,4 @@
-import { View, TouchableOpacity, StyleSheet, Platform } from "react-native";
+import { StyleSheet } from "react-native";
 
 const styling = (newTheme: any, spacing: any) =>
   StyleSheet.create({
@@ -50,6 +50,9 @@ const styling = (newTheme: any, spacing: any) =>
       color: newTheme.textSecondary || "red",
       fontSize: 15,
     },
+    rowLabelNoIcon: {
+      marginLeft: 0,
+    },
     // rowRight: { flexDirection: "row", alignItems: "center", gap: 8 },
     // rowValue: { color: newTheme.textPrimary, fontSize: 15, fontWeight: "600" },
     rowItem: {
@@ -69,7 +72,7 @@ const styling = (newTheme: any, spacing: any) =>
       alignItems: "center",
       justifyContent: "flex-end",
       flexShrink: 1, // allow right side to shrink
-      maxWidth: "55%", // tweak: 50–65% depending on your UI
+      maxWidth: "62%", // give recurrence text a little more room
     },
 
     rowValue: {
@@ -79,6 +82,18 @@ const styling = (newTheme: any, spacing: any) =>
       color: newTheme.textPrimary,
       fontSize: 15,
       fontWeight: "600",
+    },
+    rowValueStack: {
+      flexShrink: 1,
+      alignItems: "flex-end",
+    },
+    rowValueSecondary: {
+      marginTop: 2,
+      textAlign: "right",
+      color: newTheme.textSecondary,
+      fontSize: 12,
+      fontWeight: "500",
+      lineHeight: 16,
     },
   });
 

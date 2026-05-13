@@ -1,9 +1,7 @@
 import {
   View,
   TouchableOpacity,
-  StyleSheet,
   Text,
-  Platform,
   StyleProp,
   ViewStyle,
 } from "react-native";
@@ -23,12 +21,20 @@ interface HabitDurationInputProps {
   onSelect: (value: any) => void;
   isEditMode?: Duration;
   style?: StyleProp<ViewStyle>;
+  label?: string;
+  compact?: boolean;
+  showLabel?: boolean;
+  showIcon?: boolean;
 }
 
 const HabitDurationInput: React.FC<HabitDurationInputProps> = ({
   onSelect,
   style,
   isEditMode,
+  label = "Rhythm",
+  compact = false,
+  showLabel = true,
+  showIcon = true,
 }) => {
   const [duration, setDuration] = useState<Duration>({ all_day: true });
 
@@ -37,25 +43,17 @@ const HabitDurationInput: React.FC<HabitDurationInputProps> = ({
   const { newTheme, spacing } = useContext(ThemeContext);
 
   const styles = styling(newTheme, spacing);
+  const showLeftContent = showLabel || showIcon;
+  const compactRow = compact || !showLeftContent;
 
   const handleSave = (selectedDuration: any) => {
-    console.log(selectedDuration, "selectedDuration");
     onSelect(toBackendDurationPayload(selectedDuration));
   };
 
-  // function to handle task duration
   const handleHabitDuration = (selectedDuration: any) => {
     setDuration(selectedDuration);
     handleSave(selectedDuration);
   };
-
-  useEffect(() => {
-    if (duration.all_day) {
-      onSelect({ all_day: true });
-    } else {
-      onSelect(toBackendDurationPayload(duration));
-    }
-  }, []);
 
   useEffect(() => {
     if (isEditMode) {
@@ -66,20 +64,28 @@ const HabitDurationInput: React.FC<HabitDurationInputProps> = ({
   return (
     <>
       <TouchableOpacity
-        style={[styles.rowItem, style]}
+        style={[
+          styles.rowItem,
+          compactRow && { alignSelf: "flex-start", justifyContent: "space-between" },
+          style,
+        ]}
         onPress={() => setShowDurationModal(true)}
       >
-        <View style={styles.rowLeft}>
-          <Ionicons
-            style={styles.iconLeft}
-            name="time-outline"
-            size={20}
-            color={newTheme.textSecondary}
-          />
-          <Text style={styles.rowLabel}>When it happens</Text>
-        </View>
+        {showLeftContent && (
+          <View style={styles.rowLeft}>
+            {showIcon && (
+              <Ionicons
+                style={styles.iconLeft}
+                name="time-outline"
+                size={20}
+                color={newTheme.textSecondary}
+              />
+            )}
+            {showLabel && <Text style={styles.rowLabel}>{label}</Text>}
+          </View>
+        )}
 
-        <View style={styles.rowRight}>
+        <View style={[styles.rowRight, compactRow && { maxWidth: "100%" }]}>
           <Text style={styles.rowValue} numberOfLines={1} ellipsizeMode="tail">
             {formatDurationDisplay(duration, { allDayLabel: "All Day" })}
           </Text>
@@ -97,6 +103,8 @@ const HabitDurationInput: React.FC<HabitDurationInputProps> = ({
         onClose={() => setShowDurationModal(false)}
         isEditMode={duration}
         onSave={handleHabitDuration}
+        title="Rhythm"
+        subtitle="Choose whether this habit runs all day or within a focused window."
       />
     </>
   );

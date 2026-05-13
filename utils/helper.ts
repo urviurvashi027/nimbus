@@ -16,23 +16,28 @@ export function findIdBName(
   return foundItem ? foundItem[idKey] : undefined;
 }
 
-export const addObjectAtEnd = (data: any) => {
-  // Get the last object in the array
-  const lastObject = data[data.length - 1];
+export const addObjectAtEnd = (data: any[]) => {
+  const uniqueItems = Array.from(
+    new Map(data.map((item) => [item.id, item])).values()
+  );
 
-  // Extract the last id and increment it by 1
-  const newId = lastObject ? lastObject.id + 1 : 1; // Handle empty array case
+  const hasAddNew = uniqueItems.some((item) => item.name === "Add New");
+  if (hasAddNew) {
+    return uniqueItems;
+  }
 
-  // Create the new object to add
-  const newObject = {
-    id: newId,
-    name: "Add New",
-  };
+  const maxId = uniqueItems.reduce(
+    (max, item) => (typeof item.id === "number" ? Math.max(max, item.id) : max),
+    0
+  );
 
-  // Add the new object to the end of the array
-  const modifiedArray = [...data, newObject];
-
-  return modifiedArray;
+  return [
+    ...uniqueItems,
+    {
+      id: maxId + 1,
+      name: "Add New",
+    },
+  ];
 };
 
 export async function getDeviceDetails() {

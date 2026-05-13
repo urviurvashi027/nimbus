@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
-import { addDays, differenceInDays } from "date-fns";
+import { addDays } from "date-fns";
 import {
   View,
   Modal,
@@ -13,19 +13,18 @@ import {
   Text,
   TouchableWithoutFeedback,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 
 import ThemeContext from "@/contexts/ThemeContext";
+import ModalHeader from "@/components/ui/modal/ModalHeader";
 import { StyledButton } from "@/components/ui/StyledButton";
 import StyledSwitch from "@/components/ui/theme-components/StyledSwitch";
 import { HabitDateType } from "@/features/habit/types/habitTypes";
+import { fromApiDate } from "@/utils/date-time";
 
 // ✅ Nimbus-style date input (should open DatePickerSheet like TimeInput opens TimePickerSheet)
 import DateInput from "@/components/ui/picker/DateInput";
 
 type UIFreq = "Daily" | "Weekly" | "Monthly" | "";
-type BackendFreq = "daily" | "weekly" | "monthly" | "";
-
 const toUIFreq = (f?: string | null): UIFreq => {
   if (!f) return "";
   const v = f.toLowerCase();
@@ -56,6 +55,8 @@ interface HabitDateModalProps {
   onClose: () => void;
   onSave: (habitDate: HabitDateType) => void;
   isEditMode?: HabitDateType | null;
+  title?: string;
+  subtitle?: string;
 }
 
 export default function StartDateModal({
@@ -63,9 +64,16 @@ export default function StartDateModal({
   onClose,
   onSave,
   isEditMode,
+  title = "Start date",
+  subtitle = "Choose when this habit begins — and optionally repeats.",
 }: HabitDateModalProps) {
-  const { newTheme } = useContext(ThemeContext);
-  const styles = useMemo(() => styling(newTheme), [newTheme]);
+  const { newTheme, spacing, svaTypography, typography } =
+    useContext(ThemeContext);
+  const bodyTextStyle = svaTypography?.textStyle?.body ?? typography.body;
+  const styles = useMemo(
+    () => styling(newTheme, spacing, bodyTextStyle, svaTypography),
+    [newTheme, spacing, bodyTextStyle, svaTypography]
+  );
 
   // modal fields (LOGIC UNCHANGED)
   const [startDate, setStartDate] = useState<Date>(new Date());
@@ -87,18 +95,23 @@ export default function StartDateModal({
   const [error, setError] = useState<string>("");
 
   const daysOfWeek = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+  const handleClose = () => {
+    setError("");
+    onClose();
+  };
+
+  const asDate = (value?: Date | string | null) => {
+    if (!value) return undefined;
+    return value instanceof Date ? value : fromApiDate(value);
+  };
 
   // init from edit mode (LOGIC UNCHANGED)
   useEffect(() => {
     if (!visible) return;
 
     if (isEditMode) {
-      const sd = isEditMode.start_date
-        ? new Date(isEditMode.start_date)
-        : new Date();
-      const ed = isEditMode.end_date
-        ? new Date(isEditMode.end_date)
-        : undefined;
+      const sd = asDate(isEditMode.start_date) ?? new Date();
+      const ed = asDate(isEditMode.end_date);
 
       setStartDate(sd);
 
@@ -313,54 +326,44 @@ export default function StartDateModal({
 
   return (
     <Modal
-      animationType="none"
+      animationType="slide"
       transparent
       visible={visible}
-      onRequestClose={onClose}
       statusBarTranslucent
+      onRequestClose={handleClose}
     >
-      {/* Backdrop */}
-      <TouchableWithoutFeedback onPress={onClose}>
-        <View style={styles.backdrop} />
-      </TouchableWithoutFeedback>
+      <View style={styles.overlay}>
+        <TouchableWithoutFeedback onPress={handleClose}>
+          <View style={styles.backdrop} />
+        </TouchableWithoutFeedback>
 
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={styles.centering}
-      >
-        <SafeAreaView style={styles.safe}>
-          <View style={styles.card}>
-            {/* Header */}
-            <View style={styles.header}>
-              <View style={{ flex: 1, paddingRight: 10 }}>
-                <Text style={styles.title}>Start date</Text>
-                <Text style={styles.subtitle}>
-                  Choose when this habit begins — and optionally repeats.
-                </Text>
-              </View>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          style={styles.centering}
+        >
+          <SafeAreaView style={styles.safe}>
+            <View style={styles.sheet}>
+              <View style={styles.sheetHandle} />
+              <ModalHeader
+                title={title}
+                subtitle={subtitle}
+                onClose={handleClose}
+                style={styles.modalHeaderCompact}
+                titleStyle={styles.headerTitle}
+                subtitleStyle={styles.headerSubtitle}
+              />
 
-              <TouchableOpacity onPress={onClose} accessibilityLabel="Close">
-                <Ionicons name="close" size={22} color={newTheme.textPrimary} />
-              </TouchableOpacity>
-              {/* 
-              <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
-                <Ionicons name="close" size={22} color={newTheme.textPrimary} />
-              </TouchableOpacity> */}
-            </View>
-
-            {/* Scroll content */}
-            <ScrollView
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={[styles.content, { paddingBottom: 24 }]}
-              // contentContainerStyle={styles.content}
-              keyboardShouldPersistTaps="handled"
-            >
+              <ScrollView
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.content}
+                keyboardShouldPersistTaps="handled"
+              >
               {/* Start */}
               <View style={styles.section}>
                 <Text style={styles.sectionLabel}>Start</Text>
 
                 <DateInput
-                  label="Start date"
+                  label=""
                   title="Start date"
                   value={startDate}
                   minimumDate={new Date()}
@@ -609,7 +612,7 @@ export default function StartDateModal({
                       {isEndDateEnabled && (
                         <View style={{ marginTop: 10 }}>
                           <DateInput
-                            label="End date"
+                            label=""
                             title="End date"
                             value={endDate < minEndDate ? minEndDate : endDate}
                             minimumDate={minEndDate}
@@ -631,14 +634,18 @@ export default function StartDateModal({
                 )}
               </View>
 
-              {error ? <Text style={styles.error}>{error}</Text> : null}
+              {error ? (
+                <View style={styles.errorBox}>
+                  <Text style={styles.error}>{error}</Text>
+                </View>
+              ) : null}
             </ScrollView>
 
             {/* Sticky footer */}
             <View style={styles.footer}>
               <StyledButton
                 label="Cancel"
-                onPress={onClose}
+                onPress={handleClose}
                 variant="outline"
                 style={styles.footerBtn}
               />
@@ -652,116 +659,135 @@ export default function StartDateModal({
           </View>
         </SafeAreaView>
       </KeyboardAvoidingView>
+      </View>
     </Modal>
   );
 }
 
-const styling = (t: any) =>
+const styling = (t: any, spacing: any, bodyTextStyle: any, svaTypography: any) =>
   StyleSheet.create({
+    overlay: {
+      flex: 1,
+      justifyContent: "flex-end",
+    },
     backdrop: {
       ...StyleSheet.absoluteFillObject,
-      backgroundColor: "rgba(0,0,0,0.52)",
+      backgroundColor: "rgba(0,0,0,0.62)",
     },
-
-    centering: { flex: 1, justifyContent: "center" },
-
+    centering: {
+      flex: 1,
+      justifyContent: "flex-end",
+    },
     safe: {
       width: "100%",
-      paddingHorizontal: 18, // matches HabitDuration feel
+      paddingHorizontal: 14,
+      paddingBottom: 12,
     },
-
-    card: {
-      backgroundColor: t.surface,
-      borderRadius: 20,
-      borderWidth: StyleSheet.hairlineWidth,
-      borderColor: t.divider,
+    sheet: {
+      backgroundColor: t.surfaceMuted,
+      borderTopLeftRadius: 36,
+      borderTopRightRadius: 36,
+      borderWidth: 1,
+      borderColor: t.borderMuted,
       overflow: "hidden",
       maxWidth: 720,
       alignSelf: "center",
       width: "100%",
-      maxHeight: "86%", // ✅ footer never goes out
+      maxHeight: "94%",
       ...Platform.select({
         ios: {
           shadowColor: "#000",
-          shadowOpacity: 0.26,
-          shadowOffset: { width: 0, height: 12 },
-          shadowRadius: 28,
+          shadowOpacity: 0.24,
+          shadowOffset: { width: 0, height: 16 },
+          shadowRadius: 30,
         },
-        android: { elevation: 14 },
+        android: { elevation: 16 },
       }),
     },
-
-    header: {
-      paddingHorizontal: 18,
-      paddingTop: 18,
-      paddingBottom: 12,
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
+    sheetHandle: {
+      alignSelf: "center",
+      width: 54,
+      height: 5,
+      borderRadius: 999,
+      backgroundColor: t.borderMuted,
+      marginTop: 10,
+      marginBottom: 10,
     },
-    closeBtn: {
-      width: 36,
-      height: 36,
-      borderRadius: 18,
-      alignItems: "center",
-      justifyContent: "center",
-      backgroundColor: "rgba(255,255,255,0.06)",
+    modalHeaderCompact: {
+      paddingHorizontal: spacing.xl,
+      paddingTop: 0,
+      paddingBottom: 8,
     },
-    title: {
-      fontSize: 20,
-      fontWeight: "800",
+    headerTitle: {
+      ...(svaTypography?.textStyle?.displayMedium ?? {}),
+      fontSize: 28,
+      lineHeight: 32,
       color: t.textPrimary,
-      letterSpacing: 0.2,
+      fontStyle: "normal",
     },
-    subtitle: {
-      marginTop: 4,
+    headerSubtitle: {
+      ...bodyTextStyle,
       fontSize: 13,
-      color: t.textSecondary,
       lineHeight: 18,
+      color: t.textSecondary,
     },
-
     content: {
-      paddingHorizontal: 18,
-      paddingBottom: 14,
+      paddingHorizontal: spacing.xl,
+      paddingBottom: spacing.lg,
     },
-
     section: {
-      paddingTop: 8,
-      paddingBottom: 6,
+      padding: spacing.lg,
+      borderRadius: 24,
+      backgroundColor: t.surface,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: t.borderMuted,
+      marginBottom: spacing.lg,
+      ...Platform.select({
+        ios: {
+          shadowColor: "#000",
+          shadowOpacity: 0.12,
+          shadowOffset: { width: 0, height: 8 },
+          shadowRadius: 18,
+        },
+        android: { elevation: 3 },
+      }),
+    },
+    sectionCopy: {
+      flex: 1,
     },
     sectionLabel: {
-      fontSize: 14,
+      fontSize: 11,
       fontWeight: "700",
-      color: t.textPrimary,
+      color: t.textSecondary,
       marginBottom: 8,
+      letterSpacing: 1.4,
+      textTransform: "uppercase",
     },
     sectionHint: {
       marginTop: 4,
       fontSize: 12,
       color: t.textSecondary,
+      lineHeight: 16,
     },
-
     rowBetween: {
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
     },
-
     pillsRow: {
       flexDirection: "row",
       gap: 10,
-      marginTop: 12,
+      marginTop: 14,
     } as any,
-
     pill: {
       flex: 1,
       height: 44,
       borderRadius: 999,
       alignItems: "center",
       justifyContent: "center",
-      backgroundColor: "rgba(255,255,255,0.06)",
+      backgroundColor: t.surfaceMuted,
       borderWidth: StyleSheet.hairlineWidth,
-      borderColor: "rgba(255,255,255,0.08)",
+      borderColor: t.borderMuted,
     },
     pillSelected: {
       backgroundColor: t.accent,
@@ -772,15 +798,16 @@ const styling = (t: any) =>
       fontWeight: "700",
       fontSize: 14,
     },
-    pillTextSelected: { color: t.background },
-
+    pillTextSelected: {
+      color: t.background,
+    },
     block: {
-      marginTop: 12,
-      padding: 12,
-      borderRadius: 16,
-      backgroundColor: "rgba(255,255,255,0.04)",
+      marginTop: 14,
+      padding: 14,
+      borderRadius: 20,
+      backgroundColor: t.surfaceMuted,
       borderWidth: StyleSheet.hairlineWidth,
-      borderColor: "rgba(255,255,255,0.06)",
+      borderColor: t.borderMuted,
     },
     blockTitle: {
       fontSize: 14,
@@ -793,7 +820,6 @@ const styling = (t: any) =>
       color: t.textSecondary,
       lineHeight: 16,
     },
-
     inlineRow: {
       flexDirection: "row",
       alignItems: "center",
@@ -801,30 +827,28 @@ const styling = (t: any) =>
     },
     smallLabel: {
       color: t.textSecondary,
-      fontSize: 14,
+      fontSize: 13,
       marginRight: 10,
       fontWeight: "600",
     },
-
     numberInput: {
       width: 72,
-      height: 44,
-      borderRadius: 12,
+      minHeight: 44,
+      borderRadius: 14,
       borderWidth: StyleSheet.hairlineWidth,
-      borderColor: "rgba(255,255,255,0.10)",
-      backgroundColor: "rgba(0,0,0,0.18)",
+      borderColor: t.borderMuted,
+      backgroundColor: t.background,
       textAlign: "center",
       fontSize: 16,
       fontWeight: "700",
       paddingHorizontal: 10,
       marginRight: 10,
     },
-
     daysRow: {
       flexDirection: "row",
       flexWrap: "wrap",
       gap: 10,
-      marginTop: 10,
+      marginTop: 12,
     } as any,
     dayPill: {
       width: 44,
@@ -832,19 +856,26 @@ const styling = (t: any) =>
       borderRadius: 22,
       alignItems: "center",
       justifyContent: "center",
-      backgroundColor: "rgba(0,0,0,0.18)",
+      backgroundColor: t.background,
       borderWidth: StyleSheet.hairlineWidth,
-      borderColor: "rgba(255,255,255,0.08)",
+      borderColor: t.borderMuted,
     },
-    dayPillSelected: { backgroundColor: t.accent, borderColor: t.accent },
-    dayText: { color: t.textPrimary, fontWeight: "700" },
-    dayTextSelected: { color: t.background },
-
+    dayPillSelected: {
+      backgroundColor: t.accent,
+      borderColor: t.accent,
+    },
+    dayText: {
+      color: t.textPrimary,
+      fontWeight: "700",
+    },
+    dayTextSelected: {
+      color: t.background,
+    },
     monthGrid: {
       flexDirection: "row",
       flexWrap: "wrap",
       gap: 10,
-      marginTop: 10,
+      marginTop: 12,
     } as any,
     monthDay: {
       width: 36,
@@ -852,29 +883,48 @@ const styling = (t: any) =>
       borderRadius: 18,
       alignItems: "center",
       justifyContent: "center",
-      backgroundColor: "rgba(0,0,0,0.18)",
+      backgroundColor: t.background,
       borderWidth: StyleSheet.hairlineWidth,
-      borderColor: "rgba(255,255,255,0.08)",
+      borderColor: t.borderMuted,
     },
-    monthDaySelected: { backgroundColor: t.accent, borderColor: t.accent },
-    monthDayText: { color: t.textPrimary, fontSize: 12, fontWeight: "700" },
-    monthDayTextSelected: { color: t.background },
-
+    monthDaySelected: {
+      backgroundColor: t.accent,
+      borderColor: t.accent,
+    },
+    monthDayText: {
+      color: t.textPrimary,
+      fontSize: 12,
+      fontWeight: "700",
+    },
+    monthDayTextSelected: {
+      color: t.background,
+    },
+    errorBox: {
+      marginBottom: spacing.lg,
+      padding: 12,
+      borderRadius: 18,
+      backgroundColor: "rgba(228,104,104,0.08)",
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: "rgba(228,104,104,0.25)",
+    },
     error: {
       color: t.error ?? "#FF7A7A",
-      marginTop: 10,
       textAlign: "center",
       fontWeight: "600",
+      lineHeight: 18,
     },
-
     footer: {
-      paddingHorizontal: 18,
-      paddingTop: 12,
-      paddingBottom: 16,
+      paddingHorizontal: spacing.xl,
+      paddingTop: spacing.lg,
+      paddingBottom: spacing.lg,
       flexDirection: "row",
       gap: 10,
       borderTopWidth: StyleSheet.hairlineWidth,
-      borderTopColor: "rgba(255,255,255,0.06)",
+      borderTopColor: t.borderMuted,
+      backgroundColor: t.surfaceMuted,
     } as any,
-    footerBtn: { flex: 1 },
+    footerBtn: {
+      flex: 1,
+      minHeight: 52,
+    },
   });

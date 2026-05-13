@@ -11,6 +11,8 @@ import { format } from "date-fns";
 
 import ThemeContext from "@/contexts/ThemeContext";
 import { HabitDateType } from "@/features/habit/types/habitTypes";
+import { formatProtocolFrequencySummary } from "@/features/habit/utils/protocolDisplay";
+import { fromApiDate, toApiDate } from "@/utils/date-time";
 import styling from "./style/HabitInputStyle";
 import StartDateModal from "./Modal/StartDateModal";
 
@@ -18,12 +20,14 @@ interface HabitDateInputProps {
   onSelect: (value: any) => void;
   isEditMode?: HabitDateType;
   style?: StyleProp<ViewStyle>;
+  label?: string;
 }
 
 const HabitDateInput: React.FC<HabitDateInputProps> = ({
   onSelect,
   style,
   isEditMode,
+  label = "Start your journey",
 }) => {
   const { spacing, newTheme } = useContext(ThemeContext);
   const styles = styling(newTheme, spacing);
@@ -34,42 +38,46 @@ const HabitDateInput: React.FC<HabitDateInputProps> = ({
 
   const [showStartTaskModal, setShowStartTaskModal] = useState(false);
 
+  const asDate = (value?: Date | string | null) => {
+    if (!value) return undefined;
+    return value instanceof Date ? value : fromApiDate(value);
+  };
+
   // ✅ keep local state in sync when parent sends edit data
   useEffect(() => {
     if (isEditMode) {
       setHabitDate({
         ...isEditMode,
-        start_date: isEditMode.start_date
-          ? new Date(isEditMode.start_date)
-          : new Date(),
-        end_date: isEditMode.end_date
-          ? new Date(isEditMode.end_date)
-          : undefined,
+        start_date: asDate(isEditMode.start_date) ?? new Date(),
+        end_date: asDate(isEditMode.end_date),
       });
     }
   }, [isEditMode]);
 
   const userDisplay = useMemo(() => {
-    const start = habitDate.start_date
-      ? new Date(habitDate.start_date)
-      : new Date();
-    const end = habitDate.end_date ? new Date(habitDate.end_date) : undefined;
+    const start = asDate(habitDate.start_date) ?? new Date();
+    const end = asDate(habitDate.end_date);
 
     return end
       ? `${format(start, "dd-MM-yyyy")} - ${format(end, "dd-MM-yyyy")}`
       : `${format(start, "dd-MM-yyyy")}`;
   }, [habitDate]);
 
+  const recurrenceDisplay = useMemo(
+    () => formatProtocolFrequencySummary(habitDate),
+    [habitDate]
+  );
+
   const pushToParent = (hd: HabitDateType) => {
     const { start_date, end_date, ...rest } = hd;
 
     let result: any = end_date
       ? {
-          start_date: format(new Date(start_date), "yyyy-MM-dd"),
-          end_date: format(new Date(end_date), "yyyy-MM-dd"),
+          start_date: toApiDate(asDate(start_date) ?? new Date()),
+          end_date: toApiDate(asDate(end_date) ?? new Date()),
         }
       : {
-          start_date: format(new Date(start_date), "yyyy-MM-dd"),
+          start_date: toApiDate(asDate(start_date) ?? new Date()),
         };
 
     if (rest.frequency_type) {
@@ -104,11 +112,28 @@ const HabitDateInput: React.FC<HabitDateInputProps> = ({
             size={20}
             color={newTheme.textSecondary}
           />
-          <Text style={styles.rowLabel}>Start your journey</Text>
+          <Text style={styles.rowLabel}>{label}</Text>
         </View>
 
         <View style={styles.rowRight}>
-          <Text style={styles.rowValue}>{userDisplay}</Text>
+          <View style={styles.rowValueStack}>
+            <Text
+              style={styles.rowValue}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {userDisplay}
+            </Text>
+            {!!recurrenceDisplay && (
+              <Text
+                style={styles.rowValueSecondary}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                {recurrenceDisplay}
+              </Text>
+            )}
+          </View>
           <Ionicons
             name="chevron-forward"
             size={18}

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import {
   View,
   Modal,
@@ -8,69 +8,81 @@ import {
   KeyboardAvoidingView,
   SafeAreaView,
   Text,
+  ScrollView,
+  TouchableWithoutFeedback,
 } from "react-native";
-import DateTimePicker, {
-  DateTimePickerEvent,
-} from "@react-native-community/datetimepicker";
-import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/contexts/ThemeContext";
+import ModalHeader from "@/components/ui/modal/ModalHeader";
 import { StyledButton } from "@/components/ui/StyledButton";
 import StyledSwitch from "@/components/ui/theme-components/StyledSwitch";
 import TimeInput from "@/components/ui/picker/TimeInput";
+import { Duration } from "@/features/habit/types/habitTypes";
 
-export type Duration = {
-  all_day?: boolean;
-  start_time?: Date;
-  end_time?: Date;
+type DurationPreset = {
+  id: "morning" | "evening" | "work";
+  label: string;
+  start: { h: number; m: number };
+  end?: { h: number; m: number } | null;
 };
+
+const PRESETS: DurationPreset[] = [
+  {
+    id: "morning",
+    label: "Morning",
+    start: { h: 7, m: 0 },
+    end: null,
+  },
+  {
+    id: "evening",
+    label: "Evening",
+    start: { h: 19, m: 0 },
+    end: null,
+  },
+  {
+    id: "work",
+    label: "Work",
+    start: { h: 9, m: 0 },
+    end: { h: 17, m: 0 },
+  },
+];
 
 interface DurationModalProps {
   visible: boolean;
   onClose: () => void;
   onSave: (duration: Duration) => void;
   isEditMode?: Duration;
+  title?: string;
+  subtitle?: string;
 }
 
-const PRESETS = [
-  {
-    id: "morning",
-    label: "Morning (7:00 AM)",
-    start: { h: 7, m: 0 },
-    end: null,
-  },
-  {
-    id: "evening",
-    label: "Evening (7:00 PM)",
-    start: { h: 19, m: 0 },
-    end: null,
-  },
-  {
-    id: "work",
-    label: "Work (9:00 AM — 5:00 PM)",
-    start: { h: 9, m: 0 },
-    end: { h: 17, m: 0 },
-  },
-];
+const sameClockTime = (date: Date, hours: number, minutes: number) =>
+  date.getHours() === hours && date.getMinutes() === minutes;
 
-export default function HabitDurationModal({
+export default function DurationModal({
   visible,
   onClose,
   onSave,
   isEditMode,
+  title = "Rhythm",
+  subtitle = "Choose whether this habit runs all day or within a focused window.",
 }: DurationModalProps) {
-  const { newTheme } = useContext(ThemeContext);
-  const styles = styling(newTheme);
+  const { newTheme, spacing, svaTypography, typography } =
+    useContext(ThemeContext);
+  const bodyTextStyle = svaTypography?.textStyle?.body ?? typography.body;
+  const styles = useMemo(
+    () => styling(newTheme, spacing, bodyTextStyle, svaTypography),
+    [newTheme, spacing, bodyTextStyle, svaTypography]
+  );
 
-  // state
   const [allDayEnabled, setAllDayEnabled] = useState<boolean>(true);
   const [mode, setMode] = useState<"point" | "period">("point");
   const [start, setStart] = useState<Date>(new Date());
   const [end, setEnd] = useState<Date>(new Date());
-  const [showStartPicker, setShowStartPicker] = useState(false);
-  const [showEndPicker, setShowEndPicker] = useState(false);
   const [error, setError] = useState<string>("");
 
   useEffect(() => {
+    if (!visible) return;
+
     if (isEditMode) {
       if (isEditMode.all_day) {
         setAllDayEnabled(true);
@@ -91,407 +103,456 @@ export default function HabitDurationModal({
       const now = new Date();
       now.setMinutes(0, 0, 0);
       setStart(now);
-      const oneHour = new Date(now.getTime() + 60 * 60 * 1000);
-      setEnd(oneHour);
+      setEnd(new Date(now.getTime() + 60 * 60 * 1000));
     }
+
+    setError("");
   }, [isEditMode, visible]);
 
-  const applyPreset = (p: (typeof PRESETS)[number]) => {
-    // build Date objects for today with preset hours
-    const today = new Date();
-    const s = new Date(today);
-    s.setHours(p.start.h, p.start.m, 0, 0);
-    setStart(s);
+  const handleClose = () => {
+    setError("");
+    onClose();
+  };
 
-    if (p.end) {
-      const e = new Date(today);
-      e.setHours(p.end.h, p.end.m, 0, 0);
-      setEnd(e);
+  const applyPreset = (preset: DurationPreset) => {
+    const today = new Date();
+    const nextStart = new Date(today);
+    nextStart.setHours(preset.start.h, preset.start.m, 0, 0);
+    setStart(nextStart);
+
+    if (preset.end) {
+      const nextEnd = new Date(today);
+      nextEnd.setHours(preset.end.h, preset.end.m, 0, 0);
+      setEnd(nextEnd);
       setMode("period");
       setAllDayEnabled(false);
     } else {
       setMode("point");
       setAllDayEnabled(false);
     }
+
     setError("");
-  };
-
-  const onChangeStart = (
-    event: DateTimePickerEvent,
-    selected?: Date | undefined
-  ) => {
-    setShowStartPicker(Platform.OS === "ios");
-    if (selected) {
-      setStart(selected);
-      setError("");
-      // If period, ensure end is later; if not, push end one hour forward
-      if (mode === "period" && selected >= end) {
-        const next = new Date(selected.getTime() + 60 * 60 * 1000);
-        setEnd(next);
-      }
-    }
-  };
-
-  const onChangeEnd = (
-    event: DateTimePickerEvent,
-    selected?: Date | undefined
-  ) => {
-    setShowEndPicker(Platform.OS === "ios");
-    if (selected) {
-      setEnd(selected);
-      if (selected <= start) {
-        setError("End time must be after start time.");
-      } else {
-        setError("");
-      }
-    }
   };
 
   const handleSave = () => {
     if (allDayEnabled) {
       onSave({ all_day: true });
-      onClose();
+      handleClose();
       return;
     }
 
     if (mode === "point") {
       onSave({ start_time: start });
-      onClose();
+      handleClose();
       return;
     }
 
-    // period
     if (end <= start) {
       setError("End time must be after start time.");
       return;
     }
+
     onSave({ start_time: start, end_time: end });
-    onClose();
+    handleClose();
+  };
+
+  const isPresetSelected = (preset: DurationPreset) => {
+    if (allDayEnabled) return false;
+
+    if (preset.id === "morning") {
+      return mode === "point" && sameClockTime(start, 7, 0);
+    }
+
+    if (preset.id === "evening") {
+      return mode === "point" && sameClockTime(start, 19, 0);
+    }
+
+    return (
+      mode === "period" &&
+      sameClockTime(start, 9, 0) &&
+      sameClockTime(end, 17, 0)
+    );
   };
 
   return (
     <Modal
       visible={visible}
       transparent
-      animationType="none"
+      animationType="slide"
       statusBarTranslucent
-      onRequestClose={onClose}
+      onRequestClose={handleClose}
     >
-      <View style={styles.overlay} />
+      <View style={styles.overlay}>
+        <TouchableWithoutFeedback onPress={handleClose}>
+          <View style={styles.backdrop} />
+        </TouchableWithoutFeedback>
 
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={styles.centering}
-      >
-        <SafeAreaView style={{ width: "100%", paddingHorizontal: 20 }}>
-          <View
-            style={[
-              styles.card,
-              {
-                backgroundColor: newTheme.surface,
-                borderColor: newTheme.divider,
-              },
-            ]}
-          >
-            {/* header */}
-            <View style={styles.header}>
-              <Text style={[styles.title, { color: newTheme.textPrimary }]}>
-                Habit Duration
-              </Text>
-              <TouchableOpacity onPress={onClose} accessibilityLabel="Close">
-                <Ionicons name="close" size={22} color={newTheme.textPrimary} />
-              </TouchableOpacity>
-            </View>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          style={styles.centering}
+        >
+          <SafeAreaView style={styles.safe}>
+            <View style={styles.sheet}>
+              <View style={styles.sheetHandle} />
 
-            {/* All day toggle + short help */}
-            <View style={styles.rowBetween}>
-              <View>
-                <Text style={[styles.label, { color: newTheme.textSecondary }]}>
-                  All day
-                </Text>
-                <Text style={[styles.help, { color: newTheme.textSecondary }]}>
-                  Quick: choose a preset or set specific time
-                </Text>
-              </View>
-
-              <StyledSwitch
-                value={allDayEnabled}
-                onValueChange={() => {
-                  setAllDayEnabled((s) => !s);
-                }}
-                size="medium"
+              <ModalHeader
+                title={title}
+                subtitle={subtitle}
+                onClose={handleClose}
+                style={styles.modalHeaderCompact}
+                titleStyle={styles.headerTitle}
+                subtitleStyle={styles.headerSubtitle}
               />
-            </View>
 
-            {/* Presets */}
-            {!allDayEnabled && (
-              <View style={{ marginTop: 12, marginBottom: 6 }}>
-                <View style={styles.presetsRow}>
-                  {PRESETS.map((p) => (
-                    <TouchableOpacity
-                      key={p.id}
-                      onPress={() => applyPreset(p)}
-                      style={[
-                        styles.presetButton,
-                        { backgroundColor: newTheme.background },
-                      ]}
-                    >
-                      <Text style={{ color: newTheme.textPrimary }}>
-                        {p.label}
+              <ScrollView
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.content}
+                keyboardShouldPersistTaps="handled"
+              >
+                <View style={styles.section}>
+                  <View style={styles.rowBetween}>
+                    <View style={styles.sectionCopy}>
+                      <Text style={styles.sectionLabel}>All day</Text>
+                      <Text style={styles.sectionHint}>
+                        Keep it continuous or define a focused window.
                       </Text>
-                    </TouchableOpacity>
-                  ))}
+                    </View>
+
+                    <StyledSwitch
+                      value={allDayEnabled}
+                      onValueChange={() => {
+                        setAllDayEnabled((current) => {
+                          const next = !current;
+                          if (!next) setError("");
+                          return next;
+                        });
+                      }}
+                      size="medium"
+                    />
+                  </View>
                 </View>
-              </View>
-            )}
 
-            {/* Mode: Point / Period */}
-            {!allDayEnabled && (
-              <View style={[styles.row, { marginTop: 6 }]}>
-                <TouchableOpacity
-                  style={styles.radio}
-                  onPress={() => setMode("point")}
-                >
-                  <Ionicons
-                    name={
-                      mode === "point" ? "radio-button-on" : "radio-button-off"
-                    }
-                    size={18}
-                    color={
-                      mode === "point"
-                        ? newTheme.accent
-                        : newTheme.textSecondary
-                    }
-                  />
-                  <Text
-                    style={[
-                      styles.radioLabel,
-                      {
-                        color:
-                          mode === "point"
-                            ? newTheme.textPrimary
-                            : newTheme.textSecondary,
-                      },
-                    ]}
-                  >
-                    Point time
-                  </Text>
-                </TouchableOpacity>
+                {!allDayEnabled ? (
+                  <>
+                    <View style={styles.section}>
+                      <Text style={styles.sectionLabel}>Quick windows</Text>
+                      <Text style={styles.sectionHint}>
+                        Tap a preset or set your own span.
+                      </Text>
 
-                <TouchableOpacity
-                  style={styles.radio}
-                  onPress={() => setMode("period")}
-                >
-                  <Ionicons
-                    name={
-                      mode === "period" ? "radio-button-on" : "radio-button-off"
-                    }
-                    size={18}
-                    color={
-                      mode === "period"
-                        ? newTheme.accent
-                        : newTheme.textSecondary
-                    }
-                  />
-                  <Text
-                    style={[
-                      styles.radioLabel,
-                      {
-                        color:
-                          mode === "period"
-                            ? newTheme.textPrimary
-                            : newTheme.textSecondary,
-                      },
-                    ]}
-                  >
-                    Time period
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            )}
+                      <View style={styles.pillsRow}>
+                        {PRESETS.map((preset) => {
+                          const selected = isPresetSelected(preset);
+                          return (
+                            <TouchableOpacity
+                              key={preset.id}
+                              onPress={() => applyPreset(preset)}
+                              style={[
+                                styles.pill,
+                                selected && styles.pillSelected,
+                              ]}
+                              activeOpacity={0.9}
+                            >
+                              <Text
+                                style={[
+                                  styles.pillText,
+                                  selected && styles.pillTextSelected,
+                                ]}
+                                numberOfLines={1}
+                              >
+                                {preset.label}
+                              </Text>
+                            </TouchableOpacity>
+                          );
+                        })}
+                      </View>
+                    </View>
 
-            {/* Time pickers */}
-            {!allDayEnabled && (
-              <View style={{ marginTop: 12 }}>
-                <TimeInput
-                  label="Start"
-                  value={start}
-                  onChange={(next) => {
-                    setStart(next);
-                    setError("");
-                    if (mode === "period" && next >= end) {
-                      setEnd(new Date(next.getTime() + 60 * 60 * 1000));
-                    }
-                  }}
-                  title="Start time"
+                    <View style={styles.section}>
+                      <Text style={styles.sectionLabel}>Window mode</Text>
+                      <Text style={styles.sectionHint}>
+                        Choose a point in time or a time span.
+                      </Text>
+
+                      <View style={styles.pillsRow}>
+                        <TouchableOpacity
+                          style={[
+                            styles.pill,
+                            mode === "point" && styles.pillSelected,
+                          ]}
+                          onPress={() => {
+                            setMode("point");
+                            setError("");
+                          }}
+                          activeOpacity={0.9}
+                        >
+                          <Text
+                            style={[
+                              styles.pillText,
+                              mode === "point" && styles.pillTextSelected,
+                            ]}
+                            numberOfLines={1}
+                          >
+                            Point time
+                          </Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                          style={[
+                            styles.pill,
+                            mode === "period" && styles.pillSelected,
+                          ]}
+                          onPress={() => {
+                            setMode("period");
+                            setAllDayEnabled(false);
+                            setError("");
+                          }}
+                          activeOpacity={0.9}
+                        >
+                          <Text
+                            style={[
+                              styles.pillText,
+                              mode === "period" && styles.pillTextSelected,
+                            ]}
+                            numberOfLines={1}
+                          >
+                            Time period
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+
+                      <View style={{ marginTop: 14 }}>
+                        <TimeInput
+                          label="Start"
+                          value={start}
+                          onChange={(next) => {
+                            setStart(next);
+                            setError("");
+                            if (mode === "period" && next >= end) {
+                              setEnd(new Date(next.getTime() + 60 * 60 * 1000));
+                            }
+                          }}
+                          title="Start time"
+                        />
+
+                        {mode === "period" ? (
+                          <View style={{ marginTop: 12 }}>
+                            <TimeInput
+                              label="End"
+                              value={end}
+                              onChange={(next) => {
+                                setEnd(next);
+                                if (next <= start) {
+                                  setError("End time must be after start time.");
+                                } else {
+                                  setError("");
+                                }
+                              }}
+                              title="End time"
+                            />
+                          </View>
+                        ) : null}
+                      </View>
+                    </View>
+                  </>
+                ) : null}
+
+                {error ? (
+                  <View style={styles.errorBox}>
+                    <Text style={styles.error}>{error}</Text>
+                  </View>
+                ) : null}
+              </ScrollView>
+
+              <View style={styles.footer}>
+                <StyledButton
+                  label="Cancel"
+                  onPress={handleClose}
+                  variant="outline"
+                  style={styles.footerBtn}
                 />
-
-                {mode === "period" && (
-                  <TimeInput
-                    label="End"
-                    value={end}
-                    onChange={(next) => {
-                      setEnd(next);
-                      if (next <= start)
-                        setError("End time must be after start time.");
-                      else setError("");
-                    }}
-                    title="End time"
-                  />
-                )}
+                <StyledButton
+                  label="Save"
+                  onPress={handleSave}
+                  disabled={!allDayEnabled && mode === "period" && end <= start}
+                  style={styles.footerBtn}
+                />
               </View>
-            )}
-
-            {error ? (
-              <Text style={[styles.error, { color: newTheme.error }]}>
-                {error}
-              </Text>
-            ) : null}
-
-            {/* actions */}
-            <View style={styles.actionsRow}>
-              <StyledButton
-                label="Cancel"
-                onPress={onClose}
-                variant="outline"
-                style={{ minWidth: 140 }}
-              />
-
-              <StyledButton
-                label="Save"
-                onPress={() => handleSave()}
-                disabled={!allDayEnabled && mode === "period" && end <= start}
-                style={{ minWidth: 140 }}
-              />
             </View>
-          </View>
-        </SafeAreaView>
-      </KeyboardAvoidingView>
-
-      {/* native datetime pickers */}
-      {/* {showStartPicker && (
-        <View style={styles.pickerContainer}>
-          <DateTimePicker
-            value={start}
-            mode="time"
-            display={Platform.OS === "ios" ? "spinner" : "default"}
-            onChange={onChangeStart}
-            is24Hour={false}
-          />
-          <View style={styles.pickerButtons}>
-            <TouchableOpacity
-              onPress={() => setShowStartPicker(false)}
-              style={styles.pickerBtn}
-            >
-              <Text style={styles.pickerBtnText}>Done</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      )} */}
-      {/* {showEndPicker && (
-        <View style={styles.pickerContainer}>
-          <DateTimePicker
-            value={end}
-            mode="time"
-            display={Platform.OS === "ios" ? "spinner" : "default"}
-            onChange={onChangeEnd}
-            is24Hour={false}
-          />
-          <View style={styles.pickerButtons}>
-            <TouchableOpacity
-              onPress={() => setShowEndPicker(false)}
-              style={styles.pickerBtn}
-            >
-              <Text style={styles.pickerBtnText}>Done</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      )} */}
+          </SafeAreaView>
+        </KeyboardAvoidingView>
+      </View>
     </Modal>
   );
 }
 
-/* ---------- styles ---------- */
-const styling = (newTheme: any) =>
+const styling = (t: any, spacing: any, bodyTextStyle: any, svaTypography: any) =>
   StyleSheet.create({
     overlay: {
+      flex: 1,
+      justifyContent: "flex-end",
+    },
+    backdrop: {
       ...StyleSheet.absoluteFillObject,
-      backgroundColor: "rgba(0,0,0,0.45)",
+      backgroundColor: t.overlayStrong ?? "rgba(12,14,11,0.62)",
     },
     centering: {
       flex: 1,
-      justifyContent: "center",
-      paddingHorizontal: 20,
+      justifyContent: "flex-end",
     },
-    card: {
-      borderRadius: 14,
-      padding: 18,
+    safe: {
+      width: "100%",
+      paddingHorizontal: 14,
+      paddingBottom: 12,
+    },
+    sheet: {
+      width: "100%",
+      maxWidth: 720,
+      alignSelf: "center",
+      maxHeight: "94%",
+      overflow: "hidden",
+      backgroundColor: t.surfaceMuted ?? t.surface,
+      borderTopLeftRadius: 36,
+      borderTopRightRadius: 36,
       borderWidth: 1,
-      // subtle shadow
+      borderColor: t.borderMuted ?? t.border,
       ...Platform.select({
         ios: {
           shadowColor: "#000",
-          shadowOpacity: 0.35,
-          shadowOffset: { width: 0, height: 8 },
-          shadowRadius: 20,
+          shadowOpacity: 0.24,
+          shadowOffset: { width: 0, height: 16 },
+          shadowRadius: 30,
         },
-        android: { elevation: 10 },
+        android: { elevation: 16 },
       }),
     },
-    header: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: 25,
+    sheetHandle: {
+      alignSelf: "center",
+      width: 54,
+      height: 5,
+      borderRadius: 999,
+      backgroundColor: t.borderMuted ?? t.border,
+      marginTop: 10,
+      marginBottom: 10,
     },
-    title: { fontSize: 20, fontWeight: "700" },
-    label: { fontSize: 14, fontWeight: "600" },
-    help: { fontSize: 12, marginTop: 4 },
+    modalHeaderCompact: {
+      paddingHorizontal: spacing.xl,
+      paddingTop: 0,
+      paddingBottom: 8,
+    },
+    headerTitle: {
+      ...(svaTypography?.textStyle?.displayMedium ?? {}),
+      fontSize: 28,
+      lineHeight: 32,
+      color: t.textPrimary,
+      fontStyle: "normal",
+    },
+    headerSubtitle: {
+      ...bodyTextStyle,
+      fontSize: 13,
+      lineHeight: 18,
+      color: t.textSecondary,
+    },
+    content: {
+      paddingHorizontal: spacing.xl,
+      paddingBottom: spacing.lg,
+    },
+    section: {
+      padding: spacing.lg,
+      borderRadius: 24,
+      backgroundColor: t.surface ?? t.background,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: t.borderMuted ?? t.border,
+      marginBottom: spacing.lg,
+      ...Platform.select({
+        ios: {
+          shadowColor: "#000",
+          shadowOpacity: 0.12,
+          shadowOffset: { width: 0, height: 8 },
+          shadowRadius: 18,
+        },
+        android: { elevation: 3 },
+      }),
+    },
+    sectionCopy: {
+      flex: 1,
+      paddingRight: 12,
+    },
+    sectionLabel: {
+      fontSize: 11,
+      fontWeight: "700",
+      color: t.textSecondary,
+      marginBottom: 8,
+      letterSpacing: 1.4,
+      textTransform: "uppercase",
+    },
+    sectionHint: {
+      marginTop: 4,
+      fontSize: 12,
+      color: t.textSecondary,
+      lineHeight: 16,
+    },
     rowBetween: {
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
     },
-    presetsRow: { flexDirection: "row", gap: 10, flexWrap: "wrap" } as any,
-    presetButton: {
-      paddingVertical: 8,
-      paddingHorizontal: 12,
-      borderRadius: 20,
-      marginRight: 8,
-    },
-    pickerContainer: {
-      backgroundColor: newTheme.surface,
-      borderTopLeftRadius: 12,
-      borderTopRightRadius: 12,
-      paddingBottom: Platform.OS === "ios" ? 32 : 12,
-      paddingTop: 8,
-    },
-    row: { flexDirection: "row", gap: 18, marginTop: 8 },
-    radio: { flexDirection: "row", alignItems: "center", gap: 8 },
-    radioLabel: { fontSize: 15 },
-    selector: {
-      borderWidth: 1,
-      borderRadius: 10,
-      paddingVertical: 12,
-      paddingHorizontal: 14,
-      marginTop: 6,
+    pillsRow: {
       flexDirection: "row",
-      justifyContent: "space-between",
+      flexWrap: "wrap",
+      gap: 8,
+      marginTop: 12,
+    } as any,
+    pill: {
+      flexGrow: 1,
+      flexBasis: 0,
+      minHeight: 42,
+      paddingHorizontal: 16,
+      borderRadius: 999,
       alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: t.cardRaised ?? t.surfaceMuted ?? t.background,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: t.borderMuted ?? t.border,
     },
-    fieldLabel: { fontSize: 13, fontWeight: "600", marginBottom: 6 },
-    error: { marginTop: 8, fontSize: 13 },
-    actionsRow: {
+    pillSelected: {
+      backgroundColor: "rgba(163,190,140,0.14)",
+      borderColor: "rgba(163,190,140,0.32)",
+    },
+    pillText: {
+      color: t.textSecondary,
+      fontWeight: "700",
+      fontSize: 13,
+      letterSpacing: 0.2,
+      textAlign: "center",
+    },
+    pillTextSelected: {
+      color: t.accent,
+      fontWeight: "800",
+    },
+    errorBox: {
+      marginTop: 4,
+      borderRadius: 18,
+      paddingVertical: 10,
+      paddingHorizontal: 14,
+      backgroundColor: "rgba(255, 99, 99, 0.08)",
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: "rgba(255, 99, 99, 0.22)",
+    },
+    error: {
+      color: t.error ?? "#FF6B6B",
+      fontSize: 13,
+      lineHeight: 18,
+      fontWeight: "600",
+    },
+    footer: {
       flexDirection: "row",
-      justifyContent: "space-between",
-      marginTop: 18,
+      gap: 12,
+      paddingHorizontal: spacing.xl,
+      paddingBottom: spacing.xl,
+      paddingTop: 2,
+    } as any,
+    footerBtn: {
+      flex: 1,
     },
-    pickerButtons: {
-      flexDirection: "row",
-      justifyContent: "flex-end",
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-    },
-    pickerBtn: { paddingVertical: 10, paddingHorizontal: 18 },
-    pickerBtnText: { color: newTheme.accent, fontWeight: "700", fontSize: 16 },
   });

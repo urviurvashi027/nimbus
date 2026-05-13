@@ -1,22 +1,21 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   Modal,
-  TextInput,
+  TouchableWithoutFeedback,
+  FlatList,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import ThemeContext from "@/contexts/ThemeContext";
-import { findIdBName, addObjectAtEnd } from "@/utils/helper";
+import { addObjectAtEnd } from "@/utils/helper";
 import { HabitTag } from "@/features/habit/types/habitTypes";
-import { selectedTag } from "../HabitTagsInput";
 import InputField from "@/components/ui/theme-components/StyledInputOld";
+import ModalHeader from "@/components/ui/modal/ModalHeader";
 // import styling from "../style/HabitTagModalStyle";
-
-type ThemeKey = "basic" | "light" | "dark";
 
 interface TagsType {
   id: number;
@@ -29,6 +28,7 @@ interface TaskTagsModalProps {
   onClose: () => void;
   selectedTagData: any;
   onSelect: (tag?: any, newTag?: string) => void;
+  title?: string;
   //   existingTags: TagsType[];
   //   onAddNewTag: (tag: string, id: number) => void;
 }
@@ -39,6 +39,7 @@ const HabitTagsModal: React.FC<TaskTagsModalProps> = ({
   onClose,
   onSelect,
   selectedTagData,
+  title = "Select Tags",
   //   existingTags,
   //   onAddNewTag,
 }) => {
@@ -48,7 +49,7 @@ const HabitTagsModal: React.FC<TaskTagsModalProps> = ({
 
   const [selectedTag, setSelectedTag] = useState<TagsType[]>([]);
 
-  const [newTag, setNewTag] = useState<any>();
+  const [newTag, setNewTag] = useState("");
   const [error, setError] = useState("");
 
   const handleAddNew = () => {
@@ -60,7 +61,7 @@ const HabitTagsModal: React.FC<TaskTagsModalProps> = ({
       setError("Tag cannot exceed 20 characters.");
       return;
     }
-    if (selectedTag.includes(newTag.trim())) {
+    if (selectedTag.some((tag) => tag.name === newTag.trim())) {
       setError("Tag already exists.");
       return;
     }
@@ -69,11 +70,23 @@ const HabitTagsModal: React.FC<TaskTagsModalProps> = ({
     // setNewTag("");
     setIsAdding(false);
     setError("");
+    handleClose();
+  };
+
+  const handleClose = () => {
+    setIsAdding(false);
+    setNewTag("");
+    setError("");
     onClose();
   };
 
-  const { newTheme } = useContext(ThemeContext);
-  const styles = styling(newTheme);
+  const { newTheme, spacing, svaTypography, typography } =
+    useContext(ThemeContext);
+  const bodyTextStyle = svaTypography?.textStyle?.body ?? typography.body;
+  const styles = useMemo(
+    () => styling(newTheme, spacing, bodyTextStyle),
+    [newTheme, spacing, bodyTextStyle]
+  );
 
   useEffect(() => {
     const modifiedArray = addObjectAtEnd(habitTagList);
@@ -96,66 +109,83 @@ const HabitTagsModal: React.FC<TaskTagsModalProps> = ({
   };
 
   useEffect(() => {
-    if (selectedTagData.length) setSelectedTag(selectedTagData);
+    setSelectedTag(Array.isArray(selectedTagData) ? selectedTagData : []);
   }, [selectedTagData]);
-
-  // useEffect(() => {
-  //   if (selectedTag.length && newTag) {
-  //     onSelect(selectedTag, newTag);
-  //   }
-  // }, [newTag]);
 
   return (
     <Modal
       animationType="slide"
       transparent={true}
       visible={visible}
-      onRequestClose={() => {
-        setIsAdding(false);
-        setNewTag("");
-        setError("");
-        onClose();
-      }}
+      onRequestClose={handleClose}
     >
       <View style={styles.modalOverlay}>
-        <View style={styles.modalContainer}>
-          {/* Header with Title and Close Button */}
-          <View style={styles.header}>
-            <Text style={styles.title}>Select Task Tag</Text>
-            <TouchableOpacity
-              onPress={() => {
-                setIsAdding(false);
-                setNewTag("");
-                setError("");
-                onClose();
-              }}
-            >
-              <Ionicons name="close" size={24} color={newTheme.textPrimary} />
-            </TouchableOpacity>
-          </View>
+        <TouchableWithoutFeedback onPress={handleClose}>
+          <View style={styles.backdrop} />
+        </TouchableWithoutFeedback>
 
-          {/* List of Task Tags */}
-          <View style={styles.listContainer}>
-            {habitTagData.map((tag, index) => (
-              <TouchableOpacity
-                key={index}
-                style={styles.tagButton}
-                onPress={() => {
-                  if (tag.name === "Add New") {
-                    setIsAdding(true);
-                  } else {
-                    handleSaveClick(tag);
-                    onClose();
-                  }
-                }}
-              >
-                <Text style={styles.tagText}>{tag.name}</Text>
-                {tag.name === "Add New" && (
-                  <Ionicons name="chevron-forward" size={20} color="#888" />
-                )}
-              </TouchableOpacity>
-            ))}
-          </View>
+        <View style={styles.modalContainer}>
+          <ModalHeader
+            title={title}
+            onClose={handleClose}
+            style={styles.modalHeaderCompact}
+          />
+
+          <FlatList
+            data={habitTagData}
+            keyExtractor={(item) =>
+              item.name === "Add New"
+                ? "habit-tags-add-new"
+                : item.id.toString()
+            }
+            style={styles.listContainer}
+            showsVerticalScrollIndicator={false}
+            renderItem={({ item }) => {
+              const isSelected = selectedTag.some((tag) => tag.id === item.id);
+              const isAddNew = item.name === "Add New";
+
+              return (
+                <TouchableOpacity
+                  style={[
+                    styles.tagButton,
+                    isSelected && styles.tagButtonSelected,
+                  ]}
+                  onPress={() => {
+                    if (isAddNew) {
+                      setIsAdding(true);
+                    } else {
+                      handleSaveClick(item);
+                      handleClose();
+                    }
+                  }}
+                >
+                  <View style={styles.tagTextWrap}>
+                    <Text
+                      style={[
+                        styles.tagText,
+                        isSelected && styles.selectedTagText,
+                      ]}
+                    >
+                      {item.name}
+                    </Text>
+                    {!isAddNew && isSelected && (
+                      <Text style={styles.selectedHint}>Selected</Text>
+                    )}
+                  </View>
+
+                  {isAddNew ? (
+                    <Ionicons name="chevron-forward" size={20} color="#888" />
+                  ) : isSelected ? (
+                    <Ionicons
+                      name="checkmark"
+                      size={20}
+                      color={newTheme.accent}
+                    />
+                  ) : null}
+                </TouchableOpacity>
+              );
+            }}
+          />
 
           {/* Add New Tag Section */}
           {isAdding && (
@@ -163,7 +193,6 @@ const HabitTagsModal: React.FC<TaskTagsModalProps> = ({
               <InputField
                 label="New Tag"
                 value={newTag}
-                // maxLength={20}
                 onChangeText={(text) => {
                   setNewTag(text);
                   if (text.length <= 20) {
@@ -172,19 +201,6 @@ const HabitTagsModal: React.FC<TaskTagsModalProps> = ({
                 }}
                 placeholder="Add New Tag"
               />
-
-              {/* <FormInput
-                style={styles.input}
-                placeholder="Enter news tag"
-                value={newTag}
-                onChangeText={(text) => {
-                  setNewTag(text);
-                  if (text.length <= 20) {
-                    setError("");
-                  }
-                }}
-                maxLength={20}
-              /> */}
               {error ? <Text style={styles.errorText}>{error}</Text> : null}
               <TouchableOpacity style={styles.addButton} onPress={handleAddNew}>
                 <Text style={styles.addButtonText}>Add</Text>
@@ -199,49 +215,64 @@ const HabitTagsModal: React.FC<TaskTagsModalProps> = ({
 
 export default HabitTagsModal;
 
-const styling = (newTheme: any) =>
+const styling = (newTheme: any, spacing: any, bodyTextStyle: any) =>
   StyleSheet.create({
     modalOverlay: {
       flex: 1,
-      backgroundColor: "rgba(0,0,0,0.5)",
-      justifyContent: "center",
-      alignItems: "center",
+      justifyContent: "flex-end",
     },
     modalContainer: {
-      width: "85%",
-      backgroundColor: newTheme.surface,
-      borderRadius: 10,
-      padding: 20,
-      maxHeight: "85%",
+      width: "100%",
+      height: "75%",
+      backgroundColor: newTheme.surfaceMuted,
+      borderTopLeftRadius: 32,
+      borderTopRightRadius: 32,
+      padding: spacing.xl,
+      borderWidth: 1,
+      borderColor: newTheme.borderMuted,
     },
-    header: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: 20,
+    backdrop: {
+      ...StyleSheet.absoluteFillObject,
+      backgroundColor: newTheme.overlayStrong,
     },
-    title: {
-      fontSize: 18,
-      fontWeight: "bold",
-      color: newTheme.textPrimary,
+    modalHeaderCompact: {
+      paddingHorizontal: 0,
+      paddingTop: 0,
+      paddingBottom: 12,
     },
     listContainer: {
-      // Optional: Add any additional styling if needed
+      flex: 1,
     },
     tagButton: {
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      paddingVertical: 12,
+      paddingVertical: spacing.md,
       borderBottomWidth: 1,
-      borderBottomColor: newTheme.divider,
+      borderBottomColor: newTheme.borderMuted,
+    },
+    tagButtonSelected: {
+      backgroundColor: "rgba(255,255,255,0.03)",
+    },
+    tagTextWrap: {
+      flex: 1,
+      paddingRight: spacing.md,
     },
     tagText: {
-      fontSize: 16,
+      ...bodyTextStyle,
+      color: newTheme.textSecondary,
+    },
+    selectedTagText: {
       color: newTheme.textPrimary,
+      fontWeight: "700",
+    },
+    selectedHint: {
+      marginTop: 2,
+      fontSize: 12,
+      color: newTheme.textSecondary,
     },
     addNewContainer: {
-      marginTop: 20,
+      marginTop: spacing.lg,
     },
     input: {
       borderWidth: 1,
@@ -252,10 +283,10 @@ const styling = (newTheme: any) =>
       fontSize: 16,
     },
     addButton: {
-      marginTop: 10,
+      marginTop: spacing.md,
       backgroundColor: newTheme.accent,
       paddingVertical: 12,
-      borderRadius: 5,
+      borderRadius: 12,
       alignItems: "center",
     },
     addButtonText: {
