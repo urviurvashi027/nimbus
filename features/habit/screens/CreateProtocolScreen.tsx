@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { router, useNavigation } from "expo-router";
+import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import EmojiPicker, { type EmojiType } from "rn-emoji-keyboard";
 import ThemeContext from "@/contexts/ThemeContext";
 import AppHeader from "@/components/layout/AppHeader";
@@ -39,6 +39,7 @@ import {
   formatTimeUI,
   toBackendTime,
   fromApiDate,
+  fromHHmm,
   toApiDate,
   toFriendlyDate,
 } from "@/utils/date-time";
@@ -53,6 +54,10 @@ import {
 const CreateProtocolScreen = () => {
   const { svaColors, svaTypography, spacing } = useContext(ThemeContext);
   const navigation = useNavigation();
+  const params = useLocalSearchParams<{
+    title?: string | string[];
+    reminder?: string | string[];
+  }>();
   const toast = useNimbusToast();
 
   // Core State
@@ -98,6 +103,23 @@ const CreateProtocolScreen = () => {
     });
     fetchUnits();
   }, [navigation]);
+
+  useEffect(() => {
+    const titleParam = Array.isArray(params.title)
+      ? params.title[0]
+      : params.title;
+    const reminderParam = Array.isArray(params.reminder)
+      ? params.reminder[0]
+      : params.reminder;
+
+    if (titleParam) {
+      setName((prev) => prev || titleParam);
+    }
+
+    if (reminderParam) {
+      setReminderTime(fromHHmm(reminderParam));
+    }
+  }, [params.title, params.reminder]);
 
   useEffect(() => {
     fetchNatureTags();

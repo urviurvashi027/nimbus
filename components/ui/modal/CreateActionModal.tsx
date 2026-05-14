@@ -12,6 +12,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import ThemeContext from "@/contexts/ThemeContext";
+import { ROUTES } from "@/constants/routes";
 
 interface CreateActionModalProps {
   visible: boolean;
@@ -112,7 +113,7 @@ const CreateActionModal: React.FC<CreateActionModalProps> = ({
               iconBg="rgba(163, 190, 140, 0.15)"
               title="Craft Unique Formula"
               description="Design a ritual tailored to your specific neural architecture."
-              onPress={() => handleAction("/(auth)/habit/createProtocol")}
+              onPress={() => handleAction(ROUTES.AUTH.CREATE_PROTOCOL)}
               svaTypography={svaTypography}
               styles={styles}
             />
@@ -122,7 +123,7 @@ const CreateActionModal: React.FC<CreateActionModalProps> = ({
               iconBg="rgba(255, 255, 255, 0.05)"
               title="Curated Manifests"
               description="Adopt expertly designed biological rhythms."
-              onPress={() => handleAction("/(auth)/tools/templateRoutineList")}
+              onPress={() => handleAction(ROUTES.AUTH.TOOLS_CURATED_MANIFESTS)}
               svaTypography={svaTypography}
               styles={styles}
             />
