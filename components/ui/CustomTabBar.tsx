@@ -3,25 +3,54 @@ import {
   View,
   TouchableOpacity,
   StyleSheet,
-  Dimensions,
-  Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/contexts/ThemeContext";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
-import { router } from "expo-router";
+import { BlurView } from "expo-blur";
+import { LinearGradient } from "expo-linear-gradient";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import CreateActionModal from "./modal/CreateActionModal";
+import type { ColorSet, Spacing, SvaTokens } from "@/theme/types";
 
-const { width } = Dimensions.get("window");
+type IconName = keyof typeof Ionicons.glyphMap;
+
+type TabMeta = {
+  label: string;
+  icon: {
+    active: IconName;
+    inactive: IconName;
+  };
+};
+
+const TAB_META: Record<string, TabMeta> = {
+  index: {
+    label: "Home",
+    icon: { active: "home", inactive: "home-outline" },
+  },
+  "self-care": {
+    label: "Selfcare",
+    icon: { active: "leaf", inactive: "leaf-outline" },
+  },
+  tools: {
+    label: "Tools",
+    icon: { active: "construct", inactive: "construct-outline" },
+  },
+  settings: {
+    label: "Setting",
+    icon: { active: "settings", inactive: "settings-outline" },
+  },
+};
 
 const CustomTabBar: React.FC<BottomTabBarProps> = ({
   state,
   descriptors,
   navigation,
 }) => {
-  const { newTheme, spacing } = useContext(ThemeContext);
+  const { newTheme, spacing, tokens } = useContext(ThemeContext);
+  const insets = useSafeAreaInsets();
   const [modalVisible, setModalVisible] = useState(false);
-  const styles = styling(newTheme, spacing);
+  const styles = styling(newTheme, spacing, tokens, insets.bottom);
 
   const onPlusPress = () => {
     setModalVisible(true);
@@ -30,65 +59,100 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({
   return (
     <View style={styles.container}>
       <View style={styles.tabBar}>
-        {state.routes.map((route, index) => {
-          const { options } = descriptors[route.key];
-          const isFocused = state.index === index;
+        <View style={styles.tabBackdrop}>
+          <BlurView
+            intensity={18}
+            tint="dark"
+            pointerEvents="none"
+            style={StyleSheet.absoluteFillObject}
+          />
+          <LinearGradient
+            colors={["rgba(255,255,255,0.03)", "rgba(0,0,0,0.18)"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            pointerEvents="none"
+            style={StyleSheet.absoluteFillObject}
+          />
+        </View>
+        <View style={styles.tabContent}>
+          {state.routes.map((route, index) => {
+            const { options } = descriptors[route.key];
+            const isFocused = state.index === index;
 
-          const onPress = () => {
-            const event = navigation.emit({
-              type: "tabPress",
-              target: route.key,
-              canPreventDefault: true,
-            });
+            const onPress = () => {
+              const event = navigation.emit({
+                type: "tabPress",
+                target: route.key,
+                canPreventDefault: true,
+              });
 
-            if (!isFocused && !event.defaultPrevented) {
-              navigation.navigate(route.name);
+              if (!isFocused && !event.defaultPrevented) {
+                navigation.navigate(route.name);
+              }
+            };
+
+            // We render the plus button for the placeholder route
+            if (route.name === "plus-button-placeholder") {
+              return (
+                <View key={route.key} style={styles.plusSlot}>
+                  <TouchableOpacity
+                    style={styles.plusButton}
+                    onPress={onPlusPress}
+                    activeOpacity={0.85}
+                    accessibilityRole="button"
+                    accessibilityLabel="Create action"
+                  >
+                    <LinearGradient
+                      colors={[newTheme.accent, newTheme.accentPressed]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={StyleSheet.absoluteFillObject}
+                    />
+                    <Ionicons
+                      name="add"
+                      size={34}
+                      color={newTheme.background}
+                    />
+                  </TouchableOpacity>
+                </View>
+              );
             }
-          };
 
-          // We render the plus button for the placeholder route
-          if (route.name === "plus-button-placeholder") {
+            const meta =
+              TAB_META[route.name] ?? {
+                label: route.name,
+                icon: { active: "ellipse", inactive: "ellipse-outline" },
+              };
+            const label =
+              typeof options.tabBarLabel === "string"
+                ? options.tabBarLabel
+                : meta.label;
+            const iconName = isFocused ? meta.icon.active : meta.icon.inactive;
+            const iconColor = isFocused
+              ? "rgba(236,239,244,0.92)"
+              : "rgba(161,166,155,0.55)";
+
             return (
               <TouchableOpacity
                 key={route.key}
-                style={styles.plusButton}
-                onPress={onPlusPress}
-                activeOpacity={0.8}
+                accessibilityRole="button"
+                accessibilityState={isFocused ? { selected: true } : {}}
+                accessibilityLabel={
+                  options.tabBarAccessibilityLabel ?? String(label)
+                }
+                onPress={onPress}
+                activeOpacity={0.86}
+                style={styles.tabItem}
               >
-                <Ionicons name="add" size={32} color={newTheme.background} />
+                <Ionicons
+                  name={iconName}
+                  size={isFocused ? 25 : 23}
+                  color={iconColor}
+                />
               </TouchableOpacity>
             );
-          }
-
-          // Icons mapping based on screenshot 1.png
-          let iconName: any = "grid-outline";
-          if (route.name === "index")
-            iconName = isFocused ? "grid" : "grid-outline";
-          else if (route.name === "self-care")
-            iconName = isFocused ? "stats-chart" : "stats-chart-outline";
-          else if (route.name === "tools")
-            iconName = isFocused ? "clipboard" : "clipboard-outline";
-          else if (route.name === "setting")
-            iconName = isFocused ? "person" : "person-outline";
-
-          return (
-            <TouchableOpacity
-              key={route.key}
-              accessibilityRole="button"
-              accessibilityState={isFocused ? { selected: true } : {}}
-              accessibilityLabel={options.tabBarAccessibilityLabel}
-              onPress={onPress}
-              style={styles.tabItem}
-            >
-              <Ionicons
-                name={iconName}
-                size={24}
-                color={isFocused ? newTheme.accent : newTheme.textSecondary}
-                style={{ opacity: isFocused ? 1 : 0.6 }}
-              />
-            </TouchableOpacity>
-          );
-        })}
+          })}
+        </View>
       </View>
       <CreateActionModal
         visible={modalVisible}
@@ -98,55 +162,77 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({
   );
 };
 
-const styling = (theme: any, spacing: any) =>
+const styling = (
+  theme: ColorSet,
+  spacing: Spacing,
+  tokens: SvaTokens,
+  bottomInset: number
+) =>
   StyleSheet.create({
     container: {
       position: "absolute",
-      bottom: spacing.lg,
-      left: spacing.lg,
-      right: spacing.lg,
+      bottom: bottomInset + spacing.xs,
+      left: tokens.layout.screenX,
+      right: tokens.layout.screenX,
       alignItems: "center",
     },
     tabBar: {
-      flexDirection: "row",
-      width: width - spacing.lg * 2,
-      height: 80,
-      backgroundColor: "#1C1E1A",
-      borderRadius: 40,
+      width: "100%",
+      height: 78,
+      borderRadius: 39,
       borderWidth: 1,
-      borderColor: "rgba(255, 255, 255, 0.05)",
-      alignItems: "center",
-      justifyContent: "space-around",
-      paddingHorizontal: spacing.sm,
-      // Premium shadow
+      borderColor: "rgba(255,255,255,0.06)",
+      backgroundColor: "transparent",
       shadowColor: "#000",
       shadowOffset: { width: 0, height: 12 },
-      shadowOpacity: 0.4,
-      shadowRadius: 16,
-      elevation: 12,
+      shadowOpacity: 0.34,
+      shadowRadius: 14,
+      elevation: 10,
+      overflow: "visible",
+      justifyContent: "center",
+    },
+    tabBackdrop: {
+      ...StyleSheet.absoluteFillObject,
+      borderRadius: 39,
+      overflow: "hidden",
+      backgroundColor: theme.surface,
+    },
+    tabContent: {
+      flex: 1,
+      flexDirection: "row",
+      alignItems: "center",
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 6,
     },
     tabItem: {
       flex: 1,
       alignItems: "center",
       justifyContent: "center",
-      height: "100%",
+      minHeight: 56,
+      borderRadius: 22,
+      paddingVertical: 8,
+      paddingHorizontal: 6,
+    },
+    plusSlot: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
     },
     plusButton: {
       width: 64,
       height: 64,
       borderRadius: 32,
-      backgroundColor: theme.accent || "#A3BE8C",
       justifyContent: "center",
       alignItems: "center",
-      // Lifted effect
-      marginTop: -10,
-      shadowColor: theme.accent || "#A3BE8C",
+      marginTop: -22,
+      shadowColor: theme.accent,
       shadowOffset: { width: 0, height: 8 },
       shadowOpacity: 0.3,
       shadowRadius: 12,
-      elevation: 10,
-      borderWidth: 4,
-      borderColor: "#1C1E1A",
+      elevation: 9,
+      borderWidth: 1,
+      borderColor: "rgba(255,255,255,0.12)",
+      overflow: "hidden",
     },
   });
 

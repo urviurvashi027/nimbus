@@ -1,19 +1,17 @@
 // components/homeScreen/DateScroller.tsx
-import React, { useContext, useEffect, useMemo, useRef } from "react";
+import React, { useContext, useMemo, useRef } from "react";
 import {
   View,
   Text,
   FlatList,
   TouchableOpacity,
-  Dimensions,
   StyleSheet,
   ActivityIndicator,
-  NativeSyntheticEvent,
-  NativeScrollEvent,
-  LayoutChangeEvent,
+  useWindowDimensions,
 } from "react-native";
 import { addDays, isSameDay, startOfDay, subDays } from "date-fns";
 import ThemeContext from "@/contexts/ThemeContext";
+import type { ColorSet, Typography } from "@/theme/types";
 
 type Props = {
   value: Date;
@@ -32,13 +30,18 @@ export default function DateScroller({
   daysAroundToday = DEFAULT_DAYS_AROUND,
 }: Props) {
   const listRef = useRef<FlatList<Date>>(null);
-  const didCenterOnceRef = useRef(false);
-  const screenWidth = Dimensions.get("window").width;
-  const itemWidth = screenWidth / 5;
-  const sidePad = (screenWidth - itemWidth) / 2;
+  const { width: screenWidth } = useWindowDimensions();
+  const itemWidth = useMemo(
+    () => Math.max(56, Math.min(72, screenWidth / 6.2)),
+    [screenWidth]
+  );
+  const sidePad = Math.max(12, (screenWidth - itemWidth) / 2);
 
-  const { newTheme } = useContext(ThemeContext);
-  const styles = styling(newTheme, itemWidth);
+  const { newTheme: theme, typography } = useContext(ThemeContext);
+  const styles = useMemo(
+    () => styling(theme, typography, itemWidth, sidePad),
+    [theme, typography, itemWidth, sidePad]
+  );
 
   const today = useMemo(() => atMidnight(new Date()), []);
   const selected = useMemo(() => atMidnight(value), [value]);
@@ -57,69 +60,64 @@ export default function DateScroller({
     [days, selected]
   );
 
-  const centerSelected = (animated = false) => {
-    if (selectedIdx < 0) return;
-    listRef.current?.scrollToIndex({
-      index: selectedIdx,
-      animated,
-      viewPosition: 0.5,
-    });
-  };
-
-  // Center on initial layout
-  const handleLayout = (_e: LayoutChangeEvent) => {
-    if (didCenterOnceRef.current) return;
-    setTimeout(() => {
-      centerSelected(false);
-      didCenterOnceRef.current = true;
-    }, 100);
-  };
-
-  // Only re-center if the *value* prop changes drastically (e.g. initial load or "Today" button)
-  // We do NOT want to auto-center during user scrolling
-  useEffect(() => {
-    if (!didCenterOnceRef.current) return;
-    // Optional: You can re-enable this if you want to force-snap on prop change
-    // requestAnimationFrame(() => centerSelected(true));
-  }, [selectedIdx]);
+  const initialIndex = useMemo(
+    () => Math.max(0, selectedIdx - 2),
+    [selectedIdx]
+  );
 
   return (
-    <View onLayout={handleLayout}>
+    <View style={styles.container}>
       <FlatList
         ref={listRef}
         data={days}
         keyExtractor={(d) => d.toISOString()}
         horizontal
         showsHorizontalScrollIndicator={false}
-        // Remove snapToInterval to allow smooth free scrolling
-        // snapToInterval={itemWidth}
+        initialScrollIndex={initialIndex}
         decelerationRate="normal"
         getItemLayout={(_, index) => ({
           length: itemWidth,
-          offset: itemWidth * index,
+          offset: sidePad + itemWidth * index,
           index,
         })}
-        contentContainerStyle={{ paddingHorizontal: sidePad }}
+        contentContainerStyle={styles.listContent}
         initialNumToRender={15}
+        onScrollToIndexFailed={({ index }) => {
+          setTimeout(() => {
+            listRef.current?.scrollToIndex({
+              index,
+              animated: false,
+              viewPosition: 0,
+            });
+          }, 0);
+        }}
         renderItem={({ item }) => {
           const isSelected = isSameDay(item, selected);
+          const dayLabel = item
+            .toLocaleDateString(undefined, { weekday: "short" })
+            .toUpperCase();
+          const dateLabel = String(item.getDate()).padStart(2, "0");
+
           return (
             <TouchableOpacity
+              key={item.toISOString()}
               onPress={() => onChange(item)} // Immediate selection + API call via parent
               disabled={isLoading && isSelected}
-              activeOpacity={0.7}
+              activeOpacity={0.8}
               style={[styles.dateBox, isSelected && styles.selectedBox]}
             >
               <Text style={[styles.dayText, isSelected && styles.selectedText]}>
-                {item.toLocaleDateString(undefined, { weekday: "short" })}
+                {dayLabel}
               </Text>
+
               {isLoading && isSelected ? (
-                <ActivityIndicator size="small" color={newTheme.textPrimary} />
+                <ActivityIndicator
+                  size="small"
+                  color={isSelected ? theme.focus : theme.textSecondary}
+                />
               ) : (
-                <Text
-                  style={[styles.dateText, isSelected && styles.selectedText]}
-                >
-                  {String(item.getDate()).padStart(2, "0")}
+                <Text style={[styles.dateText, isSelected && styles.selectedText]}>
+                  {dateLabel}
                 </Text>
               )}
             </TouchableOpacity>
@@ -130,24 +128,56 @@ export default function DateScroller({
   );
 }
 
-const styling = (newTheme: any, itemWidth: number) =>
+const styling = (
+  theme: ColorSet,
+  typography: Typography,
+  itemWidth: number,
+  sidePad: number
+) =>
   StyleSheet.create({
+    container: {
+      width: "100%",
+      paddingTop: 2,
+      paddingBottom: 4,
+    },
+    listContent: {
+      paddingHorizontal: sidePad,
+      paddingVertical: 2,
+    },
     dateBox: {
-      width: itemWidth - 12,
-      height: 70,
-      borderRadius: 12,
-      backgroundColor: newTheme.surface,
+      width: itemWidth,
+      minHeight: 72,
+      borderRadius: 14,
       alignItems: "center",
       justifyContent: "center",
-      marginHorizontal: 6,
+      paddingVertical: 8,
+      paddingHorizontal: 6,
+      backgroundColor: "transparent",
     },
-    selectedBox: { backgroundColor: newTheme.accent },
-    dayText: { fontSize: 14, fontWeight: "500", color: newTheme.textSecondary },
+    selectedBox: {
+      backgroundColor: "rgba(74, 84, 63, 0.96)",
+      borderWidth: 1,
+      borderColor: "rgba(215,227,200,0.10)",
+      shadowColor: "rgba(0,0,0,0.32)",
+      shadowOffset: { width: 0, height: 6 },
+      shadowOpacity: 0.18,
+      shadowRadius: 10,
+      elevation: 6,
+    },
+    dayText: {
+      ...typography.smallCaption,
+      letterSpacing: 1.6,
+      color: theme.textSecondary,
+      textTransform: "uppercase",
+      textAlign: "center",
+    },
     dateText: {
-      fontSize: 16,
-      fontWeight: "600",
-      color: newTheme.textPrimary,
-      marginTop: 4,
+      ...typography.h3,
+      color: theme.textSecondary,
+      marginTop: 5,
+      textAlign: "center",
     },
-    selectedText: { color: newTheme.background, fontWeight: "700" },
+    selectedText: {
+      color: theme.focus,
+    },
   });

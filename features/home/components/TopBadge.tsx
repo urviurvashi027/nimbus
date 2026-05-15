@@ -39,6 +39,7 @@ export default function TopBadge({
 
   const colors = {
     bg: newTheme.accent || "#cfe8c3",
+    circleBg: "#22251E",
     bgMuted: newTheme.surface,
     textPrimary: newTheme.textPrimary,
     textOnAccent: newTheme.background,
@@ -50,11 +51,12 @@ export default function TopBadge({
   const content =
     variant === "circle" ? (
       <View style={classes.circle}>
+        <View style={classes.circleSheen} />
         {iconName ? (
           <Ionicons
             name={iconName as any}
             size={small ? 14 : 16}
-            color={colors.textOnAccent}
+            color={colors.bg}
           />
         ) : (
           <Text style={classes.circleText}>{String(count ?? "")}</Text>
@@ -98,7 +100,7 @@ const styles = (colors: any, small: boolean) =>
       // helpful defaults when used absolutely: wrap content, add shadow
       alignSelf: "flex-end",
       borderRadius: 14,
-      overflow: "hidden",
+      overflow: "visible",
       // subtle shadow
       ...PlatformSelectShadow(),
     },
@@ -125,19 +127,24 @@ const styles = (colors: any, small: boolean) =>
       marginLeft: 6,
     },
     circle: {
-      width: small ? 36 : 44,
-      height: small ? 36 : 44,
-      borderRadius: small ? 18 : 22,
-      backgroundColor: colors.bg,
+      width: small ? 38 : 44,
+      height: small ? 38 : 44,
+      borderRadius: small ? 19 : 22,
       justifyContent: "center",
       alignItems: "center",
+      backgroundColor: colors.circleBg,
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: "rgba(255,255,255,0.08)",
+      overflow: "hidden",
     },
     circleText: {
-      color: colors.textOnAccent,
+      color: colors.bg,
       fontWeight: "700",
-      fontSize: small ? 14 : 16,
+      fontSize: small ? 13 : 15,
+    },
+    circleSheen: {
+      ...StyleSheet.absoluteFillObject,
+      backgroundColor: "rgba(255,255,255,0.03)",
     },
   });
 

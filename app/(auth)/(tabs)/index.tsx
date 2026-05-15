@@ -11,12 +11,10 @@ import {
   FlatList,
   Platform,
   StyleSheet,
-  TouchableOpacity,
   View,
   Text,
 } from "react-native";
 import { router, useFocusEffect } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
 import {
   format,
   isAfter,
@@ -37,23 +35,13 @@ import {
 import { HabitItem } from "@/features/habit/types/habitTypes";
 
 import DateScroller from "@/features/home/components/DateScroller";
-import DailyCheckInPanel from "@/features/home/components/DailyCheckInPanel";
 import HabitItemCard from "@/features/home/components/component/HabitItem";
 import TopBadge from "@/features/home/components/TopBadge";
-import NewUserScreen from "../new-user";
 import ProgressPill from "@/features/home/components/component/ProgressPill";
 import { useNimbusToast } from "@/components/ui/toast/useNimbusToast";
 import SyncProgressCard from "@/features/home/components/component/SyncProgressCard";
-import RitualStreakPanel from "@/features/home/components/RitualStreakPanel";
-
-// import DateScroller from "@/components/homeScreen/DateScroller";
-// import RitualStreakPanel from "@/components/homeScreen/RitualStreakPanel";
-// import HabitItemCard from "@/components/homeScreen/component/HabitItem";
-// import SyncProgressCard from "@/components/homeScreen/component/SyncProgressCard";
-// import TopBadge from "@/components/homeScreen/TopBadge";
-// import NewUserScreen from "../FirstTimeUser/NewUserScreen";
-// import ProgressPill from "@/components/homeScreen/component/ProgressPill";
-// import { useNimbusToast } from "@/components/common/toast/useNimbusToast";
+import DailySutraCard from "@/features/home/components/component/DailySutraCard";
+import BioMetricBlueprintPanel from "@/features/home/components/BioMetricBlueprintPanel";
 
 // ---------- Nimbus visual helpers ----------
 const HABIT_ICONS = ["🍰", "🌱", "🏃‍♂️", "🧘", "📚", "💧"];
@@ -61,8 +49,8 @@ const HABIT_COLORS = ["#FF6B6B", "#4ECDC4", "#FFD93D", "#1A535C", "#6A4C93"];
 
 // ---------- Screen ----------
 export default function TabOneScreen() {
-  const { newTheme, spacing, typography } = useContext(ThemeContext);
-  const styles = styling(newTheme, spacing, typography);
+  const { newTheme: theme, spacing, typography } = useContext(ThemeContext);
+  const styles = styling(theme, spacing, typography);
 
   const [selectedDate, setSelectedDate] = useState(startOfDay(new Date()));
   const [habitList, setHabitList] = useState<HabitItem[]>([]);
@@ -88,11 +76,6 @@ export default function TabOneScreen() {
 
   // Section header – one clear “Today” / “Tomorrow” etc.
   const sectionTitle = useMemo(() => dateLabel, [dateLabel]);
-  const sectionSubtitle = useMemo(
-    () => format(selectedDate, "EEE, MMM dd"),
-    [selectedDate]
-  );
-
   // decorate habits with Nimbus icon + color
   const decorateHabits = useCallback((data: any[]): HabitItem[] => {
     return data.map((item: any, idx: number) => ({
@@ -146,8 +129,6 @@ export default function TabOneScreen() {
   //   loadHabits(isoDate);
   // }, [isoDate, loadHabits]);
 
-  const onCreateClick = () => router.push(ROUTES.AUTH.CREATE_HABIT);
-
   const handleHabitDoneClick = async (id: string, count: any) => {
     const currentIsoDate = format(startOfDay(selectedDate), "yyyy-MM-dd");
     const day = startOfDay(selectedDate);
@@ -187,7 +168,7 @@ export default function TabOneScreen() {
   if (loading && !userInfo) {
     return (
       <ScreenView style={styles.loadingScreen}>
-        <ActivityIndicator size="large" color={newTheme.accent} />
+        <ActivityIndicator size="large" color={theme.accent} />
         <Text style={styles.loadingText}>Preparing your routine…</Text>
       </ScreenView>
     );
@@ -220,15 +201,11 @@ export default function TabOneScreen() {
                     <Text style={styles.greetingTitle}>
                       {`Good ${getTimeOfDayGreeting()}, ${userInfo.username}.`}
                     </Text>
-                    {/* No “today” duplication – simple Nimbus line */}
-                    <Text style={styles.greetingSubtitle}>
-                      Here’s your routine.
-                    </Text>
                   </View>
 
                   <TopBadge
                     iconName="star"
-                    variant="pill"
+                    variant="circle"
                     onPress={() => router.push(ROUTES.AUTH.COACH)}
                   />
                 </View>
@@ -248,9 +225,11 @@ export default function TabOneScreen() {
                 nextPhase="Master Healer"
               />
 
+              <DailySutraCard />
+
               <>
-                {/* Ritual Streaks (formerly Daily Check-in) */}
-                <RitualStreakPanel date={isoDate} />
+                {/* Bio-Metric Blueprint */}
+                <BioMetricBlueprintPanel date={isoDate} />
 
                 {/* Habits section header */}
                 {habitList.length > 0 && (
@@ -279,6 +258,8 @@ export default function TabOneScreen() {
               color={item.color}
               frequency={item.frequency}
               time={item.time}
+              currentStreak={item.current_streak}
+              lastCompleted={item.last_completed}
               actual_count={{
                 count: item.metric_count,
                 unit: item.metric_unit,
@@ -302,11 +283,6 @@ export default function TabOneScreen() {
           }
         />
       </View>
-
-      {/* Floating add button */}
-      {/* <TouchableOpacity style={styles.floatingButton} onPress={onCreateClick}>
-        <Ionicons name="add" size={26} color={styles.fabIcon.color} />
-      </TouchableOpacity> */}
     </ScreenView>
   );
 }
@@ -339,7 +315,7 @@ const styling = (theme: any, spacing: any, typography: any) =>
     loadingText: {
       marginTop: 12,
       color: theme.textSecondary,
-      ...typography.bodySmall,
+      ...typography.caption,
     },
 
     // Greeting
@@ -347,17 +323,12 @@ const styling = (theme: any, spacing: any, typography: any) =>
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      marginBottom: spacing.xl,
+      marginBottom: spacing.lg,
       marginTop: spacing.md,
     },
     greetingTitle: {
-      ...typography.title,
+      ...typography.h2,
       color: theme.textPrimary,
-    },
-    greetingSubtitle: {
-      ...typography.bodySmall,
-      color: theme.textSecondary,
-      marginTop: 4,
     },
 
     // Daily check-in
@@ -375,14 +346,16 @@ const styling = (theme: any, spacing: any, typography: any) =>
       marginTop: spacing.xs,
     },
     sectionTitle: {
-      fontSize: 12,
+      ...typography.smallCaption,
+      fontSize: 11,
       fontWeight: "700",
-      letterSpacing: 1.2,
+      letterSpacing: 1.6,
       color: theme.accent,
       textTransform: "uppercase",
       opacity: 0.9,
     },
     sectionSubtitle: {
+      ...typography.caption,
       fontSize: 10,
       fontWeight: "600",
       letterSpacing: 0.8,
@@ -412,14 +385,14 @@ const styling = (theme: any, spacing: any, typography: any) =>
       alignItems: "center",
     },
     emptyTitle: {
-      ...typography.subtitle,
+      ...typography.h3,
       color: theme.textPrimary,
       marginBottom: spacing.xs,
     },
     emptyText: {
       textAlign: "center",
       color: theme.textSecondary,
-      ...typography.bodySmall,
+      ...typography.caption,
       paddingHorizontal: spacing.lg,
     },
 

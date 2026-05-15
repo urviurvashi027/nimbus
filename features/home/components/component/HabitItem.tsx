@@ -1,14 +1,17 @@
 import React, { useMemo } from "react";
 import {
+  Image,
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   GestureResponderEvent,
 } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import ThemeContext from "@/contexts/ThemeContext";
 import { router } from "expo-router";
+import type { ColorSet, Spacing, Typography } from "@/theme/types";
 
 interface HabitItemProps {
   selectedDate: string;
@@ -17,6 +20,8 @@ interface HabitItemProps {
   icon?: any; // emoji string is fine
   time?: string;
   done: boolean;
+  currentStreak?: number;
+  lastCompleted?: string | null;
   description?: string;
   frequency: string;
   color?: string;
@@ -24,6 +29,16 @@ interface HabitItemProps {
   // onHabitDelete:() => {};
   onToggle: (id: string, actual_count: any) => void;
 }
+
+const formatMetric = (metric: any) => {
+  const count = metric?.count ?? "--";
+  const unit = metric?.unit ? String(metric.unit).trim() : "";
+
+  return {
+    count: String(count),
+    unit,
+  };
+};
 
 /**
  * Legacy HabitItemCard - kept as per user request "do not remove the old one"
@@ -126,8 +141,9 @@ const HabitItemCard: React.FC<HabitItemProps> = ({
   name,
   selectedDate,
   icon,
-  time,
   done,
+  currentStreak,
+  lastCompleted,
   frequency,
   description,
   actual_count,
@@ -136,7 +152,7 @@ const HabitItemCard: React.FC<HabitItemProps> = ({
 }) => {
   const { newTheme, spacing, typography } = React.useContext(ThemeContext);
   const styles = useMemo(
-    () => nimbusStyling(newTheme, spacing, typography),
+    () => protocolStyling(newTheme, spacing, typography),
     [newTheme, spacing, typography]
   );
 
@@ -152,177 +168,265 @@ const HabitItemCard: React.FC<HabitItemProps> = ({
     });
   };
 
-  // Mock intensity for visual fidelity to screenshot
-  const intensity = "Phase I";
-  const actionLabel = done ? "COMPLETED" : "INITIALIZE";
-
   const accentColor = color || newTheme.accent;
+  const metric = formatMetric(actual_count);
+  const metricText = [metric.count, metric.unit].filter(Boolean).join(" ");
+  const hasProgress = (currentStreak ?? 0) > 0 || !!lastCompleted;
+  const actionState = done ? "completed" : hasProgress ? "resume" : "start";
+  const actionLabel =
+    actionState === "completed"
+      ? "COMPLETED"
+      : actionState === "resume"
+      ? "RESUME"
+      : "START";
+
+  const actionButtonStyle =
+    actionState === "completed"
+      ? styles.actionButtonCompleted
+      : actionState === "resume"
+      ? styles.actionButtonResume
+      : styles.actionButtonStart;
+
+  const actionTextStyle =
+    actionState === "completed"
+      ? styles.actionButtonTextCompleted
+      : actionState === "resume"
+      ? styles.actionButtonTextResume
+      : styles.actionButtonTextStart;
+
+  const renderIcon = () => {
+    if (typeof icon === "string") {
+      if (/^https?:\/\//i.test(icon)) {
+        return (
+          <Image
+            source={{ uri: icon }}
+            style={styles.thumbnailImage}
+            resizeMode="cover"
+          />
+        );
+      }
+
+      if (icon.length <= 2) {
+        return <Text style={styles.iconEmoji}>{icon}</Text>;
+      }
+
+      return (
+        <Ionicons
+          name={icon as any}
+          size={24}
+          color={accentColor}
+        />
+      );
+    }
+
+    if (typeof icon === "number") {
+      return (
+        <Image
+          source={icon}
+          style={styles.thumbnailImage}
+          resizeMode="cover"
+        />
+      );
+    }
+
+    if (icon?.uri) {
+      return (
+        <Image
+          source={icon}
+          style={styles.thumbnailImage}
+          resizeMode="cover"
+        />
+      );
+    }
+
+    return <Ionicons name="leaf-outline" size={24} color={accentColor} />;
+  };
 
   return (
     <TouchableOpacity
       style={styles.card}
       onPress={handleHabitClick}
-      activeOpacity={0.9}
+      activeOpacity={0.92}
     >
-      {/* Accent Strip */}
-      <View style={[styles.accentStrip, { backgroundColor: accentColor }]} />
+      <LinearGradient
+        colors={[
+          newTheme.cardRaised ?? "#262A22",
+          newTheme.surface ?? "#20231D",
+        ]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={StyleSheet.absoluteFillObject}
+      />
 
       <View style={styles.inner}>
-        {/* Top Content Row */}
         <View style={styles.topRow}>
-          <View
-            style={[
-              styles.iconWrap,
-              {
-                backgroundColor: `${accentColor}15`,
-                borderColor: `${accentColor}30`,
-              },
-            ]}
-          >
-            {icon && icon.length < 3 ? (
-              <Text style={styles.iconText}>{icon}</Text>
-            ) : (
-              <Ionicons name={icon || "leaf"} size={22} color={accentColor} />
-            )}
+          <View style={styles.iconWrap}>
+            <View
+              style={[
+                styles.iconInner,
+                {
+                  backgroundColor: `${accentColor}16`,
+                  borderColor: `${accentColor}24`,
+                },
+              ]}
+            >
+              {renderIcon()}
+            </View>
           </View>
 
           <View style={styles.textWrap}>
             <Text style={styles.title} numberOfLines={1}>
               {name}
             </Text>
-          </View>
-        </View>
-
-        {/* Bottom Row: Goal Metric & Action Button */}
-        <View style={styles.bottomRow}>
-          <View style={styles.metricWrap}>
-            <Text style={styles.metricLabel}>Goal: </Text>
-            <Text style={styles.metricText}>
-              {actual_count?.count || "5"} {actual_count?.unit || "MINS"}
-            </Text>
+            {!!frequency && (
+              <Text style={styles.subtitle} numberOfLines={1}>
+                <Text style={styles.subtitleMetric}>{metricText}</Text>
+                <Text style={styles.subtitleDivider}> | </Text>
+                <Text style={styles.subtitleFrequency}>{frequency}</Text>
+              </Text>
+            )}
           </View>
 
           <TouchableOpacity
-            style={[
-              styles.actionButton,
-              done && { backgroundColor: accentColor },
-            ]}
             onPress={handleToggle}
+            style={styles.actionButtonWrap}
+            activeOpacity={0.85}
           >
-            <Text
-              style={[
-                styles.actionButtonText,
-                done && { color: newTheme.surface },
-              ]}
-            >
-              {actionLabel}
-            </Text>
+            <View style={[styles.actionButton, actionButtonStyle]}>
+              <Text style={[styles.actionButtonText, actionTextStyle]}>
+                {actionLabel}
+              </Text>
+            </View>
           </TouchableOpacity>
         </View>
+
       </View>
     </TouchableOpacity>
   );
 };
 
-const nimbusStyling = (theme: any, spacing: any, typography: any) =>
+const protocolStyling = (theme: ColorSet, spacing: Spacing, typography: Typography) =>
   StyleSheet.create({
     card: {
+      position: "relative",
       backgroundColor: theme.cardRaised || "#262A22",
-      borderRadius: 24,
+      borderRadius: 22,
       marginVertical: spacing.sm,
       overflow: "hidden",
       borderWidth: 1,
-      borderColor: "rgba(255,255,255,0.06)",
-      // Elevation for Android / Shadow for iOS
+      borderColor: "rgba(255,255,255,0.07)",
       shadowColor: "#000",
       shadowOffset: { width: 0, height: 8 },
-      shadowOpacity: 0.2,
-      shadowRadius: 12,
-      elevation: 5,
-    },
-    accentStrip: {
-      position: "absolute",
-      left: 0,
-      top: 0,
-      bottom: 0,
-      width: 4,
+      shadowOpacity: 0.18,
+      shadowRadius: 14,
+      elevation: 6,
+      minHeight: 92,
     },
     inner: {
-      padding: spacing.md,
-      paddingLeft: spacing.md + 4, // offset for accent strip
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm + 2,
     },
     topRow: {
       flexDirection: "row",
       alignItems: "center",
-      marginBottom: spacing.md,
     },
     iconWrap: {
-      width: 44,
-      height: 44,
-      borderRadius: 22,
-      backgroundColor: "rgba(255,255,255,0.05)",
+      marginRight: spacing.md,
+    },
+    iconInner: {
+      width: 50,
+      height: 50,
+      borderRadius: 14,
       justifyContent: "center",
       alignItems: "center",
-      marginRight: spacing.md,
       borderWidth: 1,
-      borderColor: "rgba(255,255,255,0.1)",
+      overflow: "hidden",
     },
-    iconText: {
-      fontSize: 20,
+    thumbnailImage: {
+      width: "100%",
+      height: "100%",
+      borderRadius: 14,
+    },
+    iconEmoji: {
+      fontSize: 22,
     },
     textWrap: {
       flex: 1,
+      minWidth: 0,
+      gap: 2,
     },
     title: {
       ...typography.h3,
-      fontSize: 18,
-      fontWeight: "900",
+      fontSize: 17,
+      lineHeight: 21,
+      fontWeight: "800",
       color: theme.textPrimary,
-      letterSpacing: 0.2,
+      letterSpacing: 0.1,
     },
     subtitle: {
       ...typography.caption,
+      fontSize: 11,
+      lineHeight: 15,
       color: theme.textSecondary,
-      marginTop: 2,
-      opacity: 0.8,
+      letterSpacing: 0.2,
     },
-    bottomRow: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      borderTopWidth: 1,
-      borderTopColor: "rgba(255,255,255,0.05)",
-      paddingTop: spacing.sm,
+    subtitleMetric: {
+      color: theme.textPrimary,
+      fontWeight: "800",
     },
-    metricWrap: {
-      flexDirection: "row",
-      alignItems: "center",
-    },
-    metricLabel: {
-      fontSize: 12,
+    subtitleDivider: {
       color: theme.textSecondary,
-      fontWeight: "400",
-      opacity: 0.6,
+      opacity: 0.42,
+      fontWeight: "600",
     },
-    metricText: {
-      fontSize: 12,
+    subtitleFrequency: {
       color: theme.textSecondary,
-      fontWeight: "700",
-      opacity: 0.9,
+      opacity: 0.82,
+      fontWeight: "600",
+    },
+    actionButtonWrap: {
+      marginLeft: spacing.md,
+      borderRadius: 18,
+      overflow: "hidden",
     },
     actionButton: {
-      paddingHorizontal: spacing.lg,
-      paddingVertical: spacing.sm,
+      minWidth: 88,
+      paddingHorizontal: 18,
+      paddingVertical: 9,
       borderRadius: 18,
-      backgroundColor: "rgba(255,255,255,0.04)",
+      justifyContent: "center",
+      alignItems: "center",
       borderWidth: 1,
-      borderColor: "rgba(255,255,255,0.15)",
     },
     actionButtonText: {
-      fontSize: 11,
+      ...typography.button,
+      fontSize: 10,
+      lineHeight: 12,
       fontWeight: "800",
+      letterSpacing: 0.9,
+    },
+    actionButtonStart: {
+      backgroundColor: "rgba(182, 208, 155, 0.10)",
+      borderColor: "rgba(182, 208, 155, 0.14)",
+    },
+    actionButtonResume: {
+      backgroundColor: theme.surfaceMuted ?? "rgba(255,255,255,0.05)",
+      borderColor: "rgba(255,255,255,0.10)",
+    },
+    actionButtonCompleted: {
+      backgroundColor: "rgba(255,255,255,0.035)",
+      borderColor: "rgba(255,255,255,0.08)",
+    },
+    actionButtonTextStart: {
+      color: theme.accent,
+      opacity: 0.9,
+    },
+    actionButtonTextResume: {
       color: theme.textPrimary,
-      letterSpacing: 1,
+    },
+    actionButtonTextCompleted: {
+      color: theme.textSecondary,
+      opacity: 0.88,
     },
   });
 

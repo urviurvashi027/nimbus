@@ -1,3 +1,3 @@
-import { WaterCheckInScreen } from "@/features/check-in/screens/WaterCheckInScreen";
+import HydrationCheckInScreen from "../../../features/check-in/screens/HydrationCheckInScreen";
 
-export default WaterCheckInScreen;
+export default HydrationCheckInScreen;

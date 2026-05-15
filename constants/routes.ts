@@ -69,6 +69,7 @@ export const ROUTES = {
     // Check-in
     CHECK_IN_SLEEP: "/(auth)/check-in/sleep",
     CHECK_IN_MEDITATION: "/(auth)/check-in/meditation",
+    CHECK_IN_MEDITATION_ANCHOR: "/(auth)/check-in/meditation-anchor",
     CHECK_IN_WATER: "/(auth)/check-in/water",
     CHECK_IN_READING: "/(auth)/check-in/reading",
 

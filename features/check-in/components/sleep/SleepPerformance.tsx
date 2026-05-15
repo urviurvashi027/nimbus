@@ -1,27 +1,23 @@
-// components/sleep/SleepPerformanceCard.tsx
 import React, { useContext, useMemo, useState } from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
-import Svg, { Line } from "react-native-svg";
+import Svg, { Circle } from "react-native-svg";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+
 import ThemeContext from "@/contexts/ThemeContext";
+import type { ColorSet, Typography } from "@/theme/types";
 import LogSheet, { LogPayload } from "../common/logSheet/SleepLogSheet";
+import { setHM } from "@/features/check-in/utils/sleepLog";
+import {
+  clamp,
+  formatGoalHours,
+  formatHours,
+} from "@/features/check-in/utils/sleepPerformance";
 
 type Props = {
-  /** Minutes you actually slept */
   asleepMinutes: number;
-  /** Goal in minutes (e.g., 8 * 60) */
   goalMinutes: number;
-  /** Optional label above percentage (e.g., “Good”, “Great”, “Poor”) */
   ratingLabel?: string;
-};
-
-const clamp = (n: number, min: number, max: number) =>
-  Math.max(min, Math.min(n, max));
-
-const fmtHM = (mins: number) => {
-  const h = Math.floor(mins / 60);
-  const m = mins % 60;
-  const pad = (n: number) => (n < 10 ? `0${n}` : `${n}`);
-  return `${h}:${pad(m)}h`;
 };
 
 export default function SleepPerformanceCard({
@@ -29,208 +25,363 @@ export default function SleepPerformanceCard({
   goalMinutes,
   ratingLabel,
 }: Props) {
-  const { newTheme } = useContext(ThemeContext);
+  const { newTheme: theme, typography } = useContext(ThemeContext);
+  const styles = useMemo(() => styling(theme, typography), [theme, typography]);
   const [open, setOpen] = useState(false);
+  const [sleepNowProcessing, setSleepNowProcessing] = useState(false);
 
-  const percent = useMemo(() => {
+  const progress = useMemo(() => {
     if (!goalMinutes) return 0;
-    return clamp(Math.round((asleepMinutes / goalMinutes) * 100), 0, 200);
+    return clamp(asleepMinutes / goalMinutes, 0, 1);
   }, [asleepMinutes, goalMinutes]);
 
-  const label =
+  const centerLabel =
     ratingLabel ??
-    (percent >= 90 ? "Great" : percent >= 70 ? "Good" : "Keep Improving");
+    (progress >= 0.92
+      ? "Aligned recovery"
+      : progress >= 0.75
+      ? "Recovery in progress"
+      : "Deep recovery in progress");
 
-  // TODO POST: Sleep Log API call
-  const handleSleepNow = () => {
-    // start tracking immediately
-    const now = new Date();
-    const hours = now.getHours().toString().padStart(2, "0");
-    const minutes = now.getMinutes().toString().padStart(2, "0");
-    const currentTime = `${hours}:${minutes}`;
-    console.log("Sleep now pressed at:", currentTime);
+  const ringSize = 184;
+  const strokeWidth = 15;
+  const radius = (ringSize - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const progressLength = circumference * progress;
+  const dashOffset = circumference * (1 - progress);
+
+  const defaultBed = useMemo(() => setHM(23, 0), []);
+  const defaultWake = useMemo(() => setHM(7, 0), []);
+
+  const handleSleepNow = async () => {
+    if (sleepNowProcessing) return;
+
+    setSleepNowProcessing(true);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+      const now = new Date();
+      console.log("Mock sleep now API call:", now.toISOString());
+    } finally {
+      setSleepNowProcessing(false);
+    }
   };
-  const handleSaveManual = (p: LogPayload) => {
-    const bedDate = new Date(p.bedTime);
-    const wakeDate = new Date(p.wakeTime);
 
-    // Example: 22:47 or 10:47 PM depending on locale
-    const bedTimeLocal = bedDate.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
+  const handleSaveManual = (payload: LogPayload) => {
+    console.log("Sleep log saved:", {
+      bed: payload.bedTime.toISOString(),
+      wake: payload.wakeTime.toISOString(),
+      minutes: payload.durationMin,
     });
-
-    const wakeTimeLocal = wakeDate.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-
-    console.log("Bed:", bedTimeLocal);
-    console.log("Wake:", wakeTimeLocal);
   };
 
   return (
-    <View
-      style={[
-        styles.card,
-        {
-          backgroundColor: newTheme.surface,
-          borderColor: newTheme.border,
-          shadowColor: newTheme.accent ?? "#000",
-        },
-      ]}
-    >
-      {/* Title */}
-      <Text style={[styles.title, { color: newTheme.textPrimary }]}>
-        Sleep Performance
-      </Text>
+    <View style={styles.card}>
+      <LinearGradient
+        colors={["rgba(255,255,255,0.02)", "rgba(94,129,172,0.12)"]}
+        start={{ x: 0.08, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        pointerEvents="none"
+        style={StyleSheet.absoluteFillObject}
+      />
+      <View style={styles.innerGlow} />
 
-      {/* Center metric */}
-      <View style={styles.centerWrap}>
-        <Text style={[styles.centerLabel, { color: newTheme.textSecondary }]}>
-          {label}
-        </Text>
-        <Text style={[styles.centerValue, { color: newTheme.textPrimary }]}>
-          {percent}%
-        </Text>
-      </View>
-
-      {/* Dotted “guides” to left/right stats */}
-      <View style={styles.guidesWrap}>
-        <DashedGuide color={newTheme.textDisabled} />
-        <DashedGuide color={newTheme.textDisabled} />
-      </View>
-
-      {/* Bottom stats */}
-      <View style={styles.bottomRow}>
-        <View style={styles.statBlock}>
-          <Text style={[styles.statValue, { color: newTheme.textPrimary }]}>
-            {fmtHM(asleepMinutes)}
-          </Text>
-          <Text style={[styles.statLabel, { color: newTheme.textSecondary }]}>
-            Your time asleep
+      <View style={styles.topRow}>
+        <View style={styles.headerBlock}>
+          <Text style={styles.sectionLabel}>SLEEP LOG</Text>
+          <Text style={styles.cardSubTitle}>
+            Track tonight&apos;s rest or add a past sleep session.
           </Text>
         </View>
 
-        <View style={styles.statBlock}>
-          <Text style={[styles.statValue, { color: newTheme.textPrimary }]}>
-            {fmtHM(goalMinutes)}
-          </Text>
-          <Text style={[styles.statLabel, { color: newTheme.textSecondary }]}>
-            Your sleep goal
-          </Text>
+        <View style={styles.goalChip}>
+          <Text style={styles.goalChipText}>{formatGoalHours(goalMinutes)}</Text>
+          <Text style={styles.goalChipSub}>goal</Text>
         </View>
       </View>
-      {/* Your existing Sleep Performance card here... */}
-      <Pressable onPress={() => setOpen(true)} style={{ marginTop: 12 }}>
-        <Text
-          style={{
-            color: newTheme.buttonPrimary,
-            fontWeight: "500",
-            fontSize: 16,
-            textAlign: "center",
-            paddingVertical: 6,
-          }}
+
+      <View style={styles.ringStage}>
+        <Svg width={ringSize} height={ringSize} viewBox={`0 0 ${ringSize} ${ringSize}`}>
+          <Circle
+            cx={ringSize / 2}
+            cy={ringSize / 2}
+            r={radius}
+            stroke={theme.borderMuted ?? "rgba(255,255,255,0.08)"}
+            strokeWidth={strokeWidth}
+            fill="none"
+          />
+          <Circle
+            cx={ringSize / 2}
+            cy={ringSize / 2}
+            r={radius}
+            stroke={theme.chart5 ?? theme.gradBlue ?? theme.chart2 ?? theme.accent}
+            strokeWidth={strokeWidth}
+            strokeDasharray={`${progressLength} ${circumference}`}
+            strokeDashoffset={dashOffset}
+            strokeLinecap="round"
+            transform={`rotate(-90 ${ringSize / 2} ${ringSize / 2})`}
+            fill="none"
+          />
+        </Svg>
+
+        <View style={styles.centerWrap}>
+          <Text style={styles.centerValue}>
+            <Text style={styles.centerPrimary}>{formatHours(asleepMinutes)}</Text>
+            <Text style={styles.centerSecondary}> / {formatGoalHours(goalMinutes)}</Text>
+          </Text>
+          <Text style={styles.centerLabel}>{centerLabel}</Text>
+        </View>
+      </View>
+
+      <View style={styles.metricRow}>
+        <View style={styles.metricCell}>
+          <Text style={styles.metricValue}>{Math.round(progress * 100)}%</Text>
+          <Text style={styles.metricLabel}>efficiency</Text>
+        </View>
+        <View style={styles.metricDivider} />
+        <View style={styles.metricCell}>
+          <Text style={styles.metricValue}>{formatHours(asleepMinutes)}</Text>
+          <Text style={styles.metricLabel}>time asleep</Text>
+        </View>
+      </View>
+
+      <View style={styles.actionRow}>
+        <Pressable
+          onPress={handleSleepNow}
+          disabled={sleepNowProcessing}
+          style={({ pressed }) => [
+            styles.primaryActionButton,
+            pressed && !sleepNowProcessing && styles.actionPressed,
+            sleepNowProcessing && styles.actionProcessing,
+          ]}
         >
-          + Add sleep log
-        </Text>
-      </Pressable>
+          <Ionicons
+            name="moon-outline"
+            size={16}
+            color={sleepNowProcessing ? (theme.textSecondary ?? theme.textPrimary) : theme.textPrimary}
+          />
+          <Text style={styles.primaryActionText}>
+            {sleepNowProcessing ? "Processing..." : "Sleep now"}
+          </Text>
+        </Pressable>
+
+        <Pressable
+          onPress={() => setOpen(true)}
+          style={({ pressed }) => [
+            styles.secondaryActionButton,
+            pressed && styles.actionPressed,
+          ]}
+        >
+          <Ionicons
+            name="calendar-outline"
+            size={16}
+            color={theme.textPrimary}
+          />
+          <Text style={styles.secondaryActionText}>Add past sleep</Text>
+        </Pressable>
+      </View>
 
       <LogSheet
         visible={open}
         onClose={() => setOpen(false)}
-        onSleepNow={handleSleepNow}
+        showNowTab={false}
         onSaveManual={handleSaveManual}
-        // Optional: pass defaults for manual tab
-        defaultBed={new Date()} // or your last bedtime
-        defaultWake={new Date()} // or last wake time
+        defaultBed={defaultBed}
+        defaultWake={defaultWake}
+        titleText="Add a past sleep"
+        manualMode="duration"
+        manualDateSelection="pastWeek"
+        defaultDurationMinutes={goalMinutes}
+        manualTitleText="Select sleep date"
+        manualSubtitleText="Choose a date from the past week and set duration."
+        saveText="Add past sleep"
       />
     </View>
   );
 }
 
-const DashedGuide = ({ color }: { color: string }) => {
-  // vertical dashed line, sized to layout via viewBox 60x40, then scaled by style
-  return (
-    <Svg
-      width="100%"
-      height="100%"
-      viewBox="0 0 6 40"
-      preserveAspectRatio="xMidYMid meet"
-    >
-      <Line
-        x1="3"
-        y1="0"
-        x2="3"
-        y2="40"
-        stroke={color}
-        strokeWidth="1"
-        strokeDasharray="2,2"
-        strokeLinecap="round"
-      />
-    </Svg>
-  );
-};
-
-const styles = StyleSheet.create({
-  card: {
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingTop: 18,
-    paddingBottom: 14,
-    borderWidth: StyleSheet.hairlineWidth,
-    overflow: "hidden",
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 6 },
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: "700",
-    letterSpacing: 0.2,
-    marginBottom: 10,
-  },
-  centerWrap: {
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 2,
-  },
-  centerLabel: {
-    fontSize: 14,
-    fontWeight: "600",
-    marginBottom: 2,
-  },
-  centerValue: {
-    fontSize: 56,
-    fontWeight: "800",
-    letterSpacing: 0.5,
-    lineHeight: 60,
-  },
-  guidesWrap: {
-    marginTop: 4,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingHorizontal: 28,
-    height: 24, // controls the dashed guide height
-  },
-  bottomRow: {
-    marginTop: 4,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 16,
-  },
-  statBlock: {
-    flex: 1,
-    alignItems: "center",
-  },
-  statValue: {
-    fontSize: 22,
-    fontWeight: "800",
-    letterSpacing: 0.3,
-  },
-  statLabel: {
-    marginTop: 2,
-    fontSize: 12,
-    fontWeight: "500",
-  },
-});
+const styling = (theme: ColorSet, typography: Typography) =>
+  StyleSheet.create({
+    card: {
+      borderRadius: 28,
+      overflow: "hidden",
+      padding: 18,
+      backgroundColor: theme.cardRaised ?? theme.surface,
+      borderWidth: 1,
+      borderColor: theme.borderMuted ?? "rgba(255,255,255,0.06)",
+      shadowColor: theme.shadow ?? "#000",
+      shadowOpacity: 0.24,
+      shadowOffset: { width: 0, height: 12 },
+      shadowRadius: 24,
+      elevation: 8,
+      minHeight: 320,
+    },
+    innerGlow: {
+      ...StyleSheet.absoluteFillObject,
+      backgroundColor: "rgba(255,255,255,0.015)",
+    },
+    topRow: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      justifyContent: "space-between",
+      marginBottom: 14,
+      gap: 12,
+    },
+    headerBlock: {
+      flex: 1,
+    },
+    sectionLabel: {
+      ...typography.smallCaption,
+      color: theme.textSecondary,
+      letterSpacing: 1.6,
+      textTransform: "uppercase",
+    },
+    cardSubTitle: {
+      ...typography.caption,
+      marginTop: 4,
+      color: theme.textSecondary,
+      opacity: 0.86,
+    },
+    goalChip: {
+      alignItems: "flex-end",
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderRadius: 16,
+      backgroundColor: "rgba(255,255,255,0.03)",
+      borderWidth: 1,
+      borderColor: "rgba(255,255,255,0.06)",
+    },
+    goalChipText: {
+      ...typography.caption,
+      color: theme.textPrimary,
+      fontWeight: "800",
+      letterSpacing: 0.1,
+    },
+    goalChipSub: {
+      ...typography.smallCaption,
+      marginTop: 1,
+      color: theme.textSecondary,
+      fontWeight: "700",
+      letterSpacing: 1.1,
+      textTransform: "uppercase",
+    },
+    ringStage: {
+      alignItems: "center",
+      justifyContent: "center",
+      marginVertical: 6,
+      minHeight: 220,
+    },
+    centerWrap: {
+      position: "absolute",
+      alignItems: "center",
+      justifyContent: "center",
+      width: 170,
+      height: 170,
+      borderRadius: 85,
+      backgroundColor: "rgba(0,0,0,0.08)",
+      borderWidth: 1,
+      borderColor: "rgba(255,255,255,0.04)",
+    },
+    centerValue: {
+      textAlign: "center",
+    },
+    centerPrimary: {
+      ...typography.h1,
+      color: theme.textPrimary,
+      fontWeight: "800",
+      letterSpacing: -0.4,
+    },
+    centerSecondary: {
+      ...typography.h3,
+      color: theme.textSecondary,
+      fontWeight: "700",
+    },
+    centerLabel: {
+      ...typography.smallCaption,
+      marginTop: 6,
+      color: theme.textSecondary,
+      fontWeight: "800",
+      letterSpacing: 1.5,
+      textTransform: "uppercase",
+    },
+    metricRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginTop: 4,
+      marginBottom: 16,
+      paddingHorizontal: 8,
+    },
+    metricCell: {
+      flex: 1,
+      alignItems: "center",
+    },
+    metricDivider: {
+      width: 1,
+      height: 34,
+      backgroundColor: theme.borderMuted ?? "rgba(255,255,255,0.08)",
+      opacity: 0.9,
+    },
+    metricValue: {
+      ...typography.h3,
+      color: theme.textPrimary,
+      fontWeight: "800",
+      letterSpacing: 0.2,
+    },
+    metricLabel: {
+      ...typography.smallCaption,
+      marginTop: 2,
+      color: theme.textSecondary,
+      fontWeight: "700",
+      letterSpacing: 1.1,
+      textTransform: "uppercase",
+    },
+    actionRow: {
+      flexDirection: "row",
+      gap: 10,
+      marginTop: 4,
+    },
+    primaryActionButton: {
+      flex: 1,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 8,
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+      borderRadius: 16,
+      backgroundColor: "rgba(255,255,255,0.05)",
+      borderWidth: 1,
+      borderColor: "rgba(255,255,255,0.09)",
+    },
+    actionProcessing: {
+      opacity: 0.72,
+    },
+    secondaryActionButton: {
+      flex: 1,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 8,
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+      borderRadius: 16,
+      backgroundColor: "rgba(255,255,255,0.04)",
+      borderWidth: 1,
+      borderColor: "rgba(255,255,255,0.08)",
+    },
+    actionPressed: {
+      transform: [{ scale: 0.99 }],
+      opacity: 0.94,
+    },
+    primaryActionText: {
+      ...typography.button,
+      color: theme.textPrimary,
+      fontWeight: "800",
+      letterSpacing: 0.2,
+    },
+    secondaryActionText: {
+      ...typography.button,
+      color: theme.textPrimary,
+      fontWeight: "800",
+      letterSpacing: 0.2,
+    },
+  });

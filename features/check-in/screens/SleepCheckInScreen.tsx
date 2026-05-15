@@ -1,52 +1,80 @@
-import React, { useState, useEffect, useContext, useMemo } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Platform,
-  ScrollView,
-} from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { ActivityIndicator, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 
 import ThemeContext from "@/contexts/ThemeContext";
-
-import { ScreenView } from "@/components/ui/Themed";
-import NotificationSettingRow from "@/features/check-in/components/common/NotificationSettingRow";
-import SleepPerformanceCard from "@/features/check-in/components/sleep/SleepPerformance";
-import SleepTimeCard from "@/features/check-in/components/sleep/SleepTimeCard";
-import SleepWeekChart from "@/features/check-in/components/sleep/SleepWeeklyReview";
-
-import { DailyCheckInDetailResponse } from "@/features/check-in/types/dailyCheckin";
+import { ScreenView } from "@/components/ui/theme-components/ScreenView";
+import ScreenHeader from "@/components/layout/ScreenHeader";
 import { getHabitDetailsByDate } from "@/features/check-in/services/dailyCheckinService";
+import { DailyCheckInDetailResponse } from "@/features/check-in/types/dailyCheckin";
 import { toMinutes } from "@/features/check-in/utils/dailyCheckin";
-import { SkeletonCard } from "@/features/check-in/components/sleep/SkeletonCard";
-import { ErrorCard } from "@/features/check-in/components/sleep/ErrorCard";
+import SleepPerformanceCard from "@/features/check-in/components/sleep/SleepPerformance";
+import {
+  DEFAULT_BED_MINUTES,
+  DEFAULT_WAKE_MINUTES,
+  MOCK_WEEKLY_SLEEP,
+  REMINDER_OPTIONS,
+  SLEEP_GOAL_MINUTES,
+  buildWeeklySleepSeries,
+  hasMeaningfulSleepData,
+  parseTimeToMinutes,
+} from "@/features/check-in/utils/sleepCheckin";
+import {
+  CircadianAlignmentCard,
+  ReminderBufferCard,
+  SleepErrorState,
+  SleepLoadingState,
+  SleepPatternCard,
+  SleepTipCard,
+} from "@/features/check-in/components/sleep/checkIn";
+import type { ColorSet, Spacing, Typography } from "@/theme/types";
 
-const remindOptions = [
-  { key: "3hr", label: "Three Hour before bedtime" },
-  { key: "1hr", label: "One Hour before bedtime" },
-  { key: "custom", label: "Custom" },
-];
+const makeStyles = (theme: ColorSet, spacing: Spacing, typography: Typography) =>
+  StyleSheet.create({
+    scrollContent: {
+      paddingHorizontal: spacing.md,
+      paddingBottom: Platform.OS === "ios" ? 140 : 160,
+    },
+    refreshingRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 10,
+      marginTop: 16,
+    },
+    refreshingText: {
+      ...typography.caption,
+      color: theme.textSecondary,
+      fontWeight: "700",
+    },
+  });
 
 export const SleepCheckInScreen = () => {
+  const navigation = useNavigation();
+  const { newTheme: theme, spacing, typography } = useContext(ThemeContext);
+  const styles = useMemo(
+    () => makeStyles(theme, spacing, typography),
+    [theme, spacing, typography]
+  );
+
   const { id, date } = useLocalSearchParams<{ id?: string; date?: string }>();
   const templateId = useMemo(() => Number(id), [id]);
-
-  const [enabled, setEnabled] = useState(true);
-  const [valueKey, setValueKey] = useState<string | null>("1hr");
+  const scrollRef = useRef<ScrollView>(null);
 
   const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState<string | null>(null);
+  const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [detail, setDetail] = useState<DailyCheckInDetailResponse | null>(null);
-
-  const navigation = useNavigation();
-
-  const { newTheme } = useContext(ThemeContext);
-
-  const styles = styling(newTheme);
+  const [bedMinutes, setBedMinutes] = useState(DEFAULT_BED_MINUTES);
+  const [wakeMinutes, setWakeMinutes] = useState(DEFAULT_WAKE_MINUTES);
+  const [reminderIndex, setReminderIndex] = useState(1);
 
   useEffect(() => {
     navigation.setOptions({
@@ -54,231 +82,178 @@ export const SleepCheckInScreen = () => {
     });
   }, [navigation]);
 
-  // fetch details
-  const fetchDetails = async () => {
-    if (!templateId || !date) return;
+  const loadSleep = useCallback(async () => {
+    if (!templateId || !date) {
+      setError("Missing sleep check-in id or date.");
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
-    setErr(null);
+    setError(null);
+
     try {
-      const res = await getHabitDetailsByDate(templateId, date);
+      const res: DailyCheckInDetailResponse = await getHabitDetailsByDate(
+        templateId,
+        date
+      );
       setDetail(res);
-    } catch (e: any) {
-      const msg =
-        typeof e === "string" ? e : e?.message || "Failed to load sleep data";
-      setErr(msg);
+      setLoaded(true);
+    } catch (error: unknown) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : typeof error === "string"
+          ? error
+          : "Failed to load sleep data"
+      );
+      setLoaded(true);
     } finally {
       setLoading(false);
     }
-  };
+  }, [date, templateId]);
 
   useEffect(() => {
-    fetchDetails();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [templateId, date]);
+    loadSleep();
+  }, [loadSleep]);
 
-  // derive UI data from API
-  const {
-    goalMinutes,
-    asleepMinutes,
-    bedtimeHHmm,
-    wakeHHmm,
-    weeklyHours,
-  } = useMemo(() => {
-    const d = detail?.data as any | undefined;
+  useEffect(() => {
+    const data = detail?.data;
+    if (!data) return;
 
-    // goal / completed in minutes
-    const goalMin = toMinutes(
-      d?.target_unit ?? d?.metric_count ?? 8,
-      d?.metric_unit ?? "hours"
+    setBedMinutes(parseTimeToMinutes(data.start_time, DEFAULT_BED_MINUTES));
+    setWakeMinutes(parseTimeToMinutes(data.end_time, DEFAULT_WAKE_MINUTES));
+
+    const reminderValue = Number(
+      String(data.reminder_time ?? "").match(/\d+/)?.[0] ?? NaN
     );
-    const completedMin = toMinutes(
-      d?.completed_unit ?? 0,
-      d?.metric_unit ?? "hours"
-    );
+    if (Number.isFinite(reminderValue)) {
+      const index = REMINDER_OPTIONS.indexOf(reminderValue);
+      if (index >= 0) {
+        setReminderIndex(index);
+      }
+    }
+  }, [detail]);
 
-    // bedtime / wake (fallbacks)
-    const bed = d?.start_time ? d.start_time.slice(11, 16) : "23:00";
-    const wake = d?.end_time ? d.end_time.slice(11, 16) : "07:00";
-
-    // weekly chart: convert percent → hours using target
-    const targetHours =
-      (d?.metric_unit && ("" + d.metric_unit).toLowerCase().includes("hour")) ||
-      d?.metric_unit === "19"
-        ? d?.target_unit ?? d?.metric_count ?? 8
-        : (d?.target_unit ?? d?.metric_count ?? 480) / 60;
-
-    const weekly =
-      Array.isArray(d?.last_7_days_completion) && targetHours
-        ? d.last_7_days_completion.map((it: any) => ({
-            day: it.day,
-            hours:
-              Math.round(((Number(it.percent) || 0) / 100) * targetHours * 10) /
-              10,
-          }))
-        : [];
+  const sleepSummary = useMemo(() => {
+    const data = detail?.data;
+    const goalMinutes = SLEEP_GOAL_MINUTES;
+    const asleepMinutes = data
+      ? Math.max(0, toMinutes(data.completed_unit ?? 0, data.metric_unit ?? "hours"))
+      : 0;
+    const targetHours = goalMinutes / 60;
+    const weeklySeries = data
+      ? buildWeeklySleepSeries(data.last_7_days_completion, targetHours)
+      : MOCK_WEEKLY_SLEEP;
 
     return {
-      goalMinutes: goalMin,
-      asleepMinutes: completedMin,
-      bedtimeHHmm: bed,
-      wakeHHmm: wake,
-      weeklyHours: weekly,
+      goalMinutes,
+      asleepMinutes,
+      weeklySeries: hasMeaningfulSleepData(weeklySeries)
+        ? weeklySeries
+        : MOCK_WEEKLY_SLEEP,
     };
   }, [detail]);
 
+  const sleepProgress = useMemo(() => {
+    if (!sleepSummary.goalMinutes) return 0;
+    return Math.min(
+      1,
+      Math.max(0, sleepSummary.asleepMinutes / sleepSummary.goalMinutes)
+    );
+  }, [sleepSummary.asleepMinutes, sleepSummary.goalMinutes]);
+
+  const sleepStatusLabel =
+    sleepProgress >= 0.92
+      ? "Aligned recovery"
+      : sleepProgress >= 0.75
+      ? "Recovery in progress"
+      : "Deep recovery in progress";
+
+  const refreshing = loading && loaded && !error;
+
+  const handleRefresh = useCallback(() => {
+    loadSleep();
+  }, [loadSleep]);
+
+  const scrollToTip = useCallback(() => {
+    scrollRef.current?.scrollToEnd({ animated: true });
+  }, []);
+
   return (
-    <ScreenView style={{ paddingTop: Platform.OS === "ios" ? 40 : 20 }}>
-      <View style={styles.container}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Ionicons
-            name="arrow-back"
-            size={24}
-            color={newTheme.textSecondary}
-          />
-        </TouchableOpacity>
+    <ScreenView bgColor={theme.background} padding={0}>
+      <ScrollView
+        ref={scrollRef}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        <ScreenHeader
+          title="Nidra Sync"
+          subtitle="8h target • circadian alignment"
+          onBack={() => navigation.goBack()}
+          rightActions={[
+            {
+              icon: "refresh-outline",
+              accessibilityLabel: "Refresh sleep data",
+              onPress: handleRefresh,
+            },
+            {
+              icon: "information-circle-outline",
+              accessibilityLabel: "Jump to tip",
+              onPress: scrollToTip,
+            },
+          ]}
+        />
 
-        {/* SCROLLABLE CONTENT */}
-        <ScrollView
-          bounces
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 28 }}
-        >
-          <View style={styles.header}>
-            <Text style={styles.title}>Sleep CheckIns</Text>
-            <Text style={styles.subtitle}>
-              Immense Yourself in true nature.
-            </Text>
-          </View>
-          {/* Loading */}
-          {loading && (
-            <>
-              <SkeletonCard height={180} />
-              <SkeletonCard height={90} />
-              <SkeletonCard height={140} />
-              <SkeletonCard height={220} />
-            </>
-          )}
-          {/* Error */}
-          {!loading && err && (
-            <ErrorCard
-              message={err}
-              onRetry={fetchDetails}
-              accent={newTheme.accent}
-              surface={newTheme.surface}
-              text={newTheme.textPrimary}
+        {loading && !loaded ? (
+          <SleepLoadingState />
+        ) : error ? (
+          <SleepErrorState message={error} onRetry={handleRefresh} />
+        ) : (
+          <>
+            <SleepPerformanceCard
+              asleepMinutes={sleepSummary.asleepMinutes}
+              goalMinutes={sleepSummary.goalMinutes}
+              ratingLabel={sleepStatusLabel}
             />
-          )}
 
-          {/* Content */}
-          {!loading && !err && (
-            <>
-              {/* Performance */}
-              <View style={styles.section}>
-                <SleepPerformanceCard
-                  asleepMinutes={asleepMinutes}
-                  goalMinutes={goalMinutes}
-                />
-              </View>
+            <View style={{ height: 18 }} />
 
-              {/* Reminder */}
-              <View style={{ height: 20 }} />
-              <View style={{ paddingHorizontal: 0 }}>
-                <NotificationSettingRow
-                  label="Notification"
-                  subtitle="Remind me before bedtime"
-                  helpText=""
-                  enabled={enabled}
-                  onToggle={setEnabled}
-                  options={remindOptions}
-                  valueKey={valueKey}
-                  onOptionSelect={(item) => setValueKey(item.key)}
-                />
-              </View>
+            <CircadianAlignmentCard
+              bedMinutes={bedMinutes}
+              wakeMinutes={wakeMinutes}
+              onChangeBed={setBedMinutes}
+              onChangeWake={setWakeMinutes}
+            />
 
-              {/* Bed/Wake + Alarm */}
-              <View style={{ height: 12 }} />
-              <View>
-                <SleepTimeCard
-                  defaultBedtime={bedtimeHHmm}
-                  defaultWake={wakeHHmm}
-                  defaultAlarm="07:00"
-                  onSaveBedWake={(bed: string, wake: string) => {
-                    // TODO: POST save bed/wake for this habitId + date
-                    console.log({ bed, wake });
-                  }}
-                  onSaveAlarm={(alarm: string) => {
-                    // TODO: POST alarm preference
-                    console.log({ alarm });
-                  }}
-                />
-              </View>
+            <View style={{ height: 18 }} />
 
-              {/* Weekly chart */}
-              <View style={{ height: 24 }} />
-              <View>
-                <SleepWeekChart
-                  data={
-                    weeklyHours.length
-                      ? weeklyHours
-                      : [
-                          { day: "Mon", hours: 0 },
-                          { day: "Tue", hours: 0 },
-                          { day: "Wed", hours: 0 },
-                          { day: "Thu", hours: 0 },
-                          { day: "Fri", hours: 0 },
-                          { day: "Sat", hours: 0 },
-                          { day: "Sun", hours: 0 },
-                        ]
-                  }
-                  idealRange={{ min: 7, max: 9 }}
-                />
-              </View>
-            </>
-          )}
-        </ScrollView>
-      </View>
+            <ReminderBufferCard
+              reminderIndex={reminderIndex}
+              onChange={setReminderIndex}
+            />
+
+            <View style={{ height: 18 }} />
+
+            <SleepPatternCard data={sleepSummary.weeklySeries} />
+
+            <View style={{ height: 18 }} />
+
+            <SleepTipCard />
+          </>
+        )}
+
+        {refreshing ? (
+          <View style={styles.refreshingRow}>
+            <ActivityIndicator size="small" color={theme.chart2 ?? theme.accent} />
+            <Text style={styles.refreshingText}>Refreshing sleep data…</Text>
+          </View>
+        ) : null}
+
+        <View style={{ height: 24 }} />
+      </ScrollView>
     </ScreenView>
   );
 };
 
-const styling = (theme: any) =>
-  StyleSheet.create({
-    container: {
-      flex: 1,
-    },
-    backButton: {
-      marginTop: 50,
-      marginBottom: 10,
-    },
-    itemTitle: {
-      fontSize: 16,
-      color: theme.textPrimary,
-      fontWeight: "bold",
-    },
-    header: {
-      paddingTop: 10,
-      marginBottom: 20,
-    },
-    title: {
-      fontSize: 24,
-      color: theme.textPrimary,
-      fontWeight: "bold",
-    },
-    subtitle: {
-      color: theme.textSecondary,
-      fontSize: 14,
-      marginTop: 4,
-    },
-    headerTitle: {
-      fontSize: 22,
-      fontWeight: "bold",
-      marginLeft: 10,
-      color: theme.textSecondary,
-    },
-    section: {
-      paddingHorizontal: 0,
-    },
-  });
+export default SleepCheckInScreen;
