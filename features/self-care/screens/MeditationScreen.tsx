@@ -1,300 +1,317 @@
-import React, { useState, useEffect, useContext } from "react";
-import { View, Text, FlatList, StyleSheet, Platform } from "react-native";
-import { Audio } from "expo-av";
-import { useNavigation } from "expo-router";
-
-import ThemeContext from "@/contexts/ThemeContext";
-import { ScreenView } from "@/components/ui/Themed";
-
-import { getMeditationAudioList } from "@/features/self-care/services/selfCareService";
-
-import MeditationCategoryTabs from "@/features/self-care/components/meditation/MeditationCategoryTabs";
-import MeditationListItem from "@/features/self-care/components/meditation/MeditationListItem";
-import BottomPlayer from "@/components/layout/BottomPlayer";
-import MeditationFeaturedSection from "@/features/self-care/components/meditation/MeditationFeaturedSection";
-// import MeditationHeader from "@/features/self-care/components/meditation/MeditationHeader";
-
-// import MeditationCategoryTabs from "@/components/selfCare/meditation/MeditationCategoryTabs";
-// import MeditationListItem from "@/components/selfCare/meditation/MeditationListItem";
-// import BottomPlayer from "@/components/common/BottomPlayer";
-// import MeditationFeaturedSection from "@/components/selfCare/meditation/MeditationFeaturedSection";
-// import AppHeader from "@/components/common/AppHeader";
-// >>
+import React, {
+  useCallback,
+  useContext,
+  useLayoutEffect,
+  useMemo,
+  useState,
+} from "react";
 import {
-  MeditationFeaturedSkeleton,
-  MeditationListSkeleton,
-} from "@/features/self-care/components/meditation/MeditationSkeletonSections";
-import { EnrichedMeditation } from "@/features/self-care/types/selfCareTypes";
-import AppHeader from "@/components/layout/AppHeader";
+  FlatList,
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { router, useNavigation } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 
-const categories = ["All", "Stress & Anxiety", "Self-Care", "Beginner"];
+import AppHeader from "@/components/layout/AppHeader";
+import NimbusUltraFeaturedCard from "@/components/layout/NimbusUltraFeaturedCard";
+import ThemeContext from "@/contexts/ThemeContext";
+import PillFilters from "@/components/ui/PillFilters";
+import { ScreenView } from "@/components/ui/theme-components/ScreenView";
+import MeditationTemplateCard from "@/features/self-care/components/meditation/MeditationTemplateCard";
+import {
+  buildMeditationFilterOptions,
+  filterMeditationTemplates,
+  formatMeditationTagLabel,
+  mockMeditationRecommendations,
+} from "@/features/self-care/utils/meditationLibrary";
+import { ROUTES } from "@/constants/routes";
+import type {
+  ColorSet,
+  Spacing,
+  Typography,
+  TypographyTokens,
+} from "@/theme/types";
 
 export const MeditationScreen: React.FC = () => {
-  const [currentCategory, setCurrentCategory] = useState("All");
-  const [meditationList, setMeditationList] = useState<EnrichedMeditation[]>(
-    []
-  );
-  const [isLoading, setIsLoading] = useState(false);
-
-  const [currentTrack, setCurrentTrack] = useState<EnrichedMeditation | null>(
-    null
-  );
-  const [sound, setSound] = useState<Audio.Sound | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-
   const navigation = useNavigation();
-  const { newTheme, spacing, typography } = useContext(ThemeContext);
-  const styles = styling(newTheme, spacing, typography);
+  const { newTheme: theme, svaTypography, spacing, typography } =
+    useContext(ThemeContext);
 
-  // Soft pastel palette for featured cards
-  const colorPalette = [
-    // Rosewood (warm calm)
-    { bgColor: "rgba(233, 168, 160, 0.14)", color: "#E0A39B" },
+  const templates = mockMeditationRecommendations;
+  const [selectedTag, setSelectedTag] = useState<string>("all");
 
-    // Sage (signature Nimbus)
-    { bgColor: "rgba(167, 201, 180, 0.14)", color: "#A7C9B4" },
+  const styles = useMemo(
+    () => styling(theme, svaTypography, spacing, typography),
+    [theme, svaTypography, spacing, typography]
+  );
 
-    // Sand / Gold (premium highlight)
-    { bgColor: "rgba(224, 199, 129, 0.14)", color: "#E0C781" },
-
-    // Mist / Sky (clean + modern)
-    { bgColor: "rgba(152, 190, 214, 0.14)", color: "#98BED6" },
-
-    // Mauve (soft luxury)
-    { bgColor: "rgba(192, 167, 207, 0.14)", color: "#C0A7CF" },
-  ];
-
-  // Header hidden (we draw our own)
-  useEffect(() => {
+  useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
   }, [navigation]);
 
-  // Cleanup audio when sound ref changes
-  useEffect(() => {
-    return sound
-      ? () => {
-          sound.unloadAsync();
-        }
-      : undefined;
-  }, [sound]);
-
-  // // Fetch meditation list
-  const loadMeditations = async () => {
-    setIsLoading(true);
-    try {
-      const tags = categories;
-      const result: any = await getMeditationAudioList();
-      const meditations = result?.data || (Array.isArray(result) ? result : []);
-
-      if (Array.isArray(meditations)) {
-        const processed: EnrichedMeditation[] = meditations.map((item: any) => {
-          const randomTag =
-            tags[Math.floor(Math.random() * tags.length)] ?? "All";
-          return {
-            ...item,
-            tag: randomTag,
-            isLocked: false,
-            coachName: item.coach_name || "UU",
-            durationLabel: `${item.duration ?? 3} min`,
-            image: item.image
-              ? { uri: item.image }
-              : require("@/assets/images/logo.png"),
-          };
-        });
-
-        setMeditationList(processed);
-      } else {
-        console.error("API response data is not an array:", result);
-      }
-    } catch (error) {
-      console.log(error, "API Error Response");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadMeditations();
-  }, []);
-
-  const handlePlayPause = async (track: EnrichedMeditation) => {
-    try {
-      if (track.isLocked) {
-        return;
-      }
-
-      // Toggle if same track
-      if (currentTrack?.id === track.id) {
-        if (isPlaying) {
-          await sound?.pauseAsync();
-        } else {
-          await sound?.playAsync();
-        }
-        setIsPlaying(!isPlaying);
-        return;
-      }
-
-      // Switch to new track
-      if (sound) {
-        await sound.unloadAsync();
-      }
-
-      const { sound: newSound } = await Audio.Sound.createAsync(
-        typeof track.source === "string" ? { uri: track.source } : track.source
-      );
-
-      setSound(newSound);
-      setCurrentTrack(track);
-      setIsPlaying(true);
-      await newSound.playAsync();
-    } catch (err) {
-      console.error("Error playing meditation:", err);
-    }
-  };
-
-  const handleClosePlayer = async () => {
-    try {
-      if (sound) {
-        await sound.stopAsync();
-        await sound.unloadAsync();
-        setSound(null);
-      }
-    } catch (err) {
-      console.warn("Error stopping meditation:", err);
-    } finally {
-      setIsPlaying(false);
-      setCurrentTrack(null);
-    }
-  };
-
-  // Filter based on category
-  const filteredMeditations =
-    currentCategory === "All"
-      ? meditationList
-      : meditationList.filter((m) => m.tag === currentCategory);
-
-  const listHeader = isLoading ? (
-    <>
-      <MeditationFeaturedSkeleton />
-      <MeditationListSkeleton />
-    </>
-  ) : (
-    <>
-      <MeditationFeaturedSection
-        data={meditationList}
-        onPress={handlePlayPause}
-        colorPalette={colorPalette}
-      />
-
-      <MeditationCategoryTabs
-        categories={categories}
-        currentCategory={currentCategory}
-        onChangeCategory={setCurrentCategory}
-      />
-
-      <View style={[styles.sectionContainer, { marginBottom: spacing.md }]}>
-        <Text style={styles.sectionTitle}>Library</Text>
-      </View>
-    </>
+  const filterOptions = useMemo(
+    () => buildMeditationFilterOptions(templates),
+    [templates]
   );
 
+  const visibleTemplates = useMemo(
+    () => filterMeditationTemplates(templates, selectedTag),
+    [templates, selectedTag]
+  );
+
+  const featuredTemplate = useMemo(
+    () =>
+      templates.find((item) => item.id === "moonlit-reset") ??
+      visibleTemplates[0] ??
+      templates[0],
+    [visibleTemplates, templates]
+  );
+
+  const listTemplates = useMemo(
+    () =>
+      visibleTemplates.filter((item) => item.id !== featuredTemplate?.id),
+    [visibleTemplates, featuredTemplate]
+  );
+
+  const selectedLabel =
+    filterOptions.find((option) => option.value === selectedTag)?.label ??
+    "All Modes";
+
+
+  const openMeditationDetail = useCallback((meditationId: string) => {
+    router.push({
+      pathname: ROUTES.AUTH.SELF_CARE_MEDITATION_DETAIL,
+      params: { meditationId },
+    });
+  }, []);
+
   return (
-    <ScreenView
-      style={{
-        paddingTop:
-          Platform.OS === "ios"
-            ? spacing["xxl"] + spacing["xxl"] * 0.4
-            : spacing.xl,
-        paddingHorizontal: spacing.md,
-      }}
-    >
-      <View style={styles.container}>
-        {/* 🔝 Non-scrollable header – matches Soundscape */}
+    <ScreenView bgColor={theme.background} style={styles.screen}>
+      <View style={styles.root}>
         <AppHeader
-          title="Meditation"
-          subtitle="Immerse yourself in guided sessions that help you slow down, breathe, and reset."
-          onBack={() => navigation.goBack()}
-        />
-        {/* Single vertical scroll for featured + library */}
-        <FlatList
-          data={filteredMeditations}
-          keyExtractor={(item) => item.id}
-          ListHeaderComponent={listHeader}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{
-            paddingBottom: currentTrack ? spacing["xxl"] * 1.4 : spacing.xl,
-          }}
-          ListEmptyComponent={
-            !isLoading && meditationList.length === 0
-              ? () => (
-                  <Text style={styles.emptyText}>No meditations found.</Text>
-                )
-              : !isLoading && currentCategory !== "All"
-              ? () => (
-                  <Text style={styles.emptyText}>
-                    No meditations under “{currentCategory}” yet.
-                  </Text>
-                )
-              : null
-          }
-          renderItem={({ item }) => (
-            <MeditationListItem
-              item={item}
-              isActive={currentTrack?.id === item.id}
-              isPlaying={isPlaying}
-              onPress={() => handlePlayPause(item)}
-            />
-          )}
+          title="Quiet Current"
+          subtitle="Curated recommendations for breath, sleep, and reset."
+          onBack={() => router.back()}
+          containerStyle={styles.header}
         />
 
-        {/* Bottom Player */}
-        {currentTrack && (
-          <BottomPlayer
-            title={currentTrack.title}
-            subtitle={`${currentTrack.durationLabel} · Meditation`}
-            image={currentTrack.image}
-            isPlaying={isPlaying}
-            onPlayPause={() => handlePlayPause(currentTrack)}
-            onClose={handleClosePlayer}
-          />
-        )}
+        <FlatList
+          testID="meditation-library-list"
+          data={listTemplates}
+          keyExtractor={(item) => item.id}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={[
+            styles.listContent,
+            { paddingBottom: spacing.xl * 2 },
+          ]}
+          ListHeaderComponent={
+            <>
+              <View style={styles.featuredHeader}>
+                <Text style={styles.featuredEyebrow}>CURATED RECOMMENDATION</Text>
+                <Text style={styles.featuredTitle}>
+                  The first pull for the present moment.
+                </Text>
+              </View>
+
+              {featuredTemplate ? (
+                <View style={styles.featuredCardWrap}>
+                  <NimbusUltraFeaturedCard
+                    title={featuredTemplate.title}
+                    subtitle={`${featuredTemplate.durationLabel} · ${formatMeditationTagLabel(featuredTemplate.tag)}`}
+                    description={featuredTemplate.description}
+                    image={featuredTemplate.image}
+                    badge="Curated pick"
+                    tint="rgba(163,190,140,0.12)"
+                    accent={theme.chart2 ?? theme.accent}
+                    onPress={() => openMeditationDetail(featuredTemplate.id)}
+                  />
+                </View>
+              ) : null}
+
+              <PillFilters
+                options={filterOptions}
+                selectedValue={selectedTag}
+                onChange={setSelectedTag}
+                scrollable
+                contentContainerStyle={styles.filterRow}
+                selectedPillStyle={styles.filterPillActive}
+                inactivePillStyle={styles.filterPillInactive}
+                selectedLabelStyle={styles.filterTextActive}
+                inactiveLabelStyle={styles.filterTextInactive}
+              />
+
+              <View style={styles.sectionHeader}>
+                <View>
+                  <Text style={styles.sectionEyebrow}>LIBRARY</Text>
+                  <Text style={styles.sectionTitle}>
+                    {selectedLabel} collection
+                  </Text>
+                </View>
+
+                <View style={styles.countPill}>
+                  <Ionicons
+                    name="leaf-outline"
+                    size={14}
+                    color={theme.textSecondary}
+                  />
+                  <Text style={styles.countText}>
+                    {listTemplates.length} sessions
+                  </Text>
+                </View>
+              </View>
+            </>
+          }
+          renderItem={({ item }) => (
+            <MeditationTemplateCard
+              item={item}
+              onPress={() => openMeditationDetail(item.id)}
+            />
+          )}
+          ListEmptyComponent={
+            <View style={styles.emptyState}>
+              <Ionicons
+                name="leaf-outline"
+                size={40}
+                color={theme.textSecondary}
+              />
+              <Text style={styles.emptyTitle}>No templates in this mode.</Text>
+              <Text style={styles.emptyText}>
+                Try another filter to surface a different rhythm.
+              </Text>
+            </View>
+          }
+        />
       </View>
     </ScreenView>
   );
 };
 
-const styling = (newTheme: any, spacing: any, typography: any) =>
+const styling = (
+  theme: ColorSet,
+  svaTypography: TypographyTokens | undefined,
+  spacing: Spacing,
+  typography: Typography
+) =>
   StyleSheet.create({
-    container: {
+    screen: {
+      paddingHorizontal: spacing.md,
+      paddingTop:
+        Platform.OS === "ios"
+          ? spacing["xxl"] + spacing["xxl"] * 0.4
+          : spacing.xl,
+    },
+    root: {
       flex: 1,
     },
-    backButton: {
+    header: {
       marginBottom: spacing.md,
     },
-    headerBlock: {
+    listContent: {
+      paddingBottom: spacing.xl * 3,
+    },
+    featuredHeader: {
+      marginBottom: spacing.md,
+    },
+    featuredEyebrow: {
+      fontFamily:
+        svaTypography?.textStyle.authTinyLabel.fontFamily ?? "Inter_600SemiBold",
+      fontSize: 10,
+      lineHeight: 14,
+      letterSpacing: 2.2,
+      color: theme.textSecondary,
+      textTransform: "uppercase",
+      marginBottom: 4,
+    },
+    featuredTitle: {
+      ...typography.h3,
+      color: theme.textPrimary,
+    },
+    featuredCardWrap: {
       marginBottom: spacing.lg,
     },
-    header: {
-      ...typography.h2,
-      color: newTheme.textPrimary,
-    },
-    subHeader: {
-      ...typography.body,
-      color: newTheme.textSecondary,
-      marginTop: spacing.xs,
-    },
-    sectionContainer: {
+    filterRow: {
+      paddingVertical: spacing.xs,
+      paddingRight: spacing.md,
+      gap: spacing.sm,
       marginBottom: spacing.lg,
+    },
+    filterPillInactive: {
+      backgroundColor: theme.surface,
+      borderColor: theme.borderMuted ?? "rgba(255,255,255,0.05)",
+    },
+    filterPillActive: {
+      backgroundColor: theme.surfaceMuted,
+      borderColor: theme.borderMuted ?? "rgba(255,255,255,0.05)",
+    },
+    filterTextInactive: {
+      fontFamily:
+        svaTypography?.textStyle.authTinyLabel.fontFamily ?? "Inter_600SemiBold",
+      fontSize: 11,
+      letterSpacing: 1.1,
+      color: theme.textSecondary,
+    },
+    filterTextActive: {
+      color: theme.textPrimary,
+    },
+    sectionHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: 12,
+      marginBottom: spacing.md,
+    },
+    sectionEyebrow: {
+      fontFamily:
+        svaTypography?.textStyle.authTinyLabel.fontFamily ?? "Inter_600SemiBold",
+      fontSize: 10,
+      lineHeight: 14,
+      letterSpacing: 2.2,
+      color: theme.textSecondary,
+      textTransform: "uppercase",
+      marginBottom: 4,
     },
     sectionTitle: {
       ...typography.h3,
-      color: newTheme.textPrimary,
-      marginBottom: spacing.sm,
+      color: theme.textPrimary,
+    },
+    countPill: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      paddingHorizontal: 10,
+      paddingVertical: 7,
+      borderRadius: 999,
+      backgroundColor: theme.surfaceMuted,
+      borderWidth: 1,
+      borderColor: theme.borderMuted ?? "rgba(255,255,255,0.05)",
+      flexShrink: 0,
+    },
+    countText: {
+      ...typography.smallCaption,
+      color: theme.textSecondary,
+      letterSpacing: 0.9,
+    },
+    emptyState: {
+      alignItems: "center",
+      justifyContent: "center",
+      paddingTop: 80,
+      paddingHorizontal: spacing.xl,
+    },
+    emptyTitle: {
+      ...typography.h3,
+      color: theme.textPrimary,
+      marginTop: spacing.md,
+      textAlign: "center",
     },
     emptyText: {
-      textAlign: "center",
       ...typography.body,
-      color: newTheme.textSecondary,
-      marginTop: spacing.lg,
+      color: theme.textSecondary,
+      marginTop: spacing.xs,
+      textAlign: "center",
     },
   });
+
+export default MeditationScreen;

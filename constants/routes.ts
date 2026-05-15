@@ -67,6 +67,8 @@ export const ROUTES = {
     SELF_CARE_JOURNAL_SUBMISSION: "/(auth)/self-care/journal/submission",
     SELF_CARE_JOURNAL_ARCHIVE: "/(auth)/self-care/journal/archive",
     SELF_CARE_MEDITATION: "/(auth)/self-care/meditation",
+    SELF_CARE_MEDITATION_DETAIL: "/(auth)/self-care/meditation/detail/[meditationId]",
+    SELF_CARE_MEDITATION_PLAYER: "/(auth)/self-care/meditation/player/[meditationId]",
     SELF_CARE_SOUNDSCAPE: "/(auth)/self-care/soundscape",
     SELF_CARE_WORKOUT_SESSION: "/(auth)/self-care/workoutSession",
     SELF_CARE_WORKOUT: "/(auth)/self-care/workout",

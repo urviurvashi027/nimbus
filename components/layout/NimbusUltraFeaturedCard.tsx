@@ -7,29 +7,41 @@ import {
   Image,
   StyleSheet,
   Pressable,
-  Dimensions,
   ImageSourcePropType,
+  useWindowDimensions,
 } from "react-native";
 import ThemeContext from "@/contexts/ThemeContext";
-
-const { width: SCREEN_W } = Dimensions.get("window");
-const DEFAULT_CARD_WIDTH = SCREEN_W * 0.84;
+import type { ColorSet, Spacing, Typography, SvaColorSet } from "@/theme/types";
 
 export interface NimbusUltraFeaturedCardProps {
   title: string;
-  subtitle?: string; // "3 min · Reflection"
-  description?: string; // supporting line
+  subtitle?: string;
+  description?: string;
   image: ImageSourcePropType;
   onPress: () => void;
 
-  // Optional “premium tint”
-  tint?: string; // e.g. cardColor.bgColor (soft highlight)
-  accent?: string; // e.g. cardColor.color (chip/underline accent)
-
-  // Optional badge (category / vibe)
-  badge?: string; // "Relaxing" | "Focus" | "Breathwork"
+  tint?: string;
+  accent?: string;
+  badge?: string;
   width?: number;
 }
+
+type FeaturedCardPalette = {
+  base: string;
+  border: string;
+  tint: string;
+  accent: string;
+  text: string;
+  sub: string;
+  surfaceText: string;
+};
+
+type FeaturedCardTheme = {
+  newTheme: ColorSet;
+  svaColors?: SvaColorSet;
+  spacing: Spacing;
+  typography: Typography;
+};
 
 const NimbusUltraFeaturedCard: React.FC<NimbusUltraFeaturedCardProps> = ({
   title,
@@ -42,66 +54,83 @@ const NimbusUltraFeaturedCard: React.FC<NimbusUltraFeaturedCardProps> = ({
   badge,
   width,
 }) => {
-  const { newTheme, spacing, typography } = useContext(ThemeContext);
+  const { width: windowWidth } = useWindowDimensions();
+  const { newTheme, svaColors, spacing, typography } =
+    useContext(ThemeContext) as FeaturedCardTheme;
 
-  const cardWidth = width ?? DEFAULT_CARD_WIDTH;
+  const cardWidth = width ?? Math.min(440, Math.max(280, windowWidth * 0.86));
 
-  // Use Nimbus theme colors by default; allow tint/accent from caller
   const colors = useMemo(() => {
     return {
-      base: newTheme.cardRaised ?? "rgba(255,255,255,0.06)",
-      border: "rgba(255,255,255,0.10)",
-      inner: "rgba(255,255,255,0.06)",
-      text: newTheme.textPrimary,
-      sub: newTheme.textSecondary,
-      accent: accent ?? newTheme.accent,
-      tint: tint ?? "rgba(180, 210, 190, 0.10)", // soft sage glow
+      base: newTheme.cardRaised ?? newTheme.surface ?? "rgba(255,255,255,0.06)",
+      border:
+        svaColors?.border.muted ??
+        newTheme.borderMuted ??
+        "rgba(255,255,255,0.10)",
+      tint: tint ?? "rgba(163,190,140,0.10)",
+      accent: accent ?? svaColors?.brand.primary ?? newTheme.accent,
+      text: svaColors?.text.primary ?? newTheme.textPrimary,
+      sub: svaColors?.text.secondary ?? newTheme.textSecondary,
+      surfaceText: newTheme.buttonPrimaryText ?? "#10120E",
     };
-  }, [newTheme, tint, accent]);
+  }, [accent, newTheme, svaColors?.border.muted, svaColors?.brand.primary, svaColors?.text.primary, svaColors?.text.secondary, tint]);
 
-  const styles = styling(newTheme, spacing, typography, colors, cardWidth);
+  const styles = styling(spacing, typography, colors, cardWidth);
 
   return (
-    <Pressable onPress={onPress} style={styles.card}>
-      {/* Soft tint layer */}
-      <View style={styles.tintLayer} />
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`Open ${title}`}
+      accessibilityHint="Opens the featured item"
+      onPress={onPress}
+      style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
+    >
+      <View style={styles.tintLayer} pointerEvents="none" />
 
-      {/* Inner content */}
       <View style={styles.inner}>
         <View style={styles.topRow}>
-          {/* Image tile */}
           <View style={styles.imageWrap}>
             <Image source={image} style={styles.image} />
             <View style={styles.imageSheen} />
           </View>
 
           <View style={styles.textWrap}>
-            {badge ? (
-              <View style={styles.badge}>
-                <View style={styles.badgeDot} />
-                <Text style={styles.badgeText} numberOfLines={1}>
-                  {badge}
-                </Text>
-              </View>
-            ) : null}
+            <View style={styles.labelRow}>
+              {badge ? (
+                <View style={styles.badge}>
+                  <View style={styles.badgeDot} />
+                  <Text style={styles.badgeText} numberOfLines={1}>
+                    {badge}
+                  </Text>
+                </View>
+              ) : null}
 
-            <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
+              <View style={styles.chevronPill}>
+                <Text style={styles.chevronText}>Open</Text>
+                <View style={styles.chevronIcon}>
+                  <Text style={styles.chevronGlyph}>↗</Text>
+                </View>
+              </View>
+            </View>
+
+            <Text style={styles.title} numberOfLines={2} ellipsizeMode="tail">
               {title}
             </Text>
 
             {subtitle ? (
-              <Text
-                style={styles.subtitle}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-              >
-                {subtitle}
-              </Text>
+              <View style={styles.subtitlePill}>
+                <Text
+                  style={styles.subtitle}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  {subtitle}
+                </Text>
+              </View>
             ) : null}
           </View>
         </View>
 
-        {/* Description footer (lightweight, no heavy band) */}
         {description ? (
           <View style={styles.footer}>
             <View style={styles.footerAccent} />
@@ -120,97 +149,95 @@ const NimbusUltraFeaturedCard: React.FC<NimbusUltraFeaturedCardProps> = ({
 };
 
 const styling = (
-  newTheme: any,
-  spacing: any,
-  typography: any,
-  c: {
-    base: string;
-    border: string;
-    inner: string;
-    text: string;
-    sub: string;
-    accent: string;
-    tint: string;
-  },
+  spacing: Spacing,
+  typography: Typography,
+  c: FeaturedCardPalette,
   cardWidth: number
 ) =>
   StyleSheet.create({
     card: {
       width: cardWidth,
-      minHeight: 152,
+      minHeight: 164,
       marginRight: spacing.md,
       marginVertical: spacing.md,
-      borderRadius: 24,
+      borderRadius: 28,
       backgroundColor: c.base,
       borderWidth: 1,
       borderColor: c.border,
       overflow: "hidden",
-      shadowColor: "#000",
-      shadowOpacity: 0.35,
-      shadowRadius: 18,
-      shadowOffset: { width: 0, height: 10 },
-      elevation: 10,
+      shadowColor: "rgba(0,0,0,0.45)",
+      shadowOpacity: 0.3,
+      shadowRadius: 20,
+      shadowOffset: { width: 0, height: 12 },
+      elevation: 12,
     },
-
+    cardPressed: {
+      transform: [{ scale: 0.985 }],
+      backgroundColor: "rgba(255,255,255,0.03)",
+    },
     tintLayer: {
       ...StyleSheet.absoluteFillObject,
       backgroundColor: c.tint,
-      opacity: 1,
+      opacity: 0.88,
     },
-
     inner: {
+      flex: 1,
+      justifyContent: "space-between",
       padding: spacing.lg,
       gap: spacing.md,
     },
-
     topRow: {
       flexDirection: "row",
-      alignItems: "center",
+      alignItems: "flex-start",
       gap: spacing.md,
     },
-
     imageWrap: {
-      width: 74,
-      height: 74,
-      borderRadius: 22,
-      backgroundColor: "rgba(255,255,255,0.04)",
+      width: 78,
+      height: 78,
+      borderRadius: 24,
+      backgroundColor: "rgba(255,255,255,0.05)",
       borderWidth: 1,
-      borderColor: "rgba(255,255,255,0.10)",
+      borderColor: "rgba(255,255,255,0.12)",
       overflow: "hidden",
+      flexShrink: 0,
     },
     image: {
       width: "100%",
       height: "100%",
-      resizeMode: "cover",
     },
     imageSheen: {
       position: "absolute",
-      top: -30,
-      left: -20,
-      width: 120,
-      height: 60,
+      top: -18,
+      left: -16,
+      width: 130,
+      height: 70,
       borderRadius: 999,
       backgroundColor: "rgba(255,255,255,0.10)",
-      transform: [{ rotate: "-12deg" }],
+      transform: [{ rotate: "-10deg" }],
     },
-
     textWrap: {
       flex: 1,
       minWidth: 0,
-      gap: 6,
+      gap: 8,
+      paddingTop: 2,
     },
-
+    labelRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: spacing.sm,
+    },
     badge: {
       alignSelf: "flex-start",
       flexDirection: "row",
       alignItems: "center",
       gap: 6,
       paddingHorizontal: 10,
-      paddingVertical: 6,
+      paddingVertical: 5,
       borderRadius: 999,
-      backgroundColor: "rgba(255,255,255,0.06)",
+      backgroundColor: "rgba(255,255,255,0.05)",
       borderWidth: 1,
-      borderColor: "rgba(255,255,255,0.10)",
+      borderColor: "rgba(255,255,255,0.08)",
     },
     badgeDot: {
       width: 6,
@@ -220,44 +247,85 @@ const styling = (
       opacity: 0.95,
     },
     badgeText: {
-      ...typography.caption,
+      ...typography.smallCaption,
       color: c.sub,
-      fontWeight: "700",
+      letterSpacing: 0.9,
     },
-
     title: {
       ...typography.h3,
-      fontSize: 18,
+      fontSize: 19,
+      lineHeight: 24,
       color: c.text,
-      fontWeight: "900",
-      letterSpacing: 0.2,
+      letterSpacing: -0.2,
     },
     subtitle: {
       ...typography.caption,
       color: c.sub,
+      letterSpacing: 0.1,
     },
-
+    subtitlePill: {
+      alignSelf: "flex-start",
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+      borderRadius: 999,
+      backgroundColor: "rgba(255,255,255,0.04)",
+      borderWidth: 1,
+      borderColor: "rgba(255,255,255,0.08)",
+    },
     footer: {
       flexDirection: "row",
       gap: 10,
       alignItems: "flex-start",
       paddingTop: spacing.sm,
-      borderTopWidth: 1,
-      borderTopColor: "rgba(255,255,255,0.08)",
+      borderTopWidth: StyleSheet.hairlineWidth,
+      borderTopColor: "rgba(255,255,255,0.09)",
     },
     footerAccent: {
       width: 3,
-      height: "100%",
+      height: 42,
       borderRadius: 99,
       backgroundColor: c.accent,
-      opacity: 0.65,
+      opacity: 0.78,
     },
     description: {
       ...typography.body,
       color: c.text,
-      opacity: 0.85,
-      lineHeight: 19,
+      opacity: 0.88,
+      lineHeight: 20,
       flex: 1,
+    },
+    chevronPill: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+      borderRadius: 999,
+      backgroundColor: "rgba(255,255,255,0.04)",
+      borderWidth: 1,
+      borderColor: "rgba(255,255,255,0.08)",
+      flexShrink: 0,
+    },
+    chevronText: {
+      ...typography.smallCaption,
+      color: c.sub,
+      letterSpacing: 0.9,
+    },
+    chevronIcon: {
+      width: 18,
+      height: 18,
+      borderRadius: 9,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: c.accent,
+    },
+    chevronGlyph: {
+      color: c.surfaceText,
+      fontSize: 10,
+      lineHeight: 12,
+      fontWeight: "700",
+      includeFontPadding: false,
+      textAlign: "center",
     },
   });
 

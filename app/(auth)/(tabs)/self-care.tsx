@@ -24,6 +24,7 @@ type ActionTile = {
   label: string;
   icon: IconName;
   route: string;
+  navigationMode?: "push" | "navigate";
 };
 
 type SectionConfig = {
@@ -48,6 +49,7 @@ const SECTION_DATA: SectionConfig[] = [
         label: "Meditation",
         icon: "meditation",
         route: ROUTES.AUTH.SELF_CARE_MEDITATION,
+        navigationMode: "navigate",
       },
     ],
   },
@@ -94,7 +96,7 @@ const SelfCareActionTile = ({
   styles,
 }: {
   action: ActionTile;
-  onPress: (route: string) => void;
+  onPress: (route: string, mode?: "push" | "navigate") => void;
   iconColor: string;
   styles: ReturnType<typeof makeStyles>;
 }) => {
@@ -102,7 +104,7 @@ const SelfCareActionTile = ({
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={action.label}
-      onPress={() => onPress(action.route)}
+      onPress={() => onPress(action.route, action.navigationMode)}
       style={({ pressed }) => [
         styles.actionTile,
         pressed && styles.actionTilePressed,
@@ -129,7 +131,7 @@ const SelfCareSectionCard = ({
   styles,
 }: {
   section: SectionConfig;
-  onPress: (route: string) => void;
+  onPress: (route: string, mode?: "push" | "navigate") => void;
   chipIconColor: string;
   styles: ReturnType<typeof makeStyles>;
 }) => {
@@ -198,7 +200,12 @@ export default function SelfCare() {
     [theme, spacing, ringSize, fontFamilies]
   );
 
-  const onRoutePress = (route: string) => {
+  const onRoutePress = (route: string, mode: "push" | "navigate" = "push") => {
+    if (mode === "navigate") {
+      router.navigate(route as never);
+      return;
+    }
+
     router.push(route as never);
   };
 
