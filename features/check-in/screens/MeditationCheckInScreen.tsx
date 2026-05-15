@@ -1,262 +1,275 @@
-import React, { useState, useEffect, useContext, useMemo } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Platform,
-  ScrollView,
-} from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { ActivityIndicator, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
+import { router, useLocalSearchParams, useNavigation } from "expo-router";
 
-import { useLocalSearchParams, useNavigation } from "expo-router";
 import ThemeContext from "@/contexts/ThemeContext";
-import { ScreenView } from "@/components/ui/Themed";
-import NotificationSettingRow from "@/features/check-in/components/common/NotificationSettingRow";
-import MeditationWeeklySummary from "@/features/check-in/components/meditation/WeeklySummary";
-import MeditationGaugeCard from "@/features/check-in/components/meditation/MeditationGaugeCard";
-import { DailyCheckInDetailResponse } from "@/features/check-in/types/dailyCheckin";
+import ScreenHeader from "@/components/layout/ScreenHeader";
+import { ScreenView } from "@/components/ui/theme-components/ScreenView";
+import TimePickerSheet from "@/components/ui/picker/TimePickerSheet";
+import { ROUTES } from "@/constants/routes";
 import { getHabitDetailsByDate } from "@/features/check-in/services/dailyCheckinService";
+import { DailyCheckInDetailResponse } from "@/features/check-in/types/dailyCheckin";
 import { toMinutes } from "@/features/check-in/utils/dailyCheckin";
-import { Skeleton } from "@/features/check-in/components/meditation/SkeletonCard";
-import { ErrorCard } from "@/features/check-in/components/meditation/ErrorCard";
+import {
+  DEFAULT_COMPLETED_MINUTES,
+  DEFAULT_GOAL_MINUTES,
+  DEFAULT_START_TIME_MINUTES,
+  MOCK_WEEKLY_MEDITATION,
+  buildWeeklyMeditationSeries,
+  formatMinutes,
+  hasMeaningfulWeeklyData,
+  parseReminderIndex,
+  parseTimeToDate,
+  type WeeklyPoint,
+} from "@/features/check-in/utils/meditationCheckin";
+import {
+  MeditationErrorState,
+  MeditationLoadingState,
+  MeditationProgressCard,
+  MeditationScheduleCard,
+  MeditationTipCard,
+  MeditationTrendCard,
+} from "@/features/check-in/components/meditation/checkIn";
+import type { ColorSet, Spacing, Typography } from "@/theme/types";
 
-const remindOptions = [
-  { key: "3hr", label: "Three Hour before bedtime" },
-  { key: "1hr", label: "One Hour before bedtime" },
-  { key: "custom", label: "Custom" },
-];
+const makeStyles = (theme: ColorSet, spacing: Spacing, typography: Typography) =>
+  StyleSheet.create({
+    scrollContent: {
+      paddingHorizontal: spacing.md,
+      paddingBottom: Platform.OS === "ios" ? 140 : 160,
+    },
+    refreshingRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 10,
+      marginTop: spacing.md,
+    },
+    refreshingText: {
+      ...typography.caption,
+      color: theme.textSecondary,
+      fontWeight: "700",
+    },
+  });
 
 export const MeditationCheckInScreen = () => {
+  const navigation = useNavigation();
   const { id, date } = useLocalSearchParams<{ id?: string; date?: string }>();
   const templateId = useMemo(() => Number(id), [id]);
 
-  const [enabled, setEnabled] = useState(true);
-  const [valueKey, setValueKey] = useState<string | null>("1hr");
+  const { newTheme: theme, spacing, typography } = useContext(ThemeContext);
+  const styles = useMemo(
+    () => makeStyles(theme, spacing, typography),
+    [theme, spacing, typography]
+  );
+
+  const scrollRef = useRef<ScrollView>(null);
 
   const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState<string | null>(null);
+  const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [detail, setDetail] = useState<DailyCheckInDetailResponse | null>(null);
-
-  const navigation = useNavigation();
-
-  const { newTheme } = useContext(ThemeContext);
-
-  const styles = styling(newTheme);
+  const [completedMinutes, setCompletedMinutes] = useState(
+    DEFAULT_COMPLETED_MINUTES
+  );
+  const [goalMinutes, setGoalMinutes] = useState(DEFAULT_GOAL_MINUTES);
+  const [startTime, setStartTime] = useState(() =>
+    parseTimeToDate(null, DEFAULT_START_TIME_MINUTES)
+  );
+  const [reminderIndex, setReminderIndex] = useState(1);
+  const [weeklySeries, setWeeklySeries] = useState<WeeklyPoint[]>(
+    MOCK_WEEKLY_MEDITATION
+  );
+  const [currentStreak, setCurrentStreak] = useState(0);
+  const [longestStreak, setLongestStreak] = useState(0);
+  const [anchoredAt, setAnchoredAt] = useState<Date | null>(null);
+  const [showStartTimeSheet, setShowStartTimeSheet] = useState(false);
 
   useEffect(() => {
-    navigation.setOptions({ headerShown: false });
+    navigation.setOptions({
+      headerShown: false,
+    });
   }, [navigation]);
 
-  const fetchDetails = async () => {
-    if (!templateId || !date) return;
+  const loadMeditation = useCallback(async () => {
+    if (!templateId || !date) {
+      setError("Missing meditation check-in id or date.");
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
-    setErr(null);
+    setError(null);
+
     try {
-      const res = await getHabitDetailsByDate(templateId, date);
+      const res: DailyCheckInDetailResponse = await getHabitDetailsByDate(
+        templateId,
+        date
+      );
       setDetail(res);
-    } catch (e: any) {
-      setErr(e?.message ?? "Failed to load meditation data");
+      setLoaded(true);
+    } catch (error: unknown) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : typeof error === "string"
+          ? error
+          : "Failed to load meditation data"
+      );
+      setLoaded(true);
     } finally {
       setLoading(false);
     }
-  };
+  }, [date, templateId]);
 
   useEffect(() => {
-    fetchDetails();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [templateId, date]);
+    loadMeditation();
+  }, [loadMeditation]);
 
-  // ----- derive UI state from API
-  const { completedMin, progressPct, weeklySeries } =
-    useMemo(() => {
-      const d = detail?.data as any | undefined;
+  useEffect(() => {
+    const data = detail?.data;
+    if (!data) return;
 
-      // goal/completed in minutes
-      const goal = toMinutes(
-        d?.target_unit ?? d?.metric_count ?? 30,
-        d?.metric_unit ?? "min"
-      );
-      const done = toMinutes(d?.completed_unit ?? 0, d?.metric_unit ?? "min");
+    const nextGoal = toMinutes(
+      data.target_unit ?? data.metric_count ?? DEFAULT_GOAL_MINUTES,
+      data.metric_unit ?? "min"
+    );
+    const nextCompleted = toMinutes(
+      data.completed_unit ?? 0,
+      data.metric_unit ?? "min"
+    );
 
-      const pct =
-        goal > 0 ? Math.max(0, Math.min(100, (done / goal) * 100)) : 0;
+    const weekly = buildWeeklyMeditationSeries(data.last_7_days_completion);
 
-      // weekly: backend provides percents; convert to minutes using goal minutes per day
-      const perDayGoalMin =
-        (d?.metric_unit &&
-          ("" + d.metric_unit).toLowerCase().includes("hour")) ||
-        d?.metric_unit === "19"
-          ? Math.round((d?.target_unit ?? d?.metric_count ?? 0) * 60)
-          : Math.round(d?.target_unit ?? d?.metric_count ?? 0);
+    setGoalMinutes(Math.max(5, nextGoal || DEFAULT_GOAL_MINUTES));
+    setCompletedMinutes(Math.max(0, nextCompleted));
+    setStartTime(parseTimeToDate(data.start_time, DEFAULT_START_TIME_MINUTES));
+    setReminderIndex(parseReminderIndex(data.reminder_time));
+    setWeeklySeries(
+      hasMeaningfulWeeklyData(weekly) ? weekly : MOCK_WEEKLY_MEDITATION
+    );
+    setCurrentStreak(Number(data.current_streak ?? 0));
+    setLongestStreak(Number(data.longest_streak ?? 0));
+    setAnchoredAt(null);
+  }, [detail]);
 
-      const weekly =
-        Array.isArray(d?.last_7_days_completion) && perDayGoalMin
-          ? d.last_7_days_completion.map((it: any) => ({
-              day: it.day,
-              // for WeeklySummary that expects percent, pass percent directly
-              percent: Number(it.percent) || 0,
-            }))
-          : [];
+  const refreshing = loading && loaded && !error;
 
-      return {
-        goalMin: goal,
-        completedMin: done,
-        progressPct: pct,
-        weeklySeries: weekly,
-      };
-    }, [detail]);
+  const handleRefresh = useCallback(() => {
+    loadMeditation();
+  }, [loadMeditation]);
 
-  const onReminderSelect = (item: any) => setValueKey(item.key);
+  const scrollToTips = useCallback(() => {
+    scrollRef.current?.scrollToEnd({ animated: true });
+  }, []);
+
+  const handleAddMinutes = useCallback((step: number) => {
+    setCompletedMinutes((prev) => prev + step);
+  }, []);
+
+  const handleAnchorHold = useCallback(() => {
+    const now = new Date();
+    setAnchoredAt(now);
+    router.push({
+      pathname: ROUTES.AUTH.CHECK_IN_MEDITATION_ANCHOR,
+      params: {
+        goal: String(goalMinutes),
+        anchorAt: now.toISOString(),
+      },
+    });
+  }, [goalMinutes]);
 
   return (
-    <ScreenView style={{ paddingTop: Platform.OS === "ios" ? 40 : 20 }}>
-      <View style={styles.container}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Ionicons
-            name="arrow-back"
-            size={24}
-            color={newTheme.textSecondary}
-          />
-        </TouchableOpacity>
+    <ScreenView bgColor={theme.background} padding={0}>
+      <ScrollView
+        ref={scrollRef}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        <ScreenHeader
+          title="Mindful Session"
+          subtitle={`${formatMinutes(goalMinutes)} target • steady breath`}
+          onBack={() => navigation.goBack()}
+          rightActions={[
+            {
+              icon: "refresh-outline",
+              accessibilityLabel: "Refresh meditation data",
+              onPress: handleRefresh,
+            },
+            {
+              icon: "information-circle-outline",
+              accessibilityLabel: "Jump to tips",
+              onPress: scrollToTips,
+            },
+          ]}
+        />
 
-        {/* SCROLLABLE CONTENT */}
-        <ScrollView
-          bounces
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 28 }}
-        >
-          <View style={styles.header}>
-            <Text style={styles.title}>Meditation CheckIn</Text>
-            <Text style={styles.subtitle}>
-              Build a calm, consistent practice.
+        {loading && !loaded ? (
+          <MeditationLoadingState />
+        ) : error ? (
+          <MeditationErrorState message={error} onRetry={handleRefresh} />
+        ) : (
+          <>
+            <MeditationProgressCard
+              completedMinutes={completedMinutes}
+              goalMinutes={goalMinutes}
+              anchoredAt={anchoredAt}
+              onAddMinutes={handleAddMinutes}
+              onAnchorHold={handleAnchorHold}
+            />
+
+            <View style={{ height: 18 }} />
+
+            <MeditationScheduleCard
+              startTime={startTime}
+              reminderIndex={reminderIndex}
+              onOpenTimePicker={() => setShowStartTimeSheet(true)}
+              onReminderChange={setReminderIndex}
+            />
+
+            <View style={{ height: 18 }} />
+
+            <MeditationTrendCard
+              data={weeklySeries}
+              currentStreak={currentStreak}
+              longestStreak={longestStreak}
+            />
+
+            <View style={{ height: 18 }} />
+
+            <MeditationTipCard />
+          </>
+        )}
+
+        {refreshing ? (
+          <View style={styles.refreshingRow}>
+            <ActivityIndicator size="small" color={theme.chart5 ?? theme.accent} />
+            <Text style={styles.refreshingText}>
+              Refreshing mindful session…
             </Text>
           </View>
+        ) : null}
 
-          {/* Loading skeletons */}
-          {loading && (
-            <>
-              <Skeleton h={220} />
-              <Skeleton h={100} />
-              <Skeleton h={220} />
-            </>
-          )}
+        <View style={{ height: 24 }} />
+      </ScrollView>
 
-          {/* Error */}
-          {!loading && err && (
-            <ErrorCard msg={err} onRetry={fetchDetails} colors={newTheme} />
-          )}
-
-          {/* Content */}
-          {!loading && !err && (
-            <>
-              {/* --- Use your gauge card --- */}
-              <View style={{ marginBottom: 16 }}>
-                <MeditationGaugeCard
-                  title="Meditation Minutes"
-                  subtitle={`Great job! You've meditated for ${completedMin} minutes today.`}
-                  progress={Math.round(progressPct)}
-                />
-              </View>
-
-              {/* Reminders */}
-              <View style={{ marginBottom: 12 }}>
-                <NotificationSettingRow
-                  label="Notification"
-                  subtitle="Remind me to meditate"
-                  enabled={enabled}
-                  onToggle={setEnabled}
-                  options={remindOptions}
-                  valueKey={valueKey}
-                  onOptionSelect={onReminderSelect}
-                />
-              </View>
-
-              {/* Weekly summary (percent per day) */}
-              <View>
-                <MeditationWeeklySummary
-                  title="Meditation Summary"
-                  data={weeklySeries}
-                  changePct={-2}
-                  periodLabel="This Week"
-                  onPressPeriod={() => console.log("open period menu")}
-                />
-              </View>
-            </>
-          )}
-        </ScrollView>
-      </View>
+      <TimePickerSheet
+        visible={showStartTimeSheet}
+        value={startTime}
+        title="Meditation start"
+        onClose={() => setShowStartTimeSheet(false)}
+        onChange={setStartTime}
+        is24Hour={false}
+      />
     </ScreenView>
   );
 };
 
-const styling = (theme: any) =>
-  StyleSheet.create({
-    container: {
-      flex: 1,
-    },
-    backButton: {
-      marginTop: 50,
-      marginBottom: 10,
-    },
-    itemTitle: {
-      fontSize: 16,
-      color: theme.textPrimary,
-      fontWeight: "bold",
-    },
-    header: {
-      paddingTop: 10,
-      marginBottom: 20,
-    },
-    title: {
-      fontSize: 24,
-      color: theme.textPrimary,
-      fontWeight: "bold",
-    },
-    subtitle: {
-      color: theme.textSecondary,
-      fontSize: 14,
-      marginTop: 4,
-    },
-    headerTitle: {
-      fontSize: 22,
-      fontWeight: "bold",
-      marginLeft: 10,
-      color: theme.textSecondary,
-    },
-    sectionContainer: {
-      marginBottom: 20,
-    },
-    sectionHeader: {
-      flexDirection: "row",
-      alignItems: "center",
-      marginBottom: 10,
-    },
-    sectionTitle: {
-      fontSize: 18,
-      color: theme.textSecondary,
-      fontWeight: "bold",
-    },
-    item: {
-      flexDirection: "row",
-      alignItems: "center",
-      padding: 12,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.divider,
-    },
-    image: {
-      width: 60,
-      height: 60,
-      borderRadius: 30,
-      marginRight: 12,
-    },
-    textContainer: {
-      flex: 1,
-    },
-    section: {
-      paddingHorizontal: 0,
-    },
-  });
+export default MeditationCheckInScreen;
