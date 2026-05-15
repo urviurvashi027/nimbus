@@ -1,367 +1,211 @@
-import React, { useContext, useEffect, useState, useMemo } from "react";
-import {
-  View,
-  FlatList,
-  Platform,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-} from "react-native";
+import React, {
+  useCallback,
+  useContext,
+  useLayoutEffect,
+  useMemo,
+  useState,
+} from "react";
+import { FlatList, StyleSheet, Text, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { router, useNavigation } from "expo-router";
 
-import ThemeContext from "@/contexts/ThemeContext";
-
-import { ScreenView } from "@/components/ui/Themed";
-import WorkoutCard, {
-  DifficultyLevel,
-  // <<
-} from "@/features/self-care/components/workout/WorkoutCard";
-import FilterPill from "@/features/self-care/components/workout/FilterPill";
-import WorkoutHeader from "@/features/self-care/components/workout/WorkoutHeader";
-// ==
-// } from "@/components/selfCare/workout/WorkoutCard";
-// import FilterPill from "@/components/selfCare/workout/FilterPill";
-// import AppHeader from "@/components/common/AppHeader";
-// >>>
-
-import { getWorkouts } from "@/features/self-care/services/selfCareService";
-import { ROUTES } from "@/constants/routes";
 import AppHeader from "@/components/layout/AppHeader";
+import PillFilters from "@/components/ui/PillFilters";
+import { ScreenView } from "@/components/ui/theme-components/ScreenView";
+import ThemeContext from "@/contexts/ThemeContext";
+import WorkoutCard from "@/features/self-care/components/workout/WorkoutCard";
+import { ROUTES } from "@/constants/routes";
+import {
+  filterWorkoutCards,
+  mockWorkoutRecommendations,
+  WORKOUT_FILTER_OPTIONS,
+  type WorkoutFilterCategory,
+} from "@/features/self-care/utils/workoutLibrary";
+import type {
+  ColorSet,
+  Spacing,
+  Typography,
+  TypographyTokens,
+} from "@/theme/types";
 
-/* ---------- Types ---------- */
-
-type WorkoutCategory =
-  | "all"
-  | "cardio"
-  | "strength"
-  | "yoga"
-  | "full_body"
-  | "other";
-
-interface RoutineItem {
-  id: number;
-  difficulty: DifficultyLevel;
-  title: string;
-  description: string;
-  reps: string;
-  time: string;
-  tips: string;
-  gif: string | null;
-}
-
-interface WorkoutApiItem {
-  id: number;
-  name: string;
-  description: string;
-  category: string;
-  category_display: string;
-  image: string;
-  is_active: boolean;
-  routines: RoutineItem[];
-}
-
-/* ---------- Demo dataset (New API structure) ---------- */
-
-const DEMO_WORKOUTS: WorkoutApiItem[] = [
-  {
-    id: 1,
-    name: "Squat",
-    description: "A fundamental lower body exercise...",
-    category: "strength",
-    category_display: "Strength",
-    image: "https://images.pexels.com/photos/1552242/pexels-photo-1552242.jpeg",
-    is_active: true,
-    routines: [
-      {
-        id: 101,
-        difficulty: "easy",
-        title: "Air Squat",
-        description: "Perform squats using only bodyweight...",
-        reps: "15",
-        time: "5 min",
-        tips: "Keep your back straight.",
-        gif: null,
-      },
-      {
-        id: 102,
-        difficulty: "medium",
-        title: "Goblet Squat",
-        description: "Hold a weight at chest level...",
-        reps: "12",
-        time: "15 min",
-        tips: "Keep chest up.",
-        gif: null,
-      },
-    ],
-  },
-  {
-    id: 2,
-    name: "Push Up",
-    description: "Foundational upper body pushing movement.",
-    category: "strength",
-    category_display: "Strength",
-    image: "https://images.pexels.com/photos/2261485/pexels-photo-2261485.jpeg",
-    is_active: true,
-    routines: [
-      {
-        id: 201,
-        difficulty: "medium",
-        title: "Standard Push Up",
-        description: "Focus on core stability and full range of motion.",
-        reps: "10",
-        time: "3 min",
-        tips: "Don't let your hips sag.",
-        gif: null,
-      },
-    ],
-  },
-];
-
-/* ---------- UI model & mapping ---------- */
-
-interface WorkoutCardModel {
-  id: number;
-  title: string;
-  imageUri: string;
-  durationSeconds: number;
-  reps: number;
-  difficulty: DifficultyLevel;
-  category: WorkoutCategory;
-  description: string;
-  routines: RoutineItem[];
-}
-
-const FILTERS: { id: WorkoutCategory; label: string }[] = [
-  { id: "all", label: "All" },
-  { id: "cardio", label: "Cardio" },
-  { id: "strength", label: "Strength" },
-  { id: "yoga", label: "Yoga" },
-  { id: "full_body", label: "Full Body" },
-];
-
-const parseTimeToSeconds = (timeStr?: string): number => {
-  if (!timeStr) return 0;
-  // Handle "5 min", "15 min"
-  const match = timeStr.match(/(\d+)\s*min/i);
-  if (match) {
-    return parseInt(match[1], 10) * 60;
-  }
-  return 0;
-};
-
-const mapWorkoutToCardModel = (item: WorkoutApiItem): WorkoutCardModel => {
-  // Use first routine for card metadata (preview)
-  const firstRoutine = item.routines?.[0];
-
-  return {
-    id: item.id,
-    title: item.name,
-    imageUri: item.image,
-    category: item.category as WorkoutCategory,
-    difficulty: firstRoutine?.difficulty || "easy",
-    durationSeconds: parseTimeToSeconds(firstRoutine?.time),
-    reps: parseInt(firstRoutine?.reps || "0", 10),
-    description: item.description,
-    routines: item.routines || [],
-  };
-};
-
-/* ---------- Screen component ---------- */
-
-export const WorkoutListScreen = () => {
-  const [selectedCategory, setSelectedCategory] =
-    useState<WorkoutCategory>("all");
-  const [rawWorkouts, setRawWorkouts] = useState<
-    WorkoutApiItem[] | undefined
-  >();
-  const [isLoading, setIsLoading] = useState(true);
-
+export const WorkoutListScreen: React.FC = () => {
   const navigation = useNavigation();
-  const { newTheme, spacing, typography } = useContext(ThemeContext);
-  const styles = styling(newTheme, spacing, typography);
+  const { newTheme: theme, svaTypography, spacing, typography } =
+    useContext(ThemeContext);
+  const styles = useMemo(
+    () => styling(theme, svaTypography, spacing, typography),
+    [theme, svaTypography, spacing, typography]
+  );
 
-  useEffect(() => {
+  const [selectedCategory, setSelectedCategory] =
+    useState<WorkoutFilterCategory>("all");
+
+  useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
   }, [navigation]);
 
-  const fetchWorkouts = async () => {
-    try {
-      setIsLoading(true);
-      // Fetch from new endpoint
-      const result = await getWorkouts();
+  const workouts = mockWorkoutRecommendations;
 
-      if (result && result.success && Array.isArray(result.data)) {
-        // We can still merge or just use API data
-        // For now, we'll use API data if available, otherwise fallback
-        setRawWorkouts(result.data.length > 0 ? result.data : DEMO_WORKOUTS);
-      } else {
-        console.error("Workout API error or invalid data:", result);
-        setRawWorkouts(DEMO_WORKOUTS);
-      }
-    } catch (err) {
-      console.error("Workout API error:", err);
-      setRawWorkouts(DEMO_WORKOUTS);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const visibleWorkouts = useMemo(
+    () => filterWorkoutCards(workouts, selectedCategory),
+    [workouts, selectedCategory]
+  );
 
-  useEffect(() => {
-    fetchWorkouts();
+  const handleOpenWorkout = useCallback(
+    (workoutId: string, workoutTitle: string, workoutSubtitle: string) => {
+      router.push({
+        pathname: ROUTES.AUTH.SELF_CARE_WORKOUT_SESSION,
+        params: {
+          id: workoutId,
+          title: workoutTitle,
+          subtitle: workoutSubtitle,
+        },
+      });
+    },
+    []
+  );
+
+  const handleBack = useCallback(() => {
+    router.back();
   }, []);
 
-  const workoutCards: WorkoutCardModel[] = useMemo(() => {
-    if (!rawWorkouts) return [];
-    return rawWorkouts.map(mapWorkoutToCardModel);
-  }, [rawWorkouts]);
-
-  const filteredWorkouts = useMemo(
-    () =>
-      selectedCategory === "all"
-        ? workoutCards
-        : workoutCards.filter((w) => w.category === selectedCategory),
-    [workoutCards, selectedCategory]
-  );
-
-  const handleStartWorkout = (workout: WorkoutCardModel) => {
-    console.log("Start workout:", workout.id);
-
-    router.push({
-      pathname: ROUTES.AUTH.SELF_CARE_WORKOUT_SESSION,
-      params: {
-        id: workout.id.toString(),
-      },
-    });
-  };
-
-  const renderListHeader = () => (
-    <View>
-      <FlatList
-        data={FILTERS}
-        keyExtractor={(item) => item.id}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.filterRow}
-        renderItem={({ item }) => (
-          <FilterPill
-            label={item.label}
-            isActive={selectedCategory === item.id}
-            onPress={() => setSelectedCategory(item.id)}
-          />
-        )}
-      />
-    </View>
-  );
-
-  /* Loading state */
-  if (isLoading) {
-    return (
-      <ScreenView
-        style={{
-          paddingTop:
-            Platform.OS === "ios"
-              ? spacing["xxl"] + spacing["xxl"] * 0.4
-              : spacing.xl,
-          paddingHorizontal: spacing.md,
-        }}
-      >
-        <SafeAreaView style={{ flex: 1 }}>
-          <View style={styles.container}>
-            <AppHeader
-              title="Workouts"
-              subtitle="Build strength, improve flexibility, and feel your best."
-              onBack={() => navigation.goBack()}
-            />
-            <Text style={styles.loadingText}>Loading workouts...</Text>
-          </View>
-        </SafeAreaView>
-      </ScreenView>
-    );
-  }
-
-  /* Loaded state */
   return (
-    <ScreenView
-      style={{
-        paddingTop:
-          Platform.OS === "ios"
-            ? spacing["xxl"] + spacing["xxl"] * 0.4
-            : spacing.xl,
-        paddingHorizontal: spacing.md,
-      }}
-    >
-      <SafeAreaView style={{ flex: 1 }}>
-        <View style={styles.container}>
-          <AppHeader
-            title="Workouts"
-            subtitle="Build strength, improve flexibility, and feel your best."
-            onBack={() => navigation.goBack()}
-          />
+    <ScreenView bgColor={theme.background} style={styles.screen}>
+      <View style={styles.root}>
+        <AppHeader
+          title="Workouts"
+          subtitle="Find your rhythm in the silence. Move with intention, breathe with grace."
+          onBack={handleBack}
+          titleStyle={styles.headerTitle}
+          subtitleStyle={styles.headerSubtitle}
+          containerStyle={styles.header}
+        />
 
-          <FlatList
-            data={filteredWorkouts}
-            keyExtractor={(item) => item.id.toString()}
-            showsVerticalScrollIndicator={false}
-            ListHeaderComponent={renderListHeader}
-            renderItem={({ item }) => (
-              <WorkoutCard
-                title={item.title}
-                imageUri={item.imageUri}
-                durationSeconds={item.durationSeconds}
-                reps={item.reps}
-                difficulty={item.difficulty}
-                onPressStart={() => handleStartWorkout(item)}
+        <FlatList
+          testID="workout-library-list"
+          data={visibleWorkouts}
+          keyExtractor={(item) => item.id}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.listContent}
+          ListHeaderComponent={
+            <View style={styles.filterBlock}>
+              <PillFilters
+                testID="workout-filters"
+                options={WORKOUT_FILTER_OPTIONS}
+                selectedValue={selectedCategory}
+                onChange={setSelectedCategory}
+                uppercase={false}
+                scrollable
+                contentContainerStyle={styles.filterRow}
+                selectedPillStyle={styles.filterPillActive}
+                inactivePillStyle={styles.filterPillInactive}
+                selectedLabelStyle={styles.filterTextActive}
+                inactiveLabelStyle={styles.filterTextInactive}
               />
-            )}
-            contentContainerStyle={{
-              paddingBottom: spacing.xl * 2,
-            }}
-          />
-        </View>
-      </SafeAreaView>
+            </View>
+          }
+          renderItem={({ item }) => (
+            <WorkoutCard
+              item={item}
+              onPress={() => handleOpenWorkout(item.id, item.title, item.subtitle)}
+            />
+          )}
+          ListEmptyComponent={
+            <View style={styles.emptyState}>
+              <Ionicons
+                name="fitness-outline"
+                size={40}
+                color={theme.textSecondary}
+              />
+              <Text style={styles.emptyTitle}>No workouts in this mode.</Text>
+              <Text style={styles.emptyText}>
+                Try another filter to surface a different pace.
+              </Text>
+            </View>
+          }
+        />
+
+      </View>
     </ScreenView>
   );
 };
 
-const styling = (newTheme: any, spacing: any, typography: any) =>
+const styling = (
+  theme: ColorSet,
+  svaTypography: TypographyTokens | undefined,
+  spacing: Spacing,
+  typography: Typography
+) =>
   StyleSheet.create({
-    container: {
+    screen: {
       flex: 1,
     },
-    headerRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      marginBottom: spacing.lg,
+    root: {
+      flex: 1,
     },
-    backText: {
-      fontSize: 24,
-      color: newTheme.textPrimary,
-      marginRight: spacing.sm,
+    header: {
+      marginBottom: spacing.sm,
     },
     headerTitle: {
-      ...typography.h2,
-      color: newTheme.textPrimary,
+      fontFamily:
+        svaTypography?.textStyle.displayMedium.fontFamily ??
+        typography.h2.fontFamily,
+      fontSize: 30,
+      lineHeight: 36,
+      letterSpacing: -0.6,
     },
-    sectionHeader: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      marginBottom: spacing.md,
+    headerSubtitle: {
+      fontStyle: "italic",
+      color: theme.textSecondary,
+      opacity: 0.9,
     },
-    sectionTitle: {
-      ...typography.h3,
-      color: newTheme.textSecondary,
-    },
-    sectionAction: {
-      ...typography.bodySmall,
-      color: newTheme.accent,
+    filterBlock: {
+      marginBottom: spacing.lg,
     },
     filterRow: {
-      paddingBottom: spacing.md,
+      paddingVertical: spacing.xs,
+      gap: spacing.sm,
     },
-    loadingText: {
+    filterPillInactive: {
+      backgroundColor: theme.surfaceMuted,
+      borderColor: theme.borderMuted ?? "rgba(255,255,255,0.05)",
+    },
+    filterPillActive: {
+      backgroundColor: theme.buttonPrimary,
+      borderColor: theme.buttonPrimary,
+    },
+    filterTextInactive: {
+      fontFamily:
+        svaTypography?.textStyle.authTinyLabel.fontFamily ??
+        "Inter_600SemiBold",
+      fontSize: 12,
+      letterSpacing: 0.8,
+      color: theme.textSecondary,
+    },
+    filterTextActive: {
+      color: theme.buttonPrimaryText,
+    },
+    listContent: {
+      paddingBottom: spacing.xl * 3,
+    },
+    emptyState: {
+      alignItems: "center",
+      justifyContent: "center",
+      paddingTop: spacing.xl * 2,
+      paddingHorizontal: spacing.xl,
+    },
+    emptyTitle: {
+      ...typography.h3,
+      color: theme.textPrimary,
+      marginTop: spacing.md,
+      textAlign: "center",
+    },
+    emptyText: {
       ...typography.body,
-      color: newTheme.textSecondary,
+      color: theme.textSecondary,
+      marginTop: spacing.xs,
+      textAlign: "center",
     },
   });
+
+export default WorkoutListScreen;

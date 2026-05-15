@@ -1,327 +1,359 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
-import {
-  View,
-  SafeAreaView,
-  Platform,
-  StyleSheet,
-  ScrollView,
-  ActivityIndicator,
-  Text,
-} from "react-native";
-import { useLocalSearchParams, useNavigation } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useState,
+} from "react";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { router, useLocalSearchParams, useNavigation } from "expo-router";
 
+import AppHeader from "@/components/layout/AppHeader";
+import { ScreenView } from "@/components/ui/theme-components/ScreenView";
 import ThemeContext from "@/contexts/ThemeContext";
-import { ScreenView } from "@/components/ui/Themed";
-
-// <<
-import WorkoutSessionHeader from "@/features/self-care/components/workout/WorkoutSessionHeader";
-// =======
-// import AppHeader from "@/components/common/AppHeader";
-import DifficultyTabs, {
-  DifficultyOptionKey,
-} from "@/features/self-care/components/workout/DifficultyTabs";
 import ExerciseIntroCard from "@/features/self-care/components/workout/ExerciseIntroCard";
-import TimerRing from "@/features/self-care/components/workout/TimerRing";
+import DifficultyTabs from "@/features/self-care/components/workout/DifficultyTabs";
 import RestInfoRow, {
-  TimerMode,
+  type TimerMode,
 } from "@/features/self-care/components/workout/RestInfoRow";
+import TimerRing from "@/features/self-care/components/workout/TimerRing";
+import WorkoutGuideModal from "@/features/self-care/components/workout/WorkoutGuideModal";
 import WorkoutPrimaryButton from "@/features/self-care/components/workout/WorkoutPrimaryButton";
 import WorkoutTipBanner from "@/features/self-care/components/workout/WorkoutTipBanner";
+import { mockWorkoutRecommendations, type WorkoutCardModel } from "@/features/self-care/utils/workoutLibrary";
+import {
+  WORKOUT_SESSION_BREAK_DURATION_SECONDS,
+  WORKOUT_SESSION_WORK_DURATION_SECONDS,
+  getWorkoutSessionLevelContent,
+} from "@/features/self-care/utils/workoutSession";
+import { type WorkoutGuideLevel } from "@/features/self-care/utils/workoutGuide";
+import type {
+  ColorSet,
+  Spacing,
+  Typography,
+  TypographyTokens,
+} from "@/theme/types";
 
-import { getWorkoutDetails } from "@/features/self-care/services/selfCareService";
-import AppHeader from "@/components/layout/AppHeader";
-
-// Helper to parse "5 min" or "30s" to seconds
-const parseTimeToSeconds = (timeStr?: string): number => {
-  if (!timeStr) return 0;
-
-  // Handle "5 min", "15 min"
-  const minMatch = timeStr.match(/(\d+)\s*min/i);
-  if (minMatch) {
-    return parseInt(minMatch[1], 10) * 60;
-  }
-
-  // Handle "30s", "45s"
-  const secMatch = timeStr.match(/(\d+)\s*s/i);
-  if (secMatch) {
-    return parseInt(secMatch[1], 10);
-  }
-
-  return 0;
+type WorkoutSessionParams = {
+  id?: string | string[];
+  title?: string | string[];
+  subtitle?: string | string[];
 };
 
-export const WorkoutSessionScreen = () => {
+const FALLBACK_WORKOUT = mockWorkoutRecommendations[0];
+
+const readParam = (value: string | string[] | undefined) =>
+  Array.isArray(value) ? value[0] : value;
+
+const buildWorkoutFallback = (
+  id: string | undefined,
+  title: string | undefined,
+  subtitle: string | undefined
+): WorkoutCardModel | null => {
+  if (!title && !id) {
+    return null;
+  }
+
+  const base = FALLBACK_WORKOUT;
+  return {
+    id: id ?? base.id,
+    title: title ?? base.title,
+    subtitle: subtitle ?? base.subtitle,
+    category: base.category,
+    image: base.image,
+  };
+};
+
+export const WorkoutSessionScreen: React.FC = () => {
   const navigation = useNavigation();
-  const { newTheme, spacing, typography } = useContext(ThemeContext);
-  const styles = styling(newTheme, spacing, typography);
+  const { newTheme: theme, svaTypography, spacing, typography } =
+    useContext(ThemeContext);
+  const styles = useMemo(
+    () => styling(theme, svaTypography, spacing, typography),
+    [theme, svaTypography, spacing, typography]
+  );
 
-  const params = useLocalSearchParams<{ id: string }>();
-  const [loading, setLoading] = useState(true);
-  const [workoutData, setWorkoutData] = useState<any>(null);
-  const [difficulty, setDifficulty] = useState<DifficultyOptionKey>("easy");
+  const params = useLocalSearchParams<WorkoutSessionParams>();
+  const workoutId = readParam(params.id);
+  const workoutTitle = readParam(params.title);
+  const workoutSubtitle = readParam(params.subtitle);
 
+  const workout = useMemo<WorkoutCardModel | null>(() => {
+    const found = workoutId
+      ? mockWorkoutRecommendations.find((item) => item.id === workoutId)
+      : undefined;
+
+    if (found) {
+      return found;
+    }
+
+    return buildWorkoutFallback(workoutId, workoutTitle, workoutSubtitle);
+  }, [workoutId, workoutTitle, workoutSubtitle]);
+
+  const [difficulty, setDifficulty] = useState<WorkoutGuideLevel>("easy");
   const [mode, setMode] = useState<TimerMode>("workout");
-  const [remaining, setRemaining] = useState(0);
+  const [remainingSeconds, setRemainingSeconds] = useState(
+    WORKOUT_SESSION_WORK_DURATION_SECONDS
+  );
   const [isRunning, setIsRunning] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
+  const [guideWorkout, setGuideWorkout] = useState<WorkoutCardModel | null>(
+    null
+  );
 
-  // Fetch workout details
-  useEffect(() => {
-    const fetchDetails = async () => {
-      try {
-        setLoading(true);
-        if (!params.id) return;
-        const result = await getWorkoutDetails(params.id);
-        if (result && result.success && result.data) {
-          setWorkoutData(result.data);
-
-          // Auto-select first available difficulty if 'easy' isn't there
-          if (result.data.variations?.length > 0) {
-            const hasEasy = result.data.variations.some(
-              (v: any) => v.difficulty === "easy"
-            );
-            if (!hasEasy) {
-              setDifficulty(result.data.variations[0].difficulty);
-            }
-          }
-        }
-      } catch (err) {
-        console.error("Failed to fetch workout details:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchDetails();
-  }, [params.id]);
-
-  // Derived current variation based on difficulty
-  const currentVariation = useMemo(() => {
-    if (!workoutData?.variations) return null;
-    return workoutData.variations.find((v: any) => v.difficulty === difficulty);
-  }, [workoutData, difficulty]);
-
-  const WORK_DURATION = currentVariation
-    ? parseTimeToSeconds(currentVariation.time)
-    : 0;
-  const REST_DURATION = currentVariation
-    ? parseTimeToSeconds(currentVariation.rest_time)
-    : 15;
-
-  // Sync timer when variation changes or mode changes
-  useEffect(() => {
-    if (!currentVariation) return;
-
-    setRemaining(mode === "workout" ? WORK_DURATION : REST_DURATION);
-    setIsRunning(false);
-    setHasStarted(false);
-  }, [currentVariation, WORK_DURATION, REST_DURATION]);
-
-  // Separated mode change sync
-  useEffect(() => {
-    if (!currentVariation) return;
-    const duration = mode === "workout" ? WORK_DURATION : REST_DURATION;
-    setRemaining(duration);
-  }, [mode]);
-
-  useEffect(() => {
+  useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
   }, [navigation]);
 
-  // countdown effect
   useEffect(() => {
-    if (!isRunning || remaining <= 0) return;
+    setMode("workout");
+    setRemainingSeconds(WORKOUT_SESSION_WORK_DURATION_SECONDS);
+    setIsRunning(false);
+    setHasStarted(false);
+  }, [workout?.id, difficulty]);
 
-    const id = setInterval(() => {
-      setRemaining((prev) => {
-        if (prev <= 1) {
-          clearInterval(id);
+  useEffect(() => {
+    if (!isRunning || remainingSeconds <= 0) {
+      return undefined;
+    }
+
+    const timer = setInterval(() => {
+      setRemainingSeconds((current) => {
+        if (current <= 1) {
+          clearInterval(timer);
           return 0;
         }
-        return prev - 1;
+
+        return current - 1;
       });
     }, 1000);
 
-    return () => clearInterval(id);
-  }, [isRunning, remaining]);
+    return () => clearInterval(timer);
+  }, [isRunning, remainingSeconds]);
 
-  const progressBase = mode === "workout" ? WORK_DURATION : REST_DURATION;
-  const progress =
-    progressBase > 0 && hasStarted ? 1 - remaining / progressBase : 0;
+  const sessionContent = useMemo(
+    () => getWorkoutSessionLevelContent(difficulty),
+    [difficulty]
+  );
 
-  const handleToggleTimer = () => {
+  const handleDifficultyChange = useCallback((next: WorkoutGuideLevel) => {
+    setDifficulty(next);
+  }, []);
+
+  const handleToggleTimer = useCallback(() => {
     if (!hasStarted) {
       setHasStarted(true);
       setIsRunning(true);
       return;
     }
-    if (remaining === 0) {
-      const resetTo = mode === "workout" ? WORK_DURATION : REST_DURATION;
-      setRemaining(resetTo);
+
+    if (remainingSeconds === 0) {
+      const resetTo =
+        mode === "rest"
+          ? WORKOUT_SESSION_BREAK_DURATION_SECONDS
+          : WORKOUT_SESSION_WORK_DURATION_SECONDS;
+
+      setRemainingSeconds(resetTo);
       setIsRunning(true);
       return;
     }
-    setIsRunning((prev) => !prev);
-  };
 
-  const handleStartRest = () => {
+    setIsRunning((current) => !current);
+  }, [hasStarted, remainingSeconds, mode]);
+
+  const handleToggleBreak = useCallback(() => {
     if (mode === "rest") {
       setMode("workout");
-    } else {
-      setMode("rest");
-      setRemaining(REST_DURATION);
+      setRemainingSeconds(WORKOUT_SESSION_WORK_DURATION_SECONDS);
       setIsRunning(true);
       setHasStarted(true);
+      return;
     }
-  };
 
-  const handleDifficultyChange = (next: DifficultyOptionKey) => {
-    setDifficulty(next);
-    setMode("workout"); // Always reset to workout mode on difficulty change
-    setIsRunning(false);
-    setHasStarted(false);
-  };
+    setMode("rest");
+    setRemainingSeconds(WORKOUT_SESSION_BREAK_DURATION_SECONDS);
+    setIsRunning(true);
+    setHasStarted(true);
+  }, [mode]);
 
-  if (loading) {
+  const handleOpenGuide = useCallback(() => {
+    if (!workout) return;
+    setGuideWorkout(workout);
+  }, [workout]);
+
+  const handleCloseGuide = useCallback(() => {
+    setGuideWorkout(null);
+  }, []);
+
+  if (!workout) {
     return (
-      <ScreenView style={styles.center}>
-        <ActivityIndicator size="large" color={newTheme.accent} />
+      <ScreenView bgColor={theme.background} style={styles.screen}>
+        <View style={styles.emptyState}>
+          <Text style={styles.emptyTitle}>Workout not found.</Text>
+          <Text style={styles.emptyText}>
+            Go back and choose another workout to continue.
+          </Text>
+        </View>
       </ScreenView>
     );
   }
 
-  if (!workoutData) {
-    return (
-      <ScreenView style={styles.center}>
-        <Text style={{ color: newTheme.textPrimary }}>Workout not found.</Text>
-      </ScreenView>
-    );
-  }
+  const progressBase =
+    mode === "rest"
+      ? WORKOUT_SESSION_BREAK_DURATION_SECONDS
+      : WORKOUT_SESSION_WORK_DURATION_SECONDS;
+  const progress =
+    progressBase > 0 && hasStarted ? 1 - remainingSeconds / progressBase : 0;
+
+  const statusText =
+    mode === "rest"
+      ? remainingSeconds === 0
+        ? "Break complete"
+        : "Break & breathe"
+      : remainingSeconds === 0
+      ? "Ready to restart"
+      : isRunning
+      ? "In progress"
+      : "Paused";
+
+  const buttonLabel = !hasStarted
+    ? "Begin Flow"
+    : remainingSeconds === 0
+    ? "Restart Flow"
+    : isRunning
+    ? "Pause Flow"
+    : "Resume Flow";
 
   return (
-    <ScreenView
-      style={{
-        paddingTop:
-          Platform.OS === "ios"
-            ? spacing["xxl"] + spacing["xxl"] * 0.4
-            : spacing.xl,
-        paddingHorizontal: spacing.md,
-      }}
-    >
-      <SafeAreaView style={{ flex: 1 }}>
-        <View style={styles.container}>
-          <AppHeader
-            title={workoutData.name}
-            onBack={() => navigation.goBack()}
+    <ScreenView bgColor={theme.background} style={styles.screen}>
+      <View style={styles.root}>
+        <AppHeader
+          title={workout.title}
+          subtitle="Choose a rhythm, open the guide, and move with precision."
+          onBack={() => router.back()}
+          titleStyle={styles.headerTitle}
+          subtitleStyle={styles.headerSubtitle}
+          containerStyle={styles.header}
+        />
+
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
+          <DifficultyTabs
+            activeKey={difficulty}
+            onChange={handleDifficultyChange}
+            style={styles.difficultyTabs}
           />
 
-          <ScrollView
-            style={{ flex: 1 }}
-            contentContainerStyle={{ paddingBottom: spacing.xl * 3 }}
-            showsVerticalScrollIndicator={false}
-          >
-            <DifficultyTabs
-              activeKey={difficulty}
-              onChange={handleDifficultyChange}
-              style={{ marginBottom: spacing.lg }}
+          <ExerciseIntroCard
+            imageUri={workout.image}
+            reps={sessionContent.reps}
+            description={sessionContent.description}
+            title={workout.title}
+            subtitle={workout.subtitle}
+            onPress={handleOpenGuide}
+          />
+
+          <View style={styles.timerWrap}>
+            <TimerRing
+              size={260}
+              progress={progress}
+              remainingSeconds={remainingSeconds}
+              statusText={statusText}
+              mode={mode}
             />
+          </View>
 
-            {currentVariation ? (
-              <>
-                <ExerciseIntroCard
-                  imageUri={workoutData.image}
-                  reps={parseInt(currentVariation.reps || "0", 10)}
-                  description={
-                    currentVariation.description || workoutData.description
-                  }
-                  videoSource={currentVariation.gif || currentVariation.video}
-                  title={`${currentVariation.title}`}
-                />
+          <RestInfoRow
+            restSeconds={WORKOUT_SESSION_BREAK_DURATION_SECONDS}
+            mode={mode}
+            remainingSeconds={remainingSeconds}
+            onPress={handleToggleBreak}
+          />
+        </ScrollView>
 
-                <View style={{ alignItems: "center", marginTop: spacing.xl }}>
-                  <TimerRing
-                    size={260}
-                    progress={progress}
-                    remainingSeconds={remaining}
-                    statusText={
-                      mode === "rest"
-                        ? remaining === 0
-                          ? "Rest done!"
-                          : "Rest & breathe"
-                        : remaining === 0
-                        ? "Nice work!"
-                        : isRunning
-                        ? "Keep it up!"
-                        : "Paused"
-                    }
-                    mode={mode}
-                  />
-                </View>
-
-                <RestInfoRow
-                  restSeconds={REST_DURATION}
-                  mode={mode}
-                  remainingSeconds={remaining}
-                  onPress={handleStartRest}
-                />
-              </>
-            ) : (
-              <View style={[styles.center, { marginTop: 40 }]}>
-                <Ionicons
-                  name="alert-circle-outline"
-                  size={48}
-                  color={newTheme.textSecondary}
-                />
-                <Text
-                  style={{
-                    color: newTheme.textSecondary,
-                    marginTop: 12,
-                    textAlign: "center",
-                  }}
-                >
-                  This workout is not available for the {difficulty} level yet.
-                </Text>
-              </View>
-            )}
-          </ScrollView>
-
+        <View style={styles.footer}>
           <WorkoutPrimaryButton
-            label={
-              !hasStarted
-                ? "Start"
-                : remaining === 0
-                ? "Restart"
-                : isRunning
-                ? "Pause"
-                : "Resume"
-            }
+            label={buttonLabel}
             onPress={handleToggleTimer}
-            isDanger={mode === "workout"}
-            style={{ marginTop: spacing.lg }}
+            isDanger={false}
           />
-
-          {currentVariation && (
-            <WorkoutTipBanner
-              text={
-                currentVariation.tips ||
-                "Exhale as you press, inhale as you return.\nYou're doing great — keep it going!"
-              }
-            />
-          )}
+          <WorkoutTipBanner text={sessionContent.tip} />
         </View>
-      </SafeAreaView>
+
+        <WorkoutGuideModal
+          workout={guideWorkout}
+          initialLevel={difficulty}
+          onClose={handleCloseGuide}
+        />
+      </View>
     </ScreenView>
   );
 };
 
-const styling = (newTheme: any, spacing: any, typography: any) =>
+const styling = (
+  theme: ColorSet,
+  svaTypography: TypographyTokens | undefined,
+  spacing: Spacing,
+  typography: Typography
+) =>
   StyleSheet.create({
-    container: {
+    screen: {
       flex: 1,
     },
-    center: {
+    root: {
       flex: 1,
-      justifyContent: "center",
+    },
+    header: {
+      marginBottom: spacing.sm,
+    },
+    headerTitle: {
+      fontFamily:
+        svaTypography?.textStyle.displayMedium.fontFamily ??
+        typography.h2.fontFamily,
+      fontSize: 30,
+      lineHeight: 36,
+      letterSpacing: -0.6,
+    },
+    headerSubtitle: {
+      fontStyle: "italic",
+      color: theme.textSecondary,
+      opacity: 0.9,
+    },
+    scrollContent: {
+      paddingBottom: spacing.xl * 2,
+      gap: spacing.lg,
+    },
+    difficultyTabs: {
+      marginTop: spacing.xs,
+    },
+    timerWrap: {
       alignItems: "center",
+      marginTop: spacing.sm,
+    },
+    footer: {
+      gap: spacing.md,
+      paddingBottom: spacing.md,
+    },
+    emptyState: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: spacing.xl,
+    },
+    emptyTitle: {
+      ...typography.h3,
+      color: theme.textPrimary,
+      textAlign: "center",
+    },
+    emptyText: {
+      ...typography.body,
+      color: theme.textSecondary,
+      marginTop: spacing.sm,
+      textAlign: "center",
     },
   });
+
+export default WorkoutSessionScreen;
