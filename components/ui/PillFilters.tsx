@@ -11,6 +11,7 @@ import {
 } from "react-native";
 
 import ThemeContext from "@/contexts/ThemeContext";
+import type { SvaColorSet, Spacing } from "@/theme/types";
 
 export type PillFilterOption<T extends string = string> = {
   label: string;
@@ -159,7 +160,7 @@ export function PillFilters<T extends string>({
   );
 }
 
-const rowStyling = (spacing: any) =>
+const rowStyling = (spacing: Spacing) =>
   StyleSheet.create({
     row: {
       flexDirection: "row",
@@ -171,7 +172,7 @@ const rowStyling = (spacing: any) =>
     },
   });
 
-const styling = (colors: any) =>
+const styling = (colors: SvaColorSet) =>
   StyleSheet.create({
     pill: {
       minHeight: 40,

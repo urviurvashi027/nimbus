@@ -6,14 +6,18 @@ import {
   Text,
   StyleSheet,
   GestureResponderEvent,
+  StyleProp,
+  TextStyle,
   ViewStyle,
 } from "react-native";
+import type { ColorSet } from "@/theme/types";
 
 export interface FilterPillProps {
   label: string;
   isActive?: boolean;
   onPress?: (event: GestureResponderEvent) => void;
   style?: ViewStyle;
+  labelStyle?: StyleProp<TextStyle>;
 }
 
 export const FilterPill: FC<FilterPillProps> = ({
@@ -21,9 +25,10 @@ export const FilterPill: FC<FilterPillProps> = ({
   isActive = false,
   onPress,
   style,
+  labelStyle,
 }) => {
-  const { newTheme, spacing, typography } = useContext(ThemeContext);
-  const styles = styling(newTheme, spacing, typography);
+  const { newTheme } = useContext(ThemeContext);
+  const styles = styling(newTheme);
   return (
     <Pressable
       onPress={onPress}
@@ -33,14 +38,19 @@ export const FilterPill: FC<FilterPillProps> = ({
         style,
       ]}
     >
-      <Text style={isActive ? styles.textActive : styles.textInactive}>
+      <Text
+        style={[
+          isActive ? styles.textActive : styles.textInactive,
+          labelStyle,
+        ]}
+      >
         {label}
       </Text>
     </Pressable>
   );
 };
 
-const styling = (theme: any, spacing: any, typography: any) =>
+const styling = (theme: ColorSet) =>
   StyleSheet.create({
     pill: {
       paddingHorizontal: 18,

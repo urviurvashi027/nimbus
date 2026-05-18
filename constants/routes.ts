@@ -70,6 +70,8 @@ export const ROUTES = {
     SELF_CARE_MEDITATION_DETAIL: "/(auth)/self-care/meditation/detail/[meditationId]",
     SELF_CARE_MEDITATION_PLAYER: "/(auth)/self-care/meditation/player/[meditationId]",
     SELF_CARE_SOUNDSCAPE: "/(auth)/self-care/soundscape",
+    SELF_CARE_SOUNDSCAPE_DETAIL: "/(auth)/self-care/soundscape/detail/[soundscapeId]",
+    SELF_CARE_SOUNDSCAPE_PLAYER: "/(auth)/self-care/soundscape/player/[soundscapeId]",
     SELF_CARE_WORKOUT_SESSION: "/(auth)/self-care/workoutSession",
     SELF_CARE_WORKOUT: "/(auth)/self-care/workout",
 

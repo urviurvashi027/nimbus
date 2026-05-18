@@ -28,6 +28,7 @@ type Props = {
   disabled?: boolean;
   loading?: boolean;
   style?: StyleProp<ViewStyle>;
+  labelStyle?: StyleProp<TextStyle>;
 };
 
 const StyledButton: React.FC<Props> = ({
@@ -39,6 +40,7 @@ const StyledButton: React.FC<Props> = ({
   disabled = false,
   loading = false,
   style,
+  labelStyle,
 }) => {
   const { newTheme } = useContext(ThemeContext);
   const styles = getStyles(newTheme);
@@ -116,7 +118,7 @@ const StyledButton: React.FC<Props> = ({
         />
       ) : (
         <Text
-          style={[styles.label, textVariant] as StyleProp<TextStyle>}
+          style={[styles.label, labelStyle, textVariant] as StyleProp<TextStyle>}
           numberOfLines={1}
         >
           {label}
