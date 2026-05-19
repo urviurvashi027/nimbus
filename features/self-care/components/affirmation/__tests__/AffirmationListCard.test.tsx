@@ -41,7 +41,7 @@ jest.mock("expo-linear-gradient", () => {
   };
 });
 
-jest.mock("react-native", () => require("./mockReactNative"));
+jest.mock("react-native", () => require("../mockReactNative"));
 
 const getTextContent = (node: any) =>
   Array.isArray(node.props.children)

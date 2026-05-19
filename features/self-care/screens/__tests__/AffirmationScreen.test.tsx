@@ -41,7 +41,7 @@ jest.mock("expo-linear-gradient", () => {
 });
 
 jest.mock("react-native", () =>
-  require("../../components/affirmation/__tests__/mockReactNative")
+  require("../../components/affirmation/mockReactNative")
 );
 
 jest.mock("react-native-safe-area-context", () => ({
