@@ -6,18 +6,17 @@ import { Ionicons } from "@expo/vector-icons";
 
 import ThemeContext from "@/contexts/ThemeContext";
 import { Meditations } from "@/features/tools/types/toolsTypes";
+import type { ColorSet, Spacing, Typography } from "@/theme/types";
 
 interface Props {
   item: Meditations;
   isActive: boolean;
-  isPlaying: boolean;
   onPress: () => void;
 }
 
 const MeditationListItem: React.FC<Props> = ({
   item,
   isActive,
-  isPlaying,
   onPress,
 }) => {
   const { newTheme, spacing, typography } = useContext(ThemeContext);
@@ -25,6 +24,8 @@ const MeditationListItem: React.FC<Props> = ({
 
   return (
     <TouchableOpacity
+      accessibilityRole="button"
+      accessibilityLabel={`Open ${item.title}`}
       style={[styles.item, isActive && styles.itemActive]}
       activeOpacity={0.8}
       onPress={onPress}
@@ -45,7 +46,7 @@ const MeditationListItem: React.FC<Props> = ({
         <Ionicons name="lock-closed" size={18} color={newTheme.textSecondary} />
       ) : (
         <Ionicons
-          name={isActive && isPlaying ? "pause" : "play"}
+          name="chevron-forward"
           size={20}
           color={newTheme.textSecondary}
         />
@@ -54,7 +55,11 @@ const MeditationListItem: React.FC<Props> = ({
   );
 };
 
-const styling = (newTheme: any, spacing: any, typography: any) =>
+const styling = (
+  newTheme: ColorSet,
+  spacing: Spacing,
+  typography: Typography
+) =>
   StyleSheet.create({
     item: {
       flexDirection: "row",

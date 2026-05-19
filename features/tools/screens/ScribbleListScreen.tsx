@@ -9,32 +9,42 @@ import {
   Platform,
   ActivityIndicator,
 } from "react-native";
-import { router, useNavigation } from "expo-router";
+import { router } from "expo-router";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
 import ThemeContext from "@/contexts/ThemeContext";
 import { ScreenView } from "@/components/ui/Themed";
-import ToolScreenHeader from "@/features/tools/components/common/ToolScreenHeader";
 import FilterPill from "@/features/self-care/components/workout/FilterPill";
 import {
   scribbleService,
   Scribble,
 } from "@/features/tools/services/scribbleService";
-// =======
-// import ThemeContext from "@/context/ThemeContext";
-// import { ScreenView } from "@/components/Themed";
-// import AppHeader from "@/components/common/AppHeader";
-// import FilterPill from "@/components/selfCare/workout/FilterPill";
-// import { scribbleService, Scribble } from "@/services/scribbleService";
-// >>>>>>> 0903e1c (tool screen header replaced by app header):app/(auth)/toolsScreen/ScribbleListScreen.tsx
 
 import { useFocusEffect } from "expo-router";
 import { ROUTES } from "@/constants/routes";
 import AppHeader from "@/components/layout/AppHeader";
+import type { ColorSet, Spacing, TypographyTokens } from "@/theme/types";
 
 export const ScribbleListScreen = () => {
-  const { newTheme, spacing, typography } = useContext(ThemeContext);
-  const styles = styling(newTheme, spacing, typography);
+  const { newTheme, spacing, svaTypography } = useContext(ThemeContext);
+  const styles = styling(newTheme, spacing, svaTypography);
+  const headerTitleStyle = {
+    ...(svaTypography?.textStyle.authTitle ?? {}),
+    fontSize: 26,
+    lineHeight: 28,
+    fontStyle: "italic" as const,
+  };
+  const headerSubtitleStyle = {
+    ...(svaTypography?.textStyle.body ?? {}),
+    fontSize: 14,
+    lineHeight: 20,
+  };
+  const filterLabelStyle = {
+    ...(svaTypography?.textStyle.authTinyLabel ?? {}),
+    fontSize: 11,
+    lineHeight: 16,
+    letterSpacing: 1.1,
+  };
 
   const [scribbles, setScribbles] = useState<Scribble[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,7 +54,10 @@ export const ScribbleListScreen = () => {
   const fetchScribbles = async (tag?: string) => {
     try {
       setLoading(true);
-      const params: any = {
+      const params: {
+        ordering: string;
+        tag?: string;
+      } = {
         ordering: "-date", // "todays ordering" - latest first
       };
 
@@ -133,6 +146,8 @@ export const ScribbleListScreen = () => {
           title="Scribbles"
           subtitle="Jot down your thoughts and ideas."
           onBack={() => router.back()}
+          titleStyle={headerTitleStyle}
+          subtitleStyle={headerSubtitleStyle}
         />
 
         {/* Filter Row */}
@@ -148,6 +163,7 @@ export const ScribbleListScreen = () => {
                 label={item === "All" ? "All" : `#${item}`}
                 isActive={selectedTag === item}
                 onPress={() => handleTagPress(item)}
+                labelStyle={filterLabelStyle}
               />
             )}
           />
@@ -191,7 +207,11 @@ export const ScribbleListScreen = () => {
   );
 };
 
-const styling = (theme: any, spacing: any, typography: any) =>
+const styling = (
+  theme: ColorSet,
+  spacing: Spacing,
+  svaTypography?: TypographyTokens
+) =>
   StyleSheet.create({
     filterRow: {
       paddingVertical: spacing.xs,
@@ -216,20 +236,24 @@ const styling = (theme: any, spacing: any, typography: any) =>
       marginBottom: spacing.xs,
     },
     cardTitle: {
-      ...typography.bodyStrong,
-      color: theme.textPrimary,
-      fontSize: 18,
+      ...(svaTypography?.textStyle.authTitle ?? {}),
+      fontSize: 26,
+      lineHeight: 28,
+      fontStyle: "italic",
+      color: theme.accent,
       flex: 1,
     },
     cardDate: {
-      ...typography.caption,
+      ...(svaTypography?.textStyle.authTinyLabel ?? {}),
+      fontSize: 11,
+      lineHeight: 16,
+      letterSpacing: 1.1,
       color: theme.textSecondary,
       marginLeft: spacing.sm,
     },
     cardContent: {
-      ...typography.body,
+      ...(svaTypography?.textStyle.body ?? {}),
       color: theme.textSecondary,
-      fontSize: 14,
       marginBottom: spacing.md,
     },
     tagsRow: {
@@ -238,15 +262,17 @@ const styling = (theme: any, spacing: any, typography: any) =>
       gap: 8,
     },
     tagBadge: {
-      backgroundColor: theme.surfaceElevated,
+      backgroundColor: theme.surfaceMuted,
       paddingHorizontal: spacing.sm,
       paddingVertical: 4,
       borderRadius: 8,
     },
     tagText: {
-      ...typography.caption,
+      ...(svaTypography?.textStyle.authTinyLabel ?? {}),
+      fontSize: 11,
+      lineHeight: 16,
+      letterSpacing: 1.1,
       color: theme.accent,
-      fontWeight: "600",
     },
     emptyState: {
       flex: 1,
@@ -255,7 +281,7 @@ const styling = (theme: any, spacing: any, typography: any) =>
       marginTop: 100,
     },
     emptyText: {
-      ...typography.body,
+      ...(svaTypography?.textStyle.body ?? {}),
       color: theme.textSecondary,
       marginTop: spacing.md,
     },

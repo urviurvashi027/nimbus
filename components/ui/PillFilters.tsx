@@ -11,6 +11,7 @@ import {
 } from "react-native";
 
 import ThemeContext from "@/contexts/ThemeContext";
+import type { SvaColorSet, Spacing } from "@/theme/types";
 
 export type PillFilterOption<T extends string = string> = {
   label: string;
@@ -25,7 +26,11 @@ type PillFilterProps = {
   onPress: () => void;
   uppercase?: boolean;
   style?: StyleProp<ViewStyle>;
+  selectedPillStyle?: StyleProp<ViewStyle>;
+  inactivePillStyle?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
+  selectedLabelStyle?: StyleProp<TextStyle>;
+  inactiveLabelStyle?: StyleProp<TextStyle>;
   accessibilityLabel?: string;
   testID?: string;
 };
@@ -36,7 +41,11 @@ export const PillFilter = ({
   onPress,
   uppercase = true,
   style,
+  selectedPillStyle,
+  inactivePillStyle,
   textStyle,
+  selectedLabelStyle,
+  inactiveLabelStyle,
   accessibilityLabel,
   testID,
 }: PillFilterProps) => {
@@ -53,13 +62,19 @@ export const PillFilter = ({
       style={({ pressed }) => [
         styles.pill,
         selected ? styles.pillSelected : styles.pillInactive,
+        selected ? selectedPillStyle : inactivePillStyle,
         pressed && styles.pillPressed,
         style,
       ]}
     >
       <Text
         numberOfLines={1}
-        style={[styles.label, selected && styles.labelSelected, textStyle]}
+        style={[
+          styles.label,
+          selected ? styles.labelSelected : undefined,
+          selected ? selectedLabelStyle : inactiveLabelStyle,
+          textStyle,
+        ]}
       >
         {uppercase ? label.toUpperCase() : label}
       </Text>
@@ -77,6 +92,10 @@ export type PillFiltersProps<T extends string = string> = {
   contentContainerStyle?: StyleProp<ViewStyle>;
   pillStyle?: StyleProp<ViewStyle>;
   labelStyle?: StyleProp<TextStyle>;
+  selectedPillStyle?: StyleProp<ViewStyle>;
+  inactivePillStyle?: StyleProp<ViewStyle>;
+  selectedLabelStyle?: StyleProp<TextStyle>;
+  inactiveLabelStyle?: StyleProp<TextStyle>;
   testID?: string;
 };
 
@@ -90,6 +109,10 @@ export function PillFilters<T extends string>({
   contentContainerStyle,
   pillStyle,
   labelStyle,
+  selectedPillStyle,
+  inactivePillStyle,
+  selectedLabelStyle,
+  inactiveLabelStyle,
   testID,
 }: PillFiltersProps<T>) {
   const { spacing } = useContext(ThemeContext);
@@ -106,6 +129,10 @@ export function PillFilters<T extends string>({
       testID={option.testID}
       style={pillStyle}
       textStyle={labelStyle}
+      selectedPillStyle={selectedPillStyle}
+      inactivePillStyle={inactivePillStyle}
+      selectedLabelStyle={selectedLabelStyle}
+      inactiveLabelStyle={inactiveLabelStyle}
     />
   ));
 
@@ -133,7 +160,7 @@ export function PillFilters<T extends string>({
   );
 }
 
-const rowStyling = (spacing: any) =>
+const rowStyling = (spacing: Spacing) =>
   StyleSheet.create({
     row: {
       flexDirection: "row",
@@ -145,7 +172,7 @@ const rowStyling = (spacing: any) =>
     },
   });
 
-const styling = (colors: any) =>
+const styling = (colors: SvaColorSet) =>
   StyleSheet.create({
     pill: {
       minHeight: 40,

@@ -1,47 +1,42 @@
-// src/components/selfCare/workout/TimerRing.tsx
-
-import React, { useContext } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import React, { useContext, useMemo } from "react";
+import { StyleSheet, Text, View } from "react-native";
 import Svg, { Circle } from "react-native-svg";
-import ThemeContext from "@/contexts/ThemeContext";
 
-interface Props {
+import ThemeContext from "@/contexts/ThemeContext";
+import type { ColorSet, Typography } from "@/theme/types";
+
+interface TimerRingProps {
   size: number;
-  progress: number; // 0..1
+  progress: number;
   remainingSeconds: number;
   statusText: string;
   mode: "workout" | "rest";
 }
 
-const TimerRing: React.FC<Props> = ({
+const TimerRing: React.FC<TimerRingProps> = ({
   size,
   progress,
   remainingSeconds,
   statusText,
   mode,
 }) => {
-  const { newTheme, typography } = useContext(ThemeContext);
-  const styles = styling(newTheme, typography);
+  const { newTheme: theme, typography } = useContext(ThemeContext);
+  const styles = useMemo(() => styling(theme, typography), [theme, typography]);
 
   const strokeWidth = 16;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
-
   const clampedProgress = Math.min(Math.max(progress, 0), 1);
   const strokeDashoffset = circumference * (1 - clampedProgress);
 
   const minutes = Math.floor(remainingSeconds / 60);
   const seconds = remainingSeconds % 60;
-  const minutesLabel = minutes.toString().padStart(2, "0");
-  const secondsLabel = seconds.toString().padStart(2, "0");
-
-  const ringColor = mode === "rest" ? "#22C55E" : "#4C8DFF";
 
   return (
     <View style={[styles.container, { width: size, height: size }]}>
       <Svg width={size} height={size}>
         <Circle
-          stroke="#111827"
+          stroke={theme.surfaceMuted}
           fill="none"
           cx={size / 2}
           cy={size / 2}
@@ -49,7 +44,7 @@ const TimerRing: React.FC<Props> = ({
           strokeWidth={strokeWidth}
         />
         <Circle
-          stroke={ringColor}
+          stroke={mode === "rest" ? theme.chart2 ?? "#7EF2A6" : theme.buttonPrimary}
           fill="none"
           cx={size / 2}
           cy={size / 2}
@@ -66,7 +61,7 @@ const TimerRing: React.FC<Props> = ({
 
       <View style={styles.labelContainer}>
         <Text style={styles.timeText}>
-          {minutesLabel}:{secondsLabel}
+          {String(minutes).padStart(2, "0")}:{String(seconds).padStart(2, "0")}
         </Text>
         <Text style={styles.statusText}>{statusText}</Text>
       </View>
@@ -74,7 +69,7 @@ const TimerRing: React.FC<Props> = ({
   );
 };
 
-const styling = (newTheme: any, typography: any) =>
+const styling = (theme: ColorSet, typography: Typography) =>
   StyleSheet.create({
     container: {
       justifyContent: "center",
@@ -87,14 +82,17 @@ const styling = (newTheme: any, typography: any) =>
     },
     timeText: {
       ...typography.h2,
-      color: newTheme.textPrimary,
-      fontSize: 32,
+      color: theme.textPrimary,
+      fontSize: 34,
+      lineHeight: 38,
       fontWeight: "600",
     },
     statusText: {
       ...typography.caption,
-      color: newTheme.textSecondary,
+      color: theme.textSecondary,
       marginTop: 4,
+      letterSpacing: 2,
+      textTransform: "uppercase",
     },
   });
 

@@ -15,7 +15,7 @@ import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import EmojiPicker, { type EmojiType } from "rn-emoji-keyboard";
 import ThemeContext from "@/contexts/ThemeContext";
 import AppHeader from "@/components/layout/AppHeader";
-import { ScreenView } from "@/components/ui/Themed";
+import { ScreenView } from "@/components/ui/theme-components/ScreenView";
 import {
   createHabit,
   getHabitTag,
@@ -80,7 +80,7 @@ const CreateProtocolScreen = () => {
   // Divine Defaults State
   const [emoji, setEmoji] = useState("🙂");
   const [selectedColor, setSelectedColor] = useState<ProtocolColorOption>(
-    PROTOCOL_COLOR_OPTIONS[3]
+    PROTOCOL_COLOR_OPTIONS[3],
   ); // Default Moss Aura
   const [isLoading, setIsLoading] = useState(false);
   const [isProcessingModalVisible, setIsProcessingModalVisible] =
@@ -162,7 +162,7 @@ const CreateProtocolScreen = () => {
 
   const reminderTimeLabel = useMemo(
     () => formatTimeUI(reminderTime),
-    [reminderTime]
+    [reminderTime],
   );
 
   const originLabel = useMemo(() => {
@@ -172,7 +172,7 @@ const CreateProtocolScreen = () => {
 
   const originSummaryLabel = useMemo(
     () => formatProtocolFrequencySummary(origin),
-    [origin]
+    [origin],
   );
 
   const protocolTypeLabel = useMemo(() => {
@@ -198,7 +198,8 @@ const CreateProtocolScreen = () => {
     if (value?.frequency_type) payload.frequency_type = value.frequency_type;
     if (typeof value?.interval === "number") payload.interval = value.interval;
     if (value?.days_of_week?.length) payload.days_of_week = value.days_of_week;
-    if (value?.days_of_month?.length) payload.days_of_month = value.days_of_month;
+    if (value?.days_of_month?.length)
+      payload.days_of_month = value.days_of_month;
 
     return payload;
   };
@@ -206,7 +207,8 @@ const CreateProtocolScreen = () => {
   const getFormattedTag = () => {
     let value;
     if (natureTags) {
-      const oldIds = natureTags?.filter((it) => it.id !== 0).map((it) => it.id) || [];
+      const oldIds =
+        natureTags?.filter((it) => it.id !== 0).map((it) => it.id) || [];
       const newTag = natureTags?.find((it) => it.id === 0)?.name || "";
       if (newTag) value = { old: oldIds, new: [newTag] };
       else value = { old: oldIds };
@@ -303,251 +305,266 @@ const CreateProtocolScreen = () => {
   const styles = styling(svaColors, svaTypography, spacing);
 
   return (
-    <View style={styles.container}>
-      <SafeAreaView style={{ flex: 1 }}>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollContent}
-        >
-          <ScreenView bgColor={svaColors.bg.base} style={styles.screenView}>
+    <>
+      <ScreenView bgColor={svaColors.bg.base} style={styles.screenView}>
+        <SafeAreaView style={{ flex: 1 }}>
+          <View style={styles.root}>
             <AppHeader
               title="Ritual Architect"
               subtitle="Craft your formula with intention."
               onBack={() => router.back()}
+              containerStyle={styles.header}
             />
 
-            {/* Section 1: Core Details */}
-            <View style={styles.section}>
-              <Text style={styles.label}>RITUAL NAME</Text>
-              <TextInput
-                style={styles.nameInput}
-                placeholder="e.g., Morning Yoga"
-                placeholderTextColor={svaColors.text.disabled}
-                value={name}
-                onChangeText={setName}
-              />
-
-              <Text style={styles.label}>METRIC</Text>
-              <View style={styles.metricRow}>
-                <View style={styles.counterContainer}>
-                  <TouchableOpacity
-                    onPress={() => setMetricValue(Math.max(1, metricValue - 1))}
-                    style={styles.counterBtn}
-                  >
-                    <Ionicons
-                      name="remove"
-                      size={20}
-                      color={svaColors.text.primary}
-                    />
-                  </TouchableOpacity>
-                  <Text style={styles.counterValue}>{metricValue}</Text>
-                  <TouchableOpacity
-                    onPress={() => setMetricValue(metricValue + 1)}
-                    style={styles.counterBtn}
-                  >
-                    <Ionicons
-                      name="add"
-                      size={20}
-                      color={svaColors.text.primary}
-                    />
-                  </TouchableOpacity>
-                </View>
-                <TouchableOpacity
-                  style={styles.unitDropdown}
-                  onPress={() => setIsUnitPickerOpen(true)}
-                >
-                  <Text style={styles.unitText}>{metricUnit.name}</Text>
-                  <Ionicons
-                    name="chevron-down"
-                    size={16}
-                    color={svaColors.text.secondary}
-                  />
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.durationSection}>
-                <Text style={styles.label}>RHYTHM</Text>
-                <HabitDurationInput
-                  onSelect={setProtocolDuration}
-                  compact
-                  showIcon={false}
-                  showLabel={false}
-                  style={styles.durationChip}
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={styles.scrollContent}
+            >
+              {/* Section 1: Core Details */}
+              <View style={styles.section}>
+                <Text style={styles.label}>RITUAL NAME</Text>
+                <TextInput
+                  style={styles.nameInput}
+                  placeholder="e.g., Morning Yoga"
+                  placeholderTextColor={svaColors.text.disabled}
+                  value={name}
+                  onChangeText={setName}
                 />
-              </View>
 
-              <View style={styles.reminderSection}>
-                <Text style={styles.label}>YOUR DAILY NUDGE</Text>
-                <TouchableOpacity
-                  activeOpacity={0.9}
-                  style={styles.reminderTrigger}
-                  onPress={() => setIsTimePickerOpen(true)}
-                >
-                  <Text style={styles.reminderValue}>{reminderTimeLabel}</Text>
-                  <Ionicons
-                    name="chevron-down"
-                    size={16}
-                    color={svaColors.text.secondary}
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            {/* Section 2: Divine Defaults */}
-            <View style={styles.divineCard}>
-              <View style={styles.divineHeader}>
-                <Text style={styles.divineTitle}>DIVINE DEFAULTS</Text>
-              </View>
-
-              <View style={styles.gridContainer}>
-                <TouchableOpacity
-                  style={[styles.gridItem, styles.fullWidthItem]}
-                  onPress={() => setIsOriginPickerOpen(true)}
-                >
-                  <View style={[styles.gridCompactBlock, styles.gridCompactBlockWide]}>
-                    <View style={styles.gridTileHeader}>
-                      <Text style={styles.gridLabel}>GENESIS</Text>
+                <Text style={styles.label}>METRIC</Text>
+                <View style={styles.metricRow}>
+                  <View style={styles.counterContainer}>
+                    <TouchableOpacity
+                      onPress={() =>
+                        setMetricValue(Math.max(1, metricValue - 1))
+                      }
+                      style={styles.counterBtn}
+                    >
                       <Ionicons
-                        name="chevron-forward"
-                        size={14}
-                        color={svaColors.text.secondary}
+                        name="remove"
+                        size={20}
+                        color={svaColors.text.primary}
                       />
-                    </View>
-                    <View style={styles.gridValueStack}>
-                      <Text style={styles.gridValueText}>{originLabel}</Text>
-                      {!!originSummaryLabel && (
-                        <Text style={styles.gridValueSubtext}>
-                          {originSummaryLabel}
-                        </Text>
-                      )}
-                    </View>
+                    </TouchableOpacity>
+                    <Text style={styles.counterValue}>{metricValue}</Text>
+                    <TouchableOpacity
+                      onPress={() => setMetricValue(metricValue + 1)}
+                      style={styles.counterBtn}
+                    >
+                      <Ionicons
+                        name="add"
+                        size={20}
+                        color={svaColors.text.primary}
+                      />
+                    </TouchableOpacity>
                   </View>
-                </TouchableOpacity>
-
-                <View style={styles.gridRow}>
                   <TouchableOpacity
-                    style={styles.gridItem}
-                    onPress={() => setIsEmojiPickerOpen(true)}
+                    style={styles.unitDropdown}
+                    onPress={() => setIsUnitPickerOpen(true)}
                   >
-                    <View style={styles.gridTileHeader}>
-                      <Text style={styles.gridLabel}>ESSENCE</Text>
-                      <Ionicons
-                        name="chevron-forward"
-                        size={14}
-                        color={svaColors.text.secondary}
-                      />
-                    </View>
-                    <View style={styles.gridValueRow}>
-                      <Text style={styles.gridEmoji}>{emoji}</Text>
-                    </View>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={styles.gridItem}
-                    onPress={() => setIsColorPickerOpen(true)}
-                  >
-                    <View style={styles.gridTileHeader}>
-                      <Text style={styles.gridLabel}>AURA</Text>
-                      <Ionicons
-                        name="chevron-forward"
-                        size={14}
-                        color={svaColors.text.secondary}
-                      />
-                    </View>
-                    <View style={styles.gridValueRow}>
-                      <View
-                        style={[
-                          styles.colorDot,
-                          { backgroundColor: selectedColor.value },
-                        ]}
-                      />
-                      <Text style={styles.gridValueText}>
-                        {selectedColor.label}
-                      </Text>
-                    </View>
+                    <Text style={styles.unitText}>{metricUnit.name}</Text>
+                    <Ionicons
+                      name="chevron-down"
+                      size={16}
+                      color={svaColors.text.secondary}
+                    />
                   </TouchableOpacity>
                 </View>
 
-                <TouchableOpacity
-                  style={[styles.gridItem, styles.fullWidthItem]}
-                  onPress={() => setIsProtocolTypeOpen(true)}
-                >
-                  <View style={styles.gridCompactBlock}>
-                    <View style={styles.gridTileHeader}>
-                      <Text style={styles.gridLabel}>PROTOCOL TYPE</Text>
-                      <Ionicons
-                        name="chevron-forward"
-                        size={14}
-                        color={svaColors.text.secondary}
-                      />
-                    </View>
-                    <View style={styles.gridValueRow}>
-                      <Text style={styles.gridValueText}>
-                        {protocolTypeLabel}
-                      </Text>
-                    </View>
-                  </View>
-                </TouchableOpacity>
+                <View style={styles.durationSection}>
+                  <Text style={styles.label}>RHYTHM</Text>
+                  <HabitDurationInput
+                    onSelect={setProtocolDuration}
+                    compact
+                    showIcon={false}
+                    showLabel={false}
+                    style={styles.durationChip}
+                  />
+                </View>
 
-                <TouchableOpacity
-                  style={[styles.gridItem, styles.fullWidthItem]}
-                  onPress={() => setIsNaturePickerOpen(true)}
-                >
-                  <View style={styles.gridCompactBlock}>
-                    <View style={styles.gridTileHeader}>
-                      <Text style={styles.gridLabel}>NATURE</Text>
-                      <Ionicons
-                        name="chevron-forward"
-                        size={14}
-                        color={svaColors.text.secondary}
-                      />
-                    </View>
-                    <View style={styles.gridValueRow}>
-                      <Text style={styles.gridValueText}>
-                        {natureValueLabel}
-                      </Text>
-                    </View>
-                  </View>
-                </TouchableOpacity>
-
-                {natureTags.length > 0 && (
-                  <View style={styles.natureChips}>
-                    {natureTags.map((tag, index) => (
-                      <View key={`${tag.id}-${index}`} style={styles.natureChip}>
-                        <Text style={styles.natureChipText}>{tag.name}</Text>
-                        <TouchableOpacity
-                          onPress={() => handleNatureTagRemove(index)}
-                        >
-                          <Ionicons
-                            name="close-circle"
-                            size={16}
-                            color={svaColors.text.secondary}
-                          />
-                        </TouchableOpacity>
-                      </View>
-                    ))}
-                  </View>
-                )}
+                <View style={styles.reminderSection}>
+                  <Text style={styles.label}>YOUR DAILY NUDGE</Text>
+                  <TouchableOpacity
+                    activeOpacity={0.9}
+                    style={styles.reminderTrigger}
+                    onPress={() => setIsTimePickerOpen(true)}
+                  >
+                    <Text style={styles.reminderValue}>
+                      {reminderTimeLabel}
+                    </Text>
+                    <Ionicons
+                      name="chevron-down"
+                      size={16}
+                      color={svaColors.text.secondary}
+                    />
+                  </TouchableOpacity>
+                </View>
               </View>
-            </View>
 
-            {/* Seal Ritual Button */}
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                style={[styles.sealButton, isLoading && { opacity: 0.7 }]}
-                onPress={onSubmitClick}
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <ActivityIndicator color={svaColors.text.inverse} />
-                ) : (
-                  <Text style={styles.sealButtonText}>SEAL RITUAL</Text>
-                )}
-              </TouchableOpacity>
-            </View>
-          </ScreenView>
-        </ScrollView>
-      </SafeAreaView>
+              {/* Section 2: Divine Defaults */}
+              <View style={styles.divineCard}>
+                <View style={styles.divineHeader}>
+                  <Text style={styles.divineTitle}>DIVINE DEFAULTS</Text>
+                </View>
+
+                <View style={styles.gridContainer}>
+                  <TouchableOpacity
+                    style={[styles.gridItem, styles.fullWidthItem]}
+                    onPress={() => setIsOriginPickerOpen(true)}
+                  >
+                    <View
+                      style={[
+                        styles.gridCompactBlock,
+                        styles.gridCompactBlockWide,
+                      ]}
+                    >
+                      <View style={styles.gridTileHeader}>
+                        <Text style={styles.gridLabel}>GENESIS</Text>
+                        <Ionicons
+                          name="chevron-forward"
+                          size={14}
+                          color={svaColors.text.secondary}
+                        />
+                      </View>
+                      <View style={styles.gridValueStack}>
+                        <Text style={styles.gridValueText}>{originLabel}</Text>
+                        {!!originSummaryLabel && (
+                          <Text style={styles.gridValueSubtext}>
+                            {originSummaryLabel}
+                          </Text>
+                        )}
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+
+                  <View style={styles.gridRow}>
+                    <TouchableOpacity
+                      style={styles.gridItem}
+                      onPress={() => setIsEmojiPickerOpen(true)}
+                    >
+                      <View style={styles.gridTileHeader}>
+                        <Text style={styles.gridLabel}>ESSENCE</Text>
+                        <Ionicons
+                          name="chevron-forward"
+                          size={14}
+                          color={svaColors.text.secondary}
+                        />
+                      </View>
+                      <View style={styles.gridValueRow}>
+                        <Text style={styles.gridEmoji}>{emoji}</Text>
+                      </View>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={styles.gridItem}
+                      onPress={() => setIsColorPickerOpen(true)}
+                    >
+                      <View style={styles.gridTileHeader}>
+                        <Text style={styles.gridLabel}>AURA</Text>
+                        <Ionicons
+                          name="chevron-forward"
+                          size={14}
+                          color={svaColors.text.secondary}
+                        />
+                      </View>
+                      <View style={styles.gridValueRow}>
+                        <View
+                          style={[
+                            styles.colorDot,
+                            { backgroundColor: selectedColor.value },
+                          ]}
+                        />
+                        <Text style={styles.gridValueText}>
+                          {selectedColor.label}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  </View>
+
+                  <TouchableOpacity
+                    style={[styles.gridItem, styles.fullWidthItem]}
+                    onPress={() => setIsProtocolTypeOpen(true)}
+                  >
+                    <View style={styles.gridCompactBlock}>
+                      <View style={styles.gridTileHeader}>
+                        <Text style={styles.gridLabel}>PROTOCOL TYPE</Text>
+                        <Ionicons
+                          name="chevron-forward"
+                          size={14}
+                          color={svaColors.text.secondary}
+                        />
+                      </View>
+                      <View style={styles.gridValueRow}>
+                        <Text style={styles.gridValueText}>
+                          {protocolTypeLabel}
+                        </Text>
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[styles.gridItem, styles.fullWidthItem]}
+                    onPress={() => setIsNaturePickerOpen(true)}
+                  >
+                    <View style={styles.gridCompactBlock}>
+                      <View style={styles.gridTileHeader}>
+                        <Text style={styles.gridLabel}>NATURE</Text>
+                        <Ionicons
+                          name="chevron-forward"
+                          size={14}
+                          color={svaColors.text.secondary}
+                        />
+                      </View>
+                      <View style={styles.gridValueRow}>
+                        <Text style={styles.gridValueText}>
+                          {natureValueLabel}
+                        </Text>
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+
+                  {natureTags.length > 0 && (
+                    <View style={styles.natureChips}>
+                      {natureTags.map((tag, index) => (
+                        <View
+                          key={`${tag.id}-${index}`}
+                          style={styles.natureChip}
+                        >
+                          <Text style={styles.natureChipText}>{tag.name}</Text>
+                          <TouchableOpacity
+                            onPress={() => handleNatureTagRemove(index)}
+                          >
+                            <Ionicons
+                              name="close-circle"
+                              size={16}
+                              color={svaColors.text.secondary}
+                            />
+                          </TouchableOpacity>
+                        </View>
+                      ))}
+                    </View>
+                  )}
+                </View>
+              </View>
+
+              {/* Seal Ritual Button */}
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                  style={[styles.sealButton, isLoading && { opacity: 0.7 }]}
+                  onPress={onSubmitClick}
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <ActivityIndicator color={svaColors.text.inverse} />
+                  ) : (
+                    <Text style={styles.sealButtonText}>SEAL RITUAL</Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </View>
+        </SafeAreaView>
+      </ScreenView>
 
       {/* Modals */}
       <EmojiPicker
@@ -631,25 +648,27 @@ const CreateProtocolScreen = () => {
         subtitle="Your protocol is being prepared."
         message="Please wait while we sync the backend and open the home screen."
       />
-    </View>
+    </>
   );
 };
 
 const styling = (colors: any, typography: any, spacing: any) =>
   StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: colors.bg.base,
-    },
-    scrollContent: {
-      paddingBottom: 40,
-    },
     screenView: {
       paddingHorizontal: spacing.md,
       paddingTop:
         Platform.OS === "ios"
-          ? spacing.xl + spacing.xl * 0.4
+          ? spacing["xxl"] + spacing["xxl"] * 0.4
           : spacing.xl,
+    },
+    root: {
+      flex: 1,
+    },
+    header: {
+      marginBottom: spacing.md,
+    },
+    scrollContent: {
+      paddingBottom: 40,
     },
     section: {
       marginBottom: spacing.xl,

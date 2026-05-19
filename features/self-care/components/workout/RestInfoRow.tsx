@@ -1,81 +1,102 @@
-// src/components/selfCare/workout/RestInfoRow.tsx
-
-import React, { useContext } from "react";
+import React, { useContext, useMemo } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
   GestureResponderEvent,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+
 import ThemeContext from "@/contexts/ThemeContext";
+import type { ColorSet, Spacing, Typography } from "@/theme/types";
 
 export type TimerMode = "workout" | "rest";
 
-interface Props {
+interface RestInfoRowProps {
   restSeconds: number;
   mode: TimerMode;
   remainingSeconds: number;
-  onPress: (e: GestureResponderEvent) => void;
+  onPress: (event: GestureResponderEvent) => void;
 }
 
-const RestInfoRow: React.FC<Props> = ({
+const RestInfoRow: React.FC<RestInfoRowProps> = ({
   restSeconds,
   mode,
   remainingSeconds,
   onPress,
 }) => {
-  const { newTheme, spacing, typography } = useContext(ThemeContext);
-  const styles = styling(newTheme, spacing, typography);
+  const { newTheme: theme, spacing, typography } = useContext(ThemeContext);
+  const styles = useMemo(
+    () => styling(theme, spacing, typography),
+    [theme, spacing, typography]
+  );
 
   const isResting = mode === "rest";
   const labelSeconds = isResting ? remainingSeconds : restSeconds;
-  const label = `${labelSeconds} sec`;
-  const subtitle = isResting ? "Tap to return to exercise" : "Rest Time";
 
   return (
-    <TouchableOpacity
-      style={styles.container}
-      activeOpacity={0.9}
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={isResting ? "Return to workout" : "Start break"}
       onPress={onPress}
+      style={({ pressed }) => [styles.container, pressed && styles.containerPressed]}
     >
       <View style={styles.iconCircle}>
-        <Ionicons name="information" size={18} color="#4C8DFF" />
+        <Ionicons
+          name={isResting ? "pause" : "moon-outline"}
+          size={18}
+          color={theme.buttonPrimary}
+        />
       </View>
-      <View>
-        <Text style={styles.timeLabel}>{label}</Text>
-        <Text style={styles.caption}>{subtitle}</Text>
+
+      <View style={styles.copy}>
+        <Text style={styles.timeLabel}>{labelSeconds} sec</Text>
+        <Text style={styles.caption}>
+          {isResting ? "Tap to return to reps" : "Tap for a 30 sec break"}
+        </Text>
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 
-const styling = (newTheme: any, spacing: any, typography: any) =>
+const styling = (theme: ColorSet, spacing: Spacing, typography: Typography) =>
   StyleSheet.create({
     container: {
       flexDirection: "row",
       alignItems: "center",
-      marginTop: spacing.lg,
-      marginBottom: spacing.lg,
+      borderRadius: 18,
+      backgroundColor: theme.surfaceMuted,
+      borderWidth: 1,
+      borderColor: theme.borderMuted ?? "rgba(255,255,255,0.05)",
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+    },
+    containerPressed: {
+      opacity: 0.94,
+      transform: [{ scale: 0.99 }],
     },
     iconCircle: {
       width: 36,
       height: 36,
       borderRadius: 18,
-      backgroundColor: "#0B1220",
+      backgroundColor: theme.surface,
       alignItems: "center",
       justifyContent: "center",
       marginRight: spacing.sm,
     },
+    copy: {
+      flex: 1,
+    },
     timeLabel: {
-      ...typography.bodySmall,
-      color: "#FFFFFF",
+      ...typography.caption,
+      color: theme.textPrimary,
       fontWeight: "700",
     },
     caption: {
       ...typography.caption,
-      color: newTheme.textSecondary,
+      color: theme.textSecondary,
+      marginTop: 2,
     },
   });
 

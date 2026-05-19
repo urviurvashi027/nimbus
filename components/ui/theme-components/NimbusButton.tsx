@@ -3,6 +3,7 @@ import {
   Pressable,
   Text,
   StyleSheet,
+  type StyleProp,
   ViewStyle,
   TextStyle,
   View,
@@ -21,8 +22,11 @@ interface NimbusButtonProps {
   loading?: boolean;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
   textStyle?: TextStyle;
+  testID?: string;
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
 }
 
 export function NimbusButton({
@@ -35,6 +39,9 @@ export function NimbusButton({
   rightIcon,
   style,
   textStyle,
+  testID,
+  accessibilityLabel,
+  accessibilityHint,
 }: NimbusButtonProps) {
   const { newTheme, svaColors, typography } = useContext(ThemeContext);
   const isDisabled = !!disabled || !!loading;
@@ -74,8 +81,12 @@ export function NimbusButton({
 
   return (
     <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel ?? label}
+      accessibilityHint={accessibilityHint}
       onPress={onPress}
       disabled={isDisabled}
+      testID={testID}
       style={({ pressed }) => [
         s.btn,
         {

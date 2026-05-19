@@ -1,12 +1,12 @@
-import React, { useContext } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  ViewStyle,
-} from "react-native";
+import React, { useContext, useMemo } from "react";
+import { Pressable, StyleSheet, Text, View, type ViewStyle } from "react-native";
 import ThemeContext from "@/contexts/ThemeContext";
+import type {
+  ColorSet,
+  Spacing,
+  Typography,
+  TypographyTokens,
+} from "@/theme/types";
 
 export type DifficultyOptionKey = "easy" | "medium" | "hard";
 
@@ -27,54 +27,91 @@ const DifficultyTabs: React.FC<DifficultyTabsProps> = ({
   onChange,
   style,
 }) => {
-  const { newTheme, spacing, typography } = useContext(ThemeContext);
-  const styles = styling(newTheme, spacing, typography);
+  const { newTheme, svaTypography, spacing, typography } =
+    useContext(ThemeContext);
+  const styles = useMemo(
+    () => styling(newTheme, svaTypography, spacing, typography),
+    [newTheme, svaTypography, spacing, typography]
+  );
 
   return (
     <View style={[styles.container, style]}>
       {OPTIONS.map((opt) => {
         const isActive = opt.key === activeKey;
         return (
-          <TouchableOpacity
+          <Pressable
             key={opt.key}
-            style={[styles.pill, isActive && styles.pillActive]}
+            accessibilityRole="button"
+            accessibilityLabel={opt.label}
+            accessibilityState={{ selected: isActive }}
             onPress={() => onChange(opt.key)}
-            activeOpacity={0.9}
+            style={({ pressed }) => [
+              styles.pill,
+              isActive && styles.pillActive,
+              pressed && styles.pillPressed,
+            ]}
           >
             <Text style={isActive ? styles.textActive : styles.textInactive}>
               {opt.label}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         );
       })}
     </View>
   );
 };
 
-const styling = (newTheme: any, spacing: any, typography: any) =>
+const styling = (
+  theme: ColorSet,
+  svaTypography: TypographyTokens | undefined,
+  spacing: Spacing,
+  typography: Typography
+) =>
   StyleSheet.create({
     container: {
       flexDirection: "row",
+      gap: spacing.sm,
+      flexWrap: "wrap",
     },
     pill: {
+      minHeight: 40,
       paddingHorizontal: spacing.lg,
       paddingVertical: spacing.sm,
       borderRadius: 999,
-      backgroundColor: newTheme.surfaceMuted,
-      marginRight: spacing.sm,
+      backgroundColor: theme.surfaceMuted,
+      borderWidth: 1,
+      borderColor: theme.borderMuted ?? "rgba(255,255,255,0.05)",
+      justifyContent: "center",
+      alignItems: "center",
+      shadowColor: theme.shadow,
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+      shadowOffset: { width: 0, height: 4 },
+      elevation: 2,
     },
     pillActive: {
-      backgroundColor: "#6DFF8C", // Nimbus neon green
+      backgroundColor: theme.buttonPrimary,
+      borderColor: theme.buttonPrimary,
+    },
+    pillPressed: {
+      opacity: 0.94,
+      transform: [{ scale: 0.98 }],
     },
     textInactive: {
-      ...typography.bodySmall,
-      color: newTheme.textSecondary,
-      fontWeight: "500",
+      fontFamily:
+        svaTypography?.textStyle.authTinyLabel.fontFamily ??
+        typography.caption.fontFamily,
+      color: theme.textSecondary,
+      fontSize: 12,
+      letterSpacing: 0.8,
     },
     textActive: {
-      ...typography.bodySmall,
-      color: "#062814",
-      fontWeight: "600",
+      fontFamily:
+        svaTypography?.textStyle.authTinyLabel.fontFamily ??
+        typography.caption.fontFamily,
+      color: theme.buttonPrimaryText,
+      fontSize: 12,
+      letterSpacing: 0.8,
     },
   });
 

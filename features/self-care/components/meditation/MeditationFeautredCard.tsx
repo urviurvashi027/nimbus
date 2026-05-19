@@ -1,9 +1,8 @@
 // src/components/selfCare/soundscape/SoundscapeFeaturedCard.tsx
 
 import React from "react";
-import NimbusPastelFeaturedCard from "@/components/layout/PastelFeaturedCard";
-import { EnrichedMeditation } from "@/app/(auth)/self-care/MeditationScreen";
 import NimbusUltraFeaturedCard from "@/components/layout/NimbusUltraFeaturedCard";
+import { EnrichedMeditation } from "@/features/self-care/types/selfCareTypes";
 
 interface MeditationFeaturedCardProps {
   data: EnrichedMeditation;
@@ -36,14 +35,6 @@ const MeditationFeaturedCard: React.FC<MeditationFeaturedCardProps> = ({
       accent={cardColor.color} // used for dot + accent bar
       onPress={() => onPress(data)}
     />
-    // <NimbusPastelFeaturedCard
-    //   title={title}
-    //   subtitle={`${duration || "3"} min · Reflection`}
-    //   description={descText}
-    //   image={image}
-    //   colors={{ bg: cardColor.bgColor, footer: cardColor.color }}
-    //   onPress={() => onPress(data)}
-    // />
   );
 };
 

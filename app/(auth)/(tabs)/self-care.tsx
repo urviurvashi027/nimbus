@@ -1,349 +1,458 @@
+import React, { useContext, useMemo } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
+  Pressable,
   ScrollView,
+  StyleSheet,
+  Text,
+  View,
   Platform,
-  SafeAreaView,
+  useWindowDimensions,
 } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
 import { router } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-// application level import
 import ThemeContext from "@/contexts/ThemeContext";
 import { ROUTES } from "@/constants/routes";
+import AppHeader from "@/components/layout/AppHeader";
+import { ScreenView } from "@/components/ui/theme-components/ScreenView";
+import type { ColorSet, Spacing } from "@/theme/types";
 
-import {
-  buttons as NavigationButton,
-  NavigationButtonType,
-} from "@/constants/data/selfCareButton";
-import { banners } from "@/constants/data/banner";
+type IconName = React.ComponentProps<typeof MaterialCommunityIcons>["name"];
 
-import { ScreenView } from "@/components/ui/Themed";
-import TrendingCardCarousel from "@/components/layout/TrendingCardCarousel";
-import HorizontalListCardScroll from "@/components/layout/HorizontalListCardScroll";
-import HorizontalBanner from "@/components/layout/HorizontalBanner";
-import PricingModal from "@/components/ui/PricingModal";
-import NavigationIconButton from "@/components/ui/NavigationIconButton";
-import SleepScreen from "../self-care/sleep";
-import ThingsToDoModal from "../self-care/thingsToDo";
+type ActionTile = {
+  label: string;
+  icon: IconName;
+  route: string;
+  navigationMode?: "push" | "navigate";
+};
 
-import {
-  getMeditationAudioList,
-  // getMentalTestList,
-} from "@/features/self-care/services/selfCareService";
-import {
-  getRoutineList,
-  getSoundscapeList,
-} from "@/features/tools/services/toolService";
+type SectionConfig = {
+  eyebrow: string;
+  title: string;
+  chipIcon: IconName;
+  actions: ActionTile[];
+};
 
-import {
-  MeditationAudioListItem,
-} from "@/features/self-care/types/selfCareTypes";
-import { SoundscapeTrackListItem } from "@/features/tools/types/toolsTypes";
+type SelfCareFonts = {
+  serif: string;
+  mono: string;
+  action: string;
+};
 
-const SelfCare: React.FC = () => {
-  const [selectedButton, setSelectedButton] = useState<string | number>("");
+const SECTION_DATA: SectionConfig[] = [
+  {
+    eyebrow: "Cognitive Core",
+    title: "Mind",
+    chipIcon: "brain",
+    actions: [
+      {
+        label: "Journaling",
+        icon: "book-edit-outline",
+        route: ROUTES.AUTH.SELF_CARE_JOURNALING,
+      },
+      {
+        label: "Meditation",
+        icon: "meditation",
+        route: ROUTES.AUTH.SELF_CARE_MEDITATION,
+        navigationMode: "navigate",
+      },
+      {
+        label: "Affirmation",
+        icon: "cards-heart-outline",
+        route: ROUTES.AUTH.SELF_CARE_AFFIRMATION,
+      },
+      {
+        label: "Breath Work",
+        icon: "weather-windy",
+        route: ROUTES.AUTH.SELF_CARE_BREATHWORK,
+      },
+    ],
+  },
+  {
+    eyebrow: "Physical Vitality",
+    title: "Body",
+    chipIcon: "dumbbell",
+    actions: [
+      {
+        label: "Vitals",
+        icon: "heart-pulse",
+        route: ROUTES.AUTH.TOOLS_BODY_SHAPE_CALC,
+      },
+      {
+        label: "Workout Progress",
+        icon: "dumbbell",
+        route: ROUTES.AUTH.SELF_CARE_WORKOUT,
+      },
+    ],
+  },
+  {
+    eyebrow: "Inner Resonance",
+    title: "Soul",
+    chipIcon: "star-four-points-outline",
+    actions: [
+      {
+        label: "Scribble",
+        icon: "pencil-outline",
+        route: ROUTES.AUTH.TOOLS_SCRIBBLE_LIST,
+      },
+      {
+        label: "Soundscape",
+        icon: "music-circle-outline",
+        route: ROUTES.AUTH.SELF_CARE_SOUNDSCAPE,
+      },
+    ],
+  },
+];
 
-  const [meditationList, setMeditationList] = useState<
-    MeditationAudioListItem[]
-  >([]);
-
-  const [soundscapeTrackList, setSoundscapeTrackList] = useState<
-    SoundscapeTrackListItem[]
-  >([]);
-
-  // Modal States
-  const [showPricingModal, setShowPricingModal] = useState(false);
-  const [showSleepTagsModal, setShowSleepTagsModal] = useState(false);
-  const [showThingsToDoTagsModal, setShowThingsToDoTagsModal] = useState(false);
-  const [routineList, setRoutineList] = useState<any[] | undefined>();
-
-  const { newTheme, spacing, typography } = useContext(ThemeContext);
-
-  const styles = styling(newTheme, spacing, typography);
-
-  // Funstion called on click of navigation button clicked
-  const handleNavigationButtonPress = (button: NavigationButtonType) => {
-    // console.log(button.screen, button, "button");
-    if (button.action === "navigate") {
-      router.push(button.screen);
-    } else if (button.action === "modal") {
-      modalHandler(button.screen);
-    }
-  };
-
-  const getMeditationTrackList = async () => {
-    // need to add filters functionality and category param changes
-    try {
-      const result = await getMeditationAudioList();
-
-      // TEMP: Handle current direct array vs future object structure
-      let dataToProcess: any[] = [];
-
-      // if (Array.isArray(result)) {
-      //   // Current format
-      //   dataToProcess = result;
-      // }
-
-      // FUTURE: Handle { success, message, data } format
-      if (result && result.success && Array.isArray(result.data)) {
-        dataToProcess = result.data;
-      }
-
-      if (dataToProcess.length > 0) {
-        const processedAudio = dataToProcess.map((item: any) => {
-          return {
-            ...item, // Spread operator to keep original properties
-            isLocked: false,
-            coachName: item.coach_name || "UU",
-            image: {
-              uri: item.image,
-            },
-          };
-        });
-        setMeditationList(processedAudio);
-      } else {
-        // Handle the case where the data is not in the expected format
-        console.error("API response data is not an array:", result);
-      }
-    } catch (error: any) {
-      console.log(error, "API Error Response");
-    }
-  };
-
-  const getSoundscapeTrackList = async () => {
-    try {
-      const result = await getSoundscapeList();
-
-      // TEMP: Handle current direct array vs future object structure
-      let dataToProcess: any[] = [];
-
-      // if (Array.isArray(result)) {
-      //   // Current format
-      //   dataToProcess = result;
-      // }
-
-      // FUTURE: Handle { success, message, data } format
-      if (result && result.success && Array.isArray(result.data)) {
-        dataToProcess = result.data;
-      }
-
-      if (dataToProcess.length > 0) {
-        const processedArticles = dataToProcess.map((tracks: any) => {
-          return {
-            ...tracks, // Spread operator to keep original properties
-            duration: tracks.duration || "3",
-            image: {
-              uri: tracks.image,
-            },
-          };
-        });
-        setSoundscapeTrackList(processedArticles);
-      } else {
-        // Handle the case where the data is not in the expected format
-        console.error("API response data is not an array:", result);
-      }
-    } catch (error: any) {
-      console.log(error, "API Error Response");
-    }
-  };
-
-  // helper function to enable the modal
-  const modalHandler = (modalName: string) => {
-    switch (modalName) {
-      case "Sleep":
-        setShowSleepTagsModal(true);
-        break;
-      case "thingsToDo":
-        setShowThingsToDoTagsModal(true);
-        break;
-    }
-  };
-
-  const handleCardPress = (id: string) => {
-    console.log("Pressed card id:", id);
-  };
-
-  // function to be called on click of all button horizontalListCard
-  const onClickOfAll = (title: string) => {
-    switch (title) {
-      case "soundscape":
-        router.push(ROUTES.AUTH.SELF_CARE_SOUNDSCAPE);
-        break;
-      case "meditation":
-        router.push(ROUTES.AUTH.SELF_CARE_MEDITATION);
-        break;
-      case "routine":
-        router.push(ROUTES.AUTH.TOOLS_ROUTINE_TEMPLATE);
-        break;
-    }
-  };
-
-  const handleBannerPress = (id: string) => {
-    console.log("Banner pressed:", id);
-  };
-
-  const getRoutineData = async (category?: string) => {
-    // need to add filters functionality and category param changes
-    try {
-      const result = await getRoutineList(category);
-      // Check if 'result' and 'result.data' exist and is an array
-      if (result && result.success && Array.isArray(result.data)) {
-        const processedArticles = result.data.map((article: any) => {
-          // Return a new object with the original properties plus the new ones
-          return {
-            ...article, // Spread operator to keep original properties
-            title: article.name,
-            image: article.image ? { uri: article.image } : null,
-          };
-        });
-        setRoutineList(processedArticles);
-      } else {
-        // Handle the case where the data is not in the expected format
-        console.error("API response data is not an array:", result);
-      }
-    } catch (error: any) {
-      console.log(error, "API Error Response");
-    }
-  };
-
-  useEffect(() => {
-    setSelectedButton("");
-    getMeditationTrackList();
-    getSoundscapeTrackList();
-    getRoutineData();
-    // getMentalListData();
-  }, []);
-
+const SelfCareActionTile = ({
+  action,
+  onPress,
+  iconColor,
+  styles,
+}: {
+  action: ActionTile;
+  onPress: (route: string, mode?: "push" | "navigate") => void;
+  iconColor: string;
+  styles: ReturnType<typeof makeStyles>;
+}) => {
   return (
-    <ScreenView
-      style={{
-        paddingTop:
-          Platform.OS === "ios" ? spacing["xxl"] + spacing["xxl"] : spacing.xl,
-        paddingHorizontal: spacing.md,
-      }}
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={action.label}
+      onPress={() => onPress(action.route, action.navigationMode)}
+      style={({ pressed }) => [
+        styles.actionTile,
+        pressed && styles.actionTilePressed,
+      ]}
     >
-      <SafeAreaView style={{ flex: 1, padding: 0 }}>
-        <View style={styles.screenTitle}>
-          <Text style={styles.screenTitleText}>Self Care</Text>
-        </View>
-        {/* Navigation Button */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.navigationScrollView}
-          contentContainerStyle={{ paddingHorizontal: 0, paddingBottom: 30 }}
-        >
-          {NavigationButton.map((button: NavigationButtonType) => (
-            <NavigationIconButton
-              key={button.id}
-              icon={button.iconName}
-              label={button.label}
-              spacingGap={8}
-              isActive={selectedButton === button.id}
-              onPress={() => {
-                setSelectedButton(button.id);
-                handleNavigationButtonPress(button);
-              }}
-            />
-          ))}
-        </ScrollView>
-
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollContent}
-        >
-          {/* Workout Video List Section */}
-          {/* <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={{ paddingTop: 0, paddingLeft: 0, paddingBottom: 20 }}
-          >
-            {workoutVideoList.map((card) => (
-              <VideoClassCard
-                key={card.id}
-                title={card.title}
-                coachName={card?.coachName}
-                thumbnail={card.image}
-                onPress={() => handleWorkoutVideoClicked(card)}
-              />
-            ))}
-          </ScrollView> */}
-
-          {/* { Soundscpae List Section} */}
-          <HorizontalListCardScroll
-            title="Sonic Atmospheres"
-            description="The sound of nature gives you better sleep."
-            backgroundColor="#fff9d2"
-            itemList={soundscapeTrackList}
-            onClickOfAll={() => onClickOfAll("soundscape")}
-          />
-
-          {/* AudioBook List Section */}
-          <TrendingCardCarousel
-            type="rotuine"
-            title="Guided Rituals"
-            data={routineList ?? []}
-            onClickOfAll={() => onClickOfAll("routine")}
-            onPress={handleCardPress}
-          />
-
-          <HorizontalBanner data={banners} onPress={handleBannerPress} />
-
-          {/* Meditation List Section */}
-          <HorizontalListCardScroll
-            title="Pure Zen"
-            description="Now is a great time to be present. Now is good, too. And now"
-            backgroundColor="#fadfdd"
-            itemList={meditationList}
-            onClickOfAll={() => onClickOfAll("meditation")}
-          />
-        </ScrollView>
-      </SafeAreaView>
-
-      {/* Modal Details */}
-      {/* Sleep Modal */}
-      <SleepScreen
-        visible={showSleepTagsModal}
-        onClose={() => setShowSleepTagsModal(false)}
-      />
-
-      {/* Pricing Modal */}
-      <PricingModal
-        visible={showPricingModal}
-        onClose={() => {
-          setShowPricingModal(false);
-        }}
-        onSeizePress={() => {
-          console.log("onSeizeClicked");
-        }}
-      />
-
-      {/* Things To Do Modal */}
-      <ThingsToDoModal
-        isVisible={showThingsToDoTagsModal}
-        onClose={() => setShowThingsToDoTagsModal(false)}
-      />
-    </ScreenView>
+      <View style={styles.actionIconWrap}>
+        <MaterialCommunityIcons
+          name={action.icon}
+          size={18}
+          color={iconColor}
+        />
+      </View>
+      <Text style={styles.actionLabel} numberOfLines={2}>
+        {action.label}
+      </Text>
+    </Pressable>
   );
 };
 
-const styling = (newTheme: any, spacing: any, typography: any) =>
+const SelfCareSectionCard = ({
+  section,
+  onPress,
+  chipIconColor,
+  styles,
+}: {
+  section: SectionConfig;
+  onPress: (route: string, mode?: "push" | "navigate") => void;
+  chipIconColor: string;
+  styles: ReturnType<typeof makeStyles>;
+}) => {
+  return (
+    <View style={styles.sectionCard}>
+      <View style={styles.sectionInner}>
+        <View style={styles.sectionTopRow}>
+          <View style={styles.sectionCopy}>
+            <Text style={styles.sectionEyebrow} numberOfLines={1}>
+              {section.eyebrow}
+            </Text>
+            <Text style={styles.sectionTitle} numberOfLines={1}>
+              {section.title}
+            </Text>
+          </View>
+
+          <View style={styles.sectionChip}>
+            <MaterialCommunityIcons
+              name={section.chipIcon}
+              size={18}
+              color={chipIconColor}
+            />
+          </View>
+        </View>
+
+        <View style={styles.actionRow}>
+          {section.actions.map((action) => (
+            <SelfCareActionTile
+              key={action.label}
+              action={action}
+              onPress={onPress}
+              iconColor={chipIconColor}
+              styles={styles}
+            />
+          ))}
+        </View>
+      </View>
+    </View>
+  );
+};
+
+export default function SelfCare() {
+  const { newTheme: theme, svaTypography, spacing, typography } =
+    useContext(ThemeContext);
+  const { width } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
+
+  const ringSize = useMemo(() => {
+    return Math.min(220, Math.max(176, Math.round(width * 0.58)));
+  }, [width]);
+
+  const fontFamilies = useMemo(
+    () => ({
+      serif:
+        svaTypography?.textStyle.authTitle.fontFamily ??
+        "CormorantGaramond_500Medium",
+      mono:
+        svaTypography?.textStyle.authMonoLabel.fontFamily ?? "SpaceMono-Regular",
+      action: typography.button.fontFamily ?? "Outfit_600SemiBold",
+    }),
+    [svaTypography, typography.button.fontFamily]
+  );
+
+  const styles = useMemo(
+    () => makeStyles(theme, spacing, ringSize, fontFamilies),
+    [theme, spacing, ringSize, fontFamilies]
+  );
+
+  const onRoutePress = (route: string, mode: "push" | "navigate" = "push") => {
+    if (mode === "navigate") {
+      router.navigate(route as never);
+      return;
+    }
+
+    router.push(route as never);
+  };
+
+  return (
+    <ScreenView bgColor={theme.background} padding={0} style={styles.screen}>
+      <StatusBar style="light" translucent backgroundColor="transparent" />
+
+      <View style={styles.root}>
+        <AppHeader
+          title="Sattva Sanctuary"
+          subtitle="A quiet orbit for mind, body, soul."
+          rightAction={{
+            icon: "settings-outline",
+            accessibilityLabel: "Open settings",
+            onPress: () => router.push(ROUTES.TABS.SETTINGS),
+          }}
+          containerStyle={styles.header}
+        />
+
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={[
+            styles.scrollContent,
+            { paddingBottom: insets.bottom + 154 },
+          ]}
+        >
+          <View style={styles.heroBlock}>
+            <View style={styles.ringStage}>
+              <View style={styles.scoreRing}>
+                <View style={styles.scoreRingInner}>
+                  <Text style={styles.scoreNumber}>84</Text>
+                </View>
+              </View>
+            </View>
+
+            <Text style={styles.heroTitle} numberOfLines={1}>
+              Sattva Level
+            </Text>
+            <Text style={styles.heroSubtitle} numberOfLines={1}>
+              OPTIMIZED STATE • HIGH COHERENCE
+            </Text>
+          </View>
+
+          <View style={styles.sectionStack}>
+            {SECTION_DATA.map((section) => (
+              <SelfCareSectionCard
+                key={section.title}
+                section={section}
+                onPress={onRoutePress}
+                chipIconColor={theme.accent}
+                styles={styles}
+              />
+            ))}
+          </View>
+        </ScrollView>
+      </View>
+    </ScreenView>
+  );
+}
+
+const makeStyles = (
+  theme: ColorSet,
+  spacing: Spacing,
+  ringSize: number,
+  fonts: SelfCareFonts
+) =>
   StyleSheet.create({
-    screenTitle: {
-      marginBottom: spacing.xl,
+    root: {
+      flex: 1,
     },
-    screenTitleText: {
-      ...typography.h1,
-      color: newTheme.textPrimary,
+    screen: {
+      paddingHorizontal: spacing.md,
+      paddingTop:
+        Platform.OS === "ios"
+          ? spacing["xxl"] + spacing["xxl"] * 0.4
+          : spacing.xl,
     },
-    navigationScrollView: {
+    header: {
       marginBottom: spacing.md,
     },
     scrollContent: {
-      paddingBottom: 130,
+      paddingTop: spacing.xs,
+    },
+    heroBlock: {
+      alignItems: "center",
+      marginBottom: spacing.xl,
+    },
+    ringStage: {
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: spacing.lg,
+    },
+    scoreRing: {
+      width: ringSize,
+      height: ringSize,
+      borderRadius: ringSize / 2,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: theme.background,
+      borderWidth: 1.5,
+      borderColor: theme.accent,
+    },
+    scoreRingInner: {
+      flex: 1,
+      borderRadius: ringSize / 2 - 1.5,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    scoreNumber: {
+      fontFamily: fonts.serif,
+      fontSize: 60,
+      lineHeight: 62,
+      color: theme.accent,
+      letterSpacing: -1.2,
+    },
+    heroTitle: {
+      fontFamily: fonts.serif,
+      fontSize: 24,
+      lineHeight: 28,
+      color: theme.textPrimary,
+      textAlign: "center",
+    },
+    heroSubtitle: {
+      marginTop: 6,
+      fontFamily: fonts.mono,
+      fontSize: 10,
+      lineHeight: 14,
+      letterSpacing: 3.1,
+      color: theme.textSecondary,
+      textAlign: "center",
+      textTransform: "uppercase",
+      opacity: 0.92,
+    },
+    sectionStack: {
+      gap: spacing.md,
+      paddingBottom: spacing.md,
+    },
+    sectionCard: {
+      borderRadius: 30,
+      backgroundColor: theme.surface,
+      borderWidth: 1,
+      borderColor: theme.borderMuted ?? "rgba(255,255,255,0.05)",
+      overflow: "hidden",
+      shadowColor: theme.shadow,
+      shadowOpacity: 0.32,
+      shadowRadius: 22,
+      shadowOffset: { width: 0, height: 10 },
+      elevation: 9,
+    },
+    sectionInner: {
+      paddingHorizontal: 18,
+      paddingVertical: 18,
+    },
+    sectionTopRow: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      justifyContent: "space-between",
+      marginBottom: 18,
+    },
+    sectionCopy: {
+      flex: 1,
+      paddingRight: 12,
+    },
+    sectionEyebrow: {
+      fontFamily: fonts.mono,
+      fontSize: 9.5,
+      lineHeight: 12,
+      letterSpacing: 2.8,
+      textTransform: "uppercase",
+      color: theme.textSecondary,
+      opacity: 0.9,
+    },
+    sectionTitle: {
+      marginTop: 6,
+      fontFamily: fonts.serif,
+      fontSize: 32,
+      lineHeight: 34,
+      color: theme.textPrimary,
+    },
+    sectionChip: {
+      width: 46,
+      height: 46,
+      borderRadius: 15,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: theme.surfaceMuted,
+      borderWidth: 1,
+      borderColor: theme.borderMuted ?? "rgba(255,255,255,0.05)",
+    },
+    actionRow: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      justifyContent: "space-between",
+    },
+    actionTile: {
+      width: "48%",
+      minHeight: 92,
+      borderRadius: 18,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: 12,
+      paddingVertical: 14,
+      backgroundColor: theme.surfaceMuted,
+      borderWidth: 1,
+      borderColor: theme.borderMuted ?? "rgba(255,255,255,0.05)",
+      marginBottom: spacing.sm,
+    },
+    actionTilePressed: {
+      backgroundColor: theme.surface,
+      borderColor: theme.accent,
+      transform: [{ scale: 0.98 }],
+    },
+    actionIconWrap: {
+      width: 28,
+      height: 28,
+      borderRadius: 10,
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: 10,
+      backgroundColor: theme.background,
+      borderWidth: 1,
+      borderColor: theme.borderMuted ?? "rgba(255,255,255,0.05)",
+    },
+    actionLabel: {
+      fontFamily: fonts.action,
+      fontSize: 13,
+      lineHeight: 16,
+      letterSpacing: 0.2,
+      color: theme.textPrimary,
+      textAlign: "center",
+      opacity: 0.94,
     },
   });
-
-export default SelfCare;

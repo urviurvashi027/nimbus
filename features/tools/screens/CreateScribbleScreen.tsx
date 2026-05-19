@@ -18,10 +18,11 @@ import { ScreenView } from "@/components/ui/Themed";
 import StyledButton from "@/components/ui/theme-components/StyledButton";
 import { scribbleService } from "@/features/tools/services/scribbleService";
 import { toApiDate } from "@/utils/date-time";
+import type { ColorSet, Spacing, TypographyTokens } from "@/theme/types";
 
 export const CreateScribbleScreen = () => {
-  const { newTheme, spacing, typography } = useContext(ThemeContext);
-  const styles = styling(newTheme, spacing, typography);
+  const { newTheme, spacing, svaTypography } = useContext(ThemeContext);
+  const styles = styling(newTheme, spacing, svaTypography);
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -163,6 +164,7 @@ export const CreateScribbleScreen = () => {
               onPress={handleSave}
               disabled={!title || !content || isSaving}
               variant="primary"
+              labelStyle={svaTypography?.textStyle.button}
               fullWidth
             />
           </View>
@@ -172,7 +174,11 @@ export const CreateScribbleScreen = () => {
   );
 };
 
-const styling = (theme: any, spacing: any, typography: any) =>
+const styling = (
+  theme: ColorSet,
+  spacing: Spacing,
+  svaTypography?: TypographyTokens
+) =>
   StyleSheet.create({
     header: {
       flexDirection: "row",
@@ -189,11 +195,17 @@ const styling = (theme: any, spacing: any, typography: any) =>
       backgroundColor: theme.surfaceMuted,
     },
     headerTitle: {
-      ...typography.h3,
+      ...(svaTypography?.textStyle.authTitle ?? {}),
+      fontSize: 26,
+      lineHeight: 28,
+      fontStyle: "italic",
       color: theme.textPrimary,
     },
     titleInput: {
-      ...typography.h2,
+      ...(svaTypography?.textStyle.authTitle ?? {}),
+      fontSize: 31,
+      lineHeight: 34,
+      fontStyle: "italic",
       color: theme.textPrimary,
       paddingVertical: spacing.md,
       borderBottomWidth: 1,
@@ -215,9 +227,11 @@ const styling = (theme: any, spacing: any, typography: any) =>
       borderColor: "rgba(109, 255, 140, 0.3)",
     },
     tagText: {
-      ...typography.caption,
+      ...(svaTypography?.textStyle.authTinyLabel ?? {}),
+      fontSize: 11,
+      lineHeight: 16,
+      letterSpacing: 1.1,
       color: "#6DFF8C",
-      fontWeight: "700",
     },
     inputContainer: {
       minHeight: 300,
@@ -232,25 +246,20 @@ const styling = (theme: any, spacing: any, typography: any) =>
       padding: 0,
     },
     contentDisplay: {
-      ...typography.body,
+      ...(svaTypography?.textStyle.body ?? {}),
       color: theme.textPrimary,
-      fontSize: 16,
-      lineHeight: 24,
     },
     highlightedTag: {
+      ...(svaTypography?.textStyle.bodyMedium ?? {}),
       color: "#6DFF8C",
-      fontWeight: "700",
     },
     placeholder: {
-      ...typography.body,
+      ...(svaTypography?.textStyle.body ?? {}),
       color: theme.textSecondary,
-      fontSize: 16,
     },
     contentInput: {
-      ...typography.body,
+      ...(svaTypography?.textStyle.body ?? {}),
       color: "transparent", // Hide the actual text
-      fontSize: 16,
-      lineHeight: 24,
       minHeight: 300,
       textAlignVertical: "top",
       padding: 0,

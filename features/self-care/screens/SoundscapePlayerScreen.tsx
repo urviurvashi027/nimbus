@@ -1,0 +1,704 @@
+import React, { useContext, useEffect, useMemo, useState } from "react";
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  useWindowDimensions,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { router, useLocalSearchParams, useNavigation } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { LinearGradient } from "expo-linear-gradient";
+
+import { ScreenView } from "@/components/ui/theme-components/ScreenView";
+import ThemeContext from "@/contexts/ThemeContext";
+import {
+  buildSoundscapeResonanceLabel,
+  buildSoundscapeSubtitle,
+  getSoundscapeById,
+  mockSoundscapeSessions,
+  resolveSoundscapePlaybackSource,
+} from "@/features/self-care/utils/soundscapeLibrary";
+import { useAudioPlayback } from "@/features/self-care/hooks/useAudioPlayback";
+import {
+  formatPlaybackRemaining,
+  formatPlaybackTime,
+} from "@/features/self-care/utils/meditationPlayback";
+import type { ColorSet, Spacing, Typography, TypographyTokens } from "@/theme/types";
+
+type SoundscapePlayerParams = {
+  soundscapeId?: string | string[];
+};
+
+const parseParam = (value?: string | string[]) => {
+  if (Array.isArray(value)) return value[0];
+  return value;
+};
+
+const timerOptions = [null, 15, 30, 45] as const;
+const intensityVolumes = [0.45, 0.68, 0.9] as const;
+
+export default function SoundscapePlayerScreen() {
+  const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
+  const { height: windowHeight } = useWindowDimensions();
+  const params = useLocalSearchParams<SoundscapePlayerParams>();
+  const { newTheme: theme, svaTypography, spacing, typography } =
+    useContext(ThemeContext);
+  const isCompactLayout = windowHeight < 900;
+
+  const soundscapeId = parseParam(params.soundscapeId) ?? mockSoundscapeSessions[0].id;
+  const soundscape = useMemo(
+    () => getSoundscapeById(soundscapeId) ?? mockSoundscapeSessions[0],
+    [soundscapeId]
+  );
+  const source = useMemo(
+    () => resolveSoundscapePlaybackSource(soundscape.id),
+    [soundscape.id]
+  );
+  const subtitle = useMemo(() => buildSoundscapeSubtitle(soundscape), [soundscape]);
+  const resonanceLabel = useMemo(
+    () => buildSoundscapeResonanceLabel(soundscape),
+    [soundscape]
+  );
+  const styles = useMemo(
+    () => styling(theme, svaTypography, spacing, typography, isCompactLayout),
+    [theme, svaTypography, spacing, typography, isCompactLayout]
+  );
+
+  const [binauralEnabled, setBinauralEnabled] = useState(true);
+  const [timerIndex, setTimerIndex] = useState(0);
+  const [intensityIndex, setIntensityIndex] = useState(1);
+
+  const {
+    soundRef,
+    isLoading,
+    isPlaying,
+    positionMillis,
+    durationMillis,
+    togglePlayPause,
+  } = useAudioPlayback({
+    source,
+    autoPlay: true,
+    progressUpdateIntervalMillis: 500,
+  });
+  const currentSound = soundRef.current;
+
+  const orbScale = binauralEnabled
+    ? 1 + intensityIndex * 0.015 + (isPlaying ? 0.02 : 0)
+    : 0.96;
+  const playbackVolume = binauralEnabled
+    ? intensityVolumes[intensityIndex]
+    : Math.max(0.25, intensityVolumes[intensityIndex] * 0.7);
+
+  const progress = Math.min(positionMillis / durationMillis, 1);
+  const timerLabel =
+    timerOptions[timerIndex] === null ? "OFF" : `${timerOptions[timerIndex]} MIN`;
+  const intensityLabel = ["LOW", "MID", "HIGH"][intensityIndex];
+
+  useEffect(() => {
+    navigation.setOptions({ headerShown: false });
+  }, [navigation]);
+
+  const handleBack = () => {
+    router.back();
+  };
+
+  const cycleTimer = () => {
+    setTimerIndex((current) => (current + 1) % timerOptions.length);
+  };
+
+  const cycleIntensity = () => {
+    setIntensityIndex((current) => (current + 1) % 3);
+  };
+
+  useEffect(() => {
+    if (!currentSound || isLoading) return;
+
+    void currentSound.setVolumeAsync(playbackVolume);
+  }, [currentSound, isLoading, playbackVolume]);
+
+  useEffect(() => {
+    const selectedMinutes = timerOptions[timerIndex];
+    if (!selectedMinutes) return undefined;
+
+    const timeout = setTimeout(() => {
+      if (currentSound) {
+        void currentSound.stopAsync();
+      }
+      setTimerIndex(0);
+    }, selectedMinutes * 60 * 1000);
+
+    return () => clearTimeout(timeout);
+  }, [currentSound, timerIndex]);
+
+  return (
+    <ScreenView
+      bgColor={theme.background}
+      padding={0}
+      useSafeTop={false}
+      style={styles.screen}
+    >
+      <LinearGradient
+        colors={[
+          "#0A0C09",
+          theme.background,
+          "rgba(39, 46, 31, 0.94)",
+        ]}
+        style={StyleSheet.absoluteFill}
+      />
+      <View style={styles.vignetteTop} />
+      <View style={styles.vignetteBottom} />
+
+      <View style={styles.root}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={[
+            styles.scrollContent,
+            {
+              paddingTop: insets.top + (isCompactLayout ? spacing.sm : spacing.md),
+              paddingBottom:
+                insets.bottom + spacing.lg + (isCompactLayout ? spacing.md : spacing.xl),
+            },
+          ]}
+        >
+          <View style={styles.topBar}>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Back"
+              onPress={handleBack}
+              style={({ pressed }) => [
+                styles.backButton,
+                pressed && styles.buttonPressed,
+              ]}
+            >
+              <Ionicons name="arrow-back" size={20} color={theme.textPrimary} />
+            </Pressable>
+
+            <Text style={styles.topLabel} numberOfLines={1}>
+              NOW PLAYING
+            </Text>
+
+            <View style={styles.topSpacer} />
+          </View>
+
+          <View style={styles.titleBlock}>
+            <Text style={styles.kicker}>SVA LABORATORY SOUNDSCAPE</Text>
+            <Text style={styles.title} numberOfLines={2}>
+              {soundscape.title}
+            </Text>
+            <Text style={styles.subtitle} numberOfLines={1}>
+              {subtitle}
+            </Text>
+          </View>
+
+          <View style={styles.orbStage}>
+            <View
+              pointerEvents="none"
+              style={[
+                styles.orbGlow,
+                {
+                  transform: [
+                    {
+                      scale: orbScale,
+                    },
+                  ],
+                  opacity: binauralEnabled ? 1 : 0.78,
+                },
+              ]}
+            >
+              <View style={styles.orbOuterRing} />
+              <View style={styles.orbMidRing} />
+              <View style={styles.orbInnerRing} />
+              <View style={styles.orbCoreGlow} />
+              <View style={styles.orbCore} />
+              <View style={styles.orbCoreHalo} />
+            </View>
+
+            {isLoading ? (
+              <View style={styles.loadingPill}>
+                <Ionicons
+                  name="musical-notes"
+                  size={14}
+                  color={theme.buttonPrimaryText}
+                />
+                <Text style={styles.loadingText}>Preparing soundscape</Text>
+              </View>
+            ) : null}
+          </View>
+
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Toggle binaural entrainment"
+            onPress={() => setBinauralEnabled((value) => !value)}
+            style={({ pressed }) => [
+              styles.entrainmentRow,
+              pressed && styles.buttonPressed,
+            ]}
+          >
+            <Text style={styles.entrainmentLabel}>BINAURAL ENTRAINMENT</Text>
+            <View
+              style={[
+                styles.toggleTrack,
+                binauralEnabled && styles.toggleTrackActive,
+              ]}
+            >
+              <View
+                style={[
+                  styles.toggleThumb,
+                  binauralEnabled && styles.toggleThumbActive,
+                ]}
+              />
+            </View>
+          </Pressable>
+
+          <View style={styles.transportRow}>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={`Sleep timer ${timerLabel}`}
+              onPress={cycleTimer}
+              style={({ pressed }) => [
+                styles.sideControl,
+                pressed && styles.buttonPressed,
+                timerIndex > 0 && styles.sideControlActive,
+              ]}
+            >
+              <Ionicons
+                name="timer-outline"
+                size={22}
+                color={timerIndex > 0 ? theme.textPrimary : theme.textSecondary}
+              />
+              <Text
+                style={[
+                  styles.sideControlLabel,
+                  timerIndex > 0 && styles.sideControlLabelActive,
+                ]}
+                numberOfLines={1}
+              >
+                TIMER
+              </Text>
+            </Pressable>
+
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={isPlaying ? "Pause soundscape" : "Play soundscape"}
+              disabled={isLoading}
+              onPress={() => void togglePlayPause()}
+              style={({ pressed }) => [
+                styles.playControl,
+                pressed && !isLoading && styles.playControlPressed,
+                isPlaying && styles.playControlActive,
+                isLoading && styles.playControlDisabled,
+              ]}
+            >
+              <Ionicons
+                name={isPlaying ? "pause" : "play"}
+                size={34}
+                color={theme.background}
+              />
+            </Pressable>
+
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={`Intensity ${intensityLabel}`}
+              onPress={cycleIntensity}
+              style={({ pressed }) => [
+                styles.sideControl,
+                pressed && styles.buttonPressed,
+                intensityIndex > 0 && styles.sideControlActive,
+              ]}
+            >
+              <Ionicons
+                name="bar-chart-outline"
+                size={22}
+                color={intensityIndex > 0 ? theme.textPrimary : theme.textSecondary}
+              />
+              <Text
+                style={[
+                  styles.sideControlLabel,
+                  intensityIndex > 0 && styles.sideControlLabelActive,
+                ]}
+                numberOfLines={1}
+              >
+                INTENSITY
+              </Text>
+            </Pressable>
+          </View>
+
+          <View style={styles.progressBlock}>
+            <View style={styles.progressMetaRow}>
+              <Text style={styles.progressMeta}>0.0 HZ</Text>
+              <Text style={styles.progressMeta}>{resonanceLabel}</Text>
+              <Text style={styles.progressMeta}>24.0 KHZ</Text>
+            </View>
+
+            <View style={styles.progressTrack}>
+              <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
+              <View
+                style={[
+                  styles.progressDot,
+                  { left: `${Math.max(progress * 100 - 1.2, 1.2)}%` },
+                ]}
+              />
+            </View>
+
+            <View style={styles.timeRow}>
+              <Text style={styles.timeText}>
+                {formatPlaybackTime(positionMillis)}
+              </Text>
+              <Text style={styles.timeText}>
+                {formatPlaybackRemaining(positionMillis, durationMillis)}
+              </Text>
+            </View>
+          </View>
+        </ScrollView>
+      </View>
+    </ScreenView>
+  );
+}
+
+const styling = (
+  theme: ColorSet,
+  svaTypography: TypographyTokens | undefined,
+  spacing: Spacing,
+  typography: Typography,
+  isCompactLayout: boolean
+) =>
+  StyleSheet.create({
+    screen: {
+      flex: 1,
+      paddingHorizontal: 0,
+    },
+    vignetteTop: {
+      position: "absolute",
+      top: -100,
+      left: -40,
+      width: 260,
+      height: 260,
+      borderRadius: 130,
+      backgroundColor: "rgba(163,190,140,0.08)",
+    },
+    vignetteBottom: {
+      position: "absolute",
+      bottom: -120,
+      right: -60,
+      width: 300,
+      height: 300,
+      borderRadius: 150,
+      backgroundColor: "rgba(255,255,255,0.04)",
+    },
+    root: {
+      flex: 1,
+    },
+    scrollContent: {
+      flexGrow: 1,
+      paddingHorizontal: spacing.md,
+      justifyContent: "space-between",
+    },
+    topBar: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: spacing.sm,
+    },
+    backButton: {
+      width: 42,
+      height: 42,
+      borderRadius: 14,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: theme.surfaceMuted,
+      borderWidth: 1,
+      borderColor: theme.borderMuted ?? "rgba(255,255,255,0.05)",
+    },
+    topLabel: {
+      flex: 1,
+      textAlign: "center",
+      fontFamily:
+        svaTypography?.textStyle.authTinyLabel.fontFamily ??
+        "Inter_600SemiBold",
+      fontSize: 10,
+      lineHeight: 14,
+      letterSpacing: 2.4,
+      color: theme.textSecondary,
+      textTransform: "uppercase",
+    },
+    topSpacer: {
+      width: 42,
+      height: 42,
+    },
+    titleBlock: {
+      alignItems: "center",
+      paddingTop: isCompactLayout ? spacing.md : spacing.lg,
+      paddingHorizontal: spacing.lg,
+    },
+    kicker: {
+      fontFamily:
+        svaTypography?.textStyle.authTinyLabel.fontFamily ??
+        "Inter_600SemiBold",
+      fontSize: 10,
+      lineHeight: 14,
+      letterSpacing: 2.6,
+      color: theme.textSecondary,
+      textTransform: "uppercase",
+      marginBottom: 10,
+    },
+    title: {
+      fontFamily:
+        svaTypography?.textStyle.displayMedium.fontFamily ??
+        "CormorantGaramond_500Medium",
+      fontSize: isCompactLayout ? 32 : 36,
+      lineHeight: isCompactLayout ? 34 : 38,
+      letterSpacing: -0.45,
+      color: theme.textPrimary,
+      textAlign: "center",
+    },
+    subtitle: {
+      ...typography.caption,
+      color: theme.textSecondary,
+      marginTop: 8,
+      letterSpacing: 0.8,
+      textAlign: "center",
+    },
+    orbStage: {
+      alignItems: "center",
+      justifyContent: "center",
+      minHeight: isCompactLayout ? 260 : 300,
+      marginTop: isCompactLayout ? spacing.sm : spacing.md,
+      marginBottom: isCompactLayout ? spacing.sm : spacing.md,
+    },
+    orbGlow: {
+      width: isCompactLayout ? 236 : 260,
+      height: isCompactLayout ? 236 : 260,
+      borderRadius: isCompactLayout ? 118 : 130,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    orbOuterRing: {
+      position: "absolute",
+      width: isCompactLayout ? 236 : 260,
+      height: isCompactLayout ? 236 : 260,
+      borderRadius: isCompactLayout ? 118 : 130,
+      backgroundColor: "rgba(10,13,10,0.88)",
+      borderWidth: 1,
+      borderColor: "rgba(255,255,255,0.02)",
+      shadowColor: theme.shadow,
+      shadowOpacity: 0.32,
+      shadowRadius: 26,
+      shadowOffset: { width: 0, height: 16 },
+      elevation: 8,
+    },
+    orbMidRing: {
+      position: "absolute",
+      width: isCompactLayout ? 172 : 190,
+      height: isCompactLayout ? 172 : 190,
+      borderRadius: isCompactLayout ? 86 : 95,
+      backgroundColor: "rgba(163,190,140,0.08)",
+      borderWidth: 1,
+      borderColor: "rgba(163,190,140,0.12)",
+    },
+    orbInnerRing: {
+      position: "absolute",
+      width: isCompactLayout ? 120 : 132,
+      height: isCompactLayout ? 120 : 132,
+      borderRadius: isCompactLayout ? 60 : 66,
+      backgroundColor: "rgba(163,190,140,0.15)",
+      borderWidth: 1,
+      borderColor: "rgba(163,190,140,0.18)",
+    },
+    orbCoreGlow: {
+      position: "absolute",
+      width: isCompactLayout ? 82 : 92,
+      height: isCompactLayout ? 82 : 92,
+      borderRadius: isCompactLayout ? 41 : 46,
+      backgroundColor: "rgba(232,94,82,0.28)",
+    },
+    orbCore: {
+      position: "absolute",
+      width: isCompactLayout ? 64 : 72,
+      height: isCompactLayout ? 64 : 72,
+      borderRadius: isCompactLayout ? 32 : 36,
+      backgroundColor: "rgba(197,84,69,0.88)",
+      shadowColor: "#C65D4A",
+      shadowOpacity: 0.32,
+      shadowRadius: 16,
+      shadowOffset: { width: 0, height: 8 },
+      elevation: 5,
+    },
+    orbCoreHalo: {
+      position: "absolute",
+      width: isCompactLayout ? 126 : 140,
+      height: isCompactLayout ? 126 : 140,
+      borderRadius: isCompactLayout ? 63 : 70,
+      borderWidth: 1,
+      borderColor: "rgba(163,190,140,0.1)",
+      backgroundColor: "rgba(163,190,140,0.02)",
+    },
+    loadingPill: {
+      position: "absolute",
+      bottom: 16,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      paddingHorizontal: 14,
+      paddingVertical: 8,
+      borderRadius: 999,
+      backgroundColor: "rgba(255,255,255,0.04)",
+      borderWidth: 1,
+      borderColor: "rgba(255,255,255,0.08)",
+    },
+    loadingText: {
+      ...typography.smallCaption,
+      color: theme.textPrimary,
+      letterSpacing: 0.9,
+    },
+    entrainmentRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: spacing.md,
+      marginTop: isCompactLayout ? spacing.xs : spacing.sm,
+    },
+    entrainmentLabel: {
+      fontFamily:
+        svaTypography?.textStyle.authTinyLabel.fontFamily ??
+        "Inter_600SemiBold",
+      fontSize: 10,
+      lineHeight: 14,
+      letterSpacing: 2.4,
+      color: theme.accent,
+      textTransform: "uppercase",
+    },
+    toggleTrack: {
+      width: 42,
+      height: 24,
+      borderRadius: 999,
+      backgroundColor: "rgba(255,255,255,0.06)",
+      borderWidth: 1,
+      borderColor: "rgba(255,255,255,0.08)",
+      padding: 2,
+      justifyContent: "center",
+    },
+    toggleTrackActive: {
+      backgroundColor: "rgba(163,190,140,0.18)",
+      borderColor: "rgba(163,190,140,0.22)",
+    },
+    toggleThumb: {
+      width: 18,
+      height: 18,
+      borderRadius: 9,
+      backgroundColor: theme.textSecondary,
+      transform: [{ translateX: 0 }],
+    },
+    toggleThumbActive: {
+      backgroundColor: theme.buttonPrimaryText,
+      transform: [{ translateX: 18 }],
+    },
+    transportRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: spacing.md,
+      marginTop: isCompactLayout ? spacing.lg : spacing.xl,
+    },
+    sideControl: {
+      width: isCompactLayout ? 82 : 88,
+      minHeight: isCompactLayout ? 80 : 86,
+      borderRadius: isCompactLayout ? 22 : 24,
+      backgroundColor: theme.surfaceMuted,
+      borderWidth: 1,
+      borderColor: theme.borderMuted ?? "rgba(255,255,255,0.05)",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 6,
+    },
+    sideControlActive: {
+      backgroundColor: "rgba(163,190,140,0.12)",
+      borderColor: "rgba(163,190,140,0.2)",
+    },
+    sideControlLabel: {
+      ...typography.smallCaption,
+      color: theme.textSecondary,
+      letterSpacing: 1.1,
+    },
+    sideControlLabelActive: {
+      color: theme.textPrimary,
+    },
+    playControl: {
+      width: isCompactLayout ? 88 : 94,
+      height: isCompactLayout ? 88 : 94,
+      borderRadius: isCompactLayout ? 44 : 47,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: theme.accent,
+      borderWidth: 1,
+      borderColor: theme.accent,
+      shadowColor: theme.shadow,
+      shadowOpacity: 0.32,
+      shadowRadius: 16,
+      shadowOffset: { width: 0, height: 10 },
+      elevation: 8,
+    },
+    playControlActive: {
+      backgroundColor: theme.accentPressed,
+    },
+    playControlPressed: {
+      transform: [{ scale: 0.98 }],
+    },
+    playControlDisabled: {
+      opacity: 0.7,
+    },
+    progressBlock: {
+      marginTop: isCompactLayout ? spacing.lg : spacing.xl,
+    },
+    progressMetaRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: spacing.sm,
+      marginBottom: isCompactLayout ? 8 : 10,
+    },
+    progressMeta: {
+      ...typography.smallCaption,
+      color: theme.textSecondary,
+      letterSpacing: 1,
+    },
+    progressTrack: {
+      height: 4,
+      borderRadius: 999,
+      backgroundColor: "rgba(255,255,255,0.08)",
+      overflow: "hidden",
+      justifyContent: "center",
+    },
+    progressFill: {
+      height: "100%",
+      borderRadius: 999,
+      backgroundColor: theme.accent,
+    },
+    progressDot: {
+      position: "absolute",
+      top: -3,
+      width: 10,
+      height: 10,
+      borderRadius: 5,
+      backgroundColor: theme.accent,
+      shadowColor: theme.accent,
+      shadowOpacity: 0.5,
+      shadowRadius: 6,
+      shadowOffset: { width: 0, height: 0 },
+      elevation: 4,
+    },
+    timeRow: {
+      marginTop: isCompactLayout ? 6 : 8,
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
+    timeText: {
+      ...typography.caption,
+      color: theme.textSecondary,
+      letterSpacing: 0.8,
+    },
+  });
