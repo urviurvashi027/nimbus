@@ -32,6 +32,7 @@ import SoundscapePinterestSkeleton from "@/features/self-care/components/soundsc
 import type { Spacing, SvaColorSet, TypographyTokens } from "@/theme/types";
 
 const FAVORITES_KEY = "soundscape_favorites_v1";
+const FAVORITES_FILTER_VALUE = "favorites";
 const FALLBACK_IMAGE = require("@/assets/images/mt.jpg");
 const FALLBACK_SOURCE = require("@/assets/dump/lightRain.mp3");
 
@@ -260,7 +261,6 @@ export const SoundscapeScreen = () => {
     null
   );
   const [selectedFilter, setSelectedFilter] = useState("all");
-  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const seededFavoritesRef = useRef(false);
   const isMountedRef = useRef(true);
@@ -388,10 +388,13 @@ export const SoundscapeScreen = () => {
 
   const filterOptions = useMemo(() => {
     const filters = tracks.flatMap((track) => track.filterTags);
-    const uniqueFilters = uniqueStrings(filters);
+    const uniqueFilters = uniqueStrings(filters).filter(
+      (label) => normalizeKey(label) !== FAVORITES_FILTER_VALUE
+    );
 
     return [
       { label: "All", value: "all" },
+      { label: "Favorites", value: FAVORITES_FILTER_VALUE },
       ...uniqueFilters.slice(0, 8).map((label) => ({
         label,
         value: label,
@@ -399,18 +402,21 @@ export const SoundscapeScreen = () => {
     ];
   }, [tracks]);
 
+  const showFavoritesOnly = selectedFilter === FAVORITES_FILTER_VALUE;
+
   const filteredTracks = useMemo(() => {
     const selectedKey = normalizeKey(selectedFilter);
 
     return tracks.filter((track) => {
       const matchesFilter =
         selectedFilter === "all" ||
+        selectedFilter === FAVORITES_FILTER_VALUE ||
         track.filterTags.some((tag) => normalizeKey(tag) === selectedKey);
       const matchesFavorites = !showFavoritesOnly || favoriteSet.has(track.id);
 
       return matchesFilter && matchesFavorites;
     });
-  }, [tracks, selectedFilter, showFavoritesOnly, favoriteSet]);
+  }, [tracks, selectedFilter, favoriteSet, showFavoritesOnly]);
 
   useEffect(() => {
     if (
@@ -498,26 +504,26 @@ export const SoundscapeScreen = () => {
   }, []);
 
   const handleBack = useCallback(() => {
-    if (showFavoritesOnly) {
-      setShowFavoritesOnly(false);
+    if (selectedFilter === FAVORITES_FILTER_VALUE) {
+      setSelectedFilter("all");
       return;
     }
 
     navigation.goBack();
-  }, [navigation, showFavoritesOnly]);
+  }, [navigation, selectedFilter]);
 
   const headerTitle = "Acoustic Formulas";
-  const headerSubtitle = showFavoritesOnly
+  const headerSubtitle = selectedFilter === FAVORITES_FILTER_VALUE
     ? "A private stack of saved soundscapes."
     : FAVORITES_SUBTITLE;
 
-  const emptyTitle = showFavoritesOnly
+  const emptyTitle = selectedFilter === FAVORITES_FILTER_VALUE
     ? "No favorites yet."
     : selectedFilter === "all"
     ? "No soundscapes found."
     : "No soundscapes in this filter.";
-  const emptySubtitle = showFavoritesOnly
-    ? "Tap the heart on any card to save it here."
+  const emptySubtitle = selectedFilter === FAVORITES_FILTER_VALUE
+    ? "Tap the favorites tag on any card to save it here."
     : selectedFilter === "all"
     ? "Try again in a moment or revisit the library later."
     : "Try a different tag or clear the filter row.";
@@ -530,16 +536,6 @@ export const SoundscapeScreen = () => {
             title={headerTitle}
             subtitle={headerSubtitle}
             onBack={handleBack}
-            rightActions={[
-              {
-                icon: showFavoritesOnly ? "heart" : "heart-outline",
-                accessibilityLabel: showFavoritesOnly
-                  ? "Show all soundscapes"
-                  : "Show favorites",
-                onPress: () => setShowFavoritesOnly((value) => !value),
-                badge: favoriteIds.length > 0,
-              },
-            ]}
             titleStyle={styles.headerTitle}
             subtitleStyle={styles.headerSubtitle}
             containerStyle={styles.header}
@@ -558,16 +554,6 @@ export const SoundscapeScreen = () => {
           title={headerTitle}
           subtitle={headerSubtitle}
           onBack={handleBack}
-          rightActions={[
-            {
-              icon: showFavoritesOnly ? "heart" : "heart-outline",
-              accessibilityLabel: showFavoritesOnly
-                ? "Show all soundscapes"
-                : "Show favorites",
-              onPress: () => setShowFavoritesOnly((value) => !value),
-              badge: !showFavoritesOnly && favoriteIds.length > 0,
-            },
-          ]}
           titleStyle={styles.headerTitle}
           subtitleStyle={styles.headerSubtitle}
           containerStyle={styles.header}
@@ -615,20 +601,32 @@ export const SoundscapeScreen = () => {
                 }
                 onPress={() => handleToggleFavorite(item.id)}
                 style={({ pressed }) => [
-                  styles.favoriteButton,
-                  favoriteSet.has(item.id) && styles.favoriteButtonActive,
-                  pressed && styles.favoriteButtonPressed,
+                  styles.favoriteTag,
+                  favoriteSet.has(item.id) && styles.favoriteTagActive,
+                  pressed && styles.favoriteTagPressed,
                 ]}
               >
                 <Ionicons
-                  name={favoriteSet.has(item.id) ? "heart" : "heart-outline"}
-                  size={16}
+                  name={favoriteSet.has(item.id) ? "bookmark" : "bookmark-outline"}
+                  size={13}
                   color={
                     favoriteSet.has(item.id)
                       ? svaColors.brand.primary
                       : svaColors.text.primary
                   }
                 />
+                <Text
+                  style={[
+                    styles.favoriteTagText,
+                    {
+                      color: favoriteSet.has(item.id)
+                        ? svaColors.brand.primary
+                        : svaColors.text.primary,
+                    },
+                  ]}
+                >
+                  {favoriteSet.has(item.id) ? "Saved" : "Favorite"}
+                </Text>
               </Pressable>
             </View>
           )}
@@ -724,27 +722,35 @@ const styling = (
     cardCell: {
       width: "100%",
     },
-    favoriteButton: {
+    favoriteTag: {
       position: "absolute",
       top: 12,
       right: 12,
-      width: 32,
-      height: 32,
-      borderRadius: 16,
+      flexDirection: "row",
       alignItems: "center",
-      justifyContent: "center",
-      backgroundColor: "rgba(12, 14, 11, 0.82)",
+      gap: 6,
+      paddingHorizontal: 10,
+      paddingVertical: 7,
+      borderRadius: 999,
+      backgroundColor: "rgba(12, 14, 11, 0.88)",
       borderWidth: 1,
       borderColor: "rgba(255, 255, 255, 0.08)",
       zIndex: 2,
     },
-    favoriteButtonActive: {
+    favoriteTagActive: {
       backgroundColor: "rgba(163, 190, 140, 0.18)",
       borderColor: "rgba(163, 190, 140, 0.3)",
     },
-    favoriteButtonPressed: {
+    favoriteTagPressed: {
       transform: [{ scale: 0.96 }],
       opacity: 0.92,
+    },
+    favoriteTagText: {
+      ...(typography?.textStyle?.authTinyLabel ?? {}),
+      fontSize: 9.5,
+      lineHeight: 12,
+      letterSpacing: 1.1,
+      textTransform: "uppercase",
     },
     emptyState: {
       alignItems: "center",

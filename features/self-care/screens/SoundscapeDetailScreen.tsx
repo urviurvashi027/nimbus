@@ -143,7 +143,7 @@ export default function SoundscapeDetailScreen() {
           onBack={handleBack}
           rightActions={[
             {
-              icon: isFavorite ? "heart" : "heart-outline",
+              icon: isFavorite ? "bookmark" : "bookmark-outline",
               accessibilityLabel: isFavorite
                 ? "Remove from favorites"
                 : "Add to favorites",

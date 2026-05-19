@@ -29,6 +29,7 @@ type Props = {
   loading?: boolean;
   style?: StyleProp<ViewStyle>;
   labelStyle?: StyleProp<TextStyle>;
+  testID?: string;
 };
 
 const StyledButton: React.FC<Props> = ({
@@ -41,6 +42,7 @@ const StyledButton: React.FC<Props> = ({
   loading = false,
   style,
   labelStyle,
+  testID,
 }) => {
   const { newTheme } = useContext(ThemeContext);
   const styles = getStyles(newTheme);
@@ -97,6 +99,7 @@ const StyledButton: React.FC<Props> = ({
     <Pressable
       disabled={isDisabled}
       onPress={isDisabled ? undefined : onPress}
+      testID={testID}
       style={({ pressed }) => [
         baseStyle,
         containerVariant,

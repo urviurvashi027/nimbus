@@ -17,6 +17,7 @@ import ThemeContext from "@/contexts/ThemeContext";
 import { ROUTES } from "@/constants/routes";
 import AppHeader from "@/components/layout/AppHeader";
 import { ScreenView } from "@/components/ui/theme-components/ScreenView";
+import type { ColorSet, Spacing } from "@/theme/types";
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>["name"];
 
@@ -32,6 +33,12 @@ type SectionConfig = {
   title: string;
   chipIcon: IconName;
   actions: ActionTile[];
+};
+
+type SelfCareFonts = {
+  serif: string;
+  mono: string;
+  action: string;
 };
 
 const SECTION_DATA: SectionConfig[] = [
@@ -50,6 +57,16 @@ const SECTION_DATA: SectionConfig[] = [
         icon: "meditation",
         route: ROUTES.AUTH.SELF_CARE_MEDITATION,
         navigationMode: "navigate",
+      },
+      {
+        label: "Affirmation",
+        icon: "cards-heart-outline",
+        route: ROUTES.AUTH.SELF_CARE_AFFIRMATION,
+      },
+      {
+        label: "Breath Work",
+        icon: "weather-windy",
+        route: ROUTES.AUTH.SELF_CARE_BREATHWORK,
       },
     ],
   },
@@ -267,14 +284,10 @@ export default function SelfCare() {
 }
 
 const makeStyles = (
-  theme: any,
-  spacing: any,
+  theme: ColorSet,
+  spacing: Spacing,
   ringSize: number,
-  fonts: {
-    serif: string;
-    mono: string;
-    action: string;
-  }
+  fonts: SelfCareFonts
 ) =>
   StyleSheet.create({
     root: {
@@ -401,10 +414,12 @@ const makeStyles = (
     },
     actionRow: {
       flexDirection: "row",
+      flexWrap: "wrap",
+      justifyContent: "space-between",
     },
     actionTile: {
-      flex: 1,
-      minHeight: 86,
+      width: "48%",
+      minHeight: 92,
       borderRadius: 18,
       alignItems: "center",
       justifyContent: "center",
@@ -413,6 +428,7 @@ const makeStyles = (
       backgroundColor: theme.surfaceMuted,
       borderWidth: 1,
       borderColor: theme.borderMuted ?? "rgba(255,255,255,0.05)",
+      marginBottom: spacing.sm,
     },
     actionTilePressed: {
       backgroundColor: theme.surface,
