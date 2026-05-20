@@ -6,7 +6,6 @@ import {
   Text,
   View,
   Platform,
-  useWindowDimensions,
 } from "react-native";
 import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -21,99 +20,66 @@ import type { ColorSet, Spacing } from "@/theme/types";
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>["name"];
 
-type ActionTile = {
+type ToolAction = {
+  levelLabel: string;
   label: string;
   icon: IconName;
   route: string;
-  navigationMode?: "push" | "navigate";
 };
 
-type SectionConfig = {
+type ToolSection = {
   eyebrow: string;
   title: string;
   chipIcon: IconName;
-  actions: ActionTile[];
+  actions: ToolAction[];
 };
 
-type SelfCareFonts = {
+type ToolFonts = {
   serif: string;
   mono: string;
   action: string;
 };
 
-const SECTION_DATA: SectionConfig[] = [
-  {
-    eyebrow: "Cognitive Core",
-    title: "Mind",
-    chipIcon: "brain",
-    actions: [
-      {
-        label: "Journaling",
-        icon: "book-edit-outline",
-        route: ROUTES.AUTH.SELF_CARE_JOURNALING,
-      },
-      {
-        label: "Meditation",
-        icon: "meditation",
-        route: ROUTES.AUTH.SELF_CARE_MEDITATION,
-        navigationMode: "navigate",
-      },
-      {
-        label: "Affirmation",
-        icon: "cards-heart-outline",
-        route: ROUTES.AUTH.SELF_CARE_AFFIRMATION,
-      },
-      {
-        label: "Breath Work",
-        icon: "weather-windy",
-        route: ROUTES.AUTH.SELF_CARE_BREATHWORK,
-      },
-    ],
-  },
-  {
-    eyebrow: "Physical Vitality",
-    title: "Body",
-    chipIcon: "dumbbell",
-    actions: [
-      {
-        label: "Vitals",
-        icon: "heart-pulse",
-        route: ROUTES.AUTH.SELF_CARE_VITALS,
-      },
-      {
-        label: "Workout Progress",
-        icon: "dumbbell",
-        route: ROUTES.AUTH.SELF_CARE_WORKOUT,
-      },
-    ],
-  },
-  {
-    eyebrow: "Inner Resonance",
-    title: "Soul",
-    chipIcon: "star-four-points-outline",
-    actions: [
-      {
-        label: "Scribble",
-        icon: "pencil-outline",
-        route: ROUTES.AUTH.TOOLS_SCRIBBLE_LIST,
-      },
-      {
-        label: "Soundscape",
-        icon: "music-circle-outline",
-        route: ROUTES.AUTH.SELF_CARE_SOUNDSCAPE,
-      },
-    ],
-  },
-];
+const TOOL_SECTION: ToolSection = {
+  eyebrow: "Blueprint Library",
+  title: "Workbench",
+  chipIcon: "toolbox-outline",
+  actions: [
+    {
+      levelLabel: "SVA LEVEL 01",
+      label: "Protocol Template",
+      icon: "clipboard-text-outline",
+      route: ROUTES.AUTH.TOOLS_CURATED_MANIFESTS,
+    },
+    {
+      levelLabel: "SVA LEVEL 02",
+      label: "Articles",
+      icon: "newspaper-variant-outline",
+      route: ROUTES.AUTH.TOOLS_ARTICLE_LIST,
+    },
+    {
+      levelLabel: "SVA LEVEL 03",
+      label: "Recipe",
+      icon: "silverware-fork-knife",
+      route: ROUTES.AUTH.TOOLS_RECIPE,
+    },
+    {
+      levelLabel: "SVA LEVEL 04",
+      label: "Meal Planner",
+      icon: "calendar-heart",
+      route: ROUTES.AUTH.TOOLS_MEAL_PLANNER,
+    },
+  ],
+};
 
-const SelfCareActionTile = ({
+const ToolActionTile = ({
   action,
   onPress,
   iconColor,
   styles,
 }: {
-  action: ActionTile;
-  onPress: (route: string, mode?: "push" | "navigate") => void;
+  action: ToolAction;
+  onPress: (route: string) => void;
   iconColor: string;
   styles: ReturnType<typeof makeStyles>;
 }) => {
@@ -121,12 +87,18 @@ const SelfCareActionTile = ({
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={action.label}
-      onPress={() => onPress(action.route, action.navigationMode)}
+      onPress={() => onPress(action.route)}
       style={({ pressed }) => [
         styles.actionTile,
         pressed && styles.actionTilePressed,
       ]}
     >
+      <View style={styles.actionEyebrowWrap}>
+        <Text style={styles.actionEyebrow} numberOfLines={1}>
+          {action.levelLabel}
+        </Text>
+      </View>
+
       <View style={styles.actionIconWrap}>
         <MaterialCommunityIcons
           name={action.icon}
@@ -134,6 +106,7 @@ const SelfCareActionTile = ({
           color={iconColor}
         />
       </View>
+
       <Text style={styles.actionLabel} numberOfLines={2}>
         {action.label}
       </Text>
@@ -141,14 +114,14 @@ const SelfCareActionTile = ({
   );
 };
 
-const SelfCareSectionCard = ({
+const ToolSectionCard = ({
   section,
   onPress,
   chipIconColor,
   styles,
 }: {
-  section: SectionConfig;
-  onPress: (route: string, mode?: "push" | "navigate") => void;
+  section: ToolSection;
+  onPress: (route: string) => void;
   chipIconColor: string;
   styles: ReturnType<typeof makeStyles>;
 }) => {
@@ -176,7 +149,7 @@ const SelfCareSectionCard = ({
 
         <View style={styles.actionRow}>
           {section.actions.map((action) => (
-            <SelfCareActionTile
+            <ToolActionTile
               key={action.label}
               action={action}
               onPress={onPress}
@@ -190,17 +163,12 @@ const SelfCareSectionCard = ({
   );
 };
 
-export default function SelfCare() {
+export default function ToolsLandingScreen() {
   const { newTheme: theme, svaTypography, spacing, typography } =
     useContext(ThemeContext);
-  const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
 
-  const ringSize = useMemo(() => {
-    return Math.min(220, Math.max(176, Math.round(width * 0.58)));
-  }, [width]);
-
-  const fontFamilies = useMemo(
+  const fonts = useMemo<ToolFonts>(
     () => ({
       serif:
         svaTypography?.textStyle.authTitle.fontFamily ??
@@ -213,16 +181,12 @@ export default function SelfCare() {
   );
 
   const styles = useMemo(
-    () => makeStyles(theme, spacing, ringSize, fontFamilies),
-    [theme, spacing, ringSize, fontFamilies]
+    () => makeStyles(theme, spacing, fonts),
+    [theme, spacing, fonts]
   );
+  const contentBottomPadding = insets.bottom + spacing.xl * 2.5;
 
-  const onRoutePress = (route: string, mode: "push" | "navigate" = "push") => {
-    if (mode === "navigate") {
-      router.navigate(route as never);
-      return;
-    }
-
+  const onRoutePress = (route: string) => {
     router.push(route as never);
   };
 
@@ -232,8 +196,7 @@ export default function SelfCare() {
 
       <View style={styles.root}>
         <AppHeader
-          title="Sattva Sanctuary"
-          subtitle="A quiet orbit for mind, body, soul."
+          title="Tools"
           rightAction={{
             icon: "settings-outline",
             accessibilityLabel: "Open settings",
@@ -246,36 +209,16 @@ export default function SelfCare() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={[
             styles.scrollContent,
-            { paddingBottom: insets.bottom + 154 },
+            { paddingBottom: contentBottomPadding },
           ]}
         >
-          <View style={styles.heroBlock}>
-            <View style={styles.ringStage}>
-              <View style={styles.scoreRing}>
-                <View style={styles.scoreRingInner}>
-                  <Text style={styles.scoreNumber}>84</Text>
-                </View>
-              </View>
-            </View>
-
-            <Text style={styles.heroTitle} numberOfLines={1}>
-              Sattva Level
-            </Text>
-            <Text style={styles.heroSubtitle} numberOfLines={1}>
-              OPTIMIZED STATE • HIGH COHERENCE
-            </Text>
-          </View>
-
           <View style={styles.sectionStack}>
-            {SECTION_DATA.map((section) => (
-              <SelfCareSectionCard
-                key={section.title}
-                section={section}
-                onPress={onRoutePress}
-                chipIconColor={theme.accent}
-                styles={styles}
-              />
-            ))}
+            <ToolSectionCard
+              section={TOOL_SECTION}
+              onPress={onRoutePress}
+              chipIconColor={theme.accent}
+              styles={styles}
+            />
           </View>
         </ScrollView>
       </View>
@@ -286,8 +229,7 @@ export default function SelfCare() {
 const makeStyles = (
   theme: ColorSet,
   spacing: Spacing,
-  ringSize: number,
-  fonts: SelfCareFonts
+  fonts: ToolFonts
 ) =>
   StyleSheet.create({
     root: {
@@ -306,59 +248,8 @@ const makeStyles = (
     scrollContent: {
       paddingTop: spacing.xs,
     },
-    heroBlock: {
-      alignItems: "center",
-      marginBottom: spacing.xl,
-    },
-    ringStage: {
-      alignItems: "center",
-      justifyContent: "center",
-      marginBottom: spacing.lg,
-    },
-    scoreRing: {
-      width: ringSize,
-      height: ringSize,
-      borderRadius: ringSize / 2,
-      alignItems: "center",
-      justifyContent: "center",
-      backgroundColor: theme.background,
-      borderWidth: 1.5,
-      borderColor: theme.accent,
-    },
-    scoreRingInner: {
-      flex: 1,
-      borderRadius: ringSize / 2 - 1.5,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    scoreNumber: {
-      fontFamily: fonts.serif,
-      fontSize: 60,
-      lineHeight: 62,
-      color: theme.accent,
-      letterSpacing: -1.2,
-    },
-    heroTitle: {
-      fontFamily: fonts.serif,
-      fontSize: 24,
-      lineHeight: 28,
-      color: theme.textPrimary,
-      textAlign: "center",
-    },
-    heroSubtitle: {
-      marginTop: 6,
-      fontFamily: fonts.mono,
-      fontSize: 10,
-      lineHeight: 14,
-      letterSpacing: 3.1,
-      color: theme.textSecondary,
-      textAlign: "center",
-      textTransform: "uppercase",
-      opacity: 0.92,
-    },
     sectionStack: {
       gap: spacing.md,
-      paddingBottom: spacing.md,
     },
     sectionCard: {
       borderRadius: 30,
@@ -419,7 +310,7 @@ const makeStyles = (
     },
     actionTile: {
       width: "48%",
-      minHeight: 92,
+      minHeight: 98,
       borderRadius: 18,
       alignItems: "center",
       justifyContent: "center",
@@ -435,9 +326,23 @@ const makeStyles = (
       borderColor: theme.accent,
       transform: [{ scale: 0.98 }],
     },
+    actionEyebrowWrap: {
+      width: "100%",
+      alignItems: "center",
+      marginBottom: 10,
+    },
+    actionEyebrow: {
+      fontFamily: fonts.mono,
+      fontSize: 9.3,
+      lineHeight: 12,
+      letterSpacing: 2.4,
+      textTransform: "uppercase",
+      color: theme.textSecondary,
+      opacity: 0.92,
+    },
     actionIconWrap: {
-      width: 28,
-      height: 28,
+      width: 30,
+      height: 30,
       borderRadius: 10,
       alignItems: "center",
       justifyContent: "center",
