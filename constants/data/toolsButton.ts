@@ -12,69 +12,30 @@ export type NavigationButtonType = {
 export const buttons: NavigationButtonType[] = [
   {
     id: 1,
-    label: "Rituals",
+    label: "Protocol Template",
     action: "navigate",
-    screen: ROUTES.AUTH.TOOLS_ROUTINE_TEMPLATE,
-    iconName: "calendar-check",
+    screen: ROUTES.AUTH.TOOLS_CURATED_MANIFESTS,
+    iconName: "clipboard-text-outline",
   },
-  //done
   {
     id: 2,
-    label: "Nourish",
-    action: "navigate",
-    screen: ROUTES.AUTH.TOOLS_RECIPE,
-    iconName: "silverware-fork-knife",
-  },
-  //done
-  {
-    id: 3,
-    label: "Nourish Plan",
-    action: "navigate",
-    screen: ROUTES.AUTH.TOOLS_MEAL_PLANNER,
-    iconName: "calendar-heart",
-  },
-  //done
-  {
-    id: 4,
-    label: "Insights",
+    label: "Articles",
     action: "navigate",
     screen: ROUTES.AUTH.TOOLS_ARTICLE_LIST,
     iconName: "newspaper-variant-outline",
   },
   {
-    id: 5,
-    label: "Energy",
+    id: 3,
+    label: "Recipe",
     action: "navigate",
-    screen: ROUTES.AUTH.TOOLS_CALORIE_CALC,
-    iconName: "fire",
+    screen: ROUTES.AUTH.TOOLS_RECIPE,
+    iconName: "silverware-fork-knife",
   },
   {
-    id: 6,
-    label: "Fuel",
+    id: 4,
+    label: "Meal Planner",
     action: "navigate",
-    screen: ROUTES.AUTH.TOOLS_PROTEIN_CALC,
-    iconName: "food-steak",
+    screen: ROUTES.AUTH.TOOLS_MEAL_PLANNER,
+    iconName: "calendar-heart",
   },
-  {
-    id: 7,
-    label: "Vitals",
-    action: "navigate",
-    screen: ROUTES.AUTH.TOOLS_BODY_SHAPE_CALC,
-    iconName: "tape-measure",
-  },
-  // done
-  {
-    id: 8,
-    label: "Scribble",
-    action: "navigate",
-    screen: ROUTES.AUTH.TOOLS_SCRIBBLE_LIST,
-    iconName: "pencil-outline",
-  },
-  // {
-  //   id: 8,
-  //   label: "Mindset",
-  //   action: "navigate",
-  //   screen: ROUTES.AUTH.TOOLS_AI_THERAPY,
-  //   iconName: "head-heart-outline",
-  // },
 ];
